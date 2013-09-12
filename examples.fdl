@@ -1,0 +1,314 @@
+// CLASS DECLARATIONS (lasts to EOF or next declaration)
+
+	every Architect is:
+		// Class declaration
+
+	every BadArchitect (an Architect) is:
+		// Subclass of BadArchictect
+
+	every CrappyArchitect (a CrappyEmployee) is:
+		// Subclass of BadArchictect
+
+	every MockArchitect (a capable Architect) is:
+		// use Architect as an interface
+
+	every MockNotifiableArchitect (a capable Architect, a capable Notifiable) is:
+		// use Architect and Notifiable as an interface
+
+	every NotifiableLocalizedArchitect (an Architect, a capable Notifiable, a capable Localized) is:
+		// inherit Architect, use Notifiable and Localized as an interface
+
+// CONSTRUCTOR DECLARATION
+
+	every WalkingBrain is:
+
+		// Comma separated constructor args
+		needs Brain, Legs @mylegs;
+
+		// and a 'then' for ctor behavior
+		needs Brain, Legs @mylegs,
+			then {
+				Brain.teachToWalkWith(@mylegs);
+			}
+
+		// this if no dependencies but behavior
+		needs nothing then {
+		}
+
+// FUNCTION DECLARATIONS
+
+	// Using class names as variable names
+	fire( Architect )IfSameAs( BadArchitect ) {
+		if(Architect == BadArchitect #mustbecastthough) Architect.fire();
+	}
+
+	// foo( Bar )Baz is not a valid function declaration without a finalizing ()
+	fire( Architect )ForAbsolutelyNoReason() {
+		Architect.fire();
+	}
+
+	// Invalid?
+	( Architect )WillGetFired() {
+		//Method Body
+	}
+
+	// Must be clarified when same class is two arguments
+	fire( @This Architect )IfSameAs( @That Architect ) {
+		if(@This == @That) @This.fire();
+	}
+
+	// But you can clarify only one if you want
+	fire( Architect )IfSameAs( @That Architect ) {
+		if(Architect == @That) Architect.fire();
+	}
+
+	// You can also use $ for the compiler to infer the classname but have a unique name
+	fire( Architect )IfSameAs( $Architect )OrEven( $$Architect ))OrMaybeEven( $$$Architect ) {
+		if(Architect == $Architect || Architect == $$Architect || Architect == $$$Architect)
+			Architect.fire();
+	}
+
+	// And you can clarify after classname if you want
+	fire( Architect @A )IfSameAs( Architect @B ) {
+		//Method Body
+	}
+
+	// Demonstrating a return type
+	Architect -- have( ArchitectTeacher )Teach( BadArchitect ) {
+		// METHOD BODY
+	}
+}
+
+//PROPERTY DECLARATIONS
+
+	// Using class name. Public/private
+	with Int;
+	with public Text;
+
+	// Using custom name, comma separated OK
+	with public @name Text, @label Text;
+
+//OBJECT CALLS
+
+every ArchitectBoss is:
+
+	fire( Architect @a)IfSameAs( Architect @b) { ... }
+
+ArchicectBoss <= injector;
+ArchitectBoss.fire( @ThisArchitect )IfSameAs( @TheOtherArchitect );
+Accessor.getCollaborator().getOriginal().getFinal();
+Chainable
+	.doFirstThing()
+	.doSecondThing()
+	.doThirdThing();
+
+
+//INLINE COMMENTS
+
+	// Either I'll build them like this, which prevents carpel tunnel
+	if(Architect.wasFired() #thisisrare)
+		return;
+
+	// Or this, which allows more detail
+	if(Architect.wasFired() ##this is rare##)
+		return;
+
+	##
+	# Isn't this much nicer than
+	#
+	#   /**
+	#    * This!
+	#    */
+	##
+	if(Architect.wasFired() ##this is rare##)
+
+//LAMBDAS
+
+	// Accept a function with no args or return types, named Callback. And calling it.
+	invoke(Callback()) {
+		Callback();
+	}
+
+	// Accept a function with no args that returns a bool named Checker
+	checkIf( Truth -- Checker() ) { }
+
+	// Accept an array of functions with no args that return true
+	callAll( Truth -- Callbacks()[] ) { }
+
+	// Accept a function that compares two Architects named Sorter
+	sort(Truth -- Sorter( Architect, Architect ))
+
+	// Accept a function that compares two Architects with types in the method name
+	sort(Truth -- should( Architect )ComeBefore( Architect ))
+
+	// Return a function that returns a bool that compares two architects when given a boolean!
+	Truth -- ( Architect, Architect ) -- getSorterWithDirection( Truth @UpOrDown )
+
+	// Having a property that is a function that returns a function that returns a bool that compares two architects when given a boolean!
+	with public Truth -- ( Architect , Architect ) -- getSorterWithDirection( Truth @UpOrDown )
+
+	// Functions that take functions can't be named (unaliasable arguments)
+	invoke( Func( SubFunc() ) )WithFunc( SubFunc() )
+	invoke( Func( SubFunc( Architect ) ) )WithFunc( SubFunc( Architect ) )
+	invoke( Func( () ) )WithFunc( SubFunc() )
+	invoke( Func( ( Architect ) ) )With( SubFunc( Architect ) )
+	( Architect, Truth) -- invoke( @Func (Architect, Truth) -- ( Truth -- ( Architect ) ) )WithFunc( @SubFunc Truth -- ( Architect ) )
+
+//CURRYING
+
+	fire( Architect )IfSameAs( BadArchitect ) -- getFireArchitectComparisonLambda() {
+		return fire( ??? )IfSameAs( ??? );
+	}
+
+	// This is the legal shortform?
+	_( Architect, BadArchitect ) -- getFireArchitectComparisonLambda() {
+		return fire( ??? )IfSameAs( ??? );
+	}
+
+// TYPES -- dependency legal, argument/return/property/retrieval/cast legal, variable legal, provided/providedctorarg legal
+	#syntax											#need	#arg	#var	#provided
+	@alias											NO		NO		YES		NO
+	Object											YES		YES		YES		YES
+	@alias Object									YES		YES		NO		NO
+	Object @alias									YES		YES		NO		NO
+	@alias Object{Specifier}						YES		NO		NO		NO
+	Object{Specifier} @alias						YES		NO		NO		NO
+	$Object											YES		YES		YES		NO
+	$Object{Specifier}								YES		YES		NO		NO
+	Object[]										YES		YES		YES		YES
+	@alias Object[]									YES		YES		NO		NO
+	Object[] @alias									YES		YES		NO		NO
+	Object[]{Specifier}								YES		NO	 	NO		YES
+	$Object[]										YES		YES		YES		NO
+	$Object[]{Specifier}							YES		NO		NO		NO
+	Object[][]										YES		YES		YES		YES
+	@alias Object[][]								YES		YES		NO		NO
+	Object[][] @alias								YES		YES		NO		NO
+	Object[][]{Specifier}							YES		NO		NO		YES
+	@alias Object[][]{Specifier}					YES		NO		NO		NO
+	Object[][]{Specifier} @alias					YES		NO		NO		NO
+	fn(Object)[]										NO		NO		NO		YES
+	@alias (Object)[]								YES		YES		NO		NO
+	fn(Object)[] @alias								NO		YES		NO		NO
+	fn(Object)[]{Specifier}							NO		NO 		NO		YES
+	@alias (Object)[]{Specifier}					YES		NO 		NO		NO
+	fn(Object)[]{Specifier} @alias					YES		NO 		NO		NO
+	fn(Object[])[]									NO		YES		NO		YES
+	fn(Object[])[]{Specifier}							NO		NO		NO		YES
+	Object -- fn(Object[])[]							NO		NO		NO		NO
+	@alias Object -- fn(Object[])[]					NO		NO		NO		NO
+	Object -- fn(Object[])[] @alias					NO		NO		NO		NO
+	Object -- fn(Object[])[]{Specifier}				NO		NO		NO		NO
+	@alias Object -- fn(Object[])[]{Specifier}		NO		NO		NO		NO
+	Object -- fn(Object[])[]{Specifier} @alias		NO		NO		NO		NO
+	Object -- fn(Object[])[][]{Specifier}				NO		NO		NO		NO
+	Object -- fn(Object[])[][]{Specifier} @alias		NO		NO		NO		NO
+	@alias Object -- (Object[])[][]{Specifier}		NO		NO		NO		NO
+	fn(Object) -- fn(Object[])[]						NO		NO		NO		NO
+	fn(Object) -- fn(Object[])[]						NO		NO		NO		NO
+	fn(Object) -- fn(Object[])[]						NO		NO		NO		NO
+	fn(Object) -- fn(Object[])[]{Specifier}				NO		NO		NO		NO
+	@alias (Object) -- (Object[])[]{Specifier}		NO		NO		NO		NO
+	fn(Object) -- fn(Object[])[]{Specifier} @alias		NO		NO		NO		NO
+
+
+
+//CASTING
+
+	// Implied casting
+	Architect -- UselessCastOf( BadArchitect )ToArchitect() {
+		return BadArchitect;
+	}
+
+	// This is unnecessary in this instance but required when the compiler can't infer
+	Architect -- UselessCastOf( BadArchitect )ToArchitect() {
+		return ( cast Architect ) BadArchitect;
+	}
+
+//INJECTION
+
+	// Just a class -- maybe implementing provider?
+	every MyProvider (capable Provider) is:
+
+		// comma separated values are legal
+		provides
+			// basic
+			Examiner,
+
+			// bind text & numbers, with identfiers
+			Text{DBUserName} <= "SooperSecUrUserNaem",
+			Int{DBPort} <= 3306,
+
+			// Bind an injection to arbitrary behavior
+			User{LoggedIn} <= { return getLoggedInUser(); },
+
+			// Bind an injection to a method with currying and/or primitives and/or injections
+			FileReader <=  { getFileHandle("r", ???, FileSystemWrapper) },
+
+			// curry constructors -- require an ID and inject a connection
+			DBRecord( ??? , DBConnection),
+
+			// this is how to provide a BadArchitect when asked for an Architect....mwahahaha
+			Architect <= BadArchitect,
+
+			// random injections that make this example complete because I'm anal
+			FileSystem, DBConnection;
+
+		// Contrived examples of getting a provided object
+		demonstrateGettingDependencies() {
+			// No args or label
+			Architect <= provider;
+
+			// one arg no label
+			Architect(2) <= provider;
+
+			// no args but yes label
+			Architect{LoggedIn} <= provider;
+
+			// args and label
+			Architect{LoggedIn}(2) <= provider;
+		}
+
+		new(User{LoggedIn}, Provider) {
+		}
+
+//ARRAYS
+
+	Architect[] -- add( Architect )To( Architect[] ) {
+		Architect[].push(Architect);
+		return Architect[];
+	}
+
+	Int -- get( Architect[] )Length() {
+		return Architect[].length();
+	}
+
+	Architect -- getBestArchitectFrom( @List #of Architect[] ) {
+		Int @skill = 0;
+		@best Architect;
+
+		foreach(Architect in @List)
+		if(@skill < Architect.getSkill())
+			@skill = Architect.getSkill();
+			@best = Architect;
+		}
+
+		return @best;
+	}
+
+//IMPORTING AND COMPILATION TARGETS
+
+	// Load a friendl class
+	import Architect;
+	// Load a java class -- directly?? Adaptor?
+	import(java) android.os.content;
+	// Load a javascript file -- directly?? Adaptor?
+	import(javascript) window;
+	// Load a PHP adaptor
+	import(PHP) PHPMailer;
+
+//PRIVATE METHODS
+//TEMPLATES!!!!!
+//CALL PARENT METHODS
+//XLANG
+//EXCEPTIONS

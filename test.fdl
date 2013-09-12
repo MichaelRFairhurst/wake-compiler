@@ -1,0 +1,54 @@
+import "balloon";
+import(js) "poop";
+import(java) "lalala";
+
+every Banana (a Balloon) is:
+
+every BigBanana (a Banana, capable Pillow, capable Shitzu) is:
+	provides
+		Monkey,
+		Mammal <- Squirrel,
+		Mammal <- { return ; },
+		Mammal{Sea} <- SeaOtter,
+		Picture <- Picture{Cracked},
+		Picture{Cracked} <- Picture("Cracked"),
+		Europe{Medieval} <- Europe(1057),
+		LotsOfArgs{Test} <- ManyArgs(Europe{Medieval}, Picture{Cracked}, ???);
+
+	needs
+		Pillow,
+		beec{Important} @c,
+		$pillow,
+		$$$pillow
+	then {
+		(5 * (5 + 5) / 33 < 44 == 3) ? 44 : 22 + 5;
+		5 + 5;
+		@var MyType <- Provider;
+		@var OtherType -- fn(MyType) <- @MyOtherType;
+		default:
+		return;
+		return;
+		continue;
+		break;
+	}
+
+	Text -- getName() {
+		Me.Text;
+		Me.Text();
+		Me.Text().Text;
+		Me.Text(Architect)ForName();
+		Me.Text(Architect)ForName().Text;
+		Me.Text(Architect)ForName()[3 + 55].Text;
+	}
+
+	Text -- getName( Int @forsomereason, Pillow, @this Thing, $Duck, $$$$Duck )FromThis() {
+
+	}
+
+	fn( Text, Blueberry ) -- getFunction( Bob @thebuilder )With( Text @a )too() {
+
+	}
+
+	fn(Text) -- fn( Int, Pillow, Thing ) -- getFunction( Bob @thebuilder )With( Text @a )too() {
+
+	}
