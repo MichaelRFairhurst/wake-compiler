@@ -277,13 +277,14 @@ type_ctor:
 
 values:
 	value
-	| value values
+	| value ',' values
 	;
 
 value:
 	type_valued
 	| value '[' expression ']'
-	| value '.' IDENTIFIER
+	| value '.' type_valued
+	| methodcallsegments
 	| value '.' methodcallsegments
 	| STRING
 	| NUMBER

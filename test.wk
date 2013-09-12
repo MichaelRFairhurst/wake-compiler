@@ -35,10 +35,13 @@ every BigBanana (a Banana, capable Pillow, capable Shitzu) is:
 	Text -- getName() {
 		Me.Text;
 		Me.Text();
-		Me.Text().Text;
+		Me.Text().Property; Me.Fnc().@Text; Me.Fnc().@Text[2]; Me.Fnc().$Property[]; Me.Fnc().$Property[2];
 		Me.Text(Architect)ForName();
 		Me.Text(Architect)ForName().Text;
 		Me.Text(Architect)ForName()[3 + 55].Text;
+		return getName();
+		return getName(8)FromArgs(MyStuff);
+		return getName(TestTest)FromArgs(MyStuff)AndEndingLike();
 	}
 
 	Text -- getName( Int @forsomereason, Pillow, @this Thing, $Duck, $$$$Duck )FromThis() {

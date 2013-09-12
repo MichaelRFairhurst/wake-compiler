@@ -8,7 +8,7 @@ wake: lex.yy.c y.tab.c tree.o
 	cc lex.yy.c y.tab.c tree.o -o wake -lfl
 
 y.tab.h: parser.y
-	yacc -d $(DEBUG) parser.y
+	yacc -dv $(DEBUG) parser.y
 
 tree.o: tree.c tree.h
 	cc -c tree.c -o tree.o
