@@ -165,9 +165,20 @@ method:
 	;
 
 methodreturn:
-	type_common SYM_RETURN_DECREMENT
-	| type_lambda SYM_RETURN_DECREMENT
-	/*| commonorlambdatype SYM_RETURN_DECREMENT FN '(' commonorlambdatypes ')' SYM_RETURN_DECREMENT*/
+	type_returnable SYM_RETURN_DECREMENT
+	;
+
+type_returnable:
+	type_arrayablereturn SYM_ARRAYED
+	| type_arrayablereturn
+	;
+
+type_arrayablereturn:
+	IDENTIFIER
+	| FN '(' ')'
+	| FN '(' commonorlambdatypes ')'
+	| type_returnable SYM_RETURN_DECREMENT FN '(' commonorlambdatypes ')'
+	| type_returnable SYM_RETURN_DECREMENT FN '(' ')'
 	;
 
 methodbody:
