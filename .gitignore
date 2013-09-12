@@ -4,4 +4,5 @@ y.output
 y.tab.c
 y.tab.h
 *.o
+wake
 playground

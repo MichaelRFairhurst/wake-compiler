@@ -9,6 +9,7 @@
 int line = 1;
 int column = 1;
 extern char* yytext;
+extern FILE *yyin;
 
 void yyerror(const char *str)
 {
@@ -21,12 +22,28 @@ int yywrap()
         return 1;
 }
 
-main()
+
+
+main(int argc, char** argv)
 {
 #if YYDEBUG
 		yydebug = 1;
 #endif
-        yyparse();
+	if(argc < 2) {
+		printf("no file provided\n"); exit(1);
+	}
+	// open a file handle to a particular file:
+	FILE *myfile = fopen(argv[1], "r");
+	// make sure it is valid:
+	if (!myfile) {
+		printf("couldn't open file");
+		exit(1);
+	}
+	// set lex to read from it instead of defaulting to STDIN:
+	yyin = myfile;
+
+	// parse through the input until there is no more:
+	yyparse();
 }
 
 
@@ -110,7 +127,7 @@ classbody:
 classprop:
 	PROVIDES injection_bindings ';'						{ $$ = $2; }
 	| ctor												{ $$ = $1; }
-	| method
+	| method											{ $$ = 0; }
 	/*| property*/
 	;
 

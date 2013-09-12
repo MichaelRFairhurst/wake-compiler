@@ -2,8 +2,6 @@ import "balloon";
 import(js) "poop";
 import(java) "lalala";
 
-every Banana (a Balloon) is:
-
 every BigBanana (a Banana, capable Pillow, capable Shitzu) is:
 	provides
 		Monkey,
@@ -22,12 +20,14 @@ every BigBanana (a Banana, capable Pillow, capable Shitzu) is:
 		$$$pillow
 	then {
 		(5 * (5 + 5) / 33 < 44 == 3) ? 44 : 22 + 5;
-		5 + 5;
+		while(false && true || 789) 5 + 5.toThe(@x)thPower();
 		@var MyType <- Provider;
 		@var OtherType -- fn(MyType) <- @MyOtherType;
-		default:
+		while(33 / ATunnel + 1) {
+			it.eatMyPants(); it / 55;
+		}
 		return;
-		return;
+		return @var;
 		continue;
 		break;
 	}
@@ -42,13 +42,16 @@ every BigBanana (a Banana, capable Pillow, capable Shitzu) is:
 	}
 
 	Text -- getName( Int @forsomereason, Pillow, @this Thing, $Duck, $$$$Duck )FromThis() {
-
+		if(@forsomereason && Pillow) return "blah";
 	}
 
 	fn( Text, Blueberry ) -- getFunction( Bob @thebuilder )With( Text @a )too() {
-
+		switch(@thebuilder) {
+			case 2: return Blueberry[];
+			default: return 9 + 5 / 33;
+		}
 	}
 
 	fn(Text) -- fn( Int, Pillow, Thing ) -- getFunction( Bob @thebuilder )With( Text @a )too() {
-
+		return (((Bob) / 3) + 4) * 99999.max(4) + "abcdefg".length;
 	}
