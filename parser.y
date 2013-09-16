@@ -97,7 +97,7 @@ file:
 	;
 
 imports:
-	import imports																{ $$ = $2; AddSubNode($$, $1); }
+	imports import																{ $$ = $1; AddSubNode($$, $2); }
 	| import																	{ $$ = MakeOneBranchNode(NT_IMPORTSET, $1); }
 	;
 
@@ -111,7 +111,7 @@ importtarget:
 	;
 
 classes:
-	class classes																{ $$ = $2; AddSubNode($$, $1); }
+	classes class																{ $$ = $1; AddSubNode($$, $2); }
 	| class																		{ $$ = MakeOneBranchNode(NT_CLASSSET, $1); }
 	;
 
@@ -126,7 +126,7 @@ parentage:
 	;
 
 inheritances:
-	inheritance ',' inheritances												{ $$ = $3; AddSubNode($$, $1); }
+	inheritances ',' inheritance												{ $$ = $1; AddSubNode($$, $3); }
 	| inheritance																{ $$ = MakeOneBranchNode(NT_INHERITANCESET, $1); }
 	;
 
@@ -148,7 +148,7 @@ classprop:
 	;
 
 injection_bindings:
-	injection_binding ',' injection_bindings									{ $$ = $3; AddSubNode($$, $1); }
+	injection_bindings ',' injection_binding									{ $$ = $1; AddSubNode($$, $3); }
 	| injection_binding															{ $$ = MakeOneBranchNode(NT_PROVISIONS, $1); }
 	;
 
@@ -171,7 +171,7 @@ injection_ctor:
 	;
 
 injection_ctorargs:
-	injection_ctorarg ',' injection_ctorargs									{ $$ = $3; AddSubNode($$, $1); }
+	injection_ctorargs ',' injection_ctorarg									{ $$ = $1; AddSubNode($$, $3); }
 	| injection_ctorarg															{ $$ = MakeOneBranchNode(NT_INJECTED_CTOR_ARG, $1); }
 	;
 
@@ -189,7 +189,7 @@ ctor:
 	;
 
 ctorargs:
-	type_ctor ',' ctorargs														{ $$ = $3; AddSubNode($$, MakeNodeFromType($1)); }
+	ctorargs ',' type_ctor														{ $$ = $1; AddSubNode($$, MakeNodeFromType($3)); }
 	| type_ctor																	{ $$ = MakeOneBranchNode(NT_CTOR_ARGS, MakeNodeFromType($1)); }
 	;
 
@@ -233,7 +233,7 @@ methodcallsegments:
 	;
 
 assignabletypes:
-	type_assignable ',' assignabletypes											{ $$ = $3; AddTypeToTypeArray($1, $3); }
+	assignabletypes ',' type_assignable											{ $$ = $1; AddTypeToTypeArray($3, $1); }
 	| type_assignable															{ $$ = MakeTypeArray(); AddTypeToTypeArray($1, $$); }
 	;
 
@@ -265,7 +265,7 @@ type_lambda:
 	;
 
 commonorlambdatypes:
-	type_commonorlambda ',' commonorlambdatypes									{ $$ = $3; AddTypeToTypeArray($1, $3); }
+	commonorlambdatypes ',' type_commonorlambda									{ $$ = $1; AddTypeToTypeArray($3, $1); }
 	| type_commonorlambda														{ $$ = MakeTypeArray(); AddTypeToTypeArray($1, $$); }
 	;
 
@@ -294,8 +294,8 @@ type_ctor:
 curryablevalues:
 	value																		{ $$ = MakeOneBranchNode(NT_VALUES, $1); }
 	| SYM_CURRIER																{ $$ = MakeEmptyNode(NT_CURRIED); }
-	| value ',' curryablevalues													{ $$ = $3; AddSubNode($3, $1); }
-	| SYM_CURRIER ',' curryablevalues											{ $$ = $3; AddSubNode($3, MakeEmptyNode(NT_CURRIED)); }
+	| curryablevalues ',' value													{ $$ = $1; AddSubNode($1, $3); }
+	| curryablevalues ',' SYM_CURRIER											{ $$ = $1; AddSubNode($1, MakeEmptyNode(NT_CURRIED)); }
 	;
 
 value:

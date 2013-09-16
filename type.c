@@ -4,6 +4,18 @@
 Type* MakeType(int type) {
 	Type* thetype = malloc(sizeof(Type));
 	thetype->type = type;
+	thetype->arrayed = 0;
+	thetype->specialty = NULL;
+	thetype->alias = NULL;
+	switch(type) {
+		case TYPE_CLASS:
+			thetype->typedata.class.shadow = 0;
+			break;
+		case TYPE_LAMBDA:
+			thetype->typedata.lambda.returntype = NULL;
+			thetype->typedata.lambda.arguments = NULL;
+			break;
+	}
 	return thetype;
 }
 

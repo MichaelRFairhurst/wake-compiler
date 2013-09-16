@@ -12,10 +12,8 @@ typedef struct Type {
 		struct {
 			struct TypeArray* arguments;// the args nbd
 			struct Type* returntype;	// returns an X
-			char* name;					// name, if a method
 		} lambda;
 		struct {
-			char* alias;				// @bongo, Bongo, $Bongo, or $$Bongo
 			char* classname;			// Bongo
 			int shadow;					// number of $s
 		} class;

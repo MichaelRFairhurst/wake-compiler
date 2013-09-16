@@ -170,7 +170,38 @@ void printSubNodes(Node *n, int level, char* name) {
 }
 
 char* getTypeLabel(Type* thetype) {
-	return "A type description, not yet generated";
+	char *string = malloc(100 * sizeof(char));
+	switch(thetype->type) {
+		case TYPE_LAMBDA:
+			{
+				char *rettype = thetype->typedata.lambda.returntype == NULL ? "void" : getTypeLabel(thetype->typedata.lambda.returntype);
+				char *argtypes = NULL;
+				if(thetype->typedata.lambda.arguments == NULL || thetype->typedata.lambda.arguments->typecount == 0) {
+					argtypes = "none";
+				} else {
+					int i;
+					int memlen = 1;
+					argtypes = NULL;
+					for(i = 0; i < thetype->typedata.lambda.arguments->typecount; i++) {
+						char *argtype = getTypeLabel(thetype->typedata.lambda.arguments->types[i]);
+						memlen += strlen(argtype);
+						if(i > 0) memlen += 2;
+						argtypes = realloc(argtypes, sizeof(char) * memlen);
+						if(i > 0) strcat(argtypes, ", ");
+						strcat(argtypes, argtype);
+						free(argtype);
+					}
+				}
+				string = realloc(string, sizeof(char) * (100 + strlen(argtypes) + strlen(rettype)));
+				sprintf(string, "lambda, []^%d, (%s -- (%s)), {%s}, @%s", thetype->arrayed, rettype, argtypes, thetype->specialty, thetype->alias);
+				//free(rettype);free(argtypes);
+			}
+			break;
+		case TYPE_CLASS:
+			sprintf(string, "class %s, $^%d, []^%d, {%s}, @%s", thetype->typedata.class.classname, thetype->typedata.class.shadow, thetype->arrayed, thetype->specialty, thetype->alias);
+			break;
+	}
+	return string;
 }
 
 void printtree (Node *n, int level) {
@@ -195,7 +226,7 @@ void printtree (Node *n, int level) {
 			printf("%*c %s %s\n", level, ' ', myname, n->node_data.string);
 			break;
 		case NT_TYPEDATA:
-			printf("%*c %s %s\n", level, ' ', myname, "type"); //getTypeLabel(n->node_data.type));
+			printf("%*c %s %s\n", level, ' ', myname, getTypeLabel(n->node_data.type));
 			break;
 		default:
 			printSubNodes(n, level, myname); break;
