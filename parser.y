@@ -1,8 +1,10 @@
 %{
 #include <stdio.h>
 #include <string.h>
+#include "type.h"
 #include "node.h"
 #include "tree.h"
+#include "type.h"
 
 
 
@@ -13,8 +15,11 @@ extern FILE *yyin;
 
 void yyerror(const char *str)
 {
-        fprintf(stderr,"error on line %d col %d : %s on input %s \n", line, column, str, yytext);
-
+        fprintf(stderr, "[ Error                             ]\n");
+        fprintf(stderr, "[ On line %d col %d                 ]\n", line, column);
+        fprintf(stderr, "[ %s                                ]\n", str);
+        fprintf(stderr, "[ Unexpected %s                     ]\n", yytext);
+        fprintf(stderr, "[ yeah this spacing aint pretty yet ]\n");
 }
 
 int yywrap()
@@ -30,20 +35,27 @@ main(int argc, char** argv)
 		yydebug = 1;
 #endif
 	if(argc < 2) {
-		printf("no file provided\n"); exit(1);
+		printf("[ no file provided ]\n"); exit(1);
 	}
-	// open a file handle to a particular file:
+
+	if(strcmp("--version", argv[1]) == 0) {
+		printf("[ Wake    ---- std compiler ]\n");
+		printf("[ v0.01   Michael Fairhurst ]\n");
+		exit(0);
+	}
+
 	FILE *myfile = fopen(argv[1], "r");
-	// make sure it is valid:
+
 	if (!myfile) {
-		printf("couldn't open file");
+		printf("[ couldn't open file ]\n");
 		exit(1);
 	}
+
 	// set lex to read from it instead of defaulting to STDIN:
 	yyin = myfile;
 
-	// parse through the input until there is no more:
-	yyparse();
+	// And we're off!
+	return yyparse();
 }
 
 
@@ -59,6 +71,8 @@ main(int argc, char** argv)
         int number;
         char *string;
         Node *node;
+        Type *type;
+        TypeArray *type_array;
 }
 
 /* identifiers & values */
@@ -70,303 +84,310 @@ main(int argc, char** argv)
 %token <number> TRUTH
 %token <number> SYM_SHADOW
 %token <number> SYM_ARRAYED
-%type <node> imports import import importtarget classes class parentage inheritances inheritance classbody classprop type_provided injection_providable injection_ctor injection_ctorargs injection_binding injection_bindings injection_ctorarg ctor ctorargs expression value
+%type <node> imports import import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection_ctor injection_ctorargs injection_binding injection_bindings injection_ctorarg ctor ctorargs expression value method block methodreturn methodnamesegments methodbody methodcallsegments curryablevalues expression expressions retrievalsandstatements retrievalorstatement retrieval statement labelstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional type_valued
+%type <type>  type_returnable type_arrayablereturn type_assignable type_common type_lambda type_commonorlambda type_provided type_ctor
+%type <type_array> assignabletypes commonorlambdatypes
 %start file
 %%
 
 file:
-	imports classes										{ printtree(MakeTwoBranchNode(NT_PROGRAM, $1, $2), 1); }
-	| classes											{ printtree($1, 1); }
-	| imports											{ printtree($1, 1); }
+	imports classes																{ printtree(MakeTwoBranchNode(NT_PROGRAM, $1, $2), 1); }
+	| classes																	{ printtree($1, 1); }
+	| imports																	{ printtree($1, 1); }
 	;
 
 imports:
-	import imports										{ $$ = $2; AddSubNode($2, $1); }
-	| import											{ $$ = MakeOneBranchNode(NT_IMPORTSET, $1); }
+	import imports																{ $$ = $2; AddSubNode($$, $1); }
+	| import																	{ $$ = MakeOneBranchNode(NT_IMPORTSET, $1); }
 	;
 
 import:
-	IMPORT importtarget STRING ';'						{ $$ = MakeTwoBranchNode(NT_IMPORT, $2, MakeNodeFromString($3)); }
+	IMPORT importtarget STRING ';'												{ $$ = MakeTwoBranchNode(NT_IMPORT, $2, MakeNodeFromString(NT_IMPORTPATH, $3)); }
 	;
 
 importtarget:
-	/* empty */											{ $$ = MakeNodeFromString("*"); }
-	| '(' IDENTIFIER ')'								{ $$ = MakeNodeFromString($2); }
+	/* empty */																	{ $$ = MakeEmptyNode(NT_EMPTY); }
+	| '(' IDENTIFIER ')'														{ $$ = MakeNodeFromString(NT_IMPORTTARGET, $2); }
 	;
 
 classes:
-	class classes										{ $$ = $2; AddSubNode($2, $1); }
-	| class												{ $$ = MakeOneBranchNode(NT_CLASSSET, $1); }
+	class classes																{ $$ = $2; AddSubNode($$, $1); }
+	| class																		{ $$ = MakeOneBranchNode(NT_CLASSSET, $1); }
 	;
 
 class:
-	EVERY IDENTIFIER parentage IS ':'					{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromString($2), $3); }
-	| EVERY IDENTIFIER parentage IS ':' classbody		{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromString($2), $3); AddSubNode($$, $6); }
+	EVERY IDENTIFIER parentage IS ':'											{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromString(NT_CLASSNAME, $2), $3); }
+	| EVERY IDENTIFIER parentage IS ':' classbody								{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromString(NT_CLASSNAME, $2), $3); AddSubNode($$, $6); }
 	;
 
 parentage:
-	/* empty */											{ $$ = MakeNodeFromString("no inheritance"); }
-	| '(' inheritances ')'								{ $$ = $2; }
+	/* empty */																	{ $$ = MakeEmptyNode(NT_EMPTY); }
+	| '(' inheritances ')'														{ $$ = $2; }
 	;
 
 inheritances:
-	inheritance ',' inheritances						{ $$ = $3; AddSubNode($3, $1); }
-	| inheritance										{ $$ = MakeOneBranchNode(NT_INHERITANCESET, $1); }
+	inheritance ',' inheritances												{ $$ = $3; AddSubNode($$, $1); }
+	| inheritance																{ $$ = MakeOneBranchNode(NT_INHERITANCESET, $1); }
 	;
 
 inheritance:
-	CAPABLE IDENTIFIER									{ $$ = MakeTwoBranchNode(NT_INHERITANCE, MakeNodeFromString("interface"), MakeNodeFromString($2)); }
-	| A_OR_AN IDENTIFIER								{ $$ = MakeTwoBranchNode(NT_INHERITANCE, MakeNodeFromString("subclass"), MakeNodeFromString($2)); }
+	CAPABLE IDENTIFIER															{ $$ = MakeNodeFromString(NT_INTERFACE, $2); }
+	| A_OR_AN IDENTIFIER														{ $$ = MakeNodeFromString(NT_SUBCLASS, $2); }
 	;
 
 classbody:
-	classprop classbody									{ $$ = $2; AddSubNode($2, $1); }
-	| classprop											{ $$ = MakeOneBranchNode(NT_CLASSBODY, $1); }
+	classprop classbody															{ $$ = $2; AddSubNode($$, $1); }
+	| classprop																	{ $$ = MakeOneBranchNode(NT_CLASSBODY, $1); }
 	;
 
 classprop:
-	PROVIDES injection_bindings ';'						{ $$ = $2; }
-	| ctor												{ $$ = $1; }
-	| method											{ $$ = 0; }
+	PROVIDES injection_bindings ';'												{ $$ = $2; }
+	| ctor																		{ $$ = $1; }
+	| method																	{ $$ = $1; }
 	/*| property*/
 	;
 
 injection_bindings:
-	injection_binding ',' injection_bindings			{ $$ = $3; AddSubNode($3, $1); }
-	| injection_binding									{ $$ = MakeOneBranchNode(NT_PROVISIONS, $1); }
+	injection_binding ',' injection_bindings									{ $$ = $3; AddSubNode($$, $1); }
+	| injection_binding															{ $$ = MakeOneBranchNode(NT_PROVISIONS, $1); }
 	;
 
 injection_binding:
-	type_provided										{ $$ = MakeOneBranchNode(NT_PROVISION, $1); }
-	| type_provided SYM_PROVIDE injection_providable	{ $$ = MakeTwoBranchNode(NT_PROVISION, $1, $3); }
+	type_provided																{ $$ = MakeOneBranchNode(NT_PROVISION, MakeNodeFromType($1)); }
+	| type_provided SYM_PROVIDE injection_providable							{ $$ = MakeTwoBranchNode(NT_PROVISION, MakeNodeFromType($1), $3); }
 	;
 
 injection_providable:
-	type_provided										{ $$ = MakeOneBranchNode(NT_PROVIDING, $1); }
-	| injection_ctor									{ $$ = $1; }
-	| block												{ $$ = MakeNodeFromString("block"); }
-	| STRING											{ $$ = MakeOneBranchNode(NT_PROVIDING, MakeNodeFromString($1)); }
-	| NUMBER											{ $$ = MakeOneBranchNode(NT_PROVIDING, MakeNodeFromNumber($1)); }
-	| TRUTH												{ $$ = MakeOneBranchNode(NT_PROVIDING, MakeNodeFromNumber($1)); }
+	type_provided																{ $$ = MakeOneBranchNode(NT_PROVIDING, MakeNodeFromType($1)); }
+	| injection_ctor															{ $$ = $1; }
+	| block																		{ $$ = $1; }
+	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
+	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
+	| TRUTH																		{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
 	;
 
 injection_ctor:
-	IDENTIFIER '(' injection_ctorargs ')'				{ $$ = MakeTwoBranchNode(NT_INJECTED_CTOR, MakeNodeFromString($1), $3); }
+	IDENTIFIER '(' injection_ctorargs ')'										{ $$ = MakeTwoBranchNode(NT_INJECTED_CTOR, MakeNodeFromString(NT_CLASSNAME, $1), $3); }
 	;
 
 injection_ctorargs:
-	injection_ctorarg ',' injection_ctorargs			{ $$ = $3; AddSubNode($3, $1); }
-	| injection_ctorarg									{ $$ = MakeOneBranchNode(NT_INJECTED_CTOR_ARG, $1); }
+	injection_ctorarg ',' injection_ctorargs									{ $$ = $3; AddSubNode($$, $1); }
+	| injection_ctorarg															{ $$ = MakeOneBranchNode(NT_INJECTED_CTOR_ARG, $1); }
 	;
 
 injection_ctorarg:
-	type_provided										{ $$ = $1; }
-	| STRING											{ $$ = MakeNodeFromString($1); }
-	| NUMBER											{ $$ = MakeNodeFromNumber($1); }
-	| SYM_CURRIER										{ $$ = MakeNodeFromString("???"); }
+	type_provided																{ $$ = MakeNodeFromType($1); }
+	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
+	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
+	| TRUTH																		{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
+	| SYM_CURRIER																{ $$ = MakeEmptyNode(NT_CURRIED); }
 	;
 
 ctor:
-	NEEDS ctorargs ';'									{ $$ = MakeOneBranchNode(NT_CTOR, $2); }
-	| NEEDS ctorargs THEN block							{ $$ = MakeTwoBranchNode(NT_CTOR, $2, MakeNodeFromString("block"));}
+	NEEDS ctorargs ';'															{ $$ = MakeOneBranchNode(NT_CTOR, $2); }
+	| NEEDS ctorargs THEN block													{ $$ = MakeTwoBranchNode(NT_CTOR, $2, $4);}
 	;
 
 ctorargs:
-	type_ctor ',' ctorargs
-	| type_ctor
+	type_ctor ',' ctorargs														{ $$ = $3; AddSubNode($$, MakeNodeFromType($1)); }
+	| type_ctor																	{ $$ = MakeOneBranchNode(NT_CTOR_ARGS, MakeNodeFromType($1)); }
 	;
 
 method:
-	methodreturn methodnamesegments methodbody
-	| methodnamesegments methodbody
+	methodreturn methodnamesegments methodbody									{ $$ = MakeTwoBranchNode(NT_METHOD_DECLARATION, $1, $2); AddSubNode($$, $3); }
+	| methodnamesegments methodbody												{ $$ = MakeTwoBranchNode(NT_METHOD_DECLARATION, $1, $2); }
 	;
 
 methodreturn:
-	type_returnable SYM_RETURN_DECREMENT
+	type_returnable SYM_RETURN_DECREMENT										{ $$ = MakeOneBranchNode(NT_METHOD_RETURN_TYPE, MakeNodeFromType($1)); }
 	;
 
 type_returnable:
-	type_arrayablereturn SYM_ARRAYED
-	| type_arrayablereturn
+	type_arrayablereturn SYM_ARRAYED											{ $$ = $1; $1->arrayed = $2; }
+	| type_arrayablereturn														{ $$ = $1; }
 	;
 
 type_arrayablereturn:
-	IDENTIFIER
-	| FN '(' ')'
-	| FN '(' commonorlambdatypes ')'
-	| type_returnable SYM_RETURN_DECREMENT FN '(' commonorlambdatypes ')'
-	| type_returnable SYM_RETURN_DECREMENT FN '(' ')'
+	IDENTIFIER																	{ $$ = MakeType(TYPE_CLASS); $$->typedata.class.classname = strdup($1); }
+	| FN '(' ')'																{ $$ = MakeType(TYPE_LAMBDA); }
+	| FN '(' commonorlambdatypes ')'											{ $$ = MakeType(TYPE_LAMBDA); $$->typedata.lambda.arguments = $3; }
+	| type_returnable SYM_RETURN_DECREMENT FN '(' commonorlambdatypes ')'		{ $$ = MakeType(TYPE_LAMBDA); $$->typedata.lambda.returntype = $1; $$->typedata.lambda.arguments = $5; }
+	| type_returnable SYM_RETURN_DECREMENT FN '(' ')'							{ $$ = MakeType(TYPE_LAMBDA); $$->typedata.lambda.returntype = $1; }
 	;
 
 methodbody:
-	';'
-	| block
+	';'																			{ $$ = MakeEmptyNode(NT_ABSTRACT_METHOD); }
+	| block																		{ $$ = $1; }
 	;
 
 methodnamesegments:
-	IDENTIFIER '(' ')'
-	| IDENTIFIER '(' assignabletypes ')'
-	| IDENTIFIER '(' assignabletypes ')' methodnamesegments
+	IDENTIFIER '(' ')'															{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
+	| IDENTIFIER '(' assignabletypes ')'										{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1), MakeNodeFromTypeArray($3)); }
+	| IDENTIFIER '(' assignabletypes ')' methodnamesegments						{ $$ = $5; PrependSubNode($5, MakeNodeFromTypeArray($3)); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
 	;
 
 methodcallsegments:
-	IDENTIFIER '(' ')'
-	| IDENTIFIER '(' values ')'
-	| IDENTIFIER '(' values ')' methodcallsegments
+	IDENTIFIER '(' ')'															{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
+	| IDENTIFIER '(' curryablevalues ')'										{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1), $3); }
+	| IDENTIFIER '(' curryablevalues ')' methodcallsegments						{ $$ = $5; PrependSubNode($5, $3); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
 	;
 
 assignabletypes:
-	type_assignable
-	| type_assignable ',' assignabletypes
+	type_assignable ',' assignabletypes											{ $$ = $3; AddTypeToTypeArray($1, $3); }
+	| type_assignable															{ $$ = MakeTypeArray(); AddTypeToTypeArray($1, $$); }
 	;
 
 type_common:
-	IDENTIFIER SYM_ARRAYED
-	/* type_common SYM_ARRAYED isnt necessary; the lexer sends mytype[][][][] as IDENTIFIER(mytpe) SYM_ARRRAYED(4) */
-	| IDENTIFIER
+	IDENTIFIER SYM_ARRAYED														{ $$ = MakeType(TYPE_CLASS); $$->typedata.class.classname = strdup($1); $$->arrayed = $2; }
+	| IDENTIFIER																{ $$ = MakeType(TYPE_CLASS); $$->typedata.class.classname = strdup($1); }
 	;
 
 type_valued:
-	type_common
-	| SYM_SHADOW type_common
-	| ALIAS
+	type_common																	{ $$ = MakeNodeFromType($1); }
+	| SYM_SHADOW type_common													{ $$ = MakeNodeFromType($2); $2->typedata.class.shadow = $1; }
+	| ALIAS																		{ $$ = MakeNodeFromString(NT_ALIAS, $1); }
 	;
 
 type_assignable:
-	type_common
-	| SYM_SHADOW type_common
-	| ALIAS type_common
-	| type_common ALIAS
-	| ALIAS type_lambda
-	| type_lambda ALIAS
+	type_common																	{ $$ = $1; }
+	| SYM_SHADOW type_common													{ $$ = $2; $$->typedata.class.shadow = $1; }
+	| ALIAS type_common															{ $$ = $2; $$->alias = strdup($1); }
+	| type_common ALIAS															{ $$ = $1; $$->alias = strdup($2); }
+	| ALIAS type_lambda															{ $$ = $2; $$->alias = strdup($1); }
+	| type_lambda ALIAS															{ $$ = $1; $$->alias = strdup($2); }
 	;
 
 type_lambda:
-	FN '(' ')'
-	| FN '(' commonorlambdatypes ')'
-	| type_commonorlambda SYM_RETURN_DECREMENT FN '(' commonorlambdatypes ')'
-	| type_commonorlambda SYM_RETURN_DECREMENT FN '(' ')'
+	FN '(' ')'																	{ $$ = MakeType(TYPE_LAMBDA); }
+	| FN '(' commonorlambdatypes ')'											{ $$ = MakeType(TYPE_LAMBDA); $$->typedata.lambda.arguments = $3; }
+	| type_commonorlambda SYM_RETURN_DECREMENT FN '(' commonorlambdatypes ')'	{ $$ = MakeType(TYPE_LAMBDA); $$->typedata.lambda.returntype = $1; $$->typedata.lambda.arguments = $5; }
+	| type_commonorlambda SYM_RETURN_DECREMENT FN '(' ')'						{ $$ = MakeType(TYPE_LAMBDA); $$->typedata.lambda.returntype = $1; }
 	;
 
 commonorlambdatypes:
-	type_commonorlambda ',' commonorlambdatypes
-	| type_commonorlambda
+	type_commonorlambda ',' commonorlambdatypes									{ $$ = $3; AddTypeToTypeArray($1, $3); }
+	| type_commonorlambda														{ $$ = MakeTypeArray(); AddTypeToTypeArray($1, $$); }
 	;
 
 type_commonorlambda:
-	type_common
-	| type_lambda
+	type_common																	{ $$ = $1; }
+	| type_lambda																{ $$ = $1; }
 	;
 
 type_provided:
-	type_common
-	| type_common SPECIALTY
-	| type_lambda
-	| type_lambda SPECIALTY
+	type_common																	{ $$ = $1; }
+	| type_common SPECIALTY														{ $$ = $1; $$->specialty = strdup($2); }
+	| type_lambda																{ $$ = $1; }
+	| type_lambda SPECIALTY														{ $$ = $1; $$->specialty = strdup($2); }
 	;
 
 type_ctor:
-	type_assignable
-	| type_common SPECIALTY
-	| SYM_SHADOW type_common SPECIALTY
-	| ALIAS type_common SPECIALTY
-	| type_common SPECIALTY ALIAS
-	| ALIAS type_lambda SPECIALTY
-	| type_lambda SPECIALTY ALIAS
+	type_assignable																{ $$ = $1; }
+	| type_common SPECIALTY														{ $$ = $1; $$->specialty = strdup($2); }
+	| SYM_SHADOW type_common SPECIALTY											{ $$ = $2; $$->typedata.class.shadow = $1; $$->specialty = strdup($3);}
+	| ALIAS type_common SPECIALTY												{ $$ = $2; $$->alias = strdup($1); $$->specialty = strdup($3); }
+	| type_common SPECIALTY ALIAS												{ $$ = $1; $$->alias = strdup($3); $$->specialty = strdup($2); }
+	| ALIAS type_lambda SPECIALTY												{ $$ = $2; $$->alias = strdup($1); $$->specialty = strdup($3); }
+	| type_lambda SPECIALTY ALIAS												{ $$ = $1; $$->alias = strdup($3); $$->specialty = strdup($2); }
 	;
 
-values:
-	value
-	| value ',' values
+curryablevalues:
+	value																		{ $$ = MakeOneBranchNode(NT_VALUES, $1); }
+	| SYM_CURRIER																{ $$ = MakeEmptyNode(NT_CURRIED); }
+	| value ',' curryablevalues													{ $$ = $3; AddSubNode($3, $1); }
+	| SYM_CURRIER ',' curryablevalues											{ $$ = $3; AddSubNode($3, MakeEmptyNode(NT_CURRIED)); }
 	;
 
 value:
-	type_valued
-	| value '[' expression ']'
-	| value '.' type_valued
-	| methodcallsegments
-	| value '.' methodcallsegments
-	| STRING
-	| NUMBER
-	| '(' expression ')'
+	type_valued																	{ $$ = $1; }
+	| value '[' expression ']'													{ $$ = MakeTwoBranchNode(NT_ARRAY_ACCESS, $1, $3); }
+	| value '.' type_valued														{ $$ = MakeTwoBranchNode(NT_MEMBER_ACCESS, $1, $3); }
+	| methodcallsegments														{ $$ = $1; }
+	| value '.' methodcallsegments												{ $$ = MakeTwoBranchNode(NT_METHOD_INVOCATION, $1, $3); }
+	| value '(' ')'																{ $$ = MakeOneBranchNode(NT_LAMBDA_INVOCATION, $1); }
+	| value '(' curryablevalues ')'												{ $$ = MakeTwoBranchNode(NT_LAMBDA_INVOCATION, $1, $3); }
+	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
+	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
+	| '(' expression ')'														{ $$ = $2; }
+	| '[' expressions ']'														{ $$ = MakeOneBranchNode(NT_ARRAY_DECLARATION, $2); }
+	| '[' ']'																	{ $$ = MakeEmptyNode(NT_ARRAY_DECLARATION); }
 	;
 
 block:
-	'{' retrievalsandstatements '}' { printf("'{' retrievalsandstatements '}'\n"); }
-	| '{' '}' { printf("| '{' '}'\n"); }
+	'{' retrievalsandstatements '}'												{ $$ = $2; }
+	| '{' '}'																	{ $$ = MakeEmptyNode(NT_EMPTY); }
 	;
 
 retrievalsandstatements:
-	retrievalorstatement { printf("retrievalorstatement\n"); }
-	| retrievalsandstatements retrievalorstatement { printf("| retrievalsandstatements retrievalorstatement\n"); }
+	retrievalorstatement														{ $$ = MakeOneBranchNode(NT_RETRIEVALS_STATEMENTS, $1); }
+	| retrievalsandstatements retrievalorstatement								{ $$ = $1; AddSubNode($$, $2); }
 	;
 
 retrievalorstatement:
-	retrieval { printf("retrieval\n"); }
-	| statement { printf("| statement\n"); }
+	retrieval																	{ $$ = $1; }
+	| statement																	{ $$ = $1; }
 	;
 
 retrieval:
-	type_assignable SYM_PROVIDE type_valued ';' { printf("type SYM_PROVIDE IDENTIFIER ';'\n"); }
+	type_assignable SYM_PROVIDE value ';'										{ $$ = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1), $3); }
 	;
 
 statement:
-	emptystatement { printf("emptystatement\n"); }
-	| labelstatement { printf("| labelstatement\n"); }
-	| expression ';' { printf("| expression';'\n"); }
-	| selectionstatement { printf("| selectionstatement\n"); }
-	| iterationstatement { printf("| iterationstatement\n"); }
-	| jumpstatement { printf("| jumpstatement\n"); }
-	| block { printf("| block\n"); }
+	emptystatement																{ $$ = MakeEmptyNode(NT_EMPTY); }
+	| labelstatement															{ $$ = $1; }
+	| expression ';'															{ $$ = $1; }
+	| selectionstatement														{ $$ = $1; }
+	| iterationstatement														{ $$ = $1; }
+	| jumpstatement																{ $$ = $1; }
+	| block																		{ $$ = $1; }
 	;
 
 emptystatement:
-	';' { printf("';'\n"); }
+	';'
 	;
 
 labelstatement:
-	IDENTIFIER ':' { printf("IDENTIFIER ':'\n"); }
-	| CASE expression ':' { printf("| CASE expression ':'\n"); }
-	| DEFAULT ':' { printf("| DEFAULT ':'\n"); }
+	CASE expression ':'															{ $$ = MakeOneBranchNode(NT_CASE, $2); }
+	| DEFAULT ':'																{ $$ = MakeEmptyNode(NT_DEFAULTCASE); }
 	;
 
 selectionstatement:
-	IF '(' expression ')' statement { printf("IF '(' expression ')' statement\n"); }
-	| IF '(' expression ')' statement ELSE statement { printf("| IF '(' expression ')' statement ELSE statement\n"); }
-	| SWITCH '(' expression ')' block { printf("| SWITCH '(' expression ')' block\n"); }
+	IF '(' expression ')' statement												{ $$ = MakeTwoBranchNode(NT_IF_ELSE, $3, $5); }
+	| IF '(' expression ')' statement ELSE statement							{ $$ = MakeTwoBranchNode(NT_IF_ELSE, $3, $5); AddSubNode($$, $7); }
+	| SWITCH '(' expression ')' block											{ $$ = MakeTwoBranchNode(NT_SWITCH, $3, $5); }
 	;
 
 iterationstatement:
-	WHILE '(' expression ')' statement { printf("WHILE '(' expression ')' statement\n"); }
-	| DO statement WHILE '(' expression ')' ';' { printf("| DO statement WHILE '(' expression ')' ';'\n"); }
-	| FOR '(' forinit forcondition forincrement ')' statement { printf("| FOR '(' forinit forcondition forincrement ')' statement\n"); }
-	| FOR '(' forinit forcondition ')' statement { printf("| FOR '(' forinit forcondition ')' statement\n"); }
+	WHILE '(' expression ')' statement											{ $$ = MakeTwoBranchNode(NT_WHILE, $3, $5); }
+	/*| DO statement WHILE '(' expression ')' ';' { printf("| DO statement WHILE '(' expression ')' ';'\n"); }*/
+	| FOR '(' forinit forcondition forincrement ')' statement					{ $$ = MakeTwoBranchNode(NT_FOR, $3, $4); AddSubNode($$, $5); AddSubNode($$, $7); }
+	/*| FOR '(' forinit forcondition ')' statement */
 	;
 
 forinit:
-	retrieval { printf("retrieval\n"); }
-	| ';' { printf("| ';'\n"); }
+	retrieval																	{ $$ = $1; }
+	| ';'																		{ $$ = MakeEmptyNode(NT_EMPTY); }
 	;
 
 forcondition:
-	expression ';' { printf("expression ';'\n"); }
-	| ';' { printf("| ';'\n"); }
+	expression ';'																{ $$ = $1; }
+	| ';'																		{ $$ = MakeEmptyNode(NT_EMPTY); }
 	;
 
 forincrement:
-	expressionstatements { printf("expressionstatements\n"); }
+	expressionstatements														{ $$ = $1; }
 	;
 
 expressionstatements:
-	expression { printf("expression\n"); }
-	| expressionstatements ',' expression { printf("| expressionstatements ',' expression\n"); }
+	expression																	{ $$ = MakeOneBranchNode(NT_EXPRESSIONS, $1); }
+	| expressionstatements ',' expression										{ $$ = $1; AddSubNode($$, $3); }
 	;
 
 jumpstatement:
-	BREAK ';' { printf("BREAK ';'\n"); }
-	| CONTINUE ';' { printf("| CONTINUE ';'\n"); }
-	| RETURN expression ';' { printf("| RETURN expression ';'\n"); }
-	| RETURN ';' { printf("| RETURN ';'\n"); }
+	BREAK ';'																	{ $$ = MakeEmptyNode(NT_BREAK); }
+	| CONTINUE ';'																{ $$ = MakeEmptyNode(NT_CONTINUE); }
+	| RETURN expression ';'														{ $$ = MakeOneBranchNode(NT_RETURN, $2); }
+	| RETURN ';'																{ $$ = MakeEmptyNode(NT_RETURN); }
 	;
 
 specialname:
@@ -375,70 +396,66 @@ specialname:
 	;
 
 expression_unary:
-	SYM_INCREMENT expression_unary { printf("SYM_INCREMENT expression_unary\n"); }
-	| SYM_RETURN_DECREMENT expression_unary { printf("| SYM_RETURN_DECREMENT expression_unary\n"); }
-	| arithmeticunaryoperator value { printf("| arithmeticunaryoperator value\n"); }
-	| expression_logicalunary { printf("| expression_logicalunary\n"); }
+	SYM_INCREMENT expression_unary												{ $$ = MakeOneBranchNode(NT_INCREMENT, $2); }
+	| SYM_RETURN_DECREMENT expression_unary										{ $$ = MakeOneBranchNode(NT_DECREMENT, $2); }
+	| expression_logicalunary													{ $$ = $1; }
 	;
 
 expression_logicalunary:
-	logicalunaryoperator expression_unary { printf("| logicalunaryoperator expression_unary\n"); }
-	;
-
-logicalunaryoperator:
-	'~' { printf("'~'\n"); }
-	| '!' { printf("| '!'\n"); }
-	;
-
-arithmeticunaryoperator:
-	'+' { printf("'+'\n"); }
-	| '-' { printf("| '-'\n"); }
+	value																		{ $$ = $1; }
+	/*| '~' expression_unary*/
+	| '!' value																	{ $$ = MakeOneBranchNode(NT_INVERT, $2); }
 	;
 
 expression_multiply:
-	value { printf("value\n"); }
-	| expression_multiply '*' value { printf("| expression_multiply '*' value\n"); }
-	| expression_multiply '/' value { printf("| expression_multiply '/' value\n"); }
+	value																		{ $$ = $1; }
+	| expression_multiply '*' value												{ $$ = MakeTwoBranchNode(NT_MULTIPLY, $1, $3); }
+	| expression_multiply '/' value												{ $$ = MakeTwoBranchNode(NT_DIVIDE, $1, $3); }
 	;
 
 expression_add:
-	expression_multiply { printf("expression_multiply\n"); }
-	| expression_add '+' expression_multiply { printf("| expression_add '+' expression_multiply\n"); }
-	| expression_add '-' expression_multiply { printf("| expression_add '-' expression_multiply\n"); }
+	expression_multiply															{ $$ = $1; }
+	| expression_add '+' expression_multiply									{ $$ = MakeTwoBranchNode(NT_ADD, $1, $3); }
+	| expression_add '-' expression_multiply									{ $$ = MakeTwoBranchNode(NT_SUBTRACT, $1, $3); }
 	;
 
 expression_relational:
-	expression_add { printf("expression_add\n"); }
-	| expression_relational '<' expression_add { printf("| expression_relational '<' expression_add\n"); }
-	| expression_relational '>' expression_add { printf("| expression_relational '>' expression_add\n"); }
-	| expression_relational SYM_LE expression_add { printf("| expression_relational SYM_LE expression_add\n"); }
-	| expression_relational SYM_GE expression_add { printf("| expression_relational SYM_GE expression_add\n"); }
+	expression_add																{ $$ = $1; }
+	| expression_relational '<' expression_add									{ $$ = MakeTwoBranchNode(NT_LESSTHAN, $1, $3); }
+	| expression_relational '>' expression_add									{ $$ = MakeTwoBranchNode(NT_GREATERTHAN, $1, $3); }
+	| expression_relational SYM_LE expression_add								{ $$ = MakeTwoBranchNode(NT_LESSTHANEQUAL, $1, $3); }
+	| expression_relational SYM_GE expression_add								{ $$ = MakeTwoBranchNode(NT_GREATERTHANEQUAL, $1, $3); }
 	;
 
 expression_equality:
-	expression_relational { printf("expression_relational\n"); }
-	| expression_equality SYM_EQ expression_relational { printf("| expression_equality SYM_EQ expression_relational\n"); }
-	| expression_equality SYM_NE expression_relational { printf("| expression_equality SYM_NE expression_relational\n"); }
+	expression_relational														{ $$ = $1; }
+	| expression_equality SYM_EQ expression_relational							{ $$ = MakeTwoBranchNode(NT_EQUALITY, $1, $3); }
+	| expression_equality SYM_NE expression_relational							{ $$ = MakeTwoBranchNode(NT_INEQUALITY, $1, $3); }
 	;
 
 expression_conditionaland:
-	expression_equality { printf("expression_equality\n"); }
-	| expression_conditionaland SYM_AND expression_equality { printf("| expression_conditionaland SYM_AND expression_equality\n"); }
+	expression_equality															{ $$ = $1; }
+	| expression_conditionaland SYM_AND expression_equality						{ $$ = MakeTwoBranchNode(NT_AND, $1, $3); }
 	;
 
 expression_conditionalor:
-	expression_conditionaland { printf("expression_conditionaland\n"); }
-	| expression_conditionalor SYM_OR expression_conditionaland { printf("| expression_conditionalor SYM_OR expression_conditionaland\n"); }
+	expression_conditionaland													{ $$ = $1; }
+	| expression_conditionalor SYM_OR expression_conditionaland					{ $$ = MakeTwoBranchNode(NT_OR, $1, $3); }
 	;
 
 expression_conditional:
-	expression_conditionalor { printf("expression_conditionalor\n"); }
-	| expression_conditionalor '?' expression ':' expression_conditional { printf("| expression_conditionalor '?' expression ':' expression_conditional\n"); }
+	expression_conditionalor													{ $$ = $1; }
+	| expression_conditionalor '?' expression ':' expression_conditional		{ $$ = MakeTwoBranchNode(NT_IF_THEN_ELSE, $1, $3); AddSubNode($$, $5); }
 	;
 
 expression:
-	expression_conditional { printf("expression_conditional\n"); }
-	| expression_unary '=' expression { printf("| expression_unary '=' expression\n"); }
+	expression_conditional														{ $$ = $1; }
+	| type_assignable '=' expression											{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1), $3); }
+	;
+
+expressions:
+	expression																	{ $$ = MakeOneBranchNode(NT_EXPRESSIONS, $1); }
+	| expression ',' expressions												{ $$ = $3; AddSubNode($$, $1); }
 	;
 
 %%

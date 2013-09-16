@@ -8,6 +8,7 @@ typedef struct Node {
 		char* string;
 		int number;
 		struct Node** nodes;
+		struct Type* type;
 	} node_data;
 } Node;
 
