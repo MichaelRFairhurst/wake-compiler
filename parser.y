@@ -6,12 +6,9 @@
 #include "tree.h"
 #include "type.h"
 
-
-
 int line = 1;
 int column = 1;
 extern char* yytext;
-extern FILE *yyin;
 
 void yyerror(const char *str)
 {
@@ -27,44 +24,14 @@ int yywrap()
         return 1;
 }
 
-
-
-main(int argc, char** argv)
-{
-#if YYDEBUG
-		yydebug = 1;
-#endif
-	if(argc < 2) {
-		printf("[ no file provided ]\n"); exit(1);
-	}
-
-	if(strcmp("--version", argv[1]) == 0) {
-		printf("[ Wake    ---- std compiler ]\n");
-		printf("[ v0.01   Michael Fairhurst ]\n");
-		exit(0);
-	}
-
-	FILE *myfile = fopen(argv[1], "r");
-
-	if (!myfile) {
-		printf("[ couldn't open file ]\n");
-		exit(1);
-	}
-
-	// set lex to read from it instead of defaulting to STDIN:
-	yyin = myfile;
-
-	// And we're off!
-	return yyparse();
-}
-
-
 %}
 
 /* keywords */
 %token EVERY CAPABLE A_OR_AN IS RETURN FOREACH WITH PUBLIC IF ELSE WHILE IN IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN
 /* symbols */
 %token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT
+/* this too */
+%token ERRORTOKEN
 
 %union
 {

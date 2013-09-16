@@ -5,8 +5,8 @@ main: wake
 debug: DEBUG=-t
 debug: main
 
-wake: lex.yy.c y.tab.c tree.o type.o
-	cc $(OPT) lex.yy.c y.tab.c tree.o type.o -o wake -lfl
+wake: lex.yy.c y.tab.c tree.o type.o wake.c
+	cc $(OPT) lex.yy.c y.tab.c tree.o type.o wake.c -o wake -lfl
 
 y.tab.h: parser.y
 	yacc -dv $(DEBUG) parser.y
