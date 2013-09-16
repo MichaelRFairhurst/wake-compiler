@@ -130,7 +130,7 @@ Node* MakeNodeFromTypeArray(TypeArray* thearray) {
 Node* MakeNodeFromString(int nodetype, char* mystring) {
 	Node* mynode = (Node*) malloc(sizeof(Node));
 	mynode->subnodes = 0;
-	mynode->node_data.string = strdup(mystring);
+	mynode->node_data.string = mystring;
 	mynode->node_type = nodetype;
 	return mynode;
 }
@@ -181,7 +181,7 @@ char* getTypeLabel(Type* thetype) {
 				} else {
 					int i;
 					int memlen = 1;
-					argtypes = NULL;
+					argtypes = strdup("");
 					for(i = 0; i < thetype->typedata.lambda.arguments->typecount; i++) {
 						char *argtype = getTypeLabel(thetype->typedata.lambda.arguments->types[i]);
 						memlen += strlen(argtype);
@@ -194,12 +194,14 @@ char* getTypeLabel(Type* thetype) {
 				}
 				string = realloc(string, sizeof(char) * (100 + strlen(argtypes) + strlen(rettype)));
 				sprintf(string, "lambda, []^%d, (%s -- (%s)), {%s}, @%s", thetype->arrayed, rettype, argtypes, thetype->specialty, thetype->alias);
-				//free(rettype);free(argtypes);
+				if(thetype->typedata.lambda.returntype) free(rettype);
+				if(thetype->typedata.lambda.arguments && thetype->typedata.lambda.arguments->typecount) free(argtypes);
 			}
 			break;
 		case TYPE_CLASS:
 			sprintf(string, "class %s, $^%d, []^%d, {%s}, @%s", thetype->typedata.class.classname, thetype->typedata.class.shadow, thetype->arrayed, thetype->specialty, thetype->alias);
 			break;
+		default: printf("BAD BAD BAD BAD\n");
 	}
 	return string;
 }

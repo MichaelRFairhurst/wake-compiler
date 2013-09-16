@@ -10,6 +10,7 @@ every BigBanana (a Banana, capable Pillow, capable Shitzu) is:
 		Mammal{Sea} <- SeaOtter,
 		Picture <- Picture{Cracked},
 		Picture{Cracked} <- Picture("Cracked"),
+		Picture{Cracked} <- Picture("Cracked\n\n\n\tnewlines then tab then \\ backslash then \ backslash"),
 		Europe{Medieval} <- Europe(1057),
 		LotsOfArgs{Test} <- ManyArgs(Europe{Medieval}, Picture{Cracked}, ???);
 

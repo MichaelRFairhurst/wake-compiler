@@ -208,7 +208,7 @@ type_returnable:
 	;
 
 type_arrayablereturn:
-	IDENTIFIER																	{ $$ = MakeType(TYPE_CLASS); $$->typedata.class.classname = strdup($1); }
+	IDENTIFIER																	{ $$ = MakeType(TYPE_CLASS); $$->typedata.class.classname = $1; }
 	| FN '(' ')'																{ $$ = MakeType(TYPE_LAMBDA); }
 	| FN '(' commonorlambdatypes ')'											{ $$ = MakeType(TYPE_LAMBDA); $$->typedata.lambda.arguments = $3; }
 	| type_returnable SYM_RETURN_DECREMENT FN '(' commonorlambdatypes ')'		{ $$ = MakeType(TYPE_LAMBDA); $$->typedata.lambda.returntype = $1; $$->typedata.lambda.arguments = $5; }
@@ -238,8 +238,8 @@ assignabletypes:
 	;
 
 type_common:
-	IDENTIFIER SYM_ARRAYED														{ $$ = MakeType(TYPE_CLASS); $$->typedata.class.classname = strdup($1); $$->arrayed = $2; }
-	| IDENTIFIER																{ $$ = MakeType(TYPE_CLASS); $$->typedata.class.classname = strdup($1); }
+	IDENTIFIER SYM_ARRAYED														{ $$ = MakeType(TYPE_CLASS); $$->typedata.class.classname = $1; $$->arrayed = $2; }
+	| IDENTIFIER																{ $$ = MakeType(TYPE_CLASS); $$->typedata.class.classname = $1; }
 	;
 
 type_valued:
@@ -251,10 +251,10 @@ type_valued:
 type_assignable:
 	type_common																	{ $$ = $1; }
 	| SYM_SHADOW type_common													{ $$ = $2; $$->typedata.class.shadow = $1; }
-	| ALIAS type_common															{ $$ = $2; $$->alias = strdup($1); }
-	| type_common ALIAS															{ $$ = $1; $$->alias = strdup($2); }
-	| ALIAS type_lambda															{ $$ = $2; $$->alias = strdup($1); }
-	| type_lambda ALIAS															{ $$ = $1; $$->alias = strdup($2); }
+	| ALIAS type_common															{ $$ = $2; $$->alias = $1; }
+	| type_common ALIAS															{ $$ = $1; $$->alias = $2; }
+	| ALIAS type_lambda															{ $$ = $2; $$->alias = $1; }
+	| type_lambda ALIAS															{ $$ = $1; $$->alias = $2; }
 	;
 
 type_lambda:
@@ -276,19 +276,19 @@ type_commonorlambda:
 
 type_provided:
 	type_common																	{ $$ = $1; }
-	| type_common SPECIALTY														{ $$ = $1; $$->specialty = strdup($2); }
+	| type_common SPECIALTY														{ $$ = $1; $$->specialty = $2; }
 	| type_lambda																{ $$ = $1; }
-	| type_lambda SPECIALTY														{ $$ = $1; $$->specialty = strdup($2); }
+	| type_lambda SPECIALTY														{ $$ = $1; $$->specialty = $2; }
 	;
 
 type_ctor:
 	type_assignable																{ $$ = $1; }
-	| type_common SPECIALTY														{ $$ = $1; $$->specialty = strdup($2); }
-	| SYM_SHADOW type_common SPECIALTY											{ $$ = $2; $$->typedata.class.shadow = $1; $$->specialty = strdup($3);}
-	| ALIAS type_common SPECIALTY												{ $$ = $2; $$->alias = strdup($1); $$->specialty = strdup($3); }
-	| type_common SPECIALTY ALIAS												{ $$ = $1; $$->alias = strdup($3); $$->specialty = strdup($2); }
-	| ALIAS type_lambda SPECIALTY												{ $$ = $2; $$->alias = strdup($1); $$->specialty = strdup($3); }
-	| type_lambda SPECIALTY ALIAS												{ $$ = $1; $$->alias = strdup($3); $$->specialty = strdup($2); }
+	| type_common SPECIALTY														{ $$ = $1; $$->specialty = $2; }
+	| SYM_SHADOW type_common SPECIALTY											{ $$ = $2; $$->typedata.class.shadow = $1; $$->specialty = $3;}
+	| ALIAS type_common SPECIALTY												{ $$ = $2; $$->alias = $1; $$->specialty = $3; }
+	| type_common SPECIALTY ALIAS												{ $$ = $1; $$->alias = $3; $$->specialty = $2; }
+	| ALIAS type_lambda SPECIALTY												{ $$ = $2; $$->alias = $1; $$->specialty = $3; }
+	| type_lambda SPECIALTY ALIAS												{ $$ = $1; $$->alias = $3; $$->specialty = $2; }
 	;
 
 curryablevalues:
