@@ -60,8 +60,8 @@ int yywrap()
 
 file:
 	imports classes																{ parsetree = MakeTwoBranchNode(NT_PROGRAM, $1, $2); }
-	| classes																	{ parsetree = $1; }
-	| imports																	{ parsetree = $1; }
+	| classes																	{ parsetree = MakeOneBranchNode(NT_PROGRAM, $1); }
+	| imports																	{ parsetree = MakeOneBranchNode(NT_PROGRAM, $1); }
 	;
 
 imports:

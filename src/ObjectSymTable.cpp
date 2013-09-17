@@ -68,6 +68,15 @@ void ObjectSymTable::build(Node* tree) {
 				string *child = new string();child->assign(tree->node_data.string);
 				vector<string*>* children;
 
+				if(*child == addingclass) {
+					string temp = "In declaration of 'every ";
+					temp += addingclass;
+					temp += "', cannot inherit from itself";
+					SemanticError error(tree, temp);
+					errors->push_back(error);
+					break;
+				}
+
 				if(!interfaces.count(addingclass)) {
 					if(isASubtypeOfB(*child, addingclass)) {
 						std::map<string,string*>::iterator searcher = subclasses.find(addingclass);
@@ -108,6 +117,15 @@ void ObjectSymTable::build(Node* tree) {
 		case NT_SUBCLASS:
 			{
 				string *child = new string();child->assign(tree->node_data.string);
+
+				if(*child == addingclass) {
+					string temp = "In declaration of 'every ";
+					temp += addingclass;
+					temp += "', cannot inherit from itself";
+					SemanticError error(tree, temp);
+					errors->push_back(error);
+					break;
+				}
 
 				if(!subclasses.count(addingclass)) {
 					if(isASubtypeOfB(*child, addingclass)) {
