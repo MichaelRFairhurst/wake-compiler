@@ -9,7 +9,7 @@ Type* MakeType(int type) {
 	thetype->alias = NULL;
 	switch(type) {
 		case TYPE_CLASS:
-			thetype->typedata.class.shadow = 0;
+			thetype->typedata._class.shadow = 0;
 			break;
 		case TYPE_LAMBDA:
 			thetype->typedata.lambda.returntype = NULL;

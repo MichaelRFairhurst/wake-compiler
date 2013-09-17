@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include "tree.h"
 
+extern int line;
+extern int column;
+
 char *nodenames[83];
 int treeTypesInited = 0;
 
@@ -99,24 +102,29 @@ void PrependSubNode(Node* parent, Node* child) {
 	parent->node_data.nodes[0] = child;
 }
 
-Node* MakeEmptyNode(int nodetype) {
+Node* NodeFactory(int nodetype) {
 	Node* mynode = (Node*) malloc(sizeof(Node));
-	mynode->subnodes = 0;
+	mynode->line = line;
+	mynode->col = column;
 	mynode->node_type = nodetype;
+	mynode->subnodes = 0;
+	return mynode;
+}
+
+Node* MakeEmptyNode(int nodetype) {
+	Node* mynode = NodeFactory(nodetype);
 	mynode->node_data.nodes = NULL;
 	return mynode;
 }
 
 Node* MakeNodeFromType(Type* thetype) {
-	Node* mynode = malloc(sizeof(Node));
-	mynode->subnodes = 0;
-	mynode->node_type = NT_TYPEDATA;
+	Node* mynode = NodeFactory(NT_TYPEDATA);
 	mynode->node_data.type = thetype;
 	return mynode;
 }
 
 Node* MakeNodeFromTypeArray(TypeArray* thearray) {
-	Node* mynode = MakeEmptyNode(NT_TYPE_ARRAY);
+	Node* mynode = NodeFactory(NT_TYPE_ARRAY);
 	int i;
 	for(i = 0; i < thearray->typecount; i++)
 		AddSubNode(mynode, MakeNodeFromType(thearray->types[i]));
@@ -128,34 +136,28 @@ Node* MakeNodeFromTypeArray(TypeArray* thearray) {
 }
 
 Node* MakeNodeFromString(int nodetype, char* mystring) {
-	Node* mynode = (Node*) malloc(sizeof(Node));
-	mynode->subnodes = 0;
-	mynode->node_data.string = mystring;
-	mynode->node_type = nodetype;
+	Node* mynode = NodeFactory(nodetype);
+	mynode->node_data.string = strdup(mystring);
 	return mynode;
 }
 
 Node* MakeNodeFromNumber(int nodetype, int number) {
-	Node* mynode = (Node*) malloc(sizeof(Node));
-	mynode->subnodes = 0;
+	Node* mynode = NodeFactory(nodetype);
 	mynode->node_data.number = number;
-	mynode->node_type = nodetype;
 	return mynode;
 }
 
 Node* MakeTwoBranchNode(int nodetype, Node* a, Node* b) {
-	Node* mynode = (Node*) malloc(sizeof(Node));
+	Node* mynode = NodeFactory(nodetype);
 	mynode->subnodes = 2;
-	mynode->node_type = nodetype;
 	mynode->node_data.nodes = malloc(2 * sizeof(Node*));
 	mynode->node_data.nodes[0] = a; mynode->node_data.nodes[1] = b;
 	return mynode;
 }
 
 Node* MakeOneBranchNode(int nodetype, Node* a) {
-	Node* mynode = (Node*) malloc(sizeof(Node));
+	Node* mynode = NodeFactory(nodetype);
 	mynode->subnodes = 1;
-	mynode->node_type = nodetype;
 	mynode->node_data.nodes = malloc(1 * sizeof(Node*));
 	mynode->node_data.nodes[0] = a;
 	return mynode;
@@ -199,7 +201,7 @@ char* getTypeLabel(Type* thetype) {
 			}
 			break;
 		case TYPE_CLASS:
-			sprintf(string, "class %s, $^%d, []^%d, {%s}, @%s", thetype->typedata.class.classname, thetype->typedata.class.shadow, thetype->arrayed, thetype->specialty, thetype->alias);
+			sprintf(string, "class %s, $^%d, []^%d, {%s}, @%s", thetype->typedata._class.classname, thetype->typedata._class.shadow, thetype->arrayed, thetype->specialty, thetype->alias);
 			break;
 		default: printf("BAD BAD BAD BAD\n");
 	}

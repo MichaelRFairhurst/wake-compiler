@@ -9,6 +9,7 @@
 int line = 1;
 int column = 1;
 extern char* yytext;
+Node* parsetree;
 
 void yyerror(const char *str)
 {
@@ -58,9 +59,9 @@ int yywrap()
 %%
 
 file:
-	imports classes																{ printtree(MakeTwoBranchNode(NT_PROGRAM, $1, $2), 1); }
-	| classes																	{ printtree($1, 1); }
-	| imports																	{ printtree($1, 1); }
+	imports classes																{ parsetree = MakeTwoBranchNode(NT_PROGRAM, $1, $2); }
+	| classes																	{ parsetree = $1; }
+	| imports																	{ parsetree = $1; }
 	;
 
 imports:
@@ -175,7 +176,7 @@ type_returnable:
 	;
 
 type_arrayablereturn:
-	IDENTIFIER																	{ $$ = MakeType(TYPE_CLASS); $$->typedata.class.classname = $1; }
+	IDENTIFIER																	{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; }
 	| FN '(' ')'																{ $$ = MakeType(TYPE_LAMBDA); }
 	| FN '(' commonorlambdatypes ')'											{ $$ = MakeType(TYPE_LAMBDA); $$->typedata.lambda.arguments = $3; }
 	| type_returnable SYM_RETURN_DECREMENT FN '(' commonorlambdatypes ')'		{ $$ = MakeType(TYPE_LAMBDA); $$->typedata.lambda.returntype = $1; $$->typedata.lambda.arguments = $5; }
@@ -205,19 +206,19 @@ assignabletypes:
 	;
 
 type_common:
-	IDENTIFIER SYM_ARRAYED														{ $$ = MakeType(TYPE_CLASS); $$->typedata.class.classname = $1; $$->arrayed = $2; }
-	| IDENTIFIER																{ $$ = MakeType(TYPE_CLASS); $$->typedata.class.classname = $1; }
+	IDENTIFIER SYM_ARRAYED														{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; $$->arrayed = $2; }
+	| IDENTIFIER																{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; }
 	;
 
 type_valued:
 	type_common																	{ $$ = MakeNodeFromType($1); }
-	| SYM_SHADOW type_common													{ $$ = MakeNodeFromType($2); $2->typedata.class.shadow = $1; }
+	| SYM_SHADOW type_common													{ $$ = MakeNodeFromType($2); $2->typedata._class.shadow = $1; }
 	| ALIAS																		{ $$ = MakeNodeFromString(NT_ALIAS, $1); }
 	;
 
 type_assignable:
 	type_common																	{ $$ = $1; }
-	| SYM_SHADOW type_common													{ $$ = $2; $$->typedata.class.shadow = $1; }
+	| SYM_SHADOW type_common													{ $$ = $2; $$->typedata._class.shadow = $1; }
 	| ALIAS type_common															{ $$ = $2; $$->alias = $1; }
 	| type_common ALIAS															{ $$ = $1; $$->alias = $2; }
 	| ALIAS type_lambda															{ $$ = $2; $$->alias = $1; }
@@ -251,7 +252,7 @@ type_provided:
 type_ctor:
 	type_assignable																{ $$ = $1; }
 	| type_common SPECIALTY														{ $$ = $1; $$->specialty = $2; }
-	| SYM_SHADOW type_common SPECIALTY											{ $$ = $2; $$->typedata.class.shadow = $1; $$->specialty = $3;}
+	| SYM_SHADOW type_common SPECIALTY											{ $$ = $2; $$->typedata._class.shadow = $1; $$->specialty = $3;}
 	| ALIAS type_common SPECIALTY												{ $$ = $2; $$->alias = $1; $$->specialty = $3; }
 	| type_common SPECIALTY ALIAS												{ $$ = $1; $$->alias = $3; $$->specialty = $2; }
 	| ALIAS type_lambda SPECIALTY												{ $$ = $2; $$->alias = $1; $$->specialty = $3; }

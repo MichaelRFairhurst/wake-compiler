@@ -16,7 +16,7 @@ typedef struct Type {
 		struct {
 			char* classname;			// Bongo
 			int shadow;					// number of $s
-		} class;
+		} _class;
 	} typedata;
 	int arrayed;						// number of []
 	char* alias;						// this should be moved....
