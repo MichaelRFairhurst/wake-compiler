@@ -11,15 +11,16 @@ extern "C" {
 	extern FILE *yyin;
 }
 
-#include "ObjectSymTable.h"
+#include "Parser.h"
+#include "ParseTreeTraverser.h"
+#include "SemanticErrorPrinter.h"
 
 int main(int argc, char** argv) {
-	ObjectSymTable objsymt;
 	if(argc < 2) {
 		printf("[ no file provided ]\n"); exit(1);
 	}
 
-	if(strcmp("--version", argv[1]) == 0) {
+	if(strcmp("--version", argv[1]) == 0 || strcmp("-v", argv[1]) == 0) {
 		printf("[ Wake    ---- std compiler ]\n");
 		printf("[ v0.01   Michael Fairhurst ]\n");
 		exit(0);
@@ -32,16 +33,20 @@ int main(int argc, char** argv) {
 		exit(2);
 	}
 
-	// set lex to read from it instead of defaulting to STDIN:
-	yyin = myfile;
+	Parser parser;
 
-	// And we're off!
-	if(yyparse()) exit(1);
-	//printtree(parsetree, 1);
+	// Parse the shit out of this
+	if(parser.parse(myfile)) exit(1);
+	parser.print();
 
-	objsymt.build(parsetree);
-	vector<SemanticError>* errors = objsymt.getErrors();
-	for(std::vector<SemanticError>::iterator vit = errors->begin(); vit != errors->end(); vit++)
-		cout << vit->msg << endl;
+	// Now do all the semantic analysis
+	ParseTreeTraverser traverser;
+	traverser.traverse(parser.getParseTree());
 
+	SemanticErrorPrinter printer;
+
+	if(traverser.getErrors()->size())
+		traverser.printErrors(printer);
+	else
+		cout << "Everything checked out!\n" << endl;
 }

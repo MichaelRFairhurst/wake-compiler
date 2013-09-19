@@ -37,7 +37,8 @@ syn match	symbols	"\((\|)\|;\||\|=\|+\|{\|}\|,\|\.\|<\|>\)"
 syn match	ancestrysymbols "\((\|)\|,\)" contained
 syn match	typesymbols "\(\[\|\]\)"
 syn match	currysymbols "???"
-syn region	mystring start=/"/ skip=/\\\\\|\\"/ end=/"/  oneline
+syn region	mystring start=/"/ skip=/\\\\\|\\"/ end=/"/
+syn region	mystring2 start=/'/ skip=/\\\\\|\\'/ end=/'/
 syn match	injectionlabel	"\({\)\@<=[a-zA-Z0-9]\+\(}\)\@="
 
 hi link comment		Comment
@@ -61,6 +62,7 @@ hi link typesymbols		Type
 
 hi link methodnameseg		Special
 hi link functioncall		String
+hi link mystring2		String
 hi link mystring		String
 hi link injectionlabel		Function
 

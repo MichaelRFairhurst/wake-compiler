@@ -12,6 +12,7 @@ typedef struct Type {
 		struct {
 			struct TypeArray* arguments;// the args nbd
 			struct Type* returntype;	// returns an X
+			struct Node* body;			// parse tree of body
 		} lambda;
 		struct {
 			char* classname;			// Bongo

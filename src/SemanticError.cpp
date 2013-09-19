@@ -1,10 +1,24 @@
 #include <stdio.h>
 #include "SemanticError.h"
 
-SemanticError::SemanticError(Node* errortoken, string errormsg) {
+SemanticError::SemanticError(SemanticErrorCode errorcode) {
+	code = errorcode;
+}
+
+SemanticError::SemanticError(SemanticErrorCode errorcode, string errormsg) {
+	code = errorcode;
+	msg = errormsg;
+}
+
+SemanticError::SemanticError(SemanticErrorCode errorcode, string errormsg, Node* errortoken) {
+	code = errorcode;
+	msg = errormsg;
 	token = errortoken;
-	char temp[30];
-	sprintf(temp, "[ On line %d, column %d ]\n[ : ", errortoken->line, errortoken->col);
-	msg = temp + errormsg;
-	msg += " ]";
+}
+
+SemanticError::SemanticError(SemanticErrorCode errorcode, string errormsg, Node* errortoken, string errorcontext) {
+	code = errorcode;
+	msg = errormsg;
+	token = errortoken;
+	context = errorcontext;
 }

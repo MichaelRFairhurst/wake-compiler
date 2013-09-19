@@ -11,6 +11,7 @@ typedef struct Node {
 		int number;
 		struct Node** nodes;
 		struct Type* type;
+		struct TypeArray* typearray;
 	} node_data;
 } Node;
 

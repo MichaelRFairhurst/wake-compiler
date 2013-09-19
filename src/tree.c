@@ -125,12 +125,7 @@ Node* MakeNodeFromType(Type* thetype) {
 
 Node* MakeNodeFromTypeArray(TypeArray* thearray) {
 	Node* mynode = NodeFactory(NT_TYPE_ARRAY);
-	int i;
-	for(i = 0; i < thearray->typecount; i++)
-		AddSubNode(mynode, MakeNodeFromType(thearray->types[i]));
-
-	free(thearray->types);
-	free(thearray);
+	mynode->node_data.typearray = thearray;
 
 	return mynode;
 }
@@ -171,41 +166,26 @@ void printSubNodes(Node *n, int level, char* name) {
 		printtree (n->node_data.nodes[i], level+1);
 }
 
-char* getTypeLabel(Type* thetype) {
-	char *string = malloc(100 * sizeof(char));
+void printtype(Type* thetype, int level) {
 	switch(thetype->type) {
 		case TYPE_LAMBDA:
+			printf("%*c lambda, []^%d, {%s}, @%s\n", level, ' ', thetype->arrayed, thetype->specialty, thetype->alias);
+			if(thetype->typedata.lambda.returntype != NULL) {
+				printf("%*c return:\n", level, ' ');
+				printtype(thetype->typedata.lambda.returntype, level + 1);
+			}
+			printf("%*c arguments:\n", level, ' ');
 			{
-				char *rettype = thetype->typedata.lambda.returntype == NULL ? "void" : getTypeLabel(thetype->typedata.lambda.returntype);
-				char *argtypes = NULL;
-				if(thetype->typedata.lambda.arguments == NULL || thetype->typedata.lambda.arguments->typecount == 0) {
-					argtypes = "none";
-				} else {
-					int i;
-					int memlen = 1;
-					argtypes = strdup("");
-					for(i = 0; i < thetype->typedata.lambda.arguments->typecount; i++) {
-						char *argtype = getTypeLabel(thetype->typedata.lambda.arguments->types[i]);
-						memlen += strlen(argtype);
-						if(i > 0) memlen += 2;
-						argtypes = realloc(argtypes, sizeof(char) * memlen);
-						if(i > 0) strcat(argtypes, ", ");
-						strcat(argtypes, argtype);
-						free(argtype);
-					}
+				int i;
+				for(i = 0; i < thetype->typedata.lambda.arguments->typecount; i++) {
+					printtype(thetype->typedata.lambda.arguments->types[i], level + 1);
 				}
-				string = realloc(string, sizeof(char) * (100 + strlen(argtypes) + strlen(rettype)));
-				sprintf(string, "lambda, []^%d, (%s -- (%s)), {%s}, @%s", thetype->arrayed, rettype, argtypes, thetype->specialty, thetype->alias);
-				if(thetype->typedata.lambda.returntype) free(rettype);
-				if(thetype->typedata.lambda.arguments && thetype->typedata.lambda.arguments->typecount) free(argtypes);
 			}
 			break;
 		case TYPE_CLASS:
-			sprintf(string, "class %s, $^%d, []^%d, {%s}, @%s", thetype->typedata._class.classname, thetype->typedata._class.shadow, thetype->arrayed, thetype->specialty, thetype->alias);
+			printf("%*c class %s, $^%d, []^%d, {%s}, @%s\n", level, ' ', thetype->typedata._class.classname, thetype->typedata._class.shadow, thetype->arrayed, thetype->specialty, thetype->alias);
 			break;
-		default: printf("BAD BAD BAD BAD\n");
 	}
-	return string;
 }
 
 void printtree (Node *n, int level) {
@@ -230,7 +210,15 @@ void printtree (Node *n, int level) {
 			printf("%*c %s %s\n", level, ' ', myname, n->node_data.string);
 			break;
 		case NT_TYPEDATA:
-			printf("%*c %s %s\n", level, ' ', myname, getTypeLabel(n->node_data.type));
+			printtype(n->node_data.type, level);
+			break;
+		case NT_TYPE_ARRAY:
+			printf("%*c %s\n", level, ' ', myname);
+			{
+				int i;
+				for(i = 0; i < n->node_data.typearray->typecount; i++)
+					printtype(n->node_data.typearray->types[i], level + 1);
+			}
 			break;
 		default:
 			printSubNodes(n, level, myname); break;
