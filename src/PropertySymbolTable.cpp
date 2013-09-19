@@ -56,10 +56,12 @@ string PropertySymbolTable::getSymbolNameOf(Type* type) {
 	} else {
 		name = getSymbolNameOf(type->typedata.lambda.returntype);
 		name += "--(";
-		int i;
-		for(i = 0; i < type->typedata.lambda.arguments->typecount; i++) {
-			if(i) name += ",";
-			name += getSymbolNameOf(type->typedata.lambda.arguments->types[i]);
+		if(type->typedata.lambda.arguments != NULL) {
+			int i;
+			for(i = 0; i < type->typedata.lambda.arguments->typecount; i++) {
+				if(i) name += ",";
+				name += getSymbolNameOf(type->typedata.lambda.arguments->types[i]);
+			}
 		}
 		name += ")";
 	}

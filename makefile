@@ -1,5 +1,5 @@
 DEBUG=
-OPT=-O0 -g -Iinclude -Igen
+OPT=-O3 -Iinclude -Igen
 CC=cc $(OPT)
 CPP=g++ $(OPT)
 
@@ -9,7 +9,7 @@ CNAMES=tree.c type.c
 COBJS=$(addprefix bin/c/, $(CNAMES:.c=.o))
 GENNAMES=lex.yy.c y.tab.c
 GENOBJS=$(addprefix bin/gen/, $(GENNAMES:.c=.o))
-TESTNAMES=CompilerTests.cpp ObjectSymbolTableTest.cpp
+TESTNAMES=CompilerTests.cpp ObjectSymbolTableTest.cpp ParseTreeTraverserTest.cpp
 TESTOBJS=$(addprefix bin/tests/, $(TESTNAMES:.cpp=.o))
 
 wake: bin/wake

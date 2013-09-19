@@ -77,6 +77,7 @@ void ObjectSymbolTable::assertTypeIsValid(Type* type) {
 	} else {
 		if(type->typedata.lambda.returntype != NULL)
 			assertTypeIsValid(type->typedata.lambda.returntype);
+		if(type->typedata.lambda.arguments == NULL) return;
 
 		int i;
 		for(i = 0; i < type->typedata.lambda.arguments->typecount; i++)

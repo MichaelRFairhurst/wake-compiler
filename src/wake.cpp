@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
 
 	// Parse the shit out of this
 	if(parser.parse(myfile)) exit(1);
-	parser.print();
+	//parser.print();
 
 	// Now do all the semantic analysis
 	ParseTreeTraverser traverser;
