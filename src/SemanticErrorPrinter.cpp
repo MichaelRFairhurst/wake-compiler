@@ -13,7 +13,7 @@ void SemanticErrorPrinter::print(SemanticError* e) {
 			cout << "Class is defined twice";
 			break;
 		case SELF_INHERITANCE:
-			cout << "Class is inherits from itself";
+			cout << "Class inherits from itself";
 			break;
 		case CIRCULAR_INHERITANCE:
 			cout << "Circular inheritance formation";
@@ -30,10 +30,21 @@ void SemanticErrorPrinter::print(SemanticError* e) {
 		case CLASSNAME_NOT_FOUND:
 			cout << "Class by this name not found";
 			break;
+		case SYMBOL_ALREADY_DEFINED:
+			cout << "Variable declaration would overwrite previous. Either use a new alias, or shadow this declaration, or shadow the previous declaration";
+			break;
+		case SYMBOL_NOT_DEFINED:
+			cout << "Variable (by class name, shadow, or alias) is not recognized";
+			break;
+		case TYPE_ERROR:
+			cout << "Invalid type";
+			break;
 		default:
 			cout << "bad error code provided" << endl;
 	}
 	cout << " ]" << endl;
 
 	if(e->msg != "") cout << "[ -MSG: " << e->msg << " ]" << endl;
+
+	cout << endl;
 }

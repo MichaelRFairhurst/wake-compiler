@@ -1,66 +1,30 @@
-import "balloon";
-import(js) "poop";
-import(java) "lalala";
+every ExistsA is:
+every ExistsB is:
+every CircularA (a CircularB) is:
+every CircularB (a CircularA) is:
+every SelfInheriting (a SelfInheriting) is:
+every ExtendsNonExist (a NonExist) is:
+every ExtendsTwoClasses (a ExistsA, a ExistsB) is:
+every ExtendsClassTwice (capable ExistsA, capable ExistsA) is:
 
-every BigBanana (a Banana, capable Pillow, capable Shitzu) is:
+every MethodErrorsHere is:
 	provides
-		Monkey,
-		Mammal <- Squirrel,
-		Mammal <- { return ; },
-		Mammal{Sea} <- SeaOtter,
-		Picture <- Picture{Cracked},
-		Picture{Cracked} <- Picture("Cracked"),
-		Picture{Cracked} <- Picture("Cracked\n\n\n\tnewlines then tab then \\ backslash then \ backslash"),
-		Europe{Medieval} <- Europe(1057),
-		LotsOfArgs{Test} <- ManyArgs(Europe{Medieval}, Picture{Cracked}, ???);
+		NonExist,
+		ExistsA <- NonExist,
+		ExistsB <- ExistsA(NonExist);
 
-	needs
-		Pillow,
-		beec{Important} @c,
-		$pillow,
-		$$$pillow
-	then {
-		(5 * (5 + 5) / 33 < 44 == 3) ? 44 : 22 + 5;
-		while(false && true || 789) 5 + 5.toThe(@x)thPower();
-		@var MyType <- Provider;
-		@var OtherType -- fn(MyType) <- @MyOtherType;
-		while(33 / ATunnel + 1) {
-			it.eatMyPants(); it / 55;
-		}
-		return;
-		return @var;
-		continue;
-		break;
-	}
+	NonExist -- returnTypeDoesntExist() {}
 
-	#wordcomment
-	// block commen
-	##
-	# block comment
-	##
-	Text -- getName() {
-		Me.Text; // Line comment
-		Me.Text();
-		Me.Text().Property; Me.Fnc().@Text; Me.Fnc().@Text[2]; Me.Fnc().$Property[]; Me.Fnc().$Property[2];
-		Me.Text(Architect)ForName();
-		Me.Text(Architect)ForName().Text;
-		Me.Text(Architect)ForName()[3 + 55].Text;
-		return getName(#noargs);
-		return getName(8)FromArgs(MyStuff);
-		return getName(TestTest)FromArgs(MyStuff)AndEndingLike();
-	}
+	doMethodWith(NonExist) {}
 
-	Text -- getName( Int @forsomereason, Pillow, @this Thing, $Duck, $$$$Duck )FromThis() {
-		if(@forsomereason && Pillow) return "blah";
-	}
+	doMethodWith(ExistsA, ExistsB) {}
 
-	fn( Text, Blueberry ) -- getFunction( Bob @thebuilder )With( Text @a )too() {
-		switch(@thebuilder) {
-			case 2: return Blueberry[];
-			default: return 9 + 5 / 33;
-		}
-	}
+	doMethodWith(ExistsA, ExistsB) {}
 
-	fn(Text) -- fn( Int, Pillow, Thing ) -- getFunction( Bob @thebuilder )With( Text @a )too() {
-		return (((Bob) / 3) + 4) * 99999.max(4) + "abcdefg".length;
+	doMethodWith(ExistsA, ExistsB) {
+		//ExistsA;
+		//5 * 5;
+		//5 * "test";
+		return 5 + ( 5 + ( 5 + ("test" * 5) / 4 ) * 6) + "test";
+		//5 + @nonexist;
 	}

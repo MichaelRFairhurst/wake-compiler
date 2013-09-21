@@ -36,7 +36,7 @@ int yywrap()
 
 %union
 {
-        int number;
+        float number;
         char *string;
         Node *node;
         Type *type;
@@ -131,7 +131,7 @@ injection_providable:
 	| block																		{ $$ = $1; }
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
 	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
-	| TRUTH																		{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
+	| TRUTH																		{ $$ = MakeNodeFromNumber(NT_TRUTHLIT, $1); }
 	;
 
 injection_ctor:
@@ -147,7 +147,7 @@ injection_ctorarg:
 	type_provided																{ $$ = MakeNodeFromType($1); }
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
 	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
-	| TRUTH																		{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
+	| TRUTH																		{ $$ = MakeNodeFromNumber(NT_TRUTHLIT, $1); }
 	| SYM_CURRIER																{ $$ = MakeEmptyNode(NT_CURRIED); }
 	;
 
@@ -276,6 +276,7 @@ value:
 	| value '(' curryablevalues ')'												{ $$ = MakeTwoBranchNode(NT_LAMBDA_INVOCATION, $1, $3); }
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
 	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
+	| TRUTH																		{ $$ = MakeNodeFromNumber(NT_TRUTHLIT, $1); }
 	| '(' expression ')'														{ $$ = $2; }
 	| '[' expressions ']'														{ $$ = MakeOneBranchNode(NT_ARRAY_DECLARATION, $2); }
 	| '[' ']'																	{ $$ = MakeEmptyNode(NT_ARRAY_DECLARATION); }

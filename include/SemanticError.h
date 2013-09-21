@@ -17,6 +17,9 @@ enum SemanticErrorCode {
 	MULTIPLE_INHERITANCE,			// A inherits from B twice
 	MULTIPLE_METHOD_DEFINITION,		// A.methodA() defined twice
 	CLASSNAME_NOT_FOUND,			// accepting, extending, providing, or instantiating an unknown type
+	SYMBOL_ALREADY_DEFINED,			// declaring a variable twice
+	SYMBOL_NOT_DEFINED,				// using an unknown alias, shadow, or classname with no known instance
+	TYPE_ERROR,						// adding intelligence to George Bush
 };
 
 class SemanticError {

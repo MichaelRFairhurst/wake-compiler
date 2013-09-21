@@ -10,18 +10,17 @@ extern "C" {
 	#include "node.h"
 }
 
-#include "Functor.h"
-
 using namespace std;
 
 class PropertySymbolTable {
 	public:
 		map<string, bool> parentage;
+		Type* get(string name);
 		string addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, Node* body);
 		string getSymbolNameOf(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments);
 
 	private:
-		map<string, Functor*> properties;
+		map<string, Type*> properties;
 		string getSymbolNameOf(Type* type);
 };
 

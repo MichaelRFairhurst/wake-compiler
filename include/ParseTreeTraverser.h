@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "ObjectSymbolTable.h"
+#include "ScopeSymbolTable.h"
 #include "SemanticErrorPrinter.h"
 extern "C" {
 	#include "type.h"
@@ -23,12 +24,18 @@ class ParseTreeTraverser {
 
 	private:
 		void secondPass(Node* tree);
+		Type* typeCheck(Node* tree);
 		vector<SemanticError*> errors;
 
+		ScopeSymbolTable scopesymtable;
 		ObjectSymbolTable objectsymtable;
+
 		string errorcontext;
+
 		string traversingclass_name;
 		PropertySymbolTable* traversingclass_data;
+
+		Type* traversingmethod_return;
 
 };
 

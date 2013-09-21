@@ -85,6 +85,7 @@ fn						count(); return FN;
 \|\|					count(); return SYM_OR;
 \<-						count(); return SYM_PROVIDE;
 \<=						count(); return SYM_LE;
+\>=						count(); return SYM_GE;
 --						count(); return SYM_RETURN_DECREMENT;
 \?\?\?					count(); return SYM_CURRIER;
 
@@ -96,7 +97,7 @@ fn						count(); return FN;
 
 True					count(); yylval.number = 1; return TRUTH;
 False					count(); yylval.number = 0; return TRUTH;
-[0-9]+					count(); yylval.number = atoi(yytext); return NUMBER;
+[0-9]+(\.[0-9]+)?		count(); yylval.number = atof(yytext); return NUMBER;
 \{[a-zA-Z0-9]+\}		count(); yylval.string = keepInner(yytext); return SPECIALTY;
 [a-zA-Z0-9]+			count(); yylval.string = strdup(yytext); return IDENTIFIER;
 @[a-zA-Z0-9]+			count(); yylval.string = strdup(&yytext[1]); return ALIAS;

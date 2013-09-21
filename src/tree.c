@@ -9,8 +9,6 @@ int treeTypesInited = 0;
 
 void initTreeTypes() {
 	if(treeTypesInited) return;
-	nodenames[NT_NUMBER] = "NT_NUMBER";
-	nodenames[NT_STRING] = "NT_STRING";
 	nodenames[NT_CLASS] = "NT_CLASS";
 	nodenames[NT_CLASSSET] = "NT_CLASSSET";
 	nodenames[NT_IMPORT] = "NT_IMPORT";
@@ -22,7 +20,6 @@ void initTreeTypes() {
 	nodenames[NT_PROVISIONS] = "NT_PROVISIONS";
 	nodenames[NT_PROVISION] = "NT_PROVISION";
 	nodenames[NT_PROVIDED] = "NT_PROVIDED";
-	nodenames[NT_PROVIDED_SPECIALIZED] = "NT_PROVIDED_SPECIALIZED";
 	nodenames[NT_PROVIDING] = "NT_PROVIDING";
 	nodenames[NT_INJECTED_CTOR] = "NT_INJECTED_CTOR";
 	nodenames[NT_INJECTED_CTOR_ARGS] = "NT_INJECTED_CTOR_ARGS";
@@ -30,12 +27,12 @@ void initTreeTypes() {
 	nodenames[NT_CTOR] = "NT_CTOR";
 	nodenames[NT_ARGUMENTS] = "NT_ARGUMENTS";
 	nodenames[NT_ARGUMENT] = "NT_ARGUMENT";
-	nodenames[NT_SHADOW] = "NT_SHADOW";
 	nodenames[NT_EMPTY] = "NT_EMPTY";
 	nodenames[NT_INTERFACE] = "NT_INTERFACE";
 	nodenames[NT_SUBCLASS] = "NT_SUBCLASS";
 	nodenames[NT_IMPORTTARGET] = "NT_IMPORTTARGET";
 	nodenames[NT_BLOCK] = "NT_BLOCK";
+	nodenames[NT_TRUTHLIT] = "NT_TRUTHLIT";
 	nodenames[NT_STRINGLIT] = "NT_STRINGLIT";
 	nodenames[NT_NUMBERLIT] = "NT_NUMBERLIT";
 	nodenames[NT_CLASSNAME] = "NT_CLASSNAME";

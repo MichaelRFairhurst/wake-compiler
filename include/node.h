@@ -8,7 +8,7 @@ typedef struct Node {
 	int subnodes;
 	union {
 		char* string;
-		int number;
+		float number;
 		struct Node** nodes;
 		struct Type* type;
 		struct TypeArray* typearray;

@@ -3,15 +3,15 @@
 
 string PropertySymbolTable::addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, Node* body) {
 	string name = getSymbolNameOf(returntype, segments_arguments);
-	Functor* f = new Functor();
+	Type* method = MakeType(TYPE_LAMBDA);
 
 	if(properties.count(name)) {
 		string temp = "duplicate method signature is " + name;
 		throw new SemanticError(MULTIPLE_METHOD_DEFINITION, temp);
 	}
 
-	f->returntype = returntype;
-	f->body = body;
+	method->typedata.lambda.returntype = returntype;
+	method->typedata.lambda.body = body;
 
 	TypeArray* conglomerate = MakeTypeArray();
 	for(vector<pair<string, TypeArray*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
@@ -20,11 +20,15 @@ string PropertySymbolTable::addMethod(Type* returntype, vector<pair<string, Type
 			AddTypeToTypeArray(it->second->types[i], conglomerate);
 	}
 
-	f->arguments = conglomerate;
+	method->typedata.lambda.arguments = conglomerate;
 
-	properties[name] = f;
+	properties[name] = method;
 
 	return name;
+}
+
+Type* PropertySymbolTable::get(string name) {
+	return properties.find(name)->second;
 }
 
 string PropertySymbolTable::getSymbolNameOf(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments) {
@@ -54,8 +58,6 @@ string PropertySymbolTable::getSymbolNameOf(Type* type) {
 	if(type->type == TYPE_CLASS) {
 		name = type->typedata._class.classname;
 	} else {
-		name = getSymbolNameOf(type->typedata.lambda.returntype);
-		name += "--(";
 		if(type->typedata.lambda.arguments != NULL) {
 			int i;
 			for(i = 0; i < type->typedata.lambda.arguments->typecount; i++) {

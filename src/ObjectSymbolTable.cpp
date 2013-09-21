@@ -73,7 +73,8 @@ PropertySymbolTable* ObjectSymbolTable::find(string name) {
 void ObjectSymbolTable::assertTypeIsValid(Type* type) {
 	if(type->type == TYPE_CLASS) {
 		if(classes.count(type->typedata._class.classname)) return;
-		throw new SemanticError(CLASSNAME_NOT_FOUND);
+
+		throw new SemanticError(CLASSNAME_NOT_FOUND, type->typedata._class.classname + string(" is not a valid type"));
 	} else {
 		if(type->typedata.lambda.returntype != NULL)
 			assertTypeIsValid(type->typedata.lambda.returntype);
