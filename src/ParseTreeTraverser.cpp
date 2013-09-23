@@ -179,16 +179,19 @@ Type* ParseTreeTraverser::typeCheck(Node* tree) {
 		case NT_STRINGLIT:
 			ret = MakeType(NT_CLASS);
 			ret->typedata._class.classname = "Text";
+			ret->arrayed = 0;
 			break;
 
 		case NT_NUMBERLIT:
 			ret = MakeType(NT_CLASS);
 			ret->typedata._class.classname = "Int";
+			ret->arrayed = 0;
 			break;
 
 		case NT_TRUTHLIT:
 			ret = MakeType(NT_CLASS);
 			ret->typedata._class.classname = "Truth";
+			ret->arrayed = 0;
 			break;
 
 		case NT_ALIAS:
@@ -218,8 +221,8 @@ Type* ParseTreeTraverser::typeCheck(Node* tree) {
 					ret = MakeType(NT_CLASS);
 					ret->typedata._class.classname = "Int";
 
-				} else if(ret->typedata._class.classname == "Int" && ret->arrayed == 0) {
-					if(factor->typedata._class.classname != "Int" || factor->arrayed != 0) {
+				} else if(ret->typedata._class.classname == string("Int") && ret->arrayed == 0) {
+					if(factor->typedata._class.classname != string("Int") || factor->arrayed != 0) {
 						errors.push_back(new SemanticError(TYPE_ERROR, "Second operand of * must be an int", tree, errorcontext));
 					}
 
@@ -241,13 +244,13 @@ Type* ParseTreeTraverser::typeCheck(Node* tree) {
 					ret = MakeType(NT_CLASS);
 					ret->typedata._class.classname = "Int";
 
-				} else if(ret->typedata._class.classname == "Int" && ret->arrayed == 0) {
-					if(factor->typedata._class.classname != "Int" || factor->arrayed != 0) {
+				} else if(ret->typedata._class.classname == string("Int") && ret->arrayed == 0) {
+					if(factor->typedata._class.classname != string("Int") || factor->arrayed != 0) {
 						errors.push_back(new SemanticError(TYPE_ERROR, "Second operand of + must be an int", tree, errorcontext));
 					}
 
-				} else if(ret->typedata._class.classname == "Text" && ret->arrayed == 0) {
-					if(factor->typedata._class.classname != "Text" || factor->arrayed != 0) {
+				} else if(ret->typedata._class.classname == string("Text") && ret->arrayed == 0) {
+					if(factor->typedata._class.classname != string("Text") || factor->arrayed != 0) {
 						errors.push_back(new SemanticError(TYPE_ERROR, "Second operand of + must be a Text", tree, errorcontext));
 					}
 
@@ -270,7 +273,7 @@ Type* ParseTreeTraverser::typeCheck(Node* tree) {
 
 					ret = MakeType(NT_CLASS);
 
-				} else if(ret->typedata._class.classname != cmp->typedata._class.classname) {
+				} else if(string(ret->typedata._class.classname) != cmp->typedata._class.classname) {
 					errors.push_back(new SemanticError(TYPE_ERROR, "Equating different types", tree, errorcontext));
 
 				} else if(ret->arrayed != cmp->arrayed) {
@@ -299,12 +302,24 @@ Type* ParseTreeTraverser::typeCheck(Node* tree) {
 			}
 			break;
 
+		case NT_ARRAY_ACCESS:
+			{
+				ret = typeCheck(tree->node_data.nodes[0]);
+				Type* index = typeCheck(tree->node_data.nodes[1]);
+				if(index->type == TYPE_LAMBDA || string(index->typedata._class.classname) != "Int" || index->arrayed) {
+					errors.push_back(new SemanticError(TYPE_ERROR, "Array indexes must be ints", tree, errorcontext));
+				} else if(!ret->arrayed) {
+					errors.push_back(new SemanticError(TYPE_ERROR, "Attempting to get an index on a non array", tree, errorcontext));
+				} else {
+					--ret->arrayed;
+				}
+			}
+			break;
+
 		case NT_ARGUMENTS:
 		case NT_ARGUMENT:
 		case NT_TYPE_ARRAY:
-		case NT_CLASSNAME:
 		case NT_CURRIED:
-		case NT_ARRAY_ACCESS:
 		case NT_MEMBER_ACCESS:
 		case NT_METHOD_INVOCATION:
 		case NT_LAMBDA_INVOCATION:

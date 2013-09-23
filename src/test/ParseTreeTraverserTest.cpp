@@ -615,7 +615,7 @@ BOOST_AUTO_TEST_CASE( ValidArithmeticAndComparisonsReturnProperTypes )
 	BOOST_REQUIRE(e.passed());
 }
 
-BOOST_AUTO_TEST_CASE( ArithmeticOperatorsNotValidOnStringPairss )
+BOOST_AUTO_TEST_CASE( ArithmeticOperatorsNotValidOnStringPairs )
 {
 	Parser p;
 	ParseTreeTraverser t;
@@ -638,6 +638,96 @@ BOOST_AUTO_TEST_CASE( ArithmeticOperatorsNotValidOnStringPairss )
 	e.expect(TYPE_ERROR);
 	e.expect(TYPE_ERROR);
 	e.expect(TYPE_ERROR);
+
+	t.traverse(p.getParseTree());
+	t.printErrors(e);
+
+	BOOST_REQUIRE(e.passed());
+}
+
+BOOST_AUTO_TEST_CASE( AndOperatorAndOrOperatorExpectBooleans )
+{
+	Parser p;
+	ParseTreeTraverser t;
+	MockSemanticErrorPrinter e;
+
+	p.parse("every MyClass is:						\n\
+		andString() { 'test' && 'test'; }			\n\
+		orString() { 'test' || 'test'; }			\n\
+		andInt() { 6 && 6; }						\n\
+		orInt() { 6 || 6; }							\n\
+		andClass(MyClass) { MyClass && MyClass; }	\n\
+		orClass(MyClass) { MyClass || MyClass; }	\n\
+	");
+
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+
+	t.traverse(p.getParseTree());
+	t.printErrors(e);
+
+	BOOST_REQUIRE(e.passed());
+}
+
+BOOST_AUTO_TEST_CASE( AndOperatorAndOrOperatorReturnTruths )
+{
+	Parser p;
+	ParseTreeTraverser t;
+	MockSemanticErrorPrinter e;
+
+	p.parse("every MyClass is:							\n\
+		andTruths() { True && True && True; }			\n\
+		orTruths() { True || True || True; }			\n\
+	");
+
+	t.traverse(p.getParseTree());
+	t.printErrors(e);
+
+	BOOST_REQUIRE(e.passed());
+}
+
+BOOST_AUTO_TEST_CASE( ArrayIndexAccessTypeErrors )
+{
+	Parser p;
+	ParseTreeTraverser t;
+	MockSemanticErrorPrinter e;
+
+	p.parse("every Int is: every MyClass is:					\n\
+		arrayAccessOnInt() { 9[1]; }							\n\
+		arrayAccessOnString() { 'abcd'[1]; }					\n\
+		arrayAccessOnClass(MyClass) { MyClass[1]; }				\n\
+		arrayAccessWithClass(MyClass, Int[]) { Int[MyClass]; }	\n\
+		arrayAccessWithString(Int[]) { Int['test']; }			\n\
+	");
+
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+
+	t.traverse(p.getParseTree());
+	t.printErrors(e);
+
+	BOOST_REQUIRE(e.passed());
+}
+
+BOOST_AUTO_TEST_CASE(ValidArrayIndexAccessAndReturningValidTypes)
+{
+	Parser p;
+	ParseTreeTraverser t;
+	MockSemanticErrorPrinter e;
+
+	p.parse("every Int is: every Text is: every MyClass is:					\n\
+		intArrayBecomesInt(Int[]) { Int[0] + 3; }							\n\
+		stringArrayBecomesString(Text[]) { Text[1] + 'test'; }				\n\
+		stringArrayArrayBecomesString(Text[][]) { Text[1][1] + 'test'; }	\n\
+		intArrayArrayBecomesInt(Int[][]) { Int[1][1] + 5; }					\n\
+	");
 
 	t.traverse(p.getParseTree());
 	t.printErrors(e);
