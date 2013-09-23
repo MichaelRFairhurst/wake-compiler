@@ -9,7 +9,7 @@ BOOST_AUTO_TEST_CASE( TestClassesAreOwnSubclasses )
 {
 	ObjectSymbolTable table;
 
-	BOOST_CHECK(table.isASubtypeOfB("MyClass", "MyClass"));
+	BOOST_CHECK(table.getAnalyzer()->isASubtypeOfB("MyClass", "MyClass"));
 }
 
 BOOST_AUTO_TEST_CASE( TestClassesAreChildsSubclasses )
@@ -20,14 +20,14 @@ BOOST_AUTO_TEST_CASE( TestClassesAreChildsSubclasses )
 	table.addClass("ChildClass");
 	table.addInheritance("ParentClass", 1);
 
-	BOOST_REQUIRE(table.isASubtypeOfB("ChildClass", "ParentClass"));
+	BOOST_REQUIRE(table.getAnalyzer()->isASubtypeOfB("ChildClass", "ParentClass"));
 }
 
 BOOST_AUTO_TEST_CASE( TestClassesArentSubclasses )
 {
 	ObjectSymbolTable table;
 
-	BOOST_REQUIRE(!table.isASubtypeOfB("ClassA", "ClassB"));
+	BOOST_REQUIRE(!table.getAnalyzer()->isASubtypeOfB("ClassA", "ClassB"));
 }
 
 BOOST_AUTO_TEST_CASE( TestParentClassesArentSubclasses )
@@ -38,7 +38,7 @@ BOOST_AUTO_TEST_CASE( TestParentClassesArentSubclasses )
 	table.addClass("ChildClass");
 	table.addInheritance("ParentClass", 1);
 
-	BOOST_REQUIRE(!table.isASubtypeOfB("ParentClass", "ChildClass"));
+	BOOST_REQUIRE(!table.getAnalyzer()->isASubtypeOfB("ParentClass", "ChildClass"));
 }
 
 BOOST_AUTO_TEST_CASE( TestTransitiveSubclassesAreSubClasses )
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE( TestTransitiveSubclassesAreSubClasses )
 	table.addClass("ChildChildClass");
 	table.addInheritance("ChildClass", 1);
 
-	BOOST_REQUIRE(table.isASubtypeOfB("ChildChildClass", "ParentClass"));
+	BOOST_REQUIRE(table.getAnalyzer()->isASubtypeOfB("ChildChildClass", "ParentClass"));
 }
 
 BOOST_AUTO_TEST_SUITE_END()

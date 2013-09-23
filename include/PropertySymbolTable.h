@@ -10,6 +10,8 @@ extern "C" {
 	#include "node.h"
 }
 
+#include "TypeAnalyzer.h"
+
 using namespace std;
 
 class PropertySymbolTable {
@@ -18,10 +20,10 @@ class PropertySymbolTable {
 		Type* get(string name);
 		string addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, Node* body);
 		string getSymbolNameOf(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments);
+		TypeAnalyzer* analyzer;
 
 	private:
 		map<string, Type*> properties;
-		string getSymbolNameOf(Type* type);
 };
 
 #endif

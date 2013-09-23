@@ -377,9 +377,9 @@ expression_logicalunary:
 	;
 
 expression_multiply:
-	value																		{ $$ = $1; }
-	| expression_multiply '*' value												{ $$ = MakeTwoBranchNode(NT_MULTIPLY, $1, $3); }
-	| expression_multiply '/' value												{ $$ = MakeTwoBranchNode(NT_DIVIDE, $1, $3); }
+	expression_unary															{ $$ = $1; }
+	| expression_multiply '*' expression_unary									{ $$ = MakeTwoBranchNode(NT_MULTIPLY, $1, $3); }
+	| expression_multiply '/' expression_unary									{ $$ = MakeTwoBranchNode(NT_DIVIDE, $1, $3); }
 	;
 
 expression_add:

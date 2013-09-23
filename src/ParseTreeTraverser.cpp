@@ -173,183 +173,273 @@ void ParseTreeTraverser::secondPass(Node* tree) {
 }
 
 Type* ParseTreeTraverser::typeCheck(Node* tree) {
+	TypeAnalyzer* analyzer = objectsymtable.getAnalyzer();
 	Type* ret;
-	switch(tree->node_type) {
-		// Here is where the recursion ends
-		case NT_STRINGLIT:
-			ret = MakeType(NT_CLASS);
-			ret->typedata._class.classname = "Text";
-			ret->arrayed = 0;
-			break;
+	string erroneousstring;
+	string expectedstring;
 
-		case NT_NUMBERLIT:
-			ret = MakeType(NT_CLASS);
-			ret->typedata._class.classname = "Int";
-			ret->arrayed = 0;
-			break;
+	try {
+		switch(tree->node_type) {
+			// Here is where the recursion ends
+			case NT_STRINGLIT:
+				ret = MakeType(TYPE_CLASS);
+				ret->typedata._class.classname = "Text";
+				break;
 
-		case NT_TRUTHLIT:
-			ret = MakeType(NT_CLASS);
-			ret->typedata._class.classname = "Truth";
-			ret->arrayed = 0;
-			break;
+			case NT_NUMBERLIT:
+				ret = MakeType(TYPE_CLASS);
+				ret->typedata._class.classname = "Int";
+				break;
 
-		case NT_ALIAS:
-			ret = MakeType(NT_CLASS);
-			*ret = *scopesymtable.get(string("@") + tree->node_data.string);
-			break;
-
-		case NT_TYPEDATA:
-			ret = MakeType(NT_CLASS);
-			*ret = *scopesymtable.get(tree->node_data.type);
-			break;
-
-		// Backtracking from the above endpoints
-		case NT_MULTIPLY:
-		case NT_DIVIDE:
-		case NT_SUBTRACT:
-		case NT_LESSTHAN:
-		case NT_LESSTHANEQUAL:
-		case NT_GREATERTHAN:
-		case NT_GREATERTHANEQUAL:
-			{
-				ret = typeCheck(tree->node_data.nodes[0]);
-				Type* factor = typeCheck(tree->node_data.nodes[1]);
-				if(ret->type == TYPE_LAMBDA || factor->type == TYPE_LAMBDA) {
-					errors.push_back(new SemanticError(TYPE_ERROR, "Expected Ints. Cannot multiply lambdas.", tree, errorcontext));
-
-					ret = MakeType(NT_CLASS);
-					ret->typedata._class.classname = "Int";
-
-				} else if(ret->typedata._class.classname == string("Int") && ret->arrayed == 0) {
-					if(factor->typedata._class.classname != string("Int") || factor->arrayed != 0) {
-						errors.push_back(new SemanticError(TYPE_ERROR, "Second operand of * must be an int", tree, errorcontext));
-					}
-
-				} else {
-					ret->typedata._class.classname = "Int";
-					errors.push_back(new SemanticError(TYPE_ERROR, "First operand of * must be an int", tree, errorcontext));
-				}
-				delete factor;
-			}
-			break;
-
-		case NT_ADD:
-			{
-				ret = typeCheck(tree->node_data.nodes[0]);
-				Type* factor = typeCheck(tree->node_data.nodes[1]);
-				if(ret->type == TYPE_LAMBDA || factor->type == TYPE_LAMBDA) {
-					errors.push_back(new SemanticError(TYPE_ERROR, "Expected Ints. Cannot add lambdas.", tree, errorcontext));
-
-					ret = MakeType(NT_CLASS);
-					ret->typedata._class.classname = "Int";
-
-				} else if(ret->typedata._class.classname == string("Int") && ret->arrayed == 0) {
-					if(factor->typedata._class.classname != string("Int") || factor->arrayed != 0) {
-						errors.push_back(new SemanticError(TYPE_ERROR, "Second operand of + must be an int", tree, errorcontext));
-					}
-
-				} else if(ret->typedata._class.classname == string("Text") && ret->arrayed == 0) {
-					if(factor->typedata._class.classname != string("Text") || factor->arrayed != 0) {
-						errors.push_back(new SemanticError(TYPE_ERROR, "Second operand of + must be a Text", tree, errorcontext));
-					}
-
-				} else {
-					ret->typedata._class.classname = "Int";
-					errors.push_back(new SemanticError(TYPE_ERROR, "First operand of + must be an int or text", tree, errorcontext));
-				}
-				delete factor;
-			}
-			break;
-
-		case NT_EQUALITY:
-		case NT_INEQUALITY:
-			{
-				ret = typeCheck(tree->node_data.nodes[0]);
-				Type* cmp = typeCheck(tree->node_data.nodes[0]);
-
-				if(ret->type == TYPE_LAMBDA || cmp->type == TYPE_LAMBDA) {
-					errors.push_back(new SemanticError(TYPE_ERROR, "Expected Ints. Cannot compare equality of lambdas.", tree, errorcontext));
-
-					ret = MakeType(NT_CLASS);
-
-				} else if(string(ret->typedata._class.classname) != cmp->typedata._class.classname) {
-					errors.push_back(new SemanticError(TYPE_ERROR, "Equating different types", tree, errorcontext));
-
-				} else if(ret->arrayed != cmp->arrayed) {
-					errors.push_back(new SemanticError(TYPE_ERROR, "Unequal array (as in YourClass[]) amounts", tree, errorcontext));
-				}
-
-
+			case NT_TRUTHLIT:
+				ret = MakeType(TYPE_CLASS);
 				ret->typedata._class.classname = "Truth";
-			}
-			break;
+				break;
 
-		case NT_AND:
-		case NT_OR:
-			{
-				ret = typeCheck(tree->node_data.nodes[0]);
-				Type* cmp = typeCheck(tree->node_data.nodes[0]);
+			case NT_ALIAS:
+				ret = MakeType(TYPE_CLASS);
+				*ret = *scopesymtable.get(string("@") + tree->node_data.string);
+				break;
 
-				if(ret->type == TYPE_LAMBDA || cmp->type == TYPE_LAMBDA) {
-					errors.push_back(new SemanticError(TYPE_ERROR, "Expected Truths. Cannot compare equality of lambdas.", tree, errorcontext));
+			case NT_TYPEDATA:
+				ret = MakeType(TYPE_CLASS);
+				*ret = *scopesymtable.get(tree->node_data.type);
+				break;
 
+			// Backtracking from the above endpoints
+			case NT_MULTIPLY:
+			case NT_DIVIDE:
+			case NT_SUBTRACT:
+				{
+					ret = typeCheck(tree->node_data.nodes[0]);
+					Type* factor = typeCheck(tree->node_data.nodes[1]);
+
+					if(!analyzer->isPrimitiveTypeInt(ret) || !analyzer->isPrimitiveTypeInt(factor)) {
+						expectedstring = "Int";
+
+						if(analyzer->isPrimitiveTypeInt(ret)) {
+							erroneousstring = analyzer->getNameForType(factor);
+						} else {
+							erroneousstring = analyzer->getNameForType(ret); free(ret);
+							ret = MakeType(TYPE_CLASS);
+							ret->typedata._class.classname = "Int";
+						}
+
+						free(factor);
+
+						throw string("Mathematical operation performed on non-numerals");
+					}
+
+					free(factor);
+				}
+				break;
+
+			case NT_LESSTHAN:
+			case NT_LESSTHANEQUAL:
+			case NT_GREATERTHAN:
+			case NT_GREATERTHANEQUAL:
+				{
+					ret = MakeType(TYPE_CLASS);
 					ret->typedata._class.classname = "Truth";
-					ret = MakeType(NT_CLASS);
-				} else if(ret->typedata._class.classname != "Truth" || cmp->typedata._class.classname != "Truth" || ret->arrayed + cmp->arrayed > 0) {
-					errors.push_back(new SemanticError(TYPE_ERROR, "Cannot compare anything but Truth values with && or ||", tree, errorcontext));
-				}
-			}
-			break;
 
-		case NT_ARRAY_ACCESS:
-			{
-				ret = typeCheck(tree->node_data.nodes[0]);
-				Type* index = typeCheck(tree->node_data.nodes[1]);
-				if(index->type == TYPE_LAMBDA || string(index->typedata._class.classname) != "Int" || index->arrayed) {
-					errors.push_back(new SemanticError(TYPE_ERROR, "Array indexes must be ints", tree, errorcontext));
-				} else if(!ret->arrayed) {
-					errors.push_back(new SemanticError(TYPE_ERROR, "Attempting to get an index on a non array", tree, errorcontext));
-				} else {
+					Type* a = typeCheck(tree->node_data.nodes[0]);
+					Type* b = typeCheck(tree->node_data.nodes[1]);
+
+					if(!analyzer->isPrimitiveTypeInt(a) || !analyzer->isPrimitiveTypeInt(b)) {
+						expectedstring = "Int";
+
+						if(analyzer->isPrimitiveTypeInt(a)) {
+							erroneousstring = analyzer->getNameForType(b);
+						} else {
+							erroneousstring = analyzer->getNameForType(a); free(a);
+						}
+
+						free(b);
+
+						throw string("Mathematical operation performed on non-numerals");
+					}
+
+					free(b);
+				}
+				break;
+
+			case NT_ADD:
+				{
+					ret = typeCheck(tree->node_data.nodes[0]);
+					Type* additive = typeCheck(tree->node_data.nodes[1]);
+
+					if(analyzer->isPrimitiveTypeInt(ret)) {
+						if(!analyzer->isPrimitiveTypeInt(additive)) {
+							erroneousstring = analyzer->getNameForType(additive); free(additive);
+							expectedstring = "Int";
+							throw string("Addition with a non-numeral");
+						}
+
+					} else if(analyzer->isPrimitiveTypeText(ret)) {
+						if(!analyzer->isPrimitiveTypeText(additive)) {
+							erroneousstring = analyzer->getNameForType(additive); free(additive);
+							expectedstring = "Text";
+							throw string("Concatenation with non-Text");
+						}
+
+					} else {
+						expectedstring = "Int' or 'Text";
+						erroneousstring = analyzer->getNameForType(ret);
+						free(additive); free(ret);
+						ret = MakeType(TYPE_CLASS);
+						ret->typedata._class.classname = "Int";
+
+						throw string("Only numerics or Texts can be added/concatenated");
+					}
+
+					free(additive);
+				}
+				break;
+
+			case NT_EQUALITY:
+			case NT_INEQUALITY:
+				{
+					Type* a = typeCheck(tree->node_data.nodes[0]);
+					Type* b = typeCheck(tree->node_data.nodes[1]);
+					ret = MakeType(TYPE_CLASS);
+					ret->typedata._class.classname = "Truth";
+
+					if(!analyzer->isASubtypeOfB(a, b) && !analyzer->isASubtypeOfB(b, a)) {
+						expectedstring = analyzer->getNameForType(a);
+						erroneousstring = analyzer->getNameForType(b);
+						free(a); free(b);
+						throw string("Uncomparable types");
+					}
+
+					free(a);
+				}
+				break;
+
+			case NT_AND:
+			case NT_OR:
+				{
+					ret = typeCheck(tree->node_data.nodes[0]);
+					Type* cmp = typeCheck(tree->node_data.nodes[0]);
+
+					if(!analyzer->isPrimitiveTypeTruth(ret) || !analyzer->isPrimitiveTypeTruth(cmp)) {
+						if(analyzer->isPrimitiveTypeTruth(ret)) {
+							erroneousstring = analyzer->getNameForType(cmp);
+						} else {
+							erroneousstring = analyzer->getNameForType(ret); free(ret);
+							ret = MakeType(TYPE_CLASS);
+							ret->typedata._class.classname = "Truth";
+						}
+						free(cmp);
+
+						expectedstring = "Truth";
+
+						throw string("AND or OR comparison on non-Truth types");
+					}
+
+					free(cmp);
+				}
+				break;
+
+			case NT_ARRAY_ACCESS:
+				{
+					ret = typeCheck(tree->node_data.nodes[0]);
+					Type* index = typeCheck(tree->node_data.nodes[1]);
 					--ret->arrayed;
-				}
-			}
-			break;
 
-		case NT_ARGUMENTS:
-		case NT_ARGUMENT:
-		case NT_TYPE_ARRAY:
-		case NT_CURRIED:
-		case NT_MEMBER_ACCESS:
-		case NT_METHOD_INVOCATION:
-		case NT_LAMBDA_INVOCATION:
-		case NT_BLOCK:
-		case NT_EXPRESSIONS:
-		case NT_RETRIEVALS_STATEMENTS:
-		case NT_RETRIEVAL:
-		case NT_ASSIGNMENT:
-		case NT_CASE:
-		case NT_DEFAULTCASE:
-		case NT_IF_ELSE:
-		case NT_SWITCH:
-		case NT_WHILE:
-		case NT_FOR:
-		case NT_BREAK:
-		case NT_CONTINUE:
-		case NT_RETURN:
-		case NT_IF_THEN_ELSE:
-		case NT_VALUES:
-		case NT_ARRAY_DECLARATION:
-		case NT_INCREMENT:
-		case NT_DECREMENT:
-		case NT_INVERT:
-			{
-				int i = 0;
-				while(i < tree->subnodes) {
-					ret = typeCheck(tree->node_data.nodes[i]);
-					i++;
+					if(!analyzer->isPrimitiveTypeInt(index)) {
+						erroneousstring = analyzer->getNameForType(index); free(index);
+						expectedstring = "Int";
+						throw string("Array indices must be numeric");
+					} else if(ret->arrayed < 0) {
+						erroneousstring = analyzer->getNameForType(ret); free(index);
+						throw string("Getting index of non-array");
+					}
 				}
-			}
+				break;
+
+			case NT_IF_ELSE:
+			case NT_WHILE:
+				{
+					ret = typeCheck(tree->node_data.nodes[0]);
+					Type* temp = typeCheck(tree->node_data.nodes[1]);
+					free(temp);
+
+					if(tree->subnodes > 2) {
+						Type* temp = typeCheck(tree->node_data.nodes[2]);
+						free(temp);
+					}
+
+					if(!analyzer->isPrimitiveTypeTruth(ret)) {
+						expectedstring = "Truth"; free(ret);
+						ret = MakeType(TYPE_CLASS);
+						ret->typedata._class.classname = "Truth";
+						throw string("If/While conditions must be Truths");
+					}
+				}
+				break;
+
+			case NT_INVERT:
+				ret = typeCheck(tree->node_data.nodes[0]);
+
+				if(!analyzer->isPrimitiveTypeTruth(ret)) {
+					expectedstring = "Truth";
+					erroneousstring = analyzer->getNameForType(ret);
+					free(ret);
+					ret = MakeType(TYPE_CLASS);
+					ret->typedata._class.classname = "Truth";
+					ret->arrayed = 0;
+					throw string("If conditions must be Truths");
+				}
+				break;
+
+			case NT_RETURN:
+				ret = typeCheck(tree->node_data.nodes[0]);
+				if(!analyzer->isASubtypeOfB(ret, traversingmethod_return)) {
+					expectedstring = analyzer->getNameForType(traversingmethod_return);
+					erroneousstring = analyzer->getNameForType(ret);
+					throw string("Return type is incompatible with method signature");
+				}
+				break;
+
+			case NT_ARGUMENTS:
+			case NT_ARGUMENT:
+			case NT_TYPE_ARRAY:
+			case NT_CURRIED:
+			case NT_MEMBER_ACCESS:
+			case NT_METHOD_INVOCATION:
+			case NT_LAMBDA_INVOCATION:
+			case NT_BLOCK:
+			case NT_EXPRESSIONS:
+			case NT_RETRIEVALS_STATEMENTS:
+			case NT_RETRIEVAL:
+			case NT_ASSIGNMENT:
+			case NT_CASE:
+			case NT_DEFAULTCASE:
+			case NT_SWITCH:
+			case NT_FOR:
+			case NT_BREAK:
+			case NT_CONTINUE:
+			case NT_IF_THEN_ELSE:
+			case NT_VALUES:
+			case NT_ARRAY_DECLARATION:
+			case NT_INCREMENT:
+			case NT_DECREMENT:
+				{
+					int i = 0;
+					while(i < tree->subnodes) {
+						ret = typeCheck(tree->node_data.nodes[i]);
+						i++;
+					}
+				}
+		}
+	} catch(string errormsg) {
+		errormsg += "; expected '";
+		errormsg += expectedstring;
+		errormsg += "'; actual was '";
+		errormsg += erroneousstring;
+		errormsg += "'";
+
+		errors.push_back(new SemanticError(TYPE_ERROR, errormsg, tree, errorcontext));
 	}
 
 	return ret;
@@ -371,4 +461,3 @@ ParseTreeTraverser::~ParseTreeTraverser() {
 		delete *it;
 	}
 }
-

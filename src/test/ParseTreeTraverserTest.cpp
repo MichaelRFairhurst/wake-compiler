@@ -492,7 +492,7 @@ BOOST_AUTO_TEST_CASE( MultiplyIntsAndAnythingElseIsTypeError )
 		multiplyStringByInt() { 'test' * 5; }					\n\
 		multiplyIntByObject(MyClass) { 5 * MyClass; }			\n\
 		multiplyObjectByInt(MyClass) { MyClass * 5; }			\n\
-		multiplyLambdaByInt(fn() @lambda) { @lambda * 5; }		\n\
+		multiplyLambdaByInt(MyClass --fn(MyClass) @lambda) { @lambda * 5; }		\n\
 	");
 
 	e.expect(TYPE_ERROR);
@@ -598,14 +598,14 @@ BOOST_AUTO_TEST_CASE( ValidArithmeticAndComparisonsReturnProperTypes )
 			5 + 5 + 5;					// done thrice to ensure int returned		\n\
 			5 - 5 - 5;					// done thrice to ensure int returned		\n\
 			'test' + 'test' + 'test';	// done thrice to ensure string returned	\n\
-			('test' == 'test') == True;	// test returns truth						\n\
-			('test' != 'test') == True;	// test returns truth						\n\
-			(5 == 5) == True;				// test returns truth						\n\
-			(5 != 5) == True;				// test returns truth						\n\
-			(5 < 5) == True;				// test returns truth						\n\
-			(5 > 5) == True;				// test returns truth						\n\
-			(5 <= 5) == True;				// test returns truth						\n\
-			(5 >= 5) == True;				// test returns truth						\n\
+			'test' == 'test' == True;	// test returns truth						\n\
+			'test' != 'test' == True;	// test returns truth						\n\
+			5 == 5 == True;				// test returns truth						\n\
+			5 != 5 == True;				// test returns truth						\n\
+			5 < 5 == True;				// test returns truth						\n\
+			5 > 5 == True;				// test returns truth						\n\
+			5 <= 5 == True;				// test returns truth						\n\
+			5 >= 5 == True;				// test returns truth						\n\
 		}																			\n\
 	");
 
@@ -727,6 +727,158 @@ BOOST_AUTO_TEST_CASE(ValidArrayIndexAccessAndReturningValidTypes)
 		stringArrayBecomesString(Text[]) { Text[1] + 'test'; }				\n\
 		stringArrayArrayBecomesString(Text[][]) { Text[1][1] + 'test'; }	\n\
 		intArrayArrayBecomesInt(Int[][]) { Int[1][1] + 5; }					\n\
+	");
+
+	t.traverse(p.getParseTree());
+	t.printErrors(e);
+
+	BOOST_REQUIRE(e.passed());
+}
+
+BOOST_AUTO_TEST_CASE(CannotIfCondOrInvertWithAnythingButTruths)
+{
+	Parser p;
+	ParseTreeTraverser t;
+	MockSemanticErrorPrinter e;
+
+	p.parse("every MyClass is:							\n\
+		ifConditionWithInt() { if(5) 5; }				\n\
+		ifConditionWith( MyClass ) { if(MyClass) 5; }	\n\
+		ifConditionWithText() { if('test') 5; }			\n\
+		whileConditionWithInt() { while(5) 5; }				\n\
+		whileConditionWith( MyClass ) { while(MyClass) 5; }	\n\
+		whileConditionWithText() { while('test') 5; }			\n\
+		invertInt() { !5; }								\n\
+		invertText() { !'test'; }						\n\
+		invert( MyClass ) { !MyClass; }					\n\
+	");
+
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+
+	t.traverse(p.getParseTree());
+	t.printErrors(e);
+
+	BOOST_REQUIRE(e.passed());
+}
+
+BOOST_AUTO_TEST_CASE(CatchesTypeErrorsWithinIfElseAndInvertWorks)
+{
+	Parser p;
+	ParseTreeTraverser t;
+	MockSemanticErrorPrinter e;
+
+	p.parse("every MyClass is:										\n\
+		failInIf() { if(True) 5 + 'illegal'; }						\n\
+		failInElse() { if(True) 5; else 5 + 'illegal'; }			\n\
+		failInIfInverted() { if(!True) 5 + 'illegal'; }				\n\
+		failInElseInverted() { if(!True) 5; else 5 + 'illegal'; }	\n\
+		failInWhile() { while(!True) 5 + 'illegal'; }				\n\
+		failInWhileInverted() { while(!True) 5 + 'illegal'; }		\n\
+	");
+
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+
+	t.traverse(p.getParseTree());
+	t.printErrors(e);
+
+	BOOST_REQUIRE(e.passed());
+}
+
+BOOST_AUTO_TEST_CASE(ValidIfConditions)
+{
+	Parser p;
+	ParseTreeTraverser t;
+	MockSemanticErrorPrinter e;
+
+	p.parse("every Truth is: every MyClass is:			\n\
+		truthLiterals() { if(True) 5; if(False) 5; }	\n\
+		truthVariable(Truth) { if(Truth) 5; }			\n\
+		truthAlias(Truth @a) { if(@a) 5; }				\n\
+		truthLiteralsWhile() { while(True) 5; while(False) 5; }	\n\
+		truthVariableWhile(Truth) { while(Truth) 5; }			\n\
+		truthAliasWhile(Truth @a) { while(@a) 5; }				\n\
+	");
+
+	t.traverse(p.getParseTree());
+	t.printErrors(e);
+
+	BOOST_REQUIRE(e.passed());
+}
+
+BOOST_AUTO_TEST_CASE(InvalidReturnValues)
+{
+	Parser p;
+	ParseTreeTraverser t;
+	MockSemanticErrorPrinter e;
+
+	p.parse("every Truth is: every Int is: every Text is:										\n\
+		every UnrelatedClass is:																\n\
+		every ParentClass is:																	\n\
+		every MyClass (a ParentClass) is:														\n\
+			Truth -- returnTextLiteralAsTruth() { return 'text'; }								\n\
+			Truth -- returnNumberLiteralAsTruth() { return 1; }									\n\
+			Truth -- returnClassAsTruth(MyClass) { return MyClass; }							\n\
+			Text -- returnTruthLiteralAsText() { return True; }									\n\
+			Text -- returnNumberLiteralAsText() { return 1; }									\n\
+			Text -- returnClassAsText(MyClass) { return MyClass; }								\n\
+			Int -- returnTruthLiteralAsInt() { return True; }									\n\
+			Int -- returnTextLiteralAsInt() { return 'text'; }									\n\
+			Int -- returnClassAsInt(MyClass) { return MyClass; }								\n\
+			MyClass -- returnTruthLiteralAsClass() { return True; }								\n\
+			MyClass -- returnTextLiteralAsClass() { return 'test'; }							\n\
+			MyClass -- returnIntLiteralAsClass() { return 1; }									\n\
+			MyClass -- returnUnrelatedClassAsClass(UnrelatedClass) { return UnrelatedClass; }	\n\
+			MyClass -- returnParentClassAsClass(ParentClass) { return ParentClass; }			\n\
+	");
+
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	t.traverse(p.getParseTree());
+	t.printErrors(e);
+
+	BOOST_REQUIRE(e.passed());
+}
+
+BOOST_AUTO_TEST_CASE(ValidReturnValues)
+{
+	Parser p;
+	ParseTreeTraverser t;
+	MockSemanticErrorPrinter e;
+
+	p.parse("every Truth is: every Int is: every Text is:								\n\
+		every RelatedClass (a MyClass) is:												\n\
+		every MyClass is:																\n\
+			Truth -- returnTruth() { return True; }										\n\
+			Text -- returnText() { return 'text'; }										\n\
+			Int -- returnInt() { return 5; }											\n\
+			MyClass -- returnAMyClass(MyClass) { return MyClass; }						\n\
+			MyClass -- returnARelatedClass(RelatedClass) { return RelatedClass; }		\n\
+			MyClass -- returnRelatedClassAsClass(RelatedClass) { return RelatedClass; }	\n\
 	");
 
 	t.traverse(p.getParseTree());

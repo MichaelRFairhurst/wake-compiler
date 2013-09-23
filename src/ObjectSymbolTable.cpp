@@ -2,32 +2,20 @@
 #include <algorithm>
 #include "CompilationExceptions.h"
 
+ObjectSymbolTable::ObjectSymbolTable() {
+	analyzer.reference = this;
+}
+
 ObjectSymbolTable::~ObjectSymbolTable() {
 	for(map<string, PropertySymbolTable*>::iterator it = classes.begin(); it != classes.end(); ++it) {
 		delete it->second;
 	}
 }
 
-bool ObjectSymbolTable::isASubtypeOfB(string a, string b) {
-	try {
-		if(a == b) return true;
-
-		PropertySymbolTable* a_data = find(a);
-
-		for(map<string, bool>::iterator it = a_data->parentage.begin(); it != a_data->parentage.end(); ++it) {
-			if(isASubtypeOfB(it->first, b)) return true;
-		}
-
-	} catch(SymbolNotFoundException* e) {
-		delete e;
-	}
-
-	return false;
-}
-
 void ObjectSymbolTable::addClass(string name) {
 	addingclass_name = name;
 	addingclass_symbol = new PropertySymbolTable();
+	addingclass_symbol->analyzer = &analyzer;
 	addingclass_hassubclass = false;
 
 	if(classes.count(addingclass_name)) {
@@ -46,7 +34,7 @@ void ObjectSymbolTable::addInheritance(string childname, bool as_subclass) {
 		throw new SemanticError(SELF_INHERITANCE);
 	}
 
-	if(isASubtypeOfB(childname, addingclass_name)) {
+	if(analyzer.isASubtypeOfB(childname, addingclass_name)) {
 		throw new SemanticError(CIRCULAR_INHERITANCE);
 	}
 
@@ -84,4 +72,8 @@ void ObjectSymbolTable::assertTypeIsValid(Type* type) {
 		for(i = 0; i < type->typedata.lambda.arguments->typecount; i++)
 			assertTypeIsValid(type->typedata.lambda.arguments->types[i]);
 	}
+}
+
+TypeAnalyzer* ObjectSymbolTable::getAnalyzer() {
+	return &analyzer;
 }

@@ -32,38 +32,14 @@ Type* PropertySymbolTable::get(string name) {
 }
 
 string PropertySymbolTable::getSymbolNameOf(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments) {
-	string name = getSymbolNameOf(returntype) + "--";
+	string name = analyzer->getNameForType(returntype) + "--";
 	for(vector<pair<string, TypeArray*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
 		name += it->first;
 		name += "(";
 		int i;
 		for(i = 0; i < it->second->typecount; i++) {
 			if(i) name += ",";
-			name += getSymbolNameOf(it->second->types[i]);
-		}
-		name += ")";
-	}
-
-	return name;
-}
-
-string PropertySymbolTable::getSymbolNameOf(Type* type) {
-	string name;
-
-	if(type == NULL) {
-		name = "VOID";
-		return name;
-	}
-
-	if(type->type == TYPE_CLASS) {
-		name = type->typedata._class.classname;
-	} else {
-		if(type->typedata.lambda.arguments != NULL) {
-			int i;
-			for(i = 0; i < type->typedata.lambda.arguments->typecount; i++) {
-				if(i) name += ",";
-				name += getSymbolNameOf(type->typedata.lambda.arguments->types[i]);
-			}
+			name += analyzer->getNameForType(it->second->types[i]);
 		}
 		name += ")";
 	}
