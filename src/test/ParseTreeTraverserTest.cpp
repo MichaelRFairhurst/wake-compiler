@@ -887,4 +887,144 @@ BOOST_AUTO_TEST_CASE(ValidReturnValues)
 	BOOST_REQUIRE(e.passed());
 }
 
+BOOST_AUTO_TEST_CASE(InvalidAssignments)
+{
+	Parser p;
+	ParseTreeTraverser t;
+	MockSemanticErrorPrinter e;
+
+	p.parse("every Truth is: every Int is: every Text is:						\n\
+		every UnrelatedClass is:												\n\
+		every ParentClass is:													\n\
+		every MyClass (a ParentClass) is:										\n\
+			assignTruthTo(Int) { Int = True; }									\n\
+			assignTextTo(Int) { Int = 'text'; }									\n\
+			assignA(MyClass)To(Int) { Int = MyClass; }							\n\
+			assignTruthTo(Text) { Text = True; }								\n\
+			assignIntTo(Text) { Text = 5; }										\n\
+			assignA(MyClass)To(Text) { Text = MyClass; }						\n\
+			assignAn(UnrelatedClass)To(MyClass) { MyClass = UnrelatedClass; }	\n\
+			assignA(ParentClass)To(MyClass) { MyClass = ParentClass; }			\n\
+	");
+
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+
+	t.traverse(p.getParseTree());
+	t.printErrors(e);
+
+	BOOST_REQUIRE(e.passed());
+}
+
+BOOST_AUTO_TEST_CASE(ValidAssignments)
+{
+	Parser p;
+	ParseTreeTraverser t;
+	MockSemanticErrorPrinter e;
+
+	p.parse("every Truth is: every Int is: every Text is:				\n\
+		every ParentClass is:											\n\
+		every MyClass (a ParentClass) is:								\n\
+			assignTruthTo(Truth) { Truth = True; }						\n\
+			assignTextTo(Text) { Text = 'text'; }						\n\
+			assignIntTo(Int) { Int = 5; }								\n\
+			assign(MyClass @a)To(MyClass @b) { @a = @b; }				\n\
+			assignA(MyClass)To(ParentClass) { ParentClass = MyClass; }	\n\
+	");
+
+	t.traverse(p.getParseTree());
+	t.printErrors(e);
+
+	BOOST_REQUIRE(e.passed());
+}
+
+BOOST_AUTO_TEST_CASE(InvalidLambdaInvocations)
+{
+	Parser p;
+	ParseTreeTraverser t;
+	MockSemanticErrorPrinter e;
+
+	p.parse("every Truth is: every Int is: every Text is:						\n\
+		every UnrelatedClass is: every ParentClass is:							\n\
+		every MyClass (a ParentClass) is:										\n\
+			call(fn(Text) @fn)WithInt() { @fn(4); }								\n\
+			call(fn(Text) @fn)WithTruth() { @fn(True); }						\n\
+			call(fn(Text) @fn)With(MyClass) { @fn(MyClass); }					\n\
+			call(fn(Truth) @fn)With(MyClass) { @fn(MyClass); }					\n\
+			call(fn(Truth) @fn)WithInt() { @fn(4); }							\n\
+			call(fn(Truth) @fn)WithText() { @fn('test'); }						\n\
+			call(fn(Int) @fn)WithText() { @fn('test'); }						\n\
+			call(fn(Int) @fn)WithTruth() { @fn(True); }							\n\
+			call(fn(Int) @fn)With(MyClass) { @fn(MyClass); }					\n\
+			call(fn(Int, Text) @fn)WithTextInt() { @fn('abc', 4); }				\n\
+			call(fn(MyClass) @fn)With(UnrelatedClass) { @fn(UnrelatedClass); }	\n\
+			call(fn(MyClass) @fn)With(ParentClass) { @fn(ParentClass); }		\n\
+	");
+
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+
+	t.traverse(p.getParseTree());
+	t.printErrors(e);
+
+	BOOST_REQUIRE(e.passed());
+}
+
+BOOST_AUTO_TEST_CASE(ValidLambdaInvocations)
+{
+	Parser p;
+	ParseTreeTraverser t;
+	MockSemanticErrorPrinter e;
+
+	p.parse("every Truth is: every Int is: every Text is:																	\n\
+		every ParentClass is:																								\n\
+		every MyClass (a ParentClass) is:																					\n\
+																															\n\
+			call(fn(Text) @fn)WithText() { @fn('test'); }																	\n\
+																															\n\
+			call(fn(Truth) @fn)WithTruth() { @fn(True); }																	\n\
+																															\n\
+			call(fn(Int) @fn)WithInt() { @fn(4); }																			\n\
+																															\n\
+			call(fn(ParentClass) @fn)With(MyClass) { @fn(MyClass); }														\n\
+																															\n\
+			Text -- call(Text -- fn(Text, Int, Truth, ParentClass) @fn)WithProperArgsAnd(MyClass) {							\n\
+				return @fn('text', 4, True, MyClass);																		\n\
+			}																												\n\
+																															\n\
+			Int -- call(Int -- fn(Int, Truth, ParentClass, Text) @fn)WithProperArgsAnd(MyClass) {							\n\
+				return @fn(4, True, MyClass, 'text');																		\n\
+			}																												\n\
+																															\n\
+			Truth -- call(Truth -- fn(Truth, ParentClass, Text, Int) @fn)WitProperArgsAnd(MyClass) {						\n\
+				return @fn(True, MyClass, 'text', 4);																		\n\
+			}																												\n\
+																															\n\
+			MyClass -- call(MyClass -- fn(ParentClass, Truth, Text, Int) @fn)WithProperArgsAnd(MyClass) {					\n\
+				return @fn(MyClass, True, 'text', 4);																		\n\
+			}																												\n\
+	");
+
+	t.traverse(p.getParseTree());
+	t.printErrors(e);
+
+	BOOST_REQUIRE(e.passed());
+}
+
 BOOST_AUTO_TEST_SUITE_END()

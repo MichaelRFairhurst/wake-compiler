@@ -198,12 +198,12 @@ Type* ParseTreeTraverser::typeCheck(Node* tree) {
 
 			case NT_ALIAS:
 				ret = MakeType(TYPE_CLASS);
-				*ret = *scopesymtable.get(string("@") + tree->node_data.string);
+				*ret = *scopesymtable.get(string("@") + tree->node_data.string); // COPY
 				break;
 
 			case NT_TYPEDATA:
 				ret = MakeType(TYPE_CLASS);
-				*ret = *scopesymtable.get(tree->node_data.type);
+				*ret = *scopesymtable.get(tree->node_data.type); // COPY
 				break;
 
 			// Backtracking from the above endpoints
@@ -392,7 +392,7 @@ Type* ParseTreeTraverser::typeCheck(Node* tree) {
 				}
 				break;
 
-			case NT_RETURN:
+			case NT_RETURN: // TODO: void methods
 				ret = typeCheck(tree->node_data.nodes[0]);
 				if(!analyzer->isASubtypeOfB(ret, traversingmethod_return)) {
 					expectedstring = analyzer->getNameForType(traversingmethod_return);
@@ -401,29 +401,69 @@ Type* ParseTreeTraverser::typeCheck(Node* tree) {
 				}
 				break;
 
-			case NT_ARGUMENTS:
-			case NT_ARGUMENT:
-			case NT_TYPE_ARRAY:
+			case NT_ASSIGNMENT:
+				{
+					ret = typeCheck(tree->node_data.nodes[0]);
+					Type* assignment = typeCheck(tree->node_data.nodes[1]);
+					if(!analyzer->isASubtypeOfB(assignment, ret)) {
+						expectedstring = analyzer->getNameForType(ret);
+						erroneousstring = analyzer->getNameForType(assignment);
+						throw string("Invalid type in assignment");
+					}
+					free(assignment);
+				}
+				break;
+
+			case NT_LAMBDA_INVOCATION:
+				{
+					Type* lambda = typeCheck(tree->node_data.nodes[0]);
+					Type* actual = MakeType(TYPE_LAMBDA);
+					ret = actual->typedata.lambda.returntype = lambda->typedata.lambda.returntype;
+
+					if(tree->subnodes == 2) {
+						int i;
+						for(i = 0; i < tree->node_data.nodes[1]->subnodes; i++) {
+							AddTypeToTypeArray(typeCheck(tree->node_data.nodes[1]->node_data.nodes[i]), actual->typedata.lambda.arguments);
+						}
+					}
+
+					if(!analyzer->isASubtypeOfB(actual, lambda)) {
+						expectedstring = analyzer->getNameForType(lambda);
+						erroneousstring = analyzer->getNameForType(actual);
+						free(actual); // TODO: must be recursive (this is a guaranteed memleak)
+						throw string("Argument lists not compatible in function invocation");
+					}
+
+					free(actual); // TODO: must be recursive (this is a guaranteed memleak)
+				}
+				break;
+
+			// These need to have typechecking implemented
 			case NT_CURRIED:
 			case NT_MEMBER_ACCESS:
 			case NT_METHOD_INVOCATION:
-			case NT_LAMBDA_INVOCATION:
-			case NT_BLOCK:
-			case NT_EXPRESSIONS:
-			case NT_RETRIEVALS_STATEMENTS:
-			case NT_RETRIEVAL:
-			case NT_ASSIGNMENT:
-			case NT_CASE:
-			case NT_DEFAULTCASE:
 			case NT_SWITCH:
 			case NT_FOR:
-			case NT_BREAK:
-			case NT_CONTINUE:
-			case NT_IF_THEN_ELSE:
-			case NT_VALUES:
+			case NT_RETRIEVAL:
 			case NT_ARRAY_DECLARATION:
 			case NT_INCREMENT:
 			case NT_DECREMENT:
+			case NT_IF_THEN_ELSE:
+			case NT_CASE:
+
+			// these might not be necessary
+			case NT_ARGUMENTS:
+			case NT_ARGUMENT:
+			case NT_TYPE_ARRAY:
+			case NT_VALUES:
+
+			// these don't have types
+			case NT_BLOCK:
+			case NT_EXPRESSIONS:
+			case NT_RETRIEVALS_STATEMENTS:
+			case NT_DEFAULTCASE:
+			case NT_BREAK:
+			case NT_CONTINUE:
 				{
 					int i = 0;
 					while(i < tree->subnodes) {

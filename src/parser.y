@@ -52,7 +52,7 @@ int yywrap()
 %token <number> TRUTH
 %token <number> SYM_SHADOW
 %token <number> SYM_ARRAYED
-%type <node> imports import import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection_ctor injection_ctorargs injection_binding injection_bindings injection_ctorarg ctor ctorargs expression value method block methodreturn methodnamesegments methodbody methodcallsegments curryablevalues expression expressions retrievalsandstatements retrievalorstatement retrieval statement labelstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional type_valued
+%type <node> imports import import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection_ctor injection_ctorargs injection_binding injection_bindings injection_ctorarg ctor ctorargs expression value method block methodreturn methodnamesegments methodbody methodcallsegments curryableexpressions expression expressions retrievalsandstatements retrievalorstatement retrieval statement labelstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional type_valued
 %type <type>  type_returnable type_arrayablereturn type_assignable type_common type_lambda type_commonorlambda type_provided type_ctor
 %type <type_array> assignabletypes commonorlambdatypes
 %start file
@@ -196,8 +196,8 @@ methodnamesegments:
 
 methodcallsegments:
 	IDENTIFIER '(' ')'															{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
-	| IDENTIFIER '(' curryablevalues ')'										{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1), $3); }
-	| IDENTIFIER '(' curryablevalues ')' methodcallsegments						{ $$ = $5; PrependSubNode($5, $3); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
+	| IDENTIFIER '(' curryableexpressions ')'										{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1), $3); }
+	| IDENTIFIER '(' curryableexpressions ')' methodcallsegments						{ $$ = $5; PrependSubNode($5, $3); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
 	;
 
 assignabletypes:
@@ -259,11 +259,11 @@ type_ctor:
 	| type_lambda SPECIALTY ALIAS												{ $$ = $1; $$->alias = $3; $$->specialty = $2; }
 	;
 
-curryablevalues:
-	value																		{ $$ = MakeOneBranchNode(NT_VALUES, $1); }
-	| SYM_CURRIER																{ $$ = MakeEmptyNode(NT_CURRIED); }
-	| curryablevalues ',' value													{ $$ = $1; AddSubNode($1, $3); }
-	| curryablevalues ',' SYM_CURRIER											{ $$ = $1; AddSubNode($1, MakeEmptyNode(NT_CURRIED)); }
+curryableexpressions:
+	expression																	{ $$ = MakeOneBranchNode(NT_VALUES, $1); }
+	| SYM_CURRIER																{ $$ = MakeOneBranchNode(NT_VALUES, MakeEmptyNode(NT_CURRIED)); }
+	| curryableexpressions ',' expression										{ $$ = $1; AddSubNode($1, $3); }
+	| curryableexpressions ',' SYM_CURRIER										{ $$ = $1; AddSubNode($1, MakeEmptyNode(NT_CURRIED)); }
 	;
 
 value:
@@ -273,7 +273,7 @@ value:
 	| methodcallsegments														{ $$ = $1; }
 	| value '.' methodcallsegments												{ $$ = MakeTwoBranchNode(NT_METHOD_INVOCATION, $1, $3); }
 	| value '(' ')'																{ $$ = MakeOneBranchNode(NT_LAMBDA_INVOCATION, $1); }
-	| value '(' curryablevalues ')'												{ $$ = MakeTwoBranchNode(NT_LAMBDA_INVOCATION, $1, $3); }
+	| value '(' curryableexpressions ')'										{ $$ = MakeTwoBranchNode(NT_LAMBDA_INVOCATION, $1, $3); }
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
 	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
 	| TRUTH																		{ $$ = MakeNodeFromNumber(NT_TRUTHLIT, $1); }
@@ -420,6 +420,7 @@ expression_conditional:
 expression:
 	expression_conditional														{ $$ = $1; }
 	| type_assignable '=' expression											{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1), $3); }
+	| ALIAS '=' expression														{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromString(NT_ALIAS, $1), $3); }
 	;
 
 expressions:

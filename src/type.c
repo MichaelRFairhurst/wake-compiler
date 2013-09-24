@@ -13,7 +13,7 @@ Type* MakeType(int type) {
 			break;
 		case TYPE_LAMBDA:
 			thetype->typedata.lambda.returntype = NULL;
-			thetype->typedata.lambda.arguments = NULL;
+			thetype->typedata.lambda.arguments = MakeTypeArray();
 			break;
 	}
 	return thetype;

@@ -34,7 +34,7 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 		// however, void --fn() is not a subtype of Truth -- fn() as you probably guessed
 		if(a->typedata.lambda.returntype == NULL && b->typedata.lambda.returntype != NULL)
 			return false;
-		else if(!isASubtypeOfB(a->typedata.lambda.returntype, b->typedata.lambda.returntype))
+		else if(b->typedata.lambda.returntype != NULL && !isASubtypeOfB(a->typedata.lambda.returntype, b->typedata.lambda.returntype))
 			return false;
 
 		int i;
@@ -91,6 +91,9 @@ string TypeAnalyzer::getNameForType(Type* type) {
 	if(type->type == TYPE_CLASS) {
 		name = type->typedata._class.classname;
 	} else {
+		name = getNameForType(type->typedata.lambda.returntype);
+		name += "--(";
+
 		if(type->typedata.lambda.arguments != NULL) {
 			int i;
 			for(i = 0; i < type->typedata.lambda.arguments->typecount; i++) {
