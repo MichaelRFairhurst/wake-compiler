@@ -20,6 +20,7 @@ class Parser {
 		 bool parse(char* input);
 		 void print();
 		 Node* getParseTree();
+		 ~Parser();
 };
 
 #endif

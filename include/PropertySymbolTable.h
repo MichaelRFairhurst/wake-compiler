@@ -16,6 +16,7 @@ using namespace std;
 
 class PropertySymbolTable {
 	public:
+		~PropertySymbolTable();
 		map<string, bool> parentage;
 		Type* get(string name);
 		string addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, Node* body);

@@ -14,13 +14,14 @@ ObjectSymbolTable::~ObjectSymbolTable() {
 
 void ObjectSymbolTable::addClass(string name) {
 	addingclass_name = name;
-	addingclass_symbol = new PropertySymbolTable();
-	addingclass_symbol->analyzer = &analyzer;
-	addingclass_hassubclass = false;
 
 	if(classes.count(addingclass_name)) {
 		throw new SemanticError(MULTIPLE_CLASS_DEFINITION);
 	}
+
+	addingclass_symbol = new PropertySymbolTable();
+	addingclass_symbol->analyzer = &analyzer;
+	addingclass_hassubclass = false;
 
 	classes[addingclass_name] = addingclass_symbol;
 }

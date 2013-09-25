@@ -7,17 +7,18 @@ string PropertySymbolTable::addMethod(Type* returntype, vector<pair<string, Type
 
 	if(properties.count(name)) {
 		string temp = "duplicate method signature is " + name;
+		freeType(method);
 		throw new SemanticError(MULTIPLE_METHOD_DEFINITION, temp);
 	}
 
-	method->typedata.lambda.returntype = returntype;
+	method->typedata.lambda.returntype = copyType(returntype);
 	method->typedata.lambda.body = body;
 
 	TypeArray* conglomerate = MakeTypeArray();
 	for(vector<pair<string, TypeArray*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
 		int i;
 		for(i = 0; i < it->second->typecount; i++)
-			AddTypeToTypeArray(it->second->types[i], conglomerate);
+			AddTypeToTypeArray(copyType(it->second->types[i]), conglomerate);
 	}
 
 	method->typedata.lambda.arguments = conglomerate;
@@ -45,4 +46,10 @@ string PropertySymbolTable::getSymbolNameOf(Type* returntype, vector<pair<string
 	}
 
 	return name;
+}
+
+PropertySymbolTable::~PropertySymbolTable() {
+	for(map<string, Type*>::iterator it = properties.begin(); it != properties.end(); ++it) {
+		freeType(it->second);
+	}
 }

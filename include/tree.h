@@ -116,4 +116,6 @@ char* getTypeLabel(Type* thetype);
 
 void printtree (Node *n, int level);
 
+void freeNode (Node *n);
+
 #endif

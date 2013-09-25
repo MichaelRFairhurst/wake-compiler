@@ -32,5 +32,9 @@ typedef struct TypeArray {
 Type* MakeType(int type);
 TypeArray* MakeTypeArray();
 void AddTypeToTypeArray(Type* nexttype, TypeArray* container);
+void freeType(Type* t);
+void freeTypeArray(TypeArray* ta);
+Type* copyType(Type* t);
+TypeArray* copyTypeArray(TypeArray* ta);
 
 #endif

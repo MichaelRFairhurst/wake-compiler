@@ -15,16 +15,26 @@ every MethodErrorsHere is:
 
 	NonExist -- returnTypeDoesntExist() {}
 
+	#>
+	# A block comment!
+	##
 	doMethodWith(NonExist) {}
 
+	// a dangling block comment end
+	##
 	doMethodWith(ExistsA, ExistsB) {}
 
 	doMethodWith(ExistsA, ExistsB) {}
 
-	doMethodWith(ExistsA, ExistsB) {
-		//ExistsA;
-		//5 * 5;
-		//5 * "test";
-		return 5 + ( 5 + ( 5 + ("test" * 5) / 4 ) * 6) + "test";
-		//5 + @nonexist;
+	doXMethodWith(ExistsA, ExistsB) {
+		5 * "test";
+	}
+
+	ExistsB -- do1(ExistsA[][]) {
+		5;
+		return ExistsA;
+	}
+
+	ExistsB -- do1(ExistsA -- fn(ExistsB, ExistsA, ExistsA -- fn()) @mfn) {
+		@mfn = 5;
 	}

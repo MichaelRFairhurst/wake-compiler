@@ -335,6 +335,7 @@ iterationstatement:
 
 forinit:
 	retrieval																	{ $$ = $1; }
+	| statement																	{ $$ = $1; }
 	| ';'																		{ $$ = MakeEmptyNode(NT_EMPTY); }
 	;
 

@@ -748,11 +748,17 @@ BOOST_AUTO_TEST_CASE(CannotIfCondOrInvertWithAnythingButTruths)
 		whileConditionWithInt() { while(5) 5; }				\n\
 		whileConditionWith( MyClass ) { while(MyClass) 5; }	\n\
 		whileConditionWithText() { while('test') 5; }			\n\
+		forConditionWithInt() { for(5; 5; 5) 5; }				\n\
+		forConditionWith( MyClass ) { for(5; MyClass; 5) 5; }	\n\
+		forConditionWithText() { for(5; 'test'; 5) 5; }			\n\
 		invertInt() { !5; }								\n\
 		invertText() { !'test'; }						\n\
 		invert( MyClass ) { !MyClass; }					\n\
 	");
 
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
 	e.expect(TYPE_ERROR);
 	e.expect(TYPE_ERROR);
 	e.expect(TYPE_ERROR);
@@ -775,15 +781,27 @@ BOOST_AUTO_TEST_CASE(CatchesTypeErrorsWithinIfElseAndInvertWorks)
 	ParseTreeTraverser t;
 	MockSemanticErrorPrinter e;
 
-	p.parse("every MyClass is:										\n\
-		failInIf() { if(True) 5 + 'illegal'; }						\n\
-		failInElse() { if(True) 5; else 5 + 'illegal'; }			\n\
-		failInIfInverted() { if(!True) 5 + 'illegal'; }				\n\
-		failInElseInverted() { if(!True) 5; else 5 + 'illegal'; }	\n\
-		failInWhile() { while(!True) 5 + 'illegal'; }				\n\
-		failInWhileInverted() { while(!True) 5 + 'illegal'; }		\n\
+	p.parse("every MyClass is:											\n\
+		failInIf() { if(True) 5 + 'illegal'; }							\n\
+		failInElse() { if(True) 5; else 5 + 'illegal'; }				\n\
+		failInIfInverted() { if(!True) 5 + 'illegal'; }					\n\
+		failInElseInverted() { if(!True) 5; else 5 + 'illegal'; }		\n\
+		failInWhile() { while(!True) 5 + 'illegal'; }					\n\
+		failInWhileInverted() { while(!True) 5 + 'illegal'; }			\n\
+		failInFor() { for(5; !True; 5) 5 + 'illegal'; }					\n\
+		failInForInverted() { for(5; !True; 5) 5 + 'illegal'; }			\n\
+		failInForInit() { for(5 + 'illegal'; !True; 5) 5; }				\n\
+		failInForInitInverted() { for( 5 + 'illegal'; !True; 5) 5; }	\n\
+		failInForIncr() { for(5; !True; 5 + 'illegal') 5; }				\n\
+		failInForIncrInverted() { for(5; !True; 5 + 'illegal') 5; }		\n\
 	");
 
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
 	e.expect(TYPE_ERROR);
 	e.expect(TYPE_ERROR);
 	e.expect(TYPE_ERROR);
@@ -831,19 +849,35 @@ BOOST_AUTO_TEST_CASE(InvalidReturnValues)
 			Truth -- returnTextLiteralAsTruth() { return 'text'; }								\n\
 			Truth -- returnNumberLiteralAsTruth() { return 1; }									\n\
 			Truth -- returnClassAsTruth(MyClass) { return MyClass; }							\n\
+			Truth -- returnNothingAsTruth() { return; }											\n\
 			Text -- returnTruthLiteralAsText() { return True; }									\n\
 			Text -- returnNumberLiteralAsText() { return 1; }									\n\
 			Text -- returnClassAsText(MyClass) { return MyClass; }								\n\
+			Text -- returnNothingAsText() { return; }											\n\
 			Int -- returnTruthLiteralAsInt() { return True; }									\n\
 			Int -- returnTextLiteralAsInt() { return 'text'; }									\n\
 			Int -- returnClassAsInt(MyClass) { return MyClass; }								\n\
+			Int -- returnNothingAsInt() { return; }												\n\
 			MyClass -- returnTruthLiteralAsClass() { return True; }								\n\
 			MyClass -- returnTextLiteralAsClass() { return 'test'; }							\n\
 			MyClass -- returnIntLiteralAsClass() { return 1; }									\n\
 			MyClass -- returnUnrelatedClassAsClass(UnrelatedClass) { return UnrelatedClass; }	\n\
 			MyClass -- returnParentClassAsClass(ParentClass) { return ParentClass; }			\n\
+			MyClass -- returnNothingAsMyClass() { return; }										\n\
+			returnTextLiteralInVoidMethod() { return 'text'; }									\n\
+			returnNumberLiteralInVoidMethod() { return 1; }										\n\
+			returnClassInVoidMethod(MyClass) { return MyClass; }								\n\
+			returnTruthLiteralInVoidMethod() { return True; }									\n\
 	");
 
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
+	e.expect(TYPE_ERROR);
 	e.expect(TYPE_ERROR);
 	e.expect(TYPE_ERROR);
 	e.expect(TYPE_ERROR);
@@ -879,6 +913,7 @@ BOOST_AUTO_TEST_CASE(ValidReturnValues)
 			MyClass -- returnAMyClass(MyClass) { return MyClass; }						\n\
 			MyClass -- returnARelatedClass(RelatedClass) { return RelatedClass; }		\n\
 			MyClass -- returnRelatedClassAsClass(RelatedClass) { return RelatedClass; }	\n\
+			returnNothingInVoidMethod() { return; }	\n\
 	");
 
 	t.traverse(p.getParseTree());

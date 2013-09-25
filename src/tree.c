@@ -100,7 +100,7 @@ void PrependSubNode(Node* parent, Node* child) {
 }
 
 Node* NodeFactory(int nodetype) {
-	Node* mynode = (Node*) malloc(sizeof(Node));
+	Node* mynode = malloc(sizeof(Node));
 	mynode->line = line;
 	mynode->col = column;
 	mynode->node_type = nodetype;
@@ -129,7 +129,8 @@ Node* MakeNodeFromTypeArray(TypeArray* thearray) {
 
 Node* MakeNodeFromString(int nodetype, char* mystring) {
 	Node* mynode = NodeFactory(nodetype);
-	mynode->node_data.string = strdup(mystring);
+	mynode->node_data.string = mystring;
+	//mynode->node_data.string = strdup(mystring);
 	return mynode;
 }
 
@@ -220,4 +221,33 @@ void printtree (Node *n, int level) {
 		default:
 			printSubNodes(n, level, myname); break;
 	}
+}
+
+void freeNode(Node* n) {
+	if(n->subnodes) {
+		int i;
+		for(i = 0; i < n->subnodes; i++) freeNode(n->node_data.nodes[i]);
+		free(n->node_data.nodes);
+	}
+
+	switch(n->node_type) {
+		case NT_IMPORTPATH:
+		case NT_IMPORTTARGET:
+		case NT_CLASSNAME:
+		case NT_INTERFACE:
+		case NT_SUBCLASS:
+		case NT_STRINGLIT:
+		case NT_METHOD_NAME_SEGMENT:
+		case NT_ALIAS:
+			free(n->node_data.string);
+			break;
+		case NT_TYPEDATA:
+			freeType(n->node_data.type);
+			break;
+		case NT_TYPE_ARRAY:
+			freeTypeArray(n->node_data.typearray);
+			break;
+	}
+
+	free(n);
 }

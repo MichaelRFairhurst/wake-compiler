@@ -18,7 +18,8 @@ char* keepInner(char* in);
 
 %%
 
-##						count(); BEGIN(ST_BLOCKCOMMENT);
+#>						count(); BEGIN(ST_BLOCKCOMMENT);
+##						count();
 <ST_BLOCKCOMMENT>##		count(); BEGIN(INITIAL);
 <ST_BLOCKCOMMENT>.		count();
 
@@ -171,6 +172,7 @@ char* unEscapeStringLiteral(char* in, char terminator) {
 	out[c] = '\0';
 
 	// free some memory
-	//out = realloc(out, sizeof(char) * c + 1);
+	out = realloc(out, sizeof(char) * c + 1);
+	free(in);
 	return out;
 }

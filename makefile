@@ -1,6 +1,6 @@
 DEBUG=
-#OPT=-O3 -Iinclude -Igen
-OPT=-O0 -g -Iinclude -Igen
+OPT=-O3 -Iinclude -Igen
+#OPT=-O0 -g -Iinclude -Igen
 CC=cc $(OPT)
 CPP=g++ $(OPT)
 

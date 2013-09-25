@@ -24,7 +24,8 @@ syn match	withinregionkeyword	"\(every\|is:\)"
 syn region	classdecl	start="every" end="is:" contains=inheritancekeyword,interfacekeyword,ancestrysymbols,withinregionkeyword transparent keepend
 syn region	comment	start="\/\/" end="$"
 syn match	hashcomment	"#\<[a-zA-Z]\+\>\?"
-syn region	blockcomment	start="##" end="##"
+syn region	blockcomment	start="#>" end="##"
+syn match	blockcomment	"##"
 syn keyword	inheritancekeyword	a an contained
 syn keyword	interfacekeyword	capable
 syn keyword	mytype	Int Truth Text Char

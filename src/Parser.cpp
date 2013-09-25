@@ -1,4 +1,7 @@
 #include "Parser.h"
+#include <iostream>
+
+extern "C" int yylex_destroy  (void);
 
 bool Parser::parse(char* input) {
 	yy_scan_string(input);
@@ -16,4 +19,9 @@ Node* Parser::getParseTree() {
 
 void Parser::print() {
 	printtree(parsetree, 0);
+}
+
+Parser::~Parser() {
+	yylex_destroy();
+	/*if(parsetree)*/ freeNode(parsetree);
 }

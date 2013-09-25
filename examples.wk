@@ -94,7 +94,7 @@ every ArchitectBoss is:
 
 	fire( Architect @a)IfSameAs( Architect @b) { ... }
 
-ArchicectBoss <= injector;
+ArchicectBoss <- injector;
 ArchitectBoss.fire( @ThisArchitect )IfSameAs( @TheOtherArchitect );
 Accessor.getCollaborator().getOriginal().getFinal();
 Chainable
@@ -103,24 +103,19 @@ Chainable
 	.doThirdThing();
 
 
-//INLINE COMMENTS
+//COMMENTS
 
-	// Either I'll build them like this, which prevents carpel tunnel
 	if(Architect.wasFired() #thisisrare)
 		return;
 
-	// Or this, which allows more detail
-	if(Architect.wasFired() ##this is rare##)
-		return;
-
-	##
+	#>
 	# Isn't this much nicer than
 	#
 	#   /**
 	#    * This!
 	#    */
 	##
-	if(Architect.wasFired() ##this is rare##)
+	if(Architect.wasFired() #>this is rare##)
 
 //LAMBDAS
 
@@ -236,20 +231,20 @@ Chainable
 			Examiner,
 
 			// bind text & numbers, with identfiers
-			Text{DBUserName} <= "SooperSecUrUserNaem",
-			Int{DBPort} <= 3306,
+			Text{DBUserName} <- "SooperSecUrUserNaem",
+			Int{DBPort} <- 3306,
 
 			// Bind an injection to arbitrary behavior
-			User{LoggedIn} <= { return getLoggedInUser(); },
+			User{LoggedIn} <- { return getLoggedInUser(); },
 
 			// Bind an injection to a method with currying and/or primitives and/or injections
-			FileReader <=  { getFileHandle("r", ???, FileSystemWrapper) },
+			FileReader <-  { getFileHandle("r", ???, FileSystemWrapper) },
 
 			// curry constructors -- require an ID and inject a connection
 			DBRecord( ??? , DBConnection),
 
 			// this is how to provide a BadArchitect when asked for an Architect....mwahahaha
-			Architect <= BadArchitect,
+			Architect <- BadArchitect,
 
 			// random injections that make this example complete because I'm anal
 			FileSystem, DBConnection;
@@ -257,16 +252,16 @@ Chainable
 		// Contrived examples of getting a provided object
 		demonstrateGettingDependencies() {
 			// No args or label
-			Architect <= provider;
+			Architect <- provider;
 
 			// one arg no label
-			Architect(2) <= provider;
+			Architect(2) <- provider;
 
 			// no args but yes label
-			Architect{LoggedIn} <= provider;
+			Architect{LoggedIn} <- provider;
 
 			// args and label
-			Architect{LoggedIn}(2) <= provider;
+			Architect{LoggedIn}(2) <- provider;
 		}
 
 		new(User{LoggedIn}, Provider) {
