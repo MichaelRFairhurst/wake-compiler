@@ -20,6 +20,7 @@ enum SemanticErrorCode {
 	SYMBOL_ALREADY_DEFINED,			// declaring a variable twice
 	SYMBOL_NOT_DEFINED,				// using an unknown alias, shadow, or classname with no known instance
 	TYPE_ERROR,						// adding intelligence to George Bush
+	PROPERTY_OR_METHOD_NOT_FOUND,	// MyClass.asntoehuaobeiuaou() is probably a typo
 };
 
 class SemanticError {

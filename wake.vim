@@ -34,7 +34,7 @@ syn match	shadow	"\$"
 syn match	returntype	"\(\<[a-zA-Z]\+\>\s\+\)\?--"
 syn match	functioncall	")\?\<[a-zA-Z]\+\>(" contained
 syn match	methodnameseg	")\?\<[a-zA-Z]\+\>("
-syn match	symbols	"\((\|)\|;\||\|=\|+\|{\|}\|,\|\.\|<\|>\)"
+syn match	symbols	"\((\|)\|;\||\|=\|+\|{\|}\|,\|\.\|<\|>\|\-\)"
 syn match	ancestrysymbols "\((\|)\|,\)" contained
 syn match	typesymbols "\(\[\|\]\)"
 syn match	currysymbols "???"

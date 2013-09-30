@@ -94,6 +94,8 @@
 #define NT_AND 71
 #define NT_OR 72
 
+#define NT_PROPERTY 73
+
 void AddSubNode(Node* parent, Node* child);
 
 void PrependSubNode(Node* parent, Node* child);

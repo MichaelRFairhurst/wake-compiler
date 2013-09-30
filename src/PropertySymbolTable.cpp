@@ -1,7 +1,7 @@
 #include "PropertySymbolTable.h"
 #include "SemanticError.h"
 
-string PropertySymbolTable::addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, Node* body) {
+void PropertySymbolTable::addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, Node* body) {
 	string name = getSymbolNameOf(returntype, segments_arguments);
 	Type* method = MakeType(TYPE_LAMBDA);
 
@@ -24,11 +24,12 @@ string PropertySymbolTable::addMethod(Type* returntype, vector<pair<string, Type
 	method->typedata.lambda.arguments = conglomerate;
 
 	properties[name] = method;
-
-	return name;
 }
 
 Type* PropertySymbolTable::get(string name) {
+	if(!properties.count(name))
+		throw new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Cannot find method with signature " + name);
+
 	return properties.find(name)->second;
 }
 

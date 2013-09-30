@@ -4,7 +4,7 @@ OPT=-O3 -Iinclude -Igen
 CC=cc $(OPT)
 CPP=g++ $(OPT)
 
-CPPNAMES=ObjectSymbolTable.cpp ParseTreeTraverser.cpp SemanticError.cpp PropertySymbolTable.cpp Parser.cpp SemanticErrorPrinter.cpp MockSemanticErrorPrinter.cpp ScopeSymbolTable.cpp TypeAnalyzer.cpp
+CPPNAMES=ObjectSymbolTable.cpp ParseTreeTraverser.cpp SemanticError.cpp PropertySymbolTable.cpp Parser.cpp SemanticErrorPrinter.cpp MockSemanticErrorPrinter.cpp ScopeSymbolTable.cpp TypeAnalyzer.cpp ErrorTracker.cpp TypeChecker.cpp ClassParseTreeTraverser.cpp
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
 CNAMES=tree.c type.c
 COBJS=$(addprefix bin/c/, $(CNAMES:.c=.o))

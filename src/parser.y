@@ -52,7 +52,7 @@ int yywrap()
 %token <number> TRUTH
 %token <number> SYM_SHADOW
 %token <number> SYM_ARRAYED
-%type <node> imports import import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection_ctor injection_ctorargs injection_binding injection_bindings injection_ctorarg ctor ctorargs expression value method block methodreturn methodnamesegments methodbody methodcallsegments curryableexpressions expression expressions retrievalsandstatements retrievalorstatement retrieval statement labelstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional type_valued
+%type <node> imports import import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection_ctor injection_ctorargs injection_binding injection_bindings injection_ctorarg ctor ctorargs expression value method block methodreturn methodnamesegments methodbody methodcallsegments curryableexpressions expression expressions retrievalsandstatements retrievalorstatement retrieval statement labelstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional type_valued property property_value
 %type <type>  type_returnable type_arrayablereturn type_assignable type_common type_lambda type_commonorlambda type_provided type_ctor
 %type <type_array> assignabletypes commonorlambdatypes
 %start file
@@ -112,7 +112,20 @@ classprop:
 	PROVIDES injection_bindings ';'												{ $$ = $2; }
 	| ctor																		{ $$ = $1; }
 	| method																	{ $$ = $1; }
-	/*| property*/
+	| property																	{ $$ = $1; }
+	;
+
+property:
+	WITH PUBLIC property_value ';'												{ $$ = MakeOneBranchNode(NT_PROPERTY, $3); }
+	| WITH property_value ';'													{ $$ = MakeOneBranchNode(NT_PROPERTY, $2); }
+	;
+
+property_value:
+	type_assignable																{ $$ = MakeNodeFromType($1); }
+	| type_assignable '=' STRING												{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1), MakeNodeFromString(NT_STRINGLIT, $3)); }
+	| type_assignable '=' NUMBER												{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1), MakeNodeFromNumber(NT_NUMBERLIT, $3)); }
+	| type_assignable '=' type_valued											{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1), $3); }
+	| type_assignable SYM_PROVIDE type_valued									{ $$ = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1), $3); }
 	;
 
 injection_bindings:
@@ -328,15 +341,12 @@ selectionstatement:
 
 iterationstatement:
 	WHILE '(' expression ')' statement											{ $$ = MakeTwoBranchNode(NT_WHILE, $3, $5); }
-	/*| DO statement WHILE '(' expression ')' ';' { printf("| DO statement WHILE '(' expression ')' ';'\n"); }*/
 	| FOR '(' forinit forcondition forincrement ')' statement					{ $$ = MakeTwoBranchNode(NT_FOR, $3, $4); AddSubNode($$, $5); AddSubNode($$, $7); }
-	/*| FOR '(' forinit forcondition ')' statement */
 	;
 
 forinit:
 	retrieval																	{ $$ = $1; }
 	| statement																	{ $$ = $1; }
-	| ';'																		{ $$ = MakeEmptyNode(NT_EMPTY); }
 	;
 
 forcondition:
