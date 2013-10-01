@@ -288,6 +288,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				{
 					ret = typeCheck(tree->node_data.nodes[0]);
 					Type* assignment = typeCheck(tree->node_data.nodes[1]);
+					//TODO This leaks for invalid property names since analyzer throws a SymbolNotFoundException
 					if(!analyzer->isASubtypeOfB(assignment, ret)) {
 						expectedstring = analyzer->getNameForType(ret);
 						erroneousstring = analyzer->getNameForType(assignment);

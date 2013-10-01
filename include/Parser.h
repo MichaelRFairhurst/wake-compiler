@@ -9,7 +9,7 @@ extern "C" {
 	#include "tree.h"
 	#include "y.tab.h"
 	extern int yyparse();
-	extern void yy_scan_string(char* string);
+	extern void yy_scan_string(const char* string);
 	extern Node* parsetree;
 	extern FILE *yyin;
 }
@@ -17,7 +17,7 @@ extern "C" {
 class Parser {
 	public:
 		 bool parse(FILE* input);
-		 bool parse(char* input);
+		 bool parse(const char* input);
 		 void print();
 		 Node* getParseTree();
 		 ~Parser();

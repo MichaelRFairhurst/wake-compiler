@@ -3,7 +3,7 @@
 
 extern "C" int yylex_destroy  (void);
 
-bool Parser::parse(char* input) {
+bool Parser::parse(const char* input) {
 	yy_scan_string(input);
 	return yyparse();
 }
