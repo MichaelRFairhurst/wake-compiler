@@ -1062,4 +1062,129 @@ BOOST_AUTO_TEST_CASE(ValidLambdaInvocations)
 	BOOST_REQUIRE(e.passed());
 }
 
+BOOST_AUTO_TEST_CASE(InvalidPropertyClassIsNotFoundError)
+{
+	Parser p;
+	ParseTreeTraverser t;
+	MockSemanticErrorPrinter e;
+
+	p.parse("every MyClass is: with NonExist;");
+
+	e.expect(CLASSNAME_NOT_FOUND);
+
+	t.traverse(p.getParseTree());
+	t.printErrors(e);
+
+	BOOST_REQUIRE(e.passed());
+}
+
+BOOST_AUTO_TEST_CASE(AssignNonExistClassToPropertyIsNotFoundError)
+{
+	Parser p;
+	ParseTreeTraverser t;
+	MockSemanticErrorPrinter e;
+
+	p.parse("every MyClass is: with MyClass = NonExist;");
+
+	e.expect(SYMBOL_NOT_DEFINED);
+
+	t.traverse(p.getParseTree());
+	t.printErrors(e);
+
+	BOOST_REQUIRE(e.passed());
+}
+
+BOOST_AUTO_TEST_CASE(AssignNonSubTypeToPropertyIsTypeError)
+{
+	Parser p;
+	ParseTreeTraverser t;
+	MockSemanticErrorPrinter e;
+
+	p.parse("every Unrelated is: every MyClass is: with MyClass = Unrelated;");
+
+	e.expect(SYMBOL_NOT_DEFINED);
+
+	t.traverse(p.getParseTree());
+	t.printErrors(e);
+
+	BOOST_REQUIRE(e.passed());
+}
+
+BOOST_AUTO_TEST_CASE(AssignMultiplePropertiesRightOrderIsOK)
+{
+	Parser p;
+	ParseTreeTraverser t;
+	MockSemanticErrorPrinter e;
+
+	p.parse("every Int is: every MyClass is: with Int = 5; with $Int = Int; with $$Int = $Int;");
+
+	t.traverse(p.getParseTree());
+	t.printErrors(e);
+
+	BOOST_REQUIRE(e.passed());
+}
+
+BOOST_AUTO_TEST_CASE(AssignMultiplePropertiesWrongOrderIsntOk)
+{
+	Parser p;
+	ParseTreeTraverser t;
+	MockSemanticErrorPrinter e;
+
+	p.parse("every Int is: every MyClass is: with Int = $Int; with $Int = $$Int; with $$Int = 5;");
+
+	e.expect(SYMBOL_NOT_DEFINED);
+	e.expect(SYMBOL_NOT_DEFINED);
+
+	t.traverse(p.getParseTree());
+	t.printErrors(e);
+
+	BOOST_REQUIRE(e.passed());
+}
+
+BOOST_AUTO_TEST_CASE(AssignPropertyFromCtorIsOK)
+{
+	Parser p;
+	ParseTreeTraverser t;
+	MockSemanticErrorPrinter e;
+
+	p.parse("every MyClass is: with MyClass @too = MyClass; needs MyClass;");
+
+	t.traverse(p.getParseTree());
+	t.printErrors(e);
+
+	BOOST_REQUIRE(e.passed());
+}
+
+BOOST_AUTO_TEST_CASE(NotFoundTypeInCtorIsReported)
+{
+	Parser p;
+	ParseTreeTraverser t;
+	MockSemanticErrorPrinter e;
+
+	p.parse("every MyClass is: needs NonExist;");
+
+	e.expect(CLASSNAME_NOT_FOUND);
+
+	t.traverse(p.getParseTree());
+	t.printErrors(e);
+
+	BOOST_REQUIRE(e.passed());
+}
+
+BOOST_AUTO_TEST_CASE(MulipleCtorDefinition)
+{
+	Parser p;
+	ParseTreeTraverser t;
+	MockSemanticErrorPrinter e;
+
+	p.parse("every MyClass is: needs MyClass; needs MyClass;");
+
+	e.expect(MULTIPLE_METHOD_DEFINITION);
+
+	t.traverse(p.getParseTree());
+	t.printErrors(e);
+
+	BOOST_REQUIRE(e.passed());
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -39,8 +39,11 @@ void SemanticErrorPrinter::print(SemanticError* e) {
 		case TYPE_ERROR:
 			cout << "Invalid type";
 			break;
+		case PROPERTY_OR_METHOD_NOT_FOUND:
+			cout << "Property or method on class is not valid";
+			break;
 		default:
-			cout << "bad error code provided" << endl;
+			cout << "bad error code provided";
 	}
 	cout << " ]" << endl;
 

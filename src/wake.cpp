@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
 	SemanticErrorPrinter printer;
 
 	//if(traverser.getErrors()->size())
-		//traverser.printErrors(printer);
+		traverser.printErrors(printer);
 	//else
 		//cout << "Everything checked out!\n" << endl;
 }

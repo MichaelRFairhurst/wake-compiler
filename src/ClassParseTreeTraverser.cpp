@@ -1,6 +1,13 @@
 #include "ClassParseTreeTraverser.h"
 #include "CompilationExceptions.h"
 
+/**
+ * This class makes several passes to have the proper type info at the proper times.
+ * First it gathers all method signatures.
+ * Then it loads the ctor args into the sym table
+ * Then it loads the properties into the sym table in order of declaration, typechecking each
+ * Then it type checks the methods, provisions, and ctor body
+ */
 
 ClassParseTreeTraverser::ClassParseTreeTraverser(ErrorTracker* errors, ObjectSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, string classname, TypeChecker* typechecker) {
 	this->errors = errors;
@@ -22,6 +29,8 @@ void ClassParseTreeTraverser::traverse(Node* tree) {
 					traverse(tree->node_data.nodes[i]);
 					i++;
 				}
+				loadCtorArgs(tree);
+				loadProperties(tree);
 				typeCheckMethods(tree);
 			}
 			break;
@@ -82,6 +91,67 @@ void ClassParseTreeTraverser::traverse(Node* tree) {
 				errors->addError(e);
 			}
 
+	}
+}
+
+void ClassParseTreeTraverser::loadCtorArgs(Node* tree) {
+	switch(tree->node_type) {
+		case NT_CLASSBODY:
+			{
+				bool found_ctor = false;
+				for(int i = 0; i < tree->subnodes; i++)
+				if(tree->node_data.nodes[i]->node_type == NT_CTOR) {
+					if(found_ctor) errors->addError(new SemanticError(MULTIPLE_METHOD_DEFINITION, "multiple definitions of constructor", tree));
+					else loadCtorArgs(tree->node_data.nodes[i]->node_data.nodes[0]);
+					found_ctor = true;
+				}
+			}
+			break;
+
+		case NT_CTOR_ARGS:
+			try {
+				for(int i = 0; i < tree->subnodes; i++) {
+					objectsymtable->assertTypeIsValid(tree->node_data.nodes[i]->node_data.type);
+					scopesymtable->add(tree->node_data.nodes[i]->node_data.type);
+				}
+			} catch(SymbolNotFoundException* e) {
+				errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
+				delete e;
+			} catch(SemanticError* e) {
+				e->token = tree;
+				errors->addError(e);
+			}
+	}
+}
+
+void ClassParseTreeTraverser::loadProperties(Node* tree) {
+	switch(tree->node_type) {
+		case NT_CLASSBODY:
+			{
+				int i = tree->subnodes;
+				while(i > 0) {
+					i--;
+					loadProperties(tree->node_data.nodes[i]);
+				}
+			}
+			break;
+
+		case NT_PROPERTY:
+			try {
+				if(tree->node_data.nodes[0]->node_type == NT_ASSIGNMENT) {
+					scopesymtable->add(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type);
+					typechecker->check(tree->node_data.nodes[0]);
+				} else {
+					traverse(tree->node_data.nodes[0]);
+				}
+			} catch(SymbolNotFoundException* e) {
+				errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
+				delete e;
+			} catch(SemanticError* e) {
+				e->token = tree;
+				errors->addError(e);
+			}
+			break;
 	}
 }
 

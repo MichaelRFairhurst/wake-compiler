@@ -23,6 +23,8 @@ class ClassParseTreeTraverser {
 		ClassParseTreeTraverser(ErrorTracker* errors, ObjectSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, string classname, TypeChecker* typechecker);
 		~ClassParseTreeTraverser();
 		void traverse(Node* tree);
+		void loadCtorArgs(Node* tree);
+		void loadProperties(Node* tree);
 		void typeCheckMethods(Node* tree);
 
 	private:
