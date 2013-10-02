@@ -55,6 +55,7 @@ continue				count(); return CONTINUE;
 this					count(); return THIS;
 parent					count(); return PARENT;
 fn						count(); return FN;
+nothing					count(); return NOTHING;
 
 :						count(); return ':';
 @						count(); return '@';

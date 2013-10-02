@@ -25,8 +25,6 @@ void initTreeTypes() {
 	nodenames[NT_INJECTED_CTOR_ARGS] = "NT_INJECTED_CTOR_ARGS";
 	nodenames[NT_INJECTED_CTOR_ARG] = "NT_INJECTED_CTOR_ARG";
 	nodenames[NT_CTOR] = "NT_CTOR";
-	nodenames[NT_ARGUMENTS] = "NT_ARGUMENTS";
-	nodenames[NT_ARGUMENT] = "NT_ARGUMENT";
 	nodenames[NT_EMPTY] = "NT_EMPTY";
 	nodenames[NT_INTERFACE] = "NT_INTERFACE";
 	nodenames[NT_SUBCLASS] = "NT_SUBCLASS";
@@ -47,6 +45,8 @@ void initTreeTypes() {
 	nodenames[NT_TYPEDATA] = "NT_TYPEDATA";
 	nodenames[NT_VALUES] = "NT_VALUES";
 	nodenames[NT_ALIAS] = "NT_ALIAS";
+	nodenames[NT_THIS] = "NT_THIS";
+	nodenames[NT_PARENT] = "NT_PARENT";
 	nodenames[NT_ARRAY_ACCESS] = "NT_ARRAY_ACCESS";
 	nodenames[NT_MEMBER_ACCESS] = "NT_MEMBER_ACCESS";
 	nodenames[NT_METHOD_INVOCATION] = "NT_METHOD_INVOCATION";
@@ -82,6 +82,8 @@ void initTreeTypes() {
 	nodenames[NT_IF_THEN_ELSE] = "NT_IF_THEN_ELSE";
 	nodenames[NT_ASSIGNMENT] = "NT_ASSIGNMENT";
 	nodenames[NT_TYPE_ARRAY] = "NT_TYPE_ARRAY";
+	nodenames[NT_DECLARATION] = "NT_DECLARATION";
+	nodenames[NT_PROPERTY] = "NT_PROPERTY";
 	treeTypesInited = 1;
 }
 
@@ -134,7 +136,7 @@ Node* MakeNodeFromString(int nodetype, char* mystring) {
 	return mynode;
 }
 
-Node* MakeNodeFromNumber(int nodetype, int number) {
+Node* MakeNodeFromNumber(int nodetype, float number) {
 	Node* mynode = NodeFactory(nodetype);
 	mynode->node_data.number = number;
 	return mynode;
@@ -157,9 +159,9 @@ Node* MakeOneBranchNode(int nodetype, Node* a) {
 }
 
 void printSubNodes(Node *n, int level, char* name) {
+	printf ("%*c %s\n", level, ' ', name);
 	if(n->subnodes == 0) return;
 	int i;
-	printf ("%*c %s\n", level, ' ', name);
 	for(i = 0; i < n->subnodes; i++)
 		printtree (n->node_data.nodes[i], level+1);
 }
@@ -173,7 +175,7 @@ void printtype(Type* thetype, int level) {
 				printtype(thetype->typedata.lambda.returntype, level + 1);
 			}
 			printf("%*c arguments:\n", level, ' ');
-			{
+			if(thetype->typedata.lambda.arguments != NULL) {
 				int i;
 				for(i = 0; i < thetype->typedata.lambda.arguments->typecount; i++) {
 					printtype(thetype->typedata.lambda.arguments->types[i], level + 1);
@@ -195,7 +197,7 @@ void printtree (Node *n, int level) {
 
 	switch (n->node_type) {
 		case NT_NUMBERLIT:
-			printf("%*c %s %d\n", level, ' ', myname, n->node_data.number);
+			printf("%*c %s %f\n", level, ' ', myname, n->node_data.number);
 			break;
 		case NT_IMPORTPATH:
 		case NT_IMPORTTARGET:

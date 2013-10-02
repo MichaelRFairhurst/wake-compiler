@@ -52,9 +52,9 @@ int yywrap()
 %token <number> TRUTH
 %token <number> SYM_SHADOW
 %token <number> SYM_ARRAYED
-%type <node> imports import import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection_ctor injection_ctorargs injection_binding injection_bindings injection_ctorarg ctor ctorargs expression value method block methodreturn methodnamesegments methodbody methodcallsegments curryableexpressions expression expressions retrievalsandstatements retrievalorstatement retrieval statement labelstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional type_valued property property_value
-%type <type>  type_returnable type_arrayablereturn type_assignable type_common type_lambda type_commonorlambda type_provided type_ctor
-%type <type_array> assignabletypes commonorlambdatypes
+%type <node> imports import import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection_ctor injection_ctorargs injection_binding injection_bindings injection_ctorarg ctor retrievabledeclarableargs expression value method block methodreturn methodnamesegments methodbody methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional type_valued property property_value retrievalargs retrieval objectable
+%type <type>  type_returnable type_arrayablereturn type_declarable type_common type_lambda type_commonorlambda type_retrievable type_retrievabledeclarable
+%type <type_array> declarabletypes commonorlambdatypes
 %start file
 %%
 
@@ -121,11 +121,12 @@ property:
 	;
 
 property_value:
-	type_assignable																{ $$ = MakeNodeFromType($1); }
-	| type_assignable '=' STRING												{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1), MakeNodeFromString(NT_STRINGLIT, $3)); }
-	| type_assignable '=' NUMBER												{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1), MakeNodeFromNumber(NT_NUMBERLIT, $3)); }
-	| type_assignable '=' type_valued											{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1), $3); }
-	| type_assignable SYM_PROVIDE type_valued									{ $$ = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1), $3); }
+	type_declarable																{ $$ = MakeNodeFromType($1); }
+	/* The below rule has a shift/reduce that prevents 'with Int = @a = @b;' */
+	| type_declarable '=' value													{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1), $3); }
+	| type_declarable retrievalargs value										{	Node* retrieval = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1), $2);
+																					AddSubNode(retrieval, $3);
+																					$$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType($1), retrieval);		}
 	;
 
 injection_bindings:
@@ -134,12 +135,12 @@ injection_bindings:
 	;
 
 injection_binding:
-	type_provided																{ $$ = MakeOneBranchNode(NT_PROVISION, MakeNodeFromType($1)); }
-	| type_provided SYM_PROVIDE injection_providable							{ $$ = MakeTwoBranchNode(NT_PROVISION, MakeNodeFromType($1), $3); }
+	type_retrievable															{ $$ = MakeOneBranchNode(NT_PROVISION, MakeNodeFromType($1)); }
+	| type_retrievable SYM_PROVIDE injection_providable							{ $$ = MakeTwoBranchNode(NT_PROVISION, MakeNodeFromType($1), $3); }
 	;
 
 injection_providable:
-	type_provided																{ $$ = MakeOneBranchNode(NT_PROVIDING, MakeNodeFromType($1)); }
+	type_retrievable															{ $$ = MakeOneBranchNode(NT_PROVIDING, MakeNodeFromType($1)); }
 	| injection_ctor															{ $$ = $1; }
 	| block																		{ $$ = $1; }
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
@@ -157,7 +158,7 @@ injection_ctorargs:
 	;
 
 injection_ctorarg:
-	type_provided																{ $$ = MakeNodeFromType($1); }
+	type_retrievable															{ $$ = MakeNodeFromType($1); }
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
 	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
 	| TRUTH																		{ $$ = MakeNodeFromNumber(NT_TRUTHLIT, $1); }
@@ -165,13 +166,14 @@ injection_ctorarg:
 	;
 
 ctor:
-	NEEDS ctorargs ';'															{ $$ = MakeOneBranchNode(NT_CTOR, $2); }
-	| NEEDS ctorargs THEN block													{ $$ = MakeTwoBranchNode(NT_CTOR, $2, $4);}
+	NEEDS retrievabledeclarableargs ';'											{ $$ = MakeOneBranchNode(NT_CTOR, $2); }
+	| NEEDS retrievabledeclarableargs THEN block								{ $$ = MakeTwoBranchNode(NT_CTOR, $2, $4);}
+	| NEEDS NOTHING THEN block													{ $$ = MakeTwoBranchNode(NT_CTOR, MakeEmptyNode(NT_EMPTY), $4);}
 	;
 
-ctorargs:
-	ctorargs ',' type_ctor														{ $$ = $1; AddSubNode($$, MakeNodeFromType($3)); }
-	| type_ctor																	{ $$ = MakeOneBranchNode(NT_CTOR_ARGS, MakeNodeFromType($1)); }
+retrievabledeclarableargs:
+	retrievabledeclarableargs ',' type_retrievabledeclarable					{ $$ = $1; AddSubNode($$, MakeNodeFromType($3)); }
+	| type_retrievabledeclarable												{ $$ = MakeOneBranchNode(NT_CTOR_ARGS, MakeNodeFromType($1)); }
 	;
 
 method:
@@ -203,19 +205,19 @@ methodbody:
 
 methodnamesegments:
 	IDENTIFIER '(' ')'															{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
-	| IDENTIFIER '(' assignabletypes ')'										{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1), MakeNodeFromTypeArray($3)); }
-	| IDENTIFIER '(' assignabletypes ')' methodnamesegments						{ $$ = $5; PrependSubNode($5, MakeNodeFromTypeArray($3)); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
+	| IDENTIFIER '(' declarabletypes ')'										{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1), MakeNodeFromTypeArray($3)); }
+	| IDENTIFIER '(' declarabletypes ')' methodnamesegments						{ $$ = $5; PrependSubNode($5, MakeNodeFromTypeArray($3)); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
 	;
 
 methodcallsegments:
 	IDENTIFIER '(' ')'															{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
-	| IDENTIFIER '(' curryableexpressions ')'										{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1), $3); }
-	| IDENTIFIER '(' curryableexpressions ')' methodcallsegments						{ $$ = $5; PrependSubNode($5, $3); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
+	| IDENTIFIER '(' curryableexpressions ')'									{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1), $3); }
+	| IDENTIFIER '(' curryableexpressions ')' methodcallsegments				{ $$ = $5; PrependSubNode($5, $3); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
 	;
 
-assignabletypes:
-	assignabletypes ',' type_assignable											{ $$ = $1; AddTypeToTypeArray($3, $1); }
-	| type_assignable															{ $$ = MakeTypeArray(); AddTypeToTypeArray($1, $$); }
+declarabletypes:
+	declarabletypes ',' type_declarable											{ $$ = $1; AddTypeToTypeArray($3, $1); }
+	| type_declarable															{ $$ = MakeTypeArray(); AddTypeToTypeArray($1, $$); }
 	;
 
 type_common:
@@ -229,7 +231,7 @@ type_valued:
 	| ALIAS																		{ $$ = MakeNodeFromString(NT_ALIAS, $1); }
 	;
 
-type_assignable:
+type_declarable:
 	type_common																	{ $$ = $1; }
 	| SYM_SHADOW type_common													{ $$ = $2; $$->typedata._class.shadow = $1; }
 	| ALIAS type_common															{ $$ = $2; $$->alias = $1; }
@@ -255,15 +257,15 @@ type_commonorlambda:
 	| type_lambda																{ $$ = $1; }
 	;
 
-type_provided:
+type_retrievable:
 	type_common																	{ $$ = $1; }
 	| type_common SPECIALTY														{ $$ = $1; $$->specialty = $2; }
 	| type_lambda																{ $$ = $1; }
 	| type_lambda SPECIALTY														{ $$ = $1; $$->specialty = $2; }
 	;
 
-type_ctor:
-	type_assignable																{ $$ = $1; }
+type_retrievabledeclarable:
+	type_declarable																{ $$ = $1; }
 	| type_common SPECIALTY														{ $$ = $1; $$->specialty = $2; }
 	| SYM_SHADOW type_common SPECIALTY											{ $$ = $2; $$->typedata._class.shadow = $1; $$->specialty = $3;}
 	| ALIAS type_common SPECIALTY												{ $$ = $2; $$->alias = $1; $$->specialty = $3; }
@@ -281,10 +283,11 @@ curryableexpressions:
 
 value:
 	type_valued																	{ $$ = $1; }
+	| methodcallsegments														{ $$ = MakeTwoBranchNode(NT_METHOD_INVOCATION, MakeEmptyNode(NT_THIS), $1); }
+	| THIS																		{ $$ = MakeEmptyNode(NT_THIS); }
 	| value '[' expression ']'													{ $$ = MakeTwoBranchNode(NT_ARRAY_ACCESS, $1, $3); }
-	| value '.' type_valued														{ $$ = MakeTwoBranchNode(NT_MEMBER_ACCESS, $1, $3); }
-	| methodcallsegments														{ $$ = $1; }
-	| value '.' methodcallsegments												{ $$ = MakeTwoBranchNode(NT_METHOD_INVOCATION, $1, $3); }
+	| objectable '.' type_valued												{ $$ = MakeTwoBranchNode(NT_MEMBER_ACCESS, $1, $3); }
+	| objectable '.' methodcallsegments											{ $$ = MakeTwoBranchNode(NT_METHOD_INVOCATION, $1, $3); }
 	| value '(' ')'																{ $$ = MakeOneBranchNode(NT_LAMBDA_INVOCATION, $1); }
 	| value '(' curryableexpressions ')'										{ $$ = MakeTwoBranchNode(NT_LAMBDA_INVOCATION, $1, $3); }
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
@@ -295,24 +298,35 @@ value:
 	| '[' ']'																	{ $$ = MakeEmptyNode(NT_ARRAY_DECLARATION); }
 	;
 
+objectable:
+	PARENT																		{ $$ = MakeEmptyNode(NT_PARENT); }
+	| value																		{ $$ = $1; }
+
 block:
-	'{' retrievalsandstatements '}'												{ $$ = $2; }
+	'{' declarationsandstatements '}'											{ $$ = $2; }
 	| '{' '}'																	{ $$ = MakeEmptyNode(NT_EMPTY); }
 	;
 
-retrievalsandstatements:
-	retrievalorstatement														{ $$ = MakeOneBranchNode(NT_RETRIEVALS_STATEMENTS, $1); }
-	| retrievalsandstatements retrievalorstatement								{ $$ = $1; AddSubNode($$, $2); }
+declarationsandstatements:
+	declarationorstatement														{ $$ = MakeOneBranchNode(NT_RETRIEVALS_STATEMENTS, $1); }
+	| declarationsandstatements declarationorstatement							{ $$ = $1; AddSubNode($$, $2); }
 	;
 
-retrievalorstatement:
-	retrieval																	{ $$ = $1; }
+declarationorstatement:
+	declaration																	{ $$ = $1; }
 	| statement																	{ $$ = $1; }
 	;
 
-retrieval:
-	type_assignable SYM_PROVIDE value ';'										{ $$ = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1), $3); }
+declaration:
+	':' type_declarable '=' value ';'											{ $$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType($2), $4); }
+	| ':' type_declarable retrievalargs value ';'								{	Node* retrieval = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($2), $3);
+																					AddSubNode(retrieval, $4);
+																					$$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType($2), retrieval);		}
 	;
+
+retrievalargs:
+	SYM_PROVIDE																	{ $$ = MakeEmptyNode(NT_EMPTY); }
+	| '<' '(' expressions ')'													{ $$ = $3; }
 
 statement:
 	emptystatement																{ $$ = MakeEmptyNode(NT_EMPTY); }
@@ -345,7 +359,7 @@ iterationstatement:
 	;
 
 forinit:
-	retrieval																	{ $$ = $1; }
+	declaration																	{ $$ = $1; }
 	| statement																	{ $$ = $1; }
 	;
 
@@ -368,11 +382,6 @@ jumpstatement:
 	| CONTINUE ';'																{ $$ = MakeEmptyNode(NT_CONTINUE); }
 	| RETURN expression ';'														{ $$ = MakeOneBranchNode(NT_RETURN, $2); }
 	| RETURN ';'																{ $$ = MakeEmptyNode(NT_RETURN); }
-	;
-
-specialname:
-	THIS { printf("THIS\n"); }
-	| PARENT { printf("| PARENT\n"); }
 	;
 
 expression_unary:
@@ -430,8 +439,12 @@ expression_conditional:
 
 expression:
 	expression_conditional														{ $$ = $1; }
-	| type_assignable '=' expression											{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1), $3); }
-	| ALIAS '=' expression														{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromString(NT_ALIAS, $1), $3); }
+	| type_valued '=' expression												{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, $1, $3); }
+	| retrieval																	{ $$ = $1; }
+	;
+
+retrieval:
+	':' '(' type_retrievable retrievalargs value ')'							{ $$ = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($3), $4); AddSubNode($$, $5); }
 	;
 
 expressions:

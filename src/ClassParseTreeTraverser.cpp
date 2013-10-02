@@ -9,15 +9,14 @@
  * Then it type checks the methods, provisions, and ctor body
  */
 
-ClassParseTreeTraverser::ClassParseTreeTraverser(ErrorTracker* errors, ObjectSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, string classname, TypeChecker* typechecker) {
+ClassParseTreeTraverser::ClassParseTreeTraverser(ErrorTracker* errors, ObjectSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, string classname, TypeChecker* typechecker, MethodSignatureParseTreeTraverser* methodanalyzer) {
 	this->errors = errors;
 	this->scopesymtable = scopesymtable;
 	this->objectsymtable = objectsymtable;
 	this->classname = classname;
 	this->typechecker = typechecker;
+	this->methodanalyzer = methodanalyzer;
 	propertysymtable = objectsymtable->find(classname);
-
-	emptytypearray = MakeTypeArray();
 }
 
 void ClassParseTreeTraverser::traverse(Node* tree) {
@@ -29,9 +28,12 @@ void ClassParseTreeTraverser::traverse(Node* tree) {
 					traverse(tree->node_data.nodes[i]);
 					i++;
 				}
+				scopesymtable->pushScope();
 				loadCtorArgs(tree);
 				loadProperties(tree);
+				typechecker->setThisContext(classname);
 				typeCheckMethods(tree);
+				scopesymtable->popScope();
 			}
 			break;
 
@@ -76,10 +78,10 @@ void ClassParseTreeTraverser::traverse(Node* tree) {
 
 		case NT_METHOD_DECLARATION:
 			try {
-				vector<pair<string, TypeArray*> >* methodname = getMethodName(tree);
+				vector<pair<string, TypeArray*> >* methodname = methodanalyzer->getName(tree);
 
 				try {
-					propertysymtable->addMethod(getMethodReturn(tree), methodname, getMethodBody(tree));
+					propertysymtable->addMethod(methodanalyzer->getReturn(tree), methodname, methodanalyzer->getBody(tree));
 				} catch(SemanticError* e) {
 					delete methodname;
 					throw e;
@@ -142,7 +144,8 @@ void ClassParseTreeTraverser::loadProperties(Node* tree) {
 					scopesymtable->add(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type);
 					typechecker->check(tree->node_data.nodes[0]);
 				} else {
-					traverse(tree->node_data.nodes[0]);
+					objectsymtable->assertTypeIsValid(tree->node_data.nodes[0]->node_data.type);
+					scopesymtable->add(tree->node_data.nodes[0]->node_data.type);
 				}
 			} catch(SymbolNotFoundException* e) {
 				errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
@@ -171,15 +174,15 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 
 		case NT_METHOD_DECLARATION:
 			try {
-				Node* methodbody = getMethodBody(tree);
+				Node* methodbody = methodanalyzer->getBody(tree);
 				vector<pair<string, TypeArray*> >* methodname;
 				Type* methodreturn;
 				string name;
 
 				try { // If this throws we can't type check
-					methodreturn = getMethodReturn(tree);
-					methodname = getMethodName(tree);
-					name = propertysymtable->getSymbolNameOf(methodreturn, methodname);
+					methodreturn = methodanalyzer->getReturn(tree);
+					methodname = methodanalyzer->getName(tree);
+					name = propertysymtable->getSymbolNameOf(methodname); // TODO include return type
 					delete methodname;
 				} catch(SemanticError* e) {
 					delete e;
@@ -196,9 +199,14 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 					scopesymtable->add(method->typedata.lambda.arguments->types[i]);
 				}
 
-				// Run Type Analysis
-				typechecker->setReturnType(getMethodReturn(tree));
-				typechecker->check(methodbody);
+				try {
+					// Run Type Analysis
+					typechecker->setReturnType(methodanalyzer->getReturn(tree));
+					typechecker->check(methodbody);
+				} catch(SemanticError* e) {
+					e->token = tree;
+					errors->addError(e);
+				}
 
 				// Pop Method Scope
 				scopesymtable->popScope();
@@ -208,63 +216,15 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 				e->token = tree;
 				errors->addError(e);
 			}
+			break;
+
+		case NT_CTOR:
+			if(tree->subnodes == 1) return;
+
+			scopesymtable->pushScope();
+			typechecker->setReturnType(NULL);
+			typechecker->check(tree->node_data.nodes[1]);
+			scopesymtable->popScope();
+			break;
 	}
-}
-
-Node* ClassParseTreeTraverser::getMethodBody(Node* methoddef) {
-	if(methoddef->node_data.nodes[0]->node_type == NT_METHOD_RETURN_TYPE) {
-		return methoddef->node_data.nodes[2];
-	} else {
-		return methoddef->node_data.nodes[1];
-	}
-}
-
-Type* ClassParseTreeTraverser::getMethodReturn(Node* methoddef) {
-	Type* returntype;
-
-	if(methoddef->node_data.nodes[0]->node_type == NT_METHOD_RETURN_TYPE) {
-		returntype = methoddef->node_data.nodes[0]->node_data.nodes[0]->node_data.type;
-		objectsymtable->assertTypeIsValid(returntype);
-	} else {
-		returntype = NULL;
-	}
-
-	return returntype;
-}
-
-vector<pair<string, TypeArray*> >* ClassParseTreeTraverser::getMethodName(Node* methoddef) {
-	vector<pair<string, TypeArray*> >* arguments_segments = new vector<pair<string, TypeArray*> >();
-	int i;
-
-	try {
-		Node* methodname = methoddef->node_data.nodes[
-			methoddef->node_data.nodes[0]->node_type == NT_METHOD_RETURN_TYPE ? 1 : 0
-		];
-
-		for(i = 0; i < methodname->subnodes; i++) {
-			TypeArray* argshere;
-			string namesegment = methodname->node_data.nodes[i]->node_data.string;
-			i++;
-
-			if(i < methodname->subnodes) {
-				argshere = methodname->node_data.nodes[i]->node_data.typearray;
-				for(int b = 0; b < argshere->typecount; b++) {
-					objectsymtable->assertTypeIsValid(argshere->types[b]);
-				}
-			} else {
-				argshere = emptytypearray;
-			}
-
-			arguments_segments->push_back(pair<string, TypeArray*>(namesegment, argshere));
-		}
-
-		return arguments_segments;
-	} catch(SemanticError* e) {
-		delete arguments_segments;
-		throw e;
-	}
-}
-
-ClassParseTreeTraverser::~ClassParseTreeTraverser() {
-	freeTypeArray(emptytypearray);
 }

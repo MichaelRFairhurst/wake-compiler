@@ -9,6 +9,7 @@
 #include "SemanticError.h"
 #include "ErrorTracker.h"
 #include "TypeChecker.h"
+#include "MethodSignatureParseTreeTraverser.h"
 
 extern "C" {
 	#include "type.h"
@@ -20,8 +21,7 @@ using namespace std;
 
 class ClassParseTreeTraverser {
 	public:
-		ClassParseTreeTraverser(ErrorTracker* errors, ObjectSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, string classname, TypeChecker* typechecker);
-		~ClassParseTreeTraverser();
+		ClassParseTreeTraverser(ErrorTracker* errors, ObjectSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, string classname, TypeChecker* typechecker, MethodSignatureParseTreeTraverser* methodanalyzer);
 		void traverse(Node* tree);
 		void loadCtorArgs(Node* tree);
 		void loadProperties(Node* tree);
@@ -32,9 +32,9 @@ class ClassParseTreeTraverser {
 		Type* getMethodReturn(Node* methoddef);
 		vector<pair<string, TypeArray*> >* getMethodName(Node* methoddef);
 
-		TypeArray* emptytypearray;
-
 		string classname;
+
+		MethodSignatureParseTreeTraverser* methodanalyzer;
 		TypeChecker* typechecker;
 		ErrorTracker* errors;
 		ScopeSymbolTable* scopesymtable;

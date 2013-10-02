@@ -66,7 +66,7 @@ void ParseTreeTraverser::secondPass(Node* tree) {
 			{
 				string classname = tree->node_data.nodes[0]->node_data.string;
 				errors.pushContext("In declaration of 'every " + classname + "'");
-				ClassParseTreeTraverser classtraverser(&errors, &objectsymtable, &scopesymtable, classname, &typechecker);
+				ClassParseTreeTraverser classtraverser(&errors, &objectsymtable, &scopesymtable, classname, &typechecker, &methodanalyzer);
 
 				secondPass(tree->node_data.nodes[1]);
 				if(tree->subnodes > 2) classtraverser.traverse(tree->node_data.nodes[2]);

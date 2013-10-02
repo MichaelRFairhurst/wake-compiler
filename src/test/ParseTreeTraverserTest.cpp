@@ -6,6 +6,8 @@
 
 BOOST_AUTO_TEST_SUITE( ObjectSymbolTableTest )
 
+#define PTT_PRINT_TREE 0
+
 /**
  * These macros lead the charge in the test design
  */
@@ -16,6 +18,7 @@ BOOST_AUTO_TEST_SUITE( ObjectSymbolTableTest )
 		ParseTreeTraverser t; \
 		MockSemanticErrorPrinter e; \
 		p.parse( CODE ); \
+		if(PTT_PRINT_TREE) p.print(); \
 		{ EXPECTATIONS } \
 		t.traverse(p.getParseTree()); \
 		t.printErrors(e); \
@@ -690,13 +693,119 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	CtorAndPropertiesUsableInMethods,
-	"every MyClass is:							\n\
-		needs MyClass @a;						\n\
-		with MyClass @b;						\n\
-		MyClass -- testScope(MyClass @c) {		\n\
-			return @a; return @b; return @c;	\n\
+	"every MyClass is:									\n\
+		needs MyClass @a;								\n\
+		with MyClass @b;								\n\
+		with MyClass @c = @b;							\n\
+		MyClass -- testScope(MyClass @d) {				\n\
+			return @a; return @b; return @c; return @d;	\n\
 		}",
 	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	CtorBodyIsTypeChecked,
+	"every MyClass is:			\n\
+		needs nothing then {	\n\
+			5 + True;			\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+)
+
+PTT_TEST_CASE(
+	CtorBodyHasNoReturnTypeCheckWhenValid,
+	"every MyClass is: needs nothing then { return; }",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	CtorBodyHasNoReturnTypeCheckWhenInValid,
+	"every MyClass is: needs nothing then { return 5; }",
+	PTT_EXPECT(TYPE_ERROR)
+)
+
+PTT_TEST_CASE(
+	MethodInvocationOfClassNotThisComplex,
+	"every MyClass is: MyClass -- method(MyClass @a)Here(MyClass@b)Yeah() { return @a.method(@a)Here(@b)Yeah(); }",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	MethodInvocationOfClassNotThisSimple,
+	"every MyClass is: MyClass -- method(MyClass @a) { return @a.method(@a); }",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	MethodInvocationOfClassNotThisArgumentsAreTypeChecked,
+	"every Int is:																									\n\
+	every Text is:																									\n\
+	every MyClass is:																								\n\
+		MyClass -- argIsInvalidType(MyClass @a, Int) { return @a.argIsInvalidType(@a, 'test'); }					\n\
+		MyClass -- argIsInvalidExpression(MyClass @a, Int) { return @a.argIsInvalidExpression(@a, 5 + 'test'); }	\n\
+		Text -- argIsInvalidReturn(MyClass @a, Int) { return @a.argIsInvalidType(@a, 5); }							\n\
+		MyClass -- argIsInvalidArgumentCount(MyClass @a, Int) { return @a.argIsInvalidType(@a); }					\n\
+	",
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+)
+
+PTT_TEST_CASE(
+	MethodInvocationOfClassUsingThisComplex,
+	"every MyClass is: MyClass -- method(MyClass @a)Here(MyClass@b)Yeah() { return method(@a)Here(@b)Yeah(); }",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	MethodInvocationOfClassUsingThisSimple,
+	"every MyClass is: MyClass -- method(MyClass @a) { return method(@a); }",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	MethodInvocationOfClassUsingThisArgumentsAreTypeChecked,
+	"every Int is:																									\n\
+	every Text is:																									\n\
+	every MyClass is:																								\n\
+		MyClass -- argIsInvalidType(MyClass @a, Int) { return argIsInvalidType(@a, 'test'); }					\n\
+		MyClass -- argIsInvalidExpression(MyClass @a, Int) { return argIsInvalidExpression(@a, 5 + 'test'); }	\n\
+		Text -- argIsInvalidReturn(MyClass @a, Int) { return argIsInvalidType(@a, 5); }							\n\
+		MyClass -- argIsInvalidArgumentCount(MyClass @a, Int) { return argIsInvalidType(@a); }					\n\
+	",
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+)
+
+PTT_TEST_CASE(
+	MethodInvocationOfClassUsingThisExplicitComplex,
+	"every MyClass is: MyClass -- method(MyClass @a)Here(MyClass@b)Yeah() { return this.method(@a)Here(@b)Yeah(); }",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	MethodInvocationOfClassUsingThisExplicitSimple,
+	"every MyClass is: MyClass -- method(MyClass @a) { return this.method(@a); }",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	MethodInvocationOfClassUsingThisExplicitArgumentsAreTypeChecked,
+	"every Int is:																									\n\
+	every Text is:																									\n\
+	every MyClass is:																								\n\
+		MyClass -- argIsInvalidType(MyClass @a, Int) { return this.argIsInvalidType(@a, 'test'); }					\n\
+		MyClass -- argIsInvalidExpression(MyClass @a, Int) { return this.argIsInvalidExpression(@a, 5 + 'test'); }	\n\
+		Text -- argIsInvalidReturn(MyClass @a, Int) { return this.argIsInvalidType(@a, 5); }							\n\
+		MyClass -- argIsInvalidArgumentCount(MyClass @a, Int) { return this.argIsInvalidType(@a); }					\n\
+	",
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 )
 
 BOOST_AUTO_TEST_SUITE_END()

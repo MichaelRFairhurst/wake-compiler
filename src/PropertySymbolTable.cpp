@@ -2,15 +2,14 @@
 #include "SemanticError.h"
 
 void PropertySymbolTable::addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, Node* body) {
-	string name = getSymbolNameOf(returntype, segments_arguments);
-	Type* method = MakeType(TYPE_LAMBDA);
+	string name = getSymbolNameOf(segments_arguments);
 
 	if(properties.count(name)) {
 		string temp = "duplicate method signature is " + name;
-		freeType(method);
 		throw new SemanticError(MULTIPLE_METHOD_DEFINITION, temp);
 	}
 
+	Type* method = MakeType(TYPE_LAMBDA);
 	method->typedata.lambda.returntype = copyType(returntype);
 	method->typedata.lambda.body = body;
 
@@ -33,8 +32,8 @@ Type* PropertySymbolTable::get(string name) {
 	return properties.find(name)->second;
 }
 
-string PropertySymbolTable::getSymbolNameOf(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments) {
-	string name = analyzer->getNameForType(returntype) + "--";
+string PropertySymbolTable::getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments) {
+	string name;
 	for(vector<pair<string, TypeArray*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
 		name += it->first;
 		name += "(";

@@ -20,7 +20,7 @@ using namespace std;
 class ParseTreeTraverser {
 
 	public:
-		ParseTreeTraverser() : typechecker(&errors, &objectsymtable, &scopesymtable) {}
+		ParseTreeTraverser() : methodanalyzer(&objectsymtable), typechecker(&errors, &objectsymtable, &scopesymtable, &methodanalyzer) {}
 		void traverse(Node* tree);
 		void printErrors(SemanticErrorPrinter& p);
 
@@ -30,6 +30,7 @@ class ParseTreeTraverser {
 
 		ScopeSymbolTable scopesymtable;
 		ObjectSymbolTable objectsymtable;
+		MethodSignatureParseTreeTraverser methodanalyzer;
 		TypeChecker typechecker;
 
 };

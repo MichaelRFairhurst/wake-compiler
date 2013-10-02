@@ -42,9 +42,8 @@
 #define NT_METHOD_NAME 25
 #define NT_METHOD_NAME_SEGMENT 26
 
-#define NT_ARGUMENTS 27
-#define NT_ARGUMENT 28
-
+#define NT_THIS 27
+#define NT_PARENT 28
 #define NT_TYPE_ARRAY 29
 #define NT_TYPEDATA 30
 #define NT_CLASSNAME 31
@@ -64,6 +63,7 @@
 #define NT_RETRIEVALS_STATEMENTS 43
 #define NT_RETRIEVAL 44
 #define NT_ASSIGNMENT 45
+#define NT_DECLARATION 74
 
 #define NT_CASE 46
 #define NT_DEFAULTCASE 47
@@ -108,7 +108,7 @@ Node* MakeNodeFromTypeArray(TypeArray* thearray);
 
 Node* MakeNodeFromString(int nodetype, char* mystring);
 
-Node* MakeNodeFromNumber(int nodetype, int number);
+Node* MakeNodeFromNumber(int nodetype, float number);
 
 Node* MakeTwoBranchNode(int nodetype, Node* a, Node* b);
 
