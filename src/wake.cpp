@@ -14,6 +14,7 @@ extern "C" {
 #include "Parser.h"
 #include "ParseTreeTraverser.h"
 #include "SemanticErrorPrinter.h"
+#include "LibraryLoader.h"
 
 int main(int argc, char** argv) {
 	if(argc < 2) {
@@ -39,8 +40,12 @@ int main(int argc, char** argv) {
 	if(parser.parse(myfile)) exit(1);
 	//parser.print();
 
+	ObjectSymbolTable table;
+	LibraryLoader loader;
+	loader.loadToTable(&table);
+
 	// Now do all the semantic analysis
-	ParseTreeTraverser traverser;
+	ParseTreeTraverser traverser(&table);
 	traverser.traverse(parser.getParseTree());
 
 	SemanticErrorPrinter printer;

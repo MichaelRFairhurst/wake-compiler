@@ -3,6 +3,7 @@
 #include "MockSemanticErrorPrinter.h"
 #include "Parser.h"
 #include "ParseTreeTraverser.h"
+#include "LibraryLoader.h"
 
 BOOST_AUTO_TEST_SUITE( ObjectSymbolTableTest )
 
@@ -15,7 +16,10 @@ BOOST_AUTO_TEST_SUITE( ObjectSymbolTableTest )
 	BOOST_AUTO_TEST_CASE( NAME ) \
 	{ \
 		Parser p; \
-		ParseTreeTraverser t; \
+		ObjectSymbolTable table; \
+		LibraryLoader loader; \
+		loader.loadToTable(&table); \
+		ParseTreeTraverser t(&table); \
 		MockSemanticErrorPrinter e; \
 		p.parse( CODE ); \
 		if(PTT_PRINT_TREE) p.print(); \
@@ -23,7 +27,7 @@ BOOST_AUTO_TEST_SUITE( ObjectSymbolTableTest )
 		t.traverse(p.getParseTree()); \
 		t.printErrors(e); \
 		BOOST_REQUIRE(e.passed()); \
-}
+	}
 
 #define PTT_VALID ;
 
@@ -371,7 +375,7 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	ArrayIndexAccessTypeErrors,
-	"every Int is: every MyClass is:							\n\
+	"every MyClass is:											\n\
 		arrayAccessOnInt() { 9[1]; }							\n\
 		arrayAccessOnString() { 'abcd'[1]; }					\n\
 		arrayAccessOnClass(MyClass) { MyClass[1]; }				\n\
@@ -387,7 +391,7 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	ValidArrayIndexAccessAndReturningValidTypes,
-	"every Int is: every Text is: every MyClass is:							\n\
+	"every MyClass is:														\n\
 		intArrayBecomesInt(Int[]) { Int[0] + 3; }							\n\
 		stringArrayBecomesString(Text[]) { Text[1] + 'test'; }				\n\
 		stringArrayArrayBecomesString(Text[][]) { Text[1][1] + 'test'; }	\n\
@@ -458,7 +462,7 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	ValidIfConditions,
-	"every Truth is: every MyClass is:							\n\
+	"every MyClass is:											\n\
 		truthLiterals() { if(True) 5; if(False) 5; }			\n\
 		truthVariable(Truth) { if(Truth) 5; }					\n\
 		truthAlias(Truth @a) { if(@a) 5; }						\n\
@@ -471,32 +475,31 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	InvalidReturnValues,
-	"every Truth is: every Int is: every Text is:												\n\
-		every UnrelatedClass is:																\n\
-		every ParentClass is:																	\n\
-		every MyClass (a ParentClass) is:														\n\
-			Truth -- returnTextLiteralAsTruth() { return 'text'; }								\n\
-			Truth -- returnNumberLiteralAsTruth() { return 1; }									\n\
-			Truth -- returnClassAsTruth(MyClass) { return MyClass; }							\n\
-			Truth -- returnNothingAsTruth() { return; }											\n\
-			Text -- returnTruthLiteralAsText() { return True; }									\n\
-			Text -- returnNumberLiteralAsText() { return 1; }									\n\
-			Text -- returnClassAsText(MyClass) { return MyClass; }								\n\
-			Text -- returnNothingAsText() { return; }											\n\
-			Int -- returnTruthLiteralAsInt() { return True; }									\n\
-			Int -- returnTextLiteralAsInt() { return 'text'; }									\n\
-			Int -- returnClassAsInt(MyClass) { return MyClass; }								\n\
-			Int -- returnNothingAsInt() { return; }												\n\
-			MyClass -- returnTruthLiteralAsClass() { return True; }								\n\
-			MyClass -- returnTextLiteralAsClass() { return 'test'; }							\n\
-			MyClass -- returnIntLiteralAsClass() { return 1; }									\n\
-			MyClass -- returnUnrelatedClassAsClass(UnrelatedClass) { return UnrelatedClass; }	\n\
-			MyClass -- returnParentClassAsClass(ParentClass) { return ParentClass; }			\n\
-			MyClass -- returnNothingAsMyClass() { return; }										\n\
-			returnTextLiteralInVoidMethod() { return 'text'; }									\n\
-			returnNumberLiteralInVoidMethod() { return 1; }										\n\
-			returnClassInVoidMethod(MyClass) { return MyClass; }								\n\
-			returnTruthLiteralInVoidMethod() { return True; }									\n\
+	"every UnrelatedClass is:																\n\
+	every ParentClass is:																	\n\
+	every MyClass (a ParentClass) is:														\n\
+		Truth -- returnTextLiteralAsTruth() { return 'text'; }								\n\
+		Truth -- returnNumberLiteralAsTruth() { return 1; }									\n\
+		Truth -- returnClassAsTruth(MyClass) { return MyClass; }							\n\
+		Truth -- returnNothingAsTruth() { return; }											\n\
+		Text -- returnTruthLiteralAsText() { return True; }									\n\
+		Text -- returnNumberLiteralAsText() { return 1; }									\n\
+		Text -- returnClassAsText(MyClass) { return MyClass; }								\n\
+		Text -- returnNothingAsText() { return; }											\n\
+		Int -- returnTruthLiteralAsInt() { return True; }									\n\
+		Int -- returnTextLiteralAsInt() { return 'text'; }									\n\
+		Int -- returnClassAsInt(MyClass) { return MyClass; }								\n\
+		Int -- returnNothingAsInt() { return; }												\n\
+		MyClass -- returnTruthLiteralAsClass() { return True; }								\n\
+		MyClass -- returnTextLiteralAsClass() { return 'test'; }							\n\
+		MyClass -- returnIntLiteralAsClass() { return 1; }									\n\
+		MyClass -- returnUnrelatedClassAsClass(UnrelatedClass) { return UnrelatedClass; }	\n\
+		MyClass -- returnParentClassAsClass(ParentClass) { return ParentClass; }			\n\
+		MyClass -- returnNothingAsMyClass() { return; }										\n\
+		returnTextLiteralInVoidMethod() { return 'text'; }									\n\
+		returnNumberLiteralInVoidMethod() { return 1; }										\n\
+		returnClassInVoidMethod(MyClass) { return MyClass; }								\n\
+		returnTruthLiteralInVoidMethod() { return True; }									\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -524,34 +527,32 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	ValidReturnValues,
-	"every Truth is: every Int is: every Text is:										\n\
-		every RelatedClass (a MyClass) is:												\n\
-		every MyClass is:																\n\
-			Truth -- returnTruth() { return True; }										\n\
-			Text -- returnText() { return 'text'; }										\n\
-			Int -- returnInt() { return 5; }											\n\
-			MyClass -- returnAMyClass(MyClass) { return MyClass; }						\n\
-			MyClass -- returnARelatedClass(RelatedClass) { return RelatedClass; }		\n\
-			MyClass -- returnRelatedClassAsClass(RelatedClass) { return RelatedClass; }	\n\
-			returnNothingInVoidMethod() { return; }	\n\
+	"every RelatedClass (a MyClass) is:												\n\
+	every MyClass is:																\n\
+		Truth -- returnTruth() { return True; }										\n\
+		Text -- returnText() { return 'text'; }										\n\
+		Int -- returnInt() { return 5; }											\n\
+		MyClass -- returnAMyClass(MyClass) { return MyClass; }						\n\
+		MyClass -- returnARelatedClass(RelatedClass) { return RelatedClass; }		\n\
+		MyClass -- returnRelatedClassAsClass(RelatedClass) { return RelatedClass; }	\n\
+		returnNothingInVoidMethod() { return; }										\n\
 	",
 	PTT_VALID
 )
 
 PTT_TEST_CASE(
 	InvalidAssignments,
-	"every Truth is: every Int is: every Text is:								\n\
-		every UnrelatedClass is:												\n\
-		every ParentClass is:													\n\
-		every MyClass (a ParentClass) is:										\n\
-			assignTruthTo(Int) { Int = True; }									\n\
-			assignTextTo(Int) { Int = 'text'; }									\n\
-			assignA(MyClass)To(Int) { Int = MyClass; }							\n\
-			assignTruthTo(Text) { Text = True; }								\n\
-			assignIntTo(Text) { Text = 5; }										\n\
-			assignA(MyClass)To(Text) { Text = MyClass; }						\n\
-			assignAn(UnrelatedClass)To(MyClass) { MyClass = UnrelatedClass; }	\n\
-			assignA(ParentClass)To(MyClass) { MyClass = ParentClass; }			\n\
+	"every UnrelatedClass is:												\n\
+	every ParentClass is:													\n\
+	every MyClass (a ParentClass) is:										\n\
+		assignTruthTo(Int) { Int = True; }									\n\
+		assignTextTo(Int) { Int = 'text'; }									\n\
+		assignA(MyClass)To(Int) { Int = MyClass; }							\n\
+		assignTruthTo(Text) { Text = True; }								\n\
+		assignIntTo(Text) { Text = 5; }										\n\
+		assignA(MyClass)To(Text) { Text = MyClass; }						\n\
+		assignAn(UnrelatedClass)To(MyClass) { MyClass = UnrelatedClass; }	\n\
+		assignA(ParentClass)To(MyClass) { MyClass = ParentClass; }			\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -565,35 +566,33 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	ValidAssignments,
-	"every Truth is: every Int is: every Text is:						\n\
-		every ParentClass is:											\n\
-		every MyClass (a ParentClass) is:								\n\
-			assignTruthTo(Truth) { Truth = True; }						\n\
-			assignTextTo(Text) { Text = 'text'; }						\n\
-			assignIntTo(Int) { Int = 5; }								\n\
-			assign(MyClass @a)To(MyClass @b) { @a = @b; }				\n\
-			assignA(MyClass)To(ParentClass) { ParentClass = MyClass; }	\n\
+	"every ParentClass is:											\n\
+	every MyClass (a ParentClass) is:								\n\
+		assignTruthTo(Truth) { Truth = True; }						\n\
+		assignTextTo(Text) { Text = 'text'; }						\n\
+		assignIntTo(Int) { Int = 5; }								\n\
+		assign(MyClass @a)To(MyClass @b) { @a = @b; }				\n\
+		assignA(MyClass)To(ParentClass) { ParentClass = MyClass; }	\n\
 	",
 	PTT_VALID
 )
 
 PTT_TEST_CASE(
 	InvalidLambdaInvocations,
-	"every Truth is: every Int is: every Text is:								\n\
-		every UnrelatedClass is: every ParentClass is:							\n\
-		every MyClass (a ParentClass) is:										\n\
-			call(fn(Text) @fn)WithInt() { @fn(4); }								\n\
-			call(fn(Text) @fn)WithTruth() { @fn(True); }						\n\
-			call(fn(Text) @fn)With(MyClass) { @fn(MyClass); }					\n\
-			call(fn(Truth) @fn)With(MyClass) { @fn(MyClass); }					\n\
-			call(fn(Truth) @fn)WithInt() { @fn(4); }							\n\
-			call(fn(Truth) @fn)WithText() { @fn('test'); }						\n\
-			call(fn(Int) @fn)WithText() { @fn('test'); }						\n\
-			call(fn(Int) @fn)WithTruth() { @fn(True); }							\n\
-			call(fn(Int) @fn)With(MyClass) { @fn(MyClass); }					\n\
-			call(fn(Int, Text) @fn)WithTextInt() { @fn('abc', 4); }				\n\
-			call(fn(MyClass) @fn)With(UnrelatedClass) { @fn(UnrelatedClass); }	\n\
-			call(fn(MyClass) @fn)With(ParentClass) { @fn(ParentClass); }		\n\
+	"every UnrelatedClass is: every ParentClass is:							\n\
+	every MyClass (a ParentClass) is:										\n\
+		call(fn(Text) @fn)WithInt() { @fn(4); }								\n\
+		call(fn(Text) @fn)WithTruth() { @fn(True); }						\n\
+		call(fn(Text) @fn)With(MyClass) { @fn(MyClass); }					\n\
+		call(fn(Truth) @fn)With(MyClass) { @fn(MyClass); }					\n\
+		call(fn(Truth) @fn)WithInt() { @fn(4); }							\n\
+		call(fn(Truth) @fn)WithText() { @fn('test'); }						\n\
+		call(fn(Int) @fn)WithText() { @fn('test'); }						\n\
+		call(fn(Int) @fn)WithTruth() { @fn(True); }							\n\
+		call(fn(Int) @fn)With(MyClass) { @fn(MyClass); }					\n\
+		call(fn(Int, Text) @fn)WithTextInt() { @fn('abc', 4); }				\n\
+		call(fn(MyClass) @fn)With(UnrelatedClass) { @fn(UnrelatedClass); }	\n\
+		call(fn(MyClass) @fn)With(ParentClass) { @fn(ParentClass); }		\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -611,33 +610,32 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	ValidLambdaInvocations,
-	"every Truth is: every Int is: every Text is:																			\n\
-		every ParentClass is:																								\n\
-		every MyClass (a ParentClass) is:																					\n\
-																															\n\
-			call(fn(Text) @fn)WithText() { @fn('test'); }																	\n\
-																															\n\
-			call(fn(Truth) @fn)WithTruth() { @fn(True); }																	\n\
-																															\n\
-			call(fn(Int) @fn)WithInt() { @fn(4); }																			\n\
-																															\n\
-			call(fn(ParentClass) @fn)With(MyClass) { @fn(MyClass); }														\n\
-																															\n\
-			Text -- call(Text -- fn(Text, Int, Truth, ParentClass) @fn)WithProperArgsAnd(MyClass) {							\n\
-				return @fn('text', 4, True, MyClass);																		\n\
-			}																												\n\
-																															\n\
-			Int -- call(Int -- fn(Int, Truth, ParentClass, Text) @fn)WithProperArgsAnd(MyClass) {							\n\
-				return @fn(4, True, MyClass, 'text');																		\n\
-			}																												\n\
-																															\n\
-			Truth -- call(Truth -- fn(Truth, ParentClass, Text, Int) @fn)WitProperArgsAnd(MyClass) {						\n\
-				return @fn(True, MyClass, 'text', 4);																		\n\
-			}																												\n\
-																															\n\
-			MyClass -- call(MyClass -- fn(ParentClass, Truth, Text, Int) @fn)WithProperArgsAnd(MyClass) {					\n\
-				return @fn(MyClass, True, 'text', 4);																		\n\
-			}																												\n\
+	"every ParentClass is:																								\n\
+	every MyClass (a ParentClass) is:																					\n\
+																														\n\
+		call(fn(Text) @fn)WithText() { @fn('test'); }																	\n\
+																														\n\
+		call(fn(Truth) @fn)WithTruth() { @fn(True); }																	\n\
+																														\n\
+		call(fn(Int) @fn)WithInt() { @fn(4); }																			\n\
+																														\n\
+		call(fn(ParentClass) @fn)With(MyClass) { @fn(MyClass); }														\n\
+																														\n\
+		Text -- call(Text -- fn(Text, Int, Truth, ParentClass) @fn)WithProperArgsAnd(MyClass) {							\n\
+			return @fn('text', 4, True, MyClass);																		\n\
+		}																												\n\
+																														\n\
+		Int -- call(Int -- fn(Int, Truth, ParentClass, Text) @fn)WithProperArgsAnd(MyClass) {							\n\
+			return @fn(4, True, MyClass, 'text');																		\n\
+		}																												\n\
+																														\n\
+		Truth -- call(Truth -- fn(Truth, ParentClass, Text, Int) @fn)WitProperArgsAnd(MyClass) {						\n\
+			return @fn(True, MyClass, 'text', 4);																		\n\
+		}																												\n\
+																														\n\
+		MyClass -- call(MyClass -- fn(ParentClass, Truth, Text, Int) @fn)WithProperArgsAnd(MyClass) {					\n\
+			return @fn(MyClass, True, 'text', 4);																		\n\
+		}																												\n\
 	",
 	PTT_VALID
 )
@@ -662,13 +660,13 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	AssignMultiplePropertiesRightOrderIsOK,
-	"every Int is: every MyClass is: with Int = 5; with $Int = Int; with $$Int = $Int;",
+	"every MyClass is: with Int = 5; with $Int = Int; with $$Int = $Int;",
 	PTT_VALID
 )
 
 PTT_TEST_CASE(
 	assignMultiplePropertiesWrongOrderIsntOK,
-	"every Int is: every MyClass is: with Int = $Int; with $Int = $$Int; with $$Int = 5;",
+	"every MyClass is: with Int = $Int; with $Int = $$Int; with $$Int = 5;",
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 )
@@ -738,9 +736,7 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	MethodInvocationOfClassNotThisArgumentsAreTypeChecked,
-	"every Int is:																									\n\
-	every Text is:																									\n\
-	every MyClass is:																								\n\
+	"every MyClass is:																								\n\
 		MyClass -- argIsInvalidType(MyClass @a, Int) { return @a.argIsInvalidType(@a, 'test'); }					\n\
 		MyClass -- argIsInvalidExpression(MyClass @a, Int) { return @a.argIsInvalidExpression(@a, 5 + 'test'); }	\n\
 		Text -- argIsInvalidReturn(MyClass @a, Int) { return @a.argIsInvalidType(@a, 5); }							\n\
@@ -766,9 +762,7 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	MethodInvocationOfClassUsingThisArgumentsAreTypeChecked,
-	"every Int is:																									\n\
-	every Text is:																									\n\
-	every MyClass is:																								\n\
+	"every MyClass is:																							\n\
 		MyClass -- argIsInvalidType(MyClass @a, Int) { return argIsInvalidType(@a, 'test'); }					\n\
 		MyClass -- argIsInvalidExpression(MyClass @a, Int) { return argIsInvalidExpression(@a, 5 + 'test'); }	\n\
 		Text -- argIsInvalidReturn(MyClass @a, Int) { return argIsInvalidType(@a, 5); }							\n\
@@ -794,9 +788,7 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	MethodInvocationOfClassUsingThisExplicitArgumentsAreTypeChecked,
-	"every Int is:																									\n\
-	every Text is:																									\n\
-	every MyClass is:																								\n\
+	"every MyClass is:																								\n\
 		MyClass -- argIsInvalidType(MyClass @a, Int) { return this.argIsInvalidType(@a, 'test'); }					\n\
 		MyClass -- argIsInvalidExpression(MyClass @a, Int) { return this.argIsInvalidExpression(@a, 5 + 'test'); }	\n\
 		Text -- argIsInvalidReturn(MyClass @a, Int) { return this.argIsInvalidType(@a, 5); }							\n\
@@ -860,38 +852,37 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	InexhaustiveReturnFromIfsWithoutElses,
-	"every Truth is: every MyClass is: Truth -- afn() { if(True) return True; if(True) return True; if(True) return True; }",
+	"every MyClass is: Truth -- afn() { if(True) return True; if(True) return True; if(True) return True; }",
 	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
 )
 
 PTT_TEST_CASE(
 	InexhaustiveReturnFromIfsWithoutReturns,
-	"every Truth is: every MyClass is: Truth -- afn() { if(True) 5; else return True; if(True) 5; else return True; }",
+	"every MyClass is: Truth -- afn() { if(True) 5; else return True; if(True) 5; else return True; }",
 	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
 )
 
 PTT_TEST_CASE(
 	InexhaustiveReturnFromElsesWithoutReturns,
-	"every Truth is: every MyClass is: Truth -- afn() { if(True) return True; else 5; if(True) return True; else 5; }",
+	"every MyClass is: Truth -- afn() { if(True) return True; else 5; if(True) return True; else 5; }",
 	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
 )
 
 PTT_TEST_CASE(
 	InexhaustiveReturnFromReturningWithinLoopsOnly,
-	"every Truth is: every MyClass is: Truth -- afn() { while(True) return True; for(1; True; 1) return True; }",
+	"every MyClass is: Truth -- afn() { while(True) return True; for(1; True; 1) return True; }",
 	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
 )
 
 PTT_TEST_CASE(
 	InexhaustiveReturnFromNoReturn,
-	"every Truth is: every MyClass is: Truth -- afn() { 5 + 5; 6 + 6; 8 + 9 + 7; }",
+	"every MyClass is: Truth -- afn() { 5 + 5; 6 + 6; 8 + 9 + 7; }",
 	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
 )
 
 PTT_TEST_CASE(
 	InexhaustiveReturnComplicated,
-	"every Truth is:				\n\
-	every MyClass is:				\n\
+	"every MyClass is:				\n\
 		Truth -- afn() {			\n\
 			if(True) {				\n\
 				if(True) {			\n\
@@ -913,8 +904,7 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	ExhaustiveReturnComplicated,
-	"every Truth is:				\n\
-	every MyClass is:				\n\
+	"every MyClass is:				\n\
 		Truth -- afn() {			\n\
 			if(True) {				\n\
 				if(True) {			\n\
@@ -937,19 +927,19 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	InexhaustiveReturnsOkWithVoidReturnType,
-	"every Truth is: every MyClass is: afn() { } ",
+	"every MyClass is: afn() { } ",
 	PTT_VALID
 )
 
 PTT_TEST_CASE(
 	TestDeclareAnInt,
-	"every Int is: every MyClass is: Int -- myfn() { :Int = 5; return Int; }",
+	"every MyClass is: Int -- myfn() { :Int = 5; return Int; }",
 	PTT_VALID
 )
 
 PTT_TEST_CASE(
 	TestDeclareAnIntWithBadType,
-	"every Int is: every MyClass is: myfn() { :Int = 'test'; }",
+	"every MyClass is: myfn() { :Int = 'test'; }",
 	PTT_EXPECT(TYPE_ERROR)
 )
 
@@ -961,7 +951,7 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	TestDeclareAnIntIsScoped,
-	"every Int is: every MyClass is: Int -- myfn() { if(True) { :Int = 5; } return Int; }",
+	"every MyClass is: Int -- myfn() { if(True) { :Int = 5; } return Int; }",
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 )
 

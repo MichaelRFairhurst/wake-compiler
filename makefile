@@ -1,10 +1,24 @@
-DEBUG=
-OPT=-O3 -Iinclude -Igen
-#OPT=-O0 -g -Iinclude -Igen
-CC=cc $(OPT)
-CPP=g++ $(OPT)
+OPT=-O0
+FLAGS=-g -Iinclude -Igen
+CC=cc $(FLAGS)
+CPP=g++ $(FLAGS)
 
-CPPNAMES=ObjectSymbolTable.cpp ParseTreeTraverser.cpp SemanticError.cpp PropertySymbolTable.cpp Parser.cpp SemanticErrorPrinter.cpp MockSemanticErrorPrinter.cpp ScopeSymbolTable.cpp TypeAnalyzer.cpp ErrorTracker.cpp TypeChecker.cpp ClassParseTreeTraverser.cpp MethodSignatureParseTreeTraverser.cpp
+CPPNAMES= \
+	ObjectSymbolTable.cpp \
+	ParseTreeTraverser.cpp \
+	SemanticError.cpp \
+	PropertySymbolTable.cpp \
+	Parser.cpp \
+	SemanticErrorPrinter.cpp \
+	MockSemanticErrorPrinter.cpp \
+	ScopeSymbolTable.cpp \
+	TypeAnalyzer.cpp \
+	ErrorTracker.cpp \
+	TypeChecker.cpp \
+	ClassParseTreeTraverser.cpp \
+	MethodSignatureParseTreeTraverser.cpp \
+	LibraryLoader.cpp
+
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
 CNAMES=tree.c type.c
 COBJS=$(addprefix bin/c/, $(CNAMES:.c=.o))
@@ -25,32 +39,29 @@ chivvy: bin/test
 	@echo -- NOW CHIVVY ALONG
 	@echo
 
-debug: DEBUG=-t
-debug: main
-
 bin/test: $(CPPOBJS) $(GENOBJS) $(COBJS) $(TESTOBJS)
 	$(CPP) $(TESTOBJS) $(CPPOBJS) $(GENOBJS) $(COBJS) -o bin/test -lfl -lboost_unit_test_framework
 
 bin/wake: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o chivvy
-	$(CPP) $(CPPOBJS) bin/cpp/wake.o $(GENOBJS) $(COBJS) -o bin/wake -lfl
+	$(CPP) $(OPT) $(CPPOBJS) bin/cpp/wake.o $(GENOBJS) $(COBJS) -o bin/wake -lfl
 	@echo
 	@echo -- CHEERIO, MATE
 	@echo
 
 bin/gen/%.o: gen/%.c
-	$(CC) -c $< -o $@
+	$(CC) $(OPT) -c $< -o $@
 
 bin/tests/%.o: src/test/%.cpp
 	$(CPP) -c $< -o $@
 
 bin/cpp/%.o: src/%.cpp gen/y.tab.h
-	$(CPP) -c $< -o $@
+	$(CPP) $(OPT) -c $< -o $@
 
 bin/c/%.o: src/%.c gen/y.tab.h
-	$(CC) -c $< -o $@
+	$(CC) $(OPT) -c $< -o $@
 
 gen/y.tab.h: src/parser.y
-	yacc -dv $(DEBUG) -o gen/y.tab.c src/parser.y
+	yacc -dv -o gen/y.tab.c src/parser.y
 
 gen/lex.yy.c: src/lexer.l gen/y.tab.h
 	flex -o gen/lex.yy.c src/lexer.l
