@@ -42,6 +42,18 @@ void SemanticErrorPrinter::print(SemanticError* e) {
 		case PROPERTY_OR_METHOD_NOT_FOUND:
 			cout << "Property or method on class is not valid";
 			break;
+		case ILLEGAL_CASE:
+			cout << "Use of 'case' or 'default' outside of a switch block";
+			break;
+		case ILLEGAL_CONTINUE:
+			cout << "Use of 'continue' outside of a loop";
+			break;
+		case ILLEGAL_BREAK:
+			cout << "Use of 'break' outside of a loop or switch block";
+			break;
+		case INEXHAUSTIVE_RETURNS:
+			cout << "Inexhaustive returns; not all execution paths of function guarantee a return value";
+			break;
 		default:
 			cout << "bad error code provided";
 	}

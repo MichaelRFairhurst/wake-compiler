@@ -303,7 +303,7 @@ objectable:
 	| value																		{ $$ = $1; }
 
 block:
-	'{' declarationsandstatements '}'											{ $$ = $2; }
+	'{' declarationsandstatements '}'											{ $$ = MakeOneBranchNode(NT_BLOCK, $2); }
 	| '{' '}'																	{ $$ = MakeEmptyNode(NT_EMPTY); }
 	;
 

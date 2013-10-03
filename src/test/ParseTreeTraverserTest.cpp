@@ -181,8 +181,8 @@ PTT_TEST_CASE(
 			Child; @b; return @aliased(Child);														\n\
 		}																							\n\
 																									\n\
-		Child -- fn(Parent, Child) -- MyFunction(Child, Parent, Parent -- fn(Child) @aliased) {		\n\
-																									\n\
+		Parent -- fn(Child) -- MyFunction(Child, Parent, Parent -- fn(Child) @aliased) {			\n\
+			return @aliased;																		\n\
 		}																							\n\
 	",
 	PTT_VALID
@@ -806,6 +806,163 @@ PTT_TEST_CASE(
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+)
+
+PTT_TEST_CASE(
+	CaseNotWithinSwitchIsError,
+	"every MyClass is: afn() { case 5: }",
+	PTT_EXPECT(ILLEGAL_CASE)
+)
+
+PTT_TEST_CASE(
+	DefaultCaseNotWithinSwitchIsError,
+	"every MyClass is: afn() { default: }",
+	PTT_EXPECT(ILLEGAL_CASE)
+)
+
+/* SWITCH CASE LOGIC IS PENDING
+PTT_TEST_CASE(
+	CaseWithinSwitchIsOk,
+	"every MyClass is: afn() { switch(5) { case 1: case 2: default: } }",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	CaseWithinSwitchAfterClosingPriorSwitchIsOk,
+	"every MyClass is: afn() { switch(5) { case 1: switch (8) { case 6: } case 2: default: } }",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	BreakWithinSwitchAfterClosingPriorSwitchIsOk,
+	"every MyClass is: afn() { switch(5) { case 1: break; switch (8) { case 6: break; } case 2: break; default: } }",
+	PTT_VALID
+)
+*/
+
+PTT_TEST_CASE(
+	BreakNotWithinSwitchForOrWhileIsError,
+	"every MyClass is: afn() { break; }",
+	PTT_EXPECT(ILLEGAL_BREAK)
+)
+
+PTT_TEST_CASE(
+	ContinueNotWithinForOrWhileIsError,
+	"every MyClass is: afn() { continue; }",
+	PTT_EXPECT(ILLEGAL_CONTINUE)
+)
+
+PTT_TEST_CASE(
+	BreakAndContinueWithinForOrWhileIsOK,
+	"every MyClass is: afn() { while(True) { while(True) { break; continue; } for(5; True; 5) { break; continue; }; break; continue; } }",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	InexhaustiveReturnFromIfsWithoutElses,
+	"every Truth is: every MyClass is: Truth -- afn() { if(True) return True; if(True) return True; if(True) return True; }",
+	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
+)
+
+PTT_TEST_CASE(
+	InexhaustiveReturnFromIfsWithoutReturns,
+	"every Truth is: every MyClass is: Truth -- afn() { if(True) 5; else return True; if(True) 5; else return True; }",
+	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
+)
+
+PTT_TEST_CASE(
+	InexhaustiveReturnFromElsesWithoutReturns,
+	"every Truth is: every MyClass is: Truth -- afn() { if(True) return True; else 5; if(True) return True; else 5; }",
+	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
+)
+
+PTT_TEST_CASE(
+	InexhaustiveReturnFromReturningWithinLoopsOnly,
+	"every Truth is: every MyClass is: Truth -- afn() { while(True) return True; for(1; True; 1) return True; }",
+	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
+)
+
+PTT_TEST_CASE(
+	InexhaustiveReturnFromNoReturn,
+	"every Truth is: every MyClass is: Truth -- afn() { 5 + 5; 6 + 6; 8 + 9 + 7; }",
+	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
+)
+
+PTT_TEST_CASE(
+	InexhaustiveReturnComplicated,
+	"every Truth is:				\n\
+	every MyClass is:				\n\
+		Truth -- afn() {			\n\
+			if(True) {				\n\
+				if(True) {			\n\
+					5 + 5;			\n\
+					6 + 6;			\n\
+					return True;	\n\
+				}					\n\
+			} else {				\n\
+				5 + 6;				\n\
+				7 == 10;			\n\
+				while(True) {		\n\
+					return True;	\n\
+				}					\n\
+			}						\n\
+			6 + 7;					\n\
+		}",
+	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
+)
+
+PTT_TEST_CASE(
+	ExhaustiveReturnComplicated,
+	"every Truth is:				\n\
+	every MyClass is:				\n\
+		Truth -- afn() {			\n\
+			if(True) {				\n\
+				if(True) {			\n\
+					5 + 5;			\n\
+					6 + 6;			\n\
+					return True;	\n\
+				} else {			\n\
+					7 / 16;			\n\
+				}					\n\
+				return True;		\n\
+			} else {				\n\
+				5 + 6;				\n\
+				7 == 10;			\n\
+				return True;		\n\
+			}						\n\
+			6 + 7;					\n\
+	}",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	InexhaustiveReturnsOkWithVoidReturnType,
+	"every Truth is: every MyClass is: afn() { } ",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	TestDeclareAnInt,
+	"every Int is: every MyClass is: Int -- myfn() { :Int = 5; return Int; }",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	TestDeclareAnIntWithBadType,
+	"every Int is: every MyClass is: myfn() { :Int = 'test'; }",
+	PTT_EXPECT(TYPE_ERROR)
+)
+
+PTT_TEST_CASE(
+	TestDeclareAnIntWithUnknownType,
+	"every MyClass is: myfn() { :LInt = 'test'; }",
+	PTT_EXPECT(CLASSNAME_NOT_FOUND)
+)
+
+PTT_TEST_CASE(
+	TestDeclareAnIntIsScoped,
+	"every Int is: every MyClass is: Int -- myfn() { if(True) { :Int = 5; } return Int; }",
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 )
 
 BOOST_AUTO_TEST_SUITE_END()

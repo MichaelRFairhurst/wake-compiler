@@ -142,6 +142,7 @@ void ClassParseTreeTraverser::loadProperties(Node* tree) {
 			try {
 				if(tree->node_data.nodes[0]->node_type == NT_ASSIGNMENT) {
 					scopesymtable->add(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type);
+					typechecker->setReturnType(NULL);
 					typechecker->check(tree->node_data.nodes[0]);
 				} else {
 					objectsymtable->assertTypeIsValid(tree->node_data.nodes[0]->node_data.type);

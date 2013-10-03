@@ -1,4 +1,5 @@
 #include "TypeChecker.h"
+#include "CompilationExceptions.h"
 
 TypeChecker::TypeChecker(ErrorTracker* errors, ObjectSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, MethodSignatureParseTreeTraverser* methodanalyzer) {
 	this->errors = errors;
@@ -10,12 +11,80 @@ TypeChecker::TypeChecker(ErrorTracker* errors, ObjectSymbolTable* objectsymtable
 void TypeChecker::check(Node* tree) {
 	freeType(typeCheck(tree));
 
-	if(!exhaustiveReturns(tree))
-		return; // TODO
+	flowAnalysis(tree, false, false, false);
+	if(returntype != NULL && !exhaustiveReturns(tree))
+		errors->addError(new SemanticError(INEXHAUSTIVE_RETURNS, "", tree));
 }
 
 bool TypeChecker::exhaustiveReturns(Node* tree) {
-	return true; // TODO
+	switch(tree->node_type) {
+		case NT_SWITCH:
+			//not yet supported
+			return false;
+
+		case NT_FOR:
+		case NT_WHILE:
+			// Loops are always conditional and therefore never exhaustive
+			return false;
+		case NT_IF_ELSE:
+			// If no else, then not exhaustive
+			if(tree->subnodes == 2) return false;
+			// Returns are exhaustive if both the if and else statements are exhaustive
+			return exhaustiveReturns(tree->node_data.nodes[1]) && exhaustiveReturns(tree->node_data.nodes[2]);
+
+		case NT_RETURN:
+			return true;
+
+		case NT_BLOCK:
+		case NT_RETRIEVALS_STATEMENTS:
+			{
+				int i;
+				// Statement lists which contain a return are exhaustive
+				for(i = 0; i < tree->subnodes; i++)
+					if(exhaustiveReturns(tree->node_data.nodes[i])) return true;
+				return false;
+			}
+
+		default:
+			return false;
+	}
+}
+
+void TypeChecker::flowAnalysis(Node* tree, bool breakable, bool caseable, bool continuable) {
+	int i;
+	switch(tree->node_type) {
+		// These can contain switches, loops, switches, and breaks
+		case NT_SWITCH:
+			for(i = 0; i < tree->subnodes; i++)
+				flowAnalysis(tree->node_data.nodes[i], true, true, continuable);
+			break;
+		case NT_FOR:
+		case NT_WHILE:
+			for(i = 0; i < tree->subnodes; i++)
+				flowAnalysis(tree->node_data.nodes[i], true, caseable, true);
+			break;
+		case NT_BLOCK:
+		case NT_IF_ELSE:
+		case NT_RETRIEVALS_STATEMENTS:
+			for(i = 0; i < tree->subnodes; i++)
+				flowAnalysis(tree->node_data.nodes[i], breakable, caseable, continuable);
+			break;
+
+		// These can't! don't waste time recursing on them or anything else
+		case NT_CASE:
+		case NT_DEFAULTCASE:
+			if(!caseable)
+				errors->addError(new SemanticError(ILLEGAL_CASE, "", tree));
+			break;
+		case NT_BREAK:
+			if(!breakable)
+				errors->addError(new SemanticError(ILLEGAL_BREAK, "", tree));
+			break;
+		case NT_CONTINUE:
+			if(!continuable)
+				errors->addError(new SemanticError(ILLEGAL_CONTINUE, "", tree));
+			break;
+	}
 }
 
 void TypeChecker::setReturnType(Type* returntype) {
@@ -367,13 +436,35 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				}
 				break;
 
+			case NT_DECLARATION:
+				try {
+					Type* assignee = tree->node_data.nodes[0]->node_data.type;
+					objectsymtable->assertTypeIsValid(assignee);
+					Type* assignment = typeCheck(tree->node_data.nodes[1]);
+					if(!analyzer->isASubtypeOfB(assignment, assignee)) {
+						expectedstring = analyzer->getNameForType(assignee);
+						erroneousstring = analyzer->getNameForType(assignment);
+						freeType(assignment);
+						throw string("Invalid value in declaration of variable");
+					}
+					freeType(assignment);
+					scopesymtable->add(tree->node_data.nodes[0]->node_data.type);
+				} catch(SymbolNotFoundException* e) {
+					errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
+					delete e;
+				}
+				break;
+
 			// Ignoring these for now
 			case NT_SWITCH:
-			case NT_CASE:
 			case NT_CURRIED:
 			case NT_INCREMENT:
 			case NT_DECREMENT:
 				throw string("Not supported yet");
+
+			// These have tests so can't throw, but can't exist anyway as long as switch throws
+			case NT_DEFAULTCASE:
+			case NT_CASE:
 
 			// These require a common-ancestor function
 			case NT_ARRAY_DECLARATION:
@@ -389,18 +480,23 @@ Type* TypeChecker::typeCheck(Node* tree) {
 
 			// these don't have types
 			case NT_BLOCK:
+				scopesymtable->pushScope();
+				// FALL THROUGH!
 			case NT_EXPRESSIONS:
 			case NT_RETRIEVALS_STATEMENTS:
-			case NT_DEFAULTCASE:
 			case NT_BREAK:
 			case NT_CONTINUE:
-				{
+				try {
 					int i = 0;
 					while(i < tree->subnodes) {
 						if(i > 0) freeType(ret);
 						ret = typeCheck(tree->node_data.nodes[i]);
 						i++;
 					}
+					if(tree->node_type == NT_BLOCK) scopesymtable->popScope();
+				} catch(SemanticError *e) {
+					if(tree->node_type == NT_BLOCK) scopesymtable->popScope();
+					throw e;
 				}
 		}
 	} catch(string errormsg) {

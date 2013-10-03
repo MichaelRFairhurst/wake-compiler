@@ -21,6 +21,10 @@ enum SemanticErrorCode {
 	SYMBOL_NOT_DEFINED,				// using an unknown alias, shadow, or classname with no known instance
 	TYPE_ERROR,						// adding intelligence to George Bush
 	PROPERTY_OR_METHOD_NOT_FOUND,	// MyClass.asntoehuaobeiuaou() is probably a typo
+	ILLEGAL_CASE,					// Using 'case x:' or 'default:' outside a switch
+	ILLEGAL_BREAK,					// Using break outside a loop or switch
+	ILLEGAL_CONTINUE,				// Using continue outside a loop or switch
+	INEXHAUSTIVE_RETURNS,			// returning conditionally in a typed function with a returnval
 };
 
 class SemanticError {
