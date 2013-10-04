@@ -45,6 +45,7 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 
 		case NT_PROVISION:
 			try {
+				propertysymtable->addProvision(tree->node_data.nodes[0]->node_data.type, tree);
 				objectsymtable->assertTypeIsValid(tree->node_data.nodes[0]->node_data.type);
 			} catch(SemanticError* e) {
 				e->token = tree;
@@ -111,6 +112,7 @@ void ClassParseTreeTraverser::checkCtorArgs(Node* tree) {
 			try {
 				for(int i = 0; i < tree->subnodes; i++) {
 					objectsymtable->assertTypeIsValid(tree->node_data.nodes[i]->node_data.type);
+					objectsymtable->getAnalyzer()->assertNeedIsNotCircular(classname, tree->node_data.nodes[i]->node_data.type);
 					propertysymtable->addNeed(tree->node_data.nodes[i]->node_data.type);
 				}
 			} catch(SymbolNotFoundException* e) {
@@ -218,6 +220,7 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 
 							if(!objectsymtable->getAnalyzer()->isASubtypeOfB(served->node_data.type, provision))
 								errors->addError(new SemanticError(TYPE_ERROR, "Bound class is not a subtype of provided class", tree));
+							else objectsymtable->getAnalyzer()->assertClassCanProvide(classname, served->node_data.type); // Test that this class Ctor is recursively provided
 						} catch(SemanticError* e) {
 							e->token = tree;
 							errors->addError(e);
@@ -227,8 +230,8 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 					case NT_INJECTION:
 						try {
 							int i;
-							string classname = served->node_data.nodes[0]->node_data.string;
-							vector<Type*>* needs = objectsymtable->find(classname)->getNeeds();
+							string otherclassname = served->node_data.nodes[0]->node_data.string;
+							vector<Type*>* needs = objectsymtable->find(otherclassname)->getNeeds();
 							Node* arguments = served->node_data.nodes[1];
 							if(needs->size() == arguments->subnodes)
 							for(i = 0; i < arguments->subnodes; i++) {
@@ -236,8 +239,10 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 								Type* actual;
 								switch(arguments->node_data.nodes[i]->node_type) {
 									case NT_TYPEDATA:
-										actual = copyType(arguments->node_data.nodes[i]->node_data.type);
-										objectsymtable->assertTypeIsValid(actual);
+										{
+											actual = copyType(arguments->node_data.nodes[i]->node_data.type);
+											objectsymtable->assertTypeIsValid(actual);
+										}
 										break;
 									case NT_STRINGLIT:
 										actual = MakeType(TYPE_CLASS);
@@ -249,11 +254,14 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 										break;
 								}
 
-								if(required->specialty != NULL)
+								if(required->specialty != NULL && (actual->specialty == NULL || string(required->specialty) != actual->specialty))
 									errors->addError(new SemanticError(WARNING, "Injected a class with specialized dependencies...it may not be looking for what you're giving it!", tree));
 
-								if(!objectsymtable->getAnalyzer()->isASubtypeOfB(required, actual))
+								if(!objectsymtable->getAnalyzer()->isASubtypeOfB(required, actual)) {
 									errors->addError(new SemanticError(TYPE_ERROR, "Injection is not a proper subtype for class dependencies", tree));
+								} else if(arguments->node_data.nodes[i]->node_type == NT_TYPEDATA) {
+									objectsymtable->getAnalyzer()->assertClassCanProvide(classname, actual);
+								}
 							} else {
 								errors->addError(new SemanticError(MISMATCHED_INJECTION, "Too many or too few injectioned depndencies", tree));
 							}
@@ -265,6 +273,18 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 							delete e;
 						}
 						break;
+				}
+			} else {
+				try {
+					// if we merely 'provide SomeClass' we must check we provide all its dependencies
+					objectsymtable->getAnalyzer()->assertClassCanProvide(classname, tree->node_data.nodes[0]->node_data.type);
+				} catch(SemanticError *e) {
+					e->token = tree;
+					errors->addError(e);
+				} catch(SymbolNotFoundException* e) {
+					//errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
+					//Already caught :)
+					delete e;
 				}
 			}
 			break;

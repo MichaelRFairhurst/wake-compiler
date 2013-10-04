@@ -1,5 +1,6 @@
 OPT=-O3
-FLAGS=-g -Iinclude -Igen
+#OPT=-O0 -g
+FLAGS=-Iinclude -Igen
 CC=cc $(FLAGS)
 CPP=g++ $(FLAGS)
 
@@ -52,7 +53,7 @@ bin/gen/%.o: gen/%.c
 	$(CC) $(OPT) -c $< -o $@
 
 bin/tests/%.o: src/test/%.cpp
-	$(CPP) -c $< -o $@
+	$(CPP) -g -c $< -o $@
 
 bin/cpp/%.o: src/%.cpp gen/y.tab.h
 	$(CPP) $(OPT) -c $< -o $@

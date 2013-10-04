@@ -148,6 +148,8 @@ injection_providable:
 	| TRUTH																		{ $$ = MakeNodeFromNumber(NT_TRUTHLIT, $1); }
 	;
 
+injectionblockargs:
+
 injection:
 	IDENTIFIER '(' injection_args ')'											{ $$ = MakeTwoBranchNode(NT_INJECTION, MakeNodeFromString(NT_CLASSNAME, $1), $3); }
 	;

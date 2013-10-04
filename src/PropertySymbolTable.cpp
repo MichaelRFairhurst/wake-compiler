@@ -25,6 +25,24 @@ void PropertySymbolTable::addMethod(Type* returntype, vector<pair<string, TypeAr
 	properties[name] = method;
 }
 
+void PropertySymbolTable::addProvision(Type* provided, Node* body) {
+	string name = analyzer->getNameForType(provided) + "<-";
+	if(provided->specialty != NULL) name += provided->specialty;
+
+	if(properties.count(name)) {
+		string temp = "duplicate method signature is " + name;
+		throw new SemanticError(MULTIPLE_PROVISION_DEFINITION, temp);
+	}
+
+	Type* method = MakeType(TYPE_LAMBDA);
+	method->typedata.lambda.returntype = copyType(provided);
+	method->typedata.lambda.body = body;
+
+	method->typedata.lambda.arguments = MakeTypeArray(); //TODO injections with curried ctors or arguments!
+
+	properties[name] = method;
+}
+
 Type* PropertySymbolTable::get(string name) {
 	if(!properties.count(name))
 		throw new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Cannot find method with signature " + name);

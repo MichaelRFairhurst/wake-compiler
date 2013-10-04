@@ -473,28 +473,44 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				}
 				break;
 
+			case NT_RETRIEVAL:
+				try {
+					ret = copyType(tree->node_data.nodes[0]->node_data.type);
+					//TODO index 1 is the arguments
+					objectsymtable->assertTypeIsValid(ret);
+					Type* provider = typeCheck(tree->node_data.nodes[2]);
+					try {
+						// TODO This does more work than we need to since it recurses
+						objectsymtable->getAnalyzer()->assertClassCanProvide(provider, ret);
+					} catch(SemanticError *e) {
+						e->token = tree;
+						errors->addError(e);
+					}
+					free(provider);
+				} catch(SymbolNotFoundException* e) {
+					errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
+					delete e;
+				}
+				break;
+
 			// Ignoring these for now
 			case NT_SWITCH:
 			case NT_CURRIED:
 			case NT_INCREMENT:
 			case NT_DECREMENT:
-				throw string("Not supported yet");
-
-			// These have tests so can't throw, but can't exist anyway as long as switch throws
-			case NT_DEFAULTCASE:
-			case NT_CASE:
-
 			// These require a common-ancestor function
 			case NT_ARRAY_DECLARATION:
 			case NT_IF_THEN_ELSE:
-
 			// These I will implement soon(ish)
 			case NT_MEMBER_ACCESS:
-			case NT_RETRIEVAL:
-
 			// these might not be necessary
 			case NT_TYPE_ARRAY:
 			case NT_VALUES:
+				throw string("Not supported yet");
+
+			// These have tests so can't throw, but won't compile anyway as long as switch throws
+			case NT_DEFAULTCASE:
+			case NT_CASE:
 
 			// these don't have types
 			case NT_BLOCK:

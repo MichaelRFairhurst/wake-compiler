@@ -27,6 +27,8 @@ enum SemanticErrorCode {
 	INEXHAUSTIVE_RETURNS,			// returning conditionally in a typed function with a returnval
 	WARNING,						// Plain text warning. Not sure if this is the best place for them
 	MISMATCHED_INJECTION,			// provides HasThreeArgs <- HasThreeArgs(Only, Two);
+	MULTIPLE_PROVISION_DEFINITION,	// provides AClass, AClass;
+	CIRCULAR_DEPENDENCIES,			// A needs B, B needs C, C needs A, shit for everyone. Or A needs A.
 };
 
 class SemanticError {

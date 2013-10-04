@@ -64,6 +64,39 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 
 }
 
+void TypeAnalyzer::assertNeedIsNotCircular(string classname, Type* need) {
+	if(need->typedata._class.classname == classname)
+		throw new SemanticError(CIRCULAR_DEPENDENCIES, "Created by the need for class " + getNameForType(need));
+
+	vector<Type*>* recurse = reference->find(need->typedata._class.classname)->getNeeds();
+	for(vector<Type*>::iterator it = recurse->begin(); it != recurse->end(); ++it)
+	try {
+		assertNeedIsNotCircular(classname, *it);
+	} catch(SemanticError* e) {
+		e->msg += ", as required by " + getNameForType(need);
+		throw e;
+	}
+}
+
+void TypeAnalyzer::assertClassCanProvide(string provider, Type* binding) {
+	string symname = getNameForType(binding) + "<-";
+	if(binding->specialty != NULL) symname += binding->specialty;
+	reference->find(provider)->get(symname);
+
+	vector<Type*>* recurse = reference->find(binding->typedata._class.classname)->getNeeds();
+	for(vector<Type*>::iterator it = recurse->begin(); it != recurse->end(); ++it)
+	try {
+		assertClassCanProvide(provider, *it);
+	} catch(SemanticError* e) {
+		e->msg += ", when trying to provide " + symname;
+		throw e;
+	}
+}
+
+void TypeAnalyzer::assertClassCanProvide(Type* provider, Type* binding) {
+	assertClassCanProvide(string(provider->typedata._class.classname), binding);
+}
+
 Type* TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
 	return a;
 }

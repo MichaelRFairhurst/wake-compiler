@@ -54,6 +54,18 @@ void SemanticErrorPrinter::print(SemanticError* e) {
 		case INEXHAUSTIVE_RETURNS:
 			cout << "Inexhaustive returns; not all execution paths of function guarantee a return value";
 			break;
+		case WARNING:
+			cout << "Warning";
+			break;
+		case MISMATCHED_INJECTION:
+			cout << "Invalid injection mapping";
+			break;
+		case MULTIPLE_PROVISION_DEFINITION:
+			cout << "This class already provides this";
+			break;
+		case CIRCULAR_DEPENDENCIES:
+			cout << "Circular dependency formation";
+			break;
 		default:
 			cout << "bad error code provided";
 	}

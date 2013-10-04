@@ -92,13 +92,13 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	ProvideBindToClassConstructorArgumentNotExists,
-	"every ClassA is: needs ClassA; provides ClassA <- ClassA(NonExistClass);",
+	"every ClassB is: needs ClassA; every ClassA is: provides ClassB <- ClassB(NonExistClass);",
 	PTT_EXPECT(CLASSNAME_NOT_FOUND)
 )
 
 PTT_TEST_CASE(
 	ProvideBindToClassConstructorArgumentTwoNotExists,
-	"every ClassA is: needs ClassA, ClassA @also; provides ClassA <- ClassA(ClassA, NonExistClass);",
+	"every ClassB is: needs ClassA, ClassA @also; every ClassA is: provides ClassA, ClassB <- ClassB(ClassA, NonExistClass);",
 	PTT_EXPECT(CLASSNAME_NOT_FOUND)
 )
 
@@ -665,15 +665,15 @@ PTT_TEST_CASE(
 )
 
 PTT_TEST_CASE(
-	assignMultiplePropertiesWrongOrderIsntOK,
+	AssignMultiplePropertiesWrongOrderIsntOK,
 	"every MyClass is: with Int = $Int; with $Int = $$Int; with $$Int = 5;",
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 )
 
 PTT_TEST_CASE(
-	assignPropertyFromCtorIsOK,
-	"every MyClass is: with MyClass @too = MyClass; needs MyClass;",
+	AssignPropertyFromCtorIsOK,
+	"every MyClass is: with Int @too = Int; needs Int;",
 	PTT_VALID
 )
 
@@ -685,13 +685,14 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	MulipleCtorDefinition,
-	"every MyClass is: needs MyClass; needs MyClass;",
+	"every MyClass is: needs Int; needs Int;",
 	PTT_EXPECT(MULTIPLE_METHOD_DEFINITION)
 )
 
 PTT_TEST_CASE(
 	CtorAndPropertiesUsableInMethods,
 	"every MyClass is:									\n\
+	every OtherClass is:								\n\
 		needs MyClass @a;								\n\
 		with MyClass @b;								\n\
 		with MyClass @c = @b;							\n\
@@ -1029,8 +1030,8 @@ PTT_TEST_CASE(
 	InjectCtorIsTooFewDependencies,
 	"every ClassA is:						\n\
 	every ClassB is:						\n\
-		needs ClassA, ClassB;				\n\
-		provides ClassB <- ClassB(ClassA);	\n\
+		needs Int, ClassA;					\n\
+		provides ClassB <- ClassB(5);		\n\
 	",
 	PTT_EXPECT(MISMATCHED_INJECTION)
 )
@@ -1047,22 +1048,34 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	InjectCtorValid,
-	"every ClassA is:						\n\
-	every ClassB is:						\n\
-		needs ClassA;						\n\
-		provides ClassB <- ClassB(ClassA);	\n\
+	"every ClassA is:								\n\
+	every ClassB is:								\n\
+		needs ClassA;								\n\
+		provides ClassA, ClassB <- ClassB(ClassA);	\n\
 	",
 	PTT_VALID
 )
 
 PTT_TEST_CASE(
 	InjectCtorSpecializationWarning,
-	"every ClassA is:						\n\
-	every ClassB is:						\n\
-		needs ClassA{Specified};			\n\
-		provides ClassB <- ClassB(ClassA);	\n\
+	"every ClassA is:								\n\
+	every ClassB is:								\n\
+		needs ClassA{Specified};					\n\
+		provides ClassA, ClassB <- ClassB(ClassA);	\n\
 	",
 	PTT_EXPECT(WARNING)
+)
+
+PTT_TEST_CASE(
+	InjectCtorSpecializationMatchedNotWarning,
+	"every ClassA is:											\n\
+	every ClassB is:											\n\
+		needs ClassA{Specified};								\n\
+		provides												\n\
+			ClassA{Specified},									\n\
+			ClassB <- ClassB(ClassA{Specified});				\n\
+	",
+	PTT_VALID
 )
 
 PTT_TEST_CASE(
@@ -1094,5 +1107,121 @@ PTT_TEST_CASE(
 	",
 	PTT_VALID
 )
+
+PTT_TEST_CASE(
+	DuplicateProvisionNoSpecialtyIsError,
+	"every ClassA is:				\n\
+		provides ClassA, ClassA;	\n\
+	",
+	PTT_EXPECT(MULTIPLE_PROVISION_DEFINITION)
+)
+
+PTT_TEST_CASE(
+	DuplicateProvisionWithSpecialtyIsError,
+	"every ClassA is:							\n\
+		provides ClassA{Poop}, ClassA{Poop};	\n\
+	",
+	PTT_EXPECT(MULTIPLE_PROVISION_DEFINITION)
+)
+
+PTT_TEST_CASE(
+	DuplicateProvisionWithDifferentSpecialtyIsOk,
+	"every ClassA is:							\n\
+		provides ClassA{Poop}, ClassA{NotPoop};	\n\
+	",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	RetrieveFromClassValid,
+	"every MyClass is: provides MyClass; MyClass -- method() { return :(MyClass <- this); }",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	RetrieveFromClassInvalid,
+	"every MyClass is: MyClass -- method() { return :(MyClass <- this); }",
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+)
+
+PTT_TEST_CASE(
+	BindToCtorNonexistProviding,
+	"every MyClass is: needs Int, Text; provides Int <- 5, MyClass <- MyClass(Int, Text);",
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+)
+
+PTT_TEST_CASE(
+	RetrieveFromClassCtordSpecialtiedValid,
+	"every MyDB is:										\n\
+														\n\
+		needs Int{Port}, Text{Username};				\n\
+														\n\
+		provides										\n\
+			Int{Port} <- 55,							\n\
+			Text{Username} <- 'Bilbo',					\n\
+			MyDB <- MyDB(Int{Port}, Text{Username});	\n\
+														\n\
+		MyDB -- cloneMe() {								\n\
+			return :(MyDB <- this);						\n\
+		}												\n\
+	",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	InjectionsAndProvisionsRequireTransitiveProvidability,
+	"every ClassA is:							\n\
+		needs Int{Port};						\n\
+	every ClassB is:							\n\
+		needs ClassA, Text{Stuff};				\n\
+	every ClassC is:							\n\
+		needs ClassB, Int{ID};					\n\
+	every Provider is:							\n\
+		provides								\n\
+			ClassB,								\n\
+			ClassC,								\n\
+			Int{ID},							\n\
+			Text{Stuff};						\n\
+	",
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+)
+
+PTT_TEST_CASE(
+	InjectionsAndProvisionsRequireTransitiveProvidabilityOK,
+	"every ClassA is:					\n\
+		needs Int{Port};				\n\
+										\n\
+	every ClassB is:					\n\
+		needs ClassA, Text{Stuff};		\n\
+										\n\
+	every ClassC is:					\n\
+		needs ClassB, Int{ID};			\n\
+										\n\
+	every Provider is:					\n\
+		provides						\n\
+			ClassC,						\n\
+			Int{ID},					\n\
+			Text{Stuff},				\n\
+			Int{Port},					\n\
+			ClassB,						\n\
+			ClassA;						\n\
+	",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	CircularDependenciesAreError,
+	"every CircularA is: needs CircularB;	\n\
+	every CircularB is: needs CircularC;	\n\
+	every CircularC is: needs CircularA;",
+	PTT_EXPECT(CIRCULAR_DEPENDENCIES)
+);
+
+PTT_TEST_CASE(
+	SelfDependencyIsError,
+	"every Circular is: needs Circular;",
+	PTT_EXPECT(CIRCULAR_DEPENDENCIES)
+);
 
 BOOST_AUTO_TEST_SUITE_END()
