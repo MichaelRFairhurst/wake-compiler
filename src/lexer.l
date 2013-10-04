@@ -56,6 +56,7 @@ this					count(); return THIS;
 parent					count(); return PARENT;
 fn						count(); return FN;
 nothing					count(); return NOTHING;
+cast					count(); return CAST;
 
 :						count(); return ':';
 @						count(); return '@';

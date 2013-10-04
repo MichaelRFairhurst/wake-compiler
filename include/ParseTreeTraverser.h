@@ -26,6 +26,7 @@ class ParseTreeTraverser {
 
 	private:
 		void secondPass(Node* tree);
+		void thirdPass(Node* tree);
 		ErrorTracker errors;
 
 		ScopeSymbolTable scopesymtable;

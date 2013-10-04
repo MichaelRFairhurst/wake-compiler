@@ -19,11 +19,9 @@ void initTreeTypes() {
 	nodenames[NT_CLASSBODY] = "NT_CLASSBODY";
 	nodenames[NT_PROVISIONS] = "NT_PROVISIONS";
 	nodenames[NT_PROVISION] = "NT_PROVISION";
-	nodenames[NT_PROVIDED] = "NT_PROVIDED";
-	nodenames[NT_PROVIDING] = "NT_PROVIDING";
-	nodenames[NT_INJECTED_CTOR] = "NT_INJECTED_CTOR";
-	nodenames[NT_INJECTED_CTOR_ARGS] = "NT_INJECTED_CTOR_ARGS";
-	nodenames[NT_INJECTED_CTOR_ARG] = "NT_INJECTED_CTOR_ARG";
+	nodenames[NT_INJECTION] = "NT_INJECTION";
+	nodenames[NT_INJECTION_ARGS] = "NT_INJECTION_ARGS";
+	nodenames[NT_INJECTION_ARG] = "NT_INJECTION_ARG";
 	nodenames[NT_CTOR] = "NT_CTOR";
 	nodenames[NT_EMPTY] = "NT_EMPTY";
 	nodenames[NT_INTERFACE] = "NT_INTERFACE";
@@ -84,6 +82,7 @@ void initTreeTypes() {
 	nodenames[NT_TYPE_ARRAY] = "NT_TYPE_ARRAY";
 	nodenames[NT_DECLARATION] = "NT_DECLARATION";
 	nodenames[NT_PROPERTY] = "NT_PROPERTY";
+	nodenames[NT_CAST] = "NT_CAST";
 	treeTypesInited = 1;
 }
 

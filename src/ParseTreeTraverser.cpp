@@ -10,6 +10,8 @@ void ParseTreeTraverser::traverse(Node* tree) {
 			if(tree->subnodes > 1) traverse(tree->node_data.nodes[1]);
 			secondPass(tree->node_data.nodes[0]);
 			if(tree->subnodes > 1) secondPass(tree->node_data.nodes[1]);
+			thirdPass(tree->node_data.nodes[0]);
+			if(tree->subnodes > 1) thirdPass(tree->node_data.nodes[1]);
 			break;
 
 		case NT_INHERITANCESET:
@@ -69,7 +71,7 @@ void ParseTreeTraverser::secondPass(Node* tree) {
 				ClassParseTreeTraverser classtraverser(&errors, objectsymtable, &scopesymtable, classname, &typechecker, &methodanalyzer);
 
 				secondPass(tree->node_data.nodes[1]);
-				if(tree->subnodes > 2) classtraverser.traverse(tree->node_data.nodes[2]);
+				if(tree->subnodes > 2) classtraverser.firstPass(tree->node_data.nodes[2]);
 
 				errors.popContext();
 			}
@@ -85,6 +87,33 @@ void ParseTreeTraverser::secondPass(Node* tree) {
 			}
 			break;
 
+	}
+}
+
+void ParseTreeTraverser::thirdPass(Node* tree) {
+	switch(tree->node_type) {
+		case NT_CLASSSET:
+			{
+				int i = 0;
+				while(i < tree->subnodes) {
+					thirdPass(tree->node_data.nodes[i]);
+					i++;
+				}
+			}
+			break;
+
+		case NT_CLASS:
+			{
+				string classname = tree->node_data.nodes[0]->node_data.string;
+				errors.pushContext("In declaration of 'every " + classname + "'");
+				ClassParseTreeTraverser classtraverser(&errors, objectsymtable, &scopesymtable, classname, &typechecker, &methodanalyzer);
+
+				thirdPass(tree->node_data.nodes[1]);
+				if(tree->subnodes > 2) classtraverser.secondPass(tree->node_data.nodes[2]);
+
+				errors.popContext();
+			}
+			break;
 	}
 }
 

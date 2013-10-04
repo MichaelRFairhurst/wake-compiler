@@ -19,60 +19,36 @@ ClassParseTreeTraverser::ClassParseTreeTraverser(ErrorTracker* errors, ObjectSym
 	propertysymtable = objectsymtable->find(classname);
 }
 
-void ClassParseTreeTraverser::traverse(Node* tree) {
+void ClassParseTreeTraverser::firstPass(Node* tree) {
 	switch(tree->node_type) {
 		case NT_CLASSBODY:
 			{
 				int i = 0;
 				while(i < tree->subnodes) {
-					traverse(tree->node_data.nodes[i]);
+					firstPass(tree->node_data.nodes[i]);
 					i++;
 				}
-				scopesymtable->pushScope();
-				loadCtorArgs(tree);
-				loadProperties(tree);
-				typechecker->setThisContext(classname);
-				typeCheckMethods(tree);
-				scopesymtable->popScope();
+				checkCtorArgs(tree);
 			}
 			break;
 
 		case NT_PROVISIONS:
-		case NT_INJECTED_CTOR_ARG:
+		case NT_INJECTION_ARG:
 			{
 				int i = 0;
 				while(i < tree->subnodes) {
-					traverse(tree->node_data.nodes[i]);
+					firstPass(tree->node_data.nodes[i]);
 					i++;
 				}
 			}
 			break;
 
 		case NT_PROVISION:
-		case NT_PROVIDING:
 			try {
-				traverse(tree->node_data.nodes[0]);
-				if(tree->subnodes > 1) traverse(tree->node_data.nodes[1]);
-			} catch(SymbolNotFoundException* e) {
-				errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
-				delete e;
-			}
-			break;
-
-		case NT_TYPEDATA:
-			{
-				Type* injection = tree->node_data.type;
-				if(injection->type == TYPE_CLASS) objectsymtable->find(injection->typedata._class.classname);
-			}
-			break;
-
-		case NT_INJECTED_CTOR:
-			try {
-				objectsymtable->find(tree->node_data.nodes[0]->node_data.string);
-				traverse(tree->node_data.nodes[1]);
-			} catch(SymbolNotFoundException* e) {
-				errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
-				delete e;
+				objectsymtable->assertTypeIsValid(tree->node_data.nodes[0]->node_data.type);
+			} catch(SemanticError* e) {
+				e->token = tree;
+				errors->addError(e);
 			}
 			break;
 
@@ -96,7 +72,28 @@ void ClassParseTreeTraverser::traverse(Node* tree) {
 	}
 }
 
-void ClassParseTreeTraverser::loadCtorArgs(Node* tree) {
+void ClassParseTreeTraverser::secondPass(Node* tree) {
+	switch(tree->node_type) {
+		case NT_CLASSBODY:
+			{
+				/*int i = 0;
+				while(i < tree->subnodes) {
+					secondPass(tree->node_data.nodes[i]);
+					i++;
+				}*/
+				scopesymtable->pushScope();
+				loadCtorArgs(tree);
+				loadProperties(tree);
+				typechecker->setThisContext(classname);
+				typeCheckMethods(tree);
+				scopesymtable->popScope();
+			}
+			break;
+	}
+}
+
+
+void ClassParseTreeTraverser::checkCtorArgs(Node* tree) {
 	switch(tree->node_type) {
 		case NT_CLASSBODY:
 			{
@@ -104,7 +101,7 @@ void ClassParseTreeTraverser::loadCtorArgs(Node* tree) {
 				for(int i = 0; i < tree->subnodes; i++)
 				if(tree->node_data.nodes[i]->node_type == NT_CTOR) {
 					if(found_ctor) errors->addError(new SemanticError(MULTIPLE_METHOD_DEFINITION, "multiple definitions of constructor", tree));
-					else loadCtorArgs(tree->node_data.nodes[i]->node_data.nodes[0]);
+					else checkCtorArgs(tree->node_data.nodes[i]->node_data.nodes[0]);
 					found_ctor = true;
 				}
 			}
@@ -114,7 +111,7 @@ void ClassParseTreeTraverser::loadCtorArgs(Node* tree) {
 			try {
 				for(int i = 0; i < tree->subnodes; i++) {
 					objectsymtable->assertTypeIsValid(tree->node_data.nodes[i]->node_data.type);
-					scopesymtable->add(tree->node_data.nodes[i]->node_data.type);
+					propertysymtable->addNeed(tree->node_data.nodes[i]->node_data.type);
 				}
 			} catch(SymbolNotFoundException* e) {
 				errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
@@ -122,6 +119,32 @@ void ClassParseTreeTraverser::loadCtorArgs(Node* tree) {
 			} catch(SemanticError* e) {
 				e->token = tree;
 				errors->addError(e);
+			}
+	}
+}
+
+void ClassParseTreeTraverser::loadCtorArgs(Node* tree) {
+	switch(tree->node_type) {
+		case NT_CLASSBODY:
+			{
+				for(int i = 0; i < tree->subnodes; i++)
+				if(tree->node_data.nodes[i]->node_type == NT_CTOR) {
+					loadCtorArgs(tree->node_data.nodes[i]->node_data.nodes[0]);
+					return;
+				}
+			}
+			break;
+
+		case NT_CTOR_ARGS:
+			try {
+				for(int i = 0; i < tree->subnodes; i++) {
+					Type* need = tree->node_data.nodes[i]->node_data.type;
+					scopesymtable->add(need);
+				}
+			} catch(SymbolNotFoundException* e) {
+				delete e;
+			} catch(SemanticError* e) {
+				delete e;
 			}
 	}
 }
@@ -163,7 +186,6 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 	switch(tree->node_type) {
 		case NT_CLASSBODY:
 		case NT_PROVISIONS:
-		case NT_INJECTED_CTOR_ARG:
 			{
 				int i = 0;
 				while(i < tree->subnodes) {
@@ -172,6 +194,81 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 				}
 			}
 			break;
+
+		case NT_PROVISION:
+			if(tree->subnodes > 1) {
+				Type* provision = tree->node_data.nodes[0]->node_data.type;
+				Node* served = tree->node_data.nodes[1];
+				switch(served->node_type) {
+					case NT_BLOCK:
+						errors->addError(new SemanticError(TYPE_ERROR, "Not implemented", tree));
+						return;
+
+					case NT_STRINGLIT:
+						if(!objectsymtable->getAnalyzer()->isPrimitiveTypeText(provision))
+							errors->addError(new SemanticError(TYPE_ERROR, "Bound a Text value to something that is not a Text", tree));
+						break;
+					case NT_NUMBERLIT:
+						if(!objectsymtable->getAnalyzer()->isPrimitiveTypeInt(provision))
+							errors->addError(new SemanticError(TYPE_ERROR, "Bound an Int value to something that is not an Int", tree));
+						break;
+					case NT_TYPEDATA:
+						try {
+							objectsymtable->assertTypeIsValid(served->node_data.type);
+
+							if(!objectsymtable->getAnalyzer()->isASubtypeOfB(served->node_data.type, provision))
+								errors->addError(new SemanticError(TYPE_ERROR, "Bound class is not a subtype of provided class", tree));
+						} catch(SemanticError* e) {
+							e->token = tree;
+							errors->addError(e);
+						}
+						break;
+
+					case NT_INJECTION:
+						try {
+							int i;
+							string classname = served->node_data.nodes[0]->node_data.string;
+							vector<Type*>* needs = objectsymtable->find(classname)->getNeeds();
+							Node* arguments = served->node_data.nodes[1];
+							if(needs->size() == arguments->subnodes)
+							for(i = 0; i < arguments->subnodes; i++) {
+								Type* required = needs->at(i);
+								Type* actual;
+								switch(arguments->node_data.nodes[i]->node_type) {
+									case NT_TYPEDATA:
+										actual = copyType(arguments->node_data.nodes[i]->node_data.type);
+										objectsymtable->assertTypeIsValid(actual);
+										break;
+									case NT_STRINGLIT:
+										actual = MakeType(TYPE_CLASS);
+										actual->typedata._class.classname = "Text";
+										break;
+									case NT_NUMBERLIT:
+										actual = MakeType(TYPE_CLASS);
+										actual->typedata._class.classname = "Int";
+										break;
+								}
+
+								if(required->specialty != NULL)
+									errors->addError(new SemanticError(WARNING, "Injected a class with specialized dependencies...it may not be looking for what you're giving it!", tree));
+
+								if(!objectsymtable->getAnalyzer()->isASubtypeOfB(required, actual))
+									errors->addError(new SemanticError(TYPE_ERROR, "Injection is not a proper subtype for class dependencies", tree));
+							} else {
+								errors->addError(new SemanticError(MISMATCHED_INJECTION, "Too many or too few injectioned depndencies", tree));
+							}
+						} catch(SemanticError* e) {
+							e->token = tree;
+							errors->addError(e);
+						} catch(SymbolNotFoundException* e) {
+							errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
+							delete e;
+						}
+						break;
+				}
+			}
+			break;
+
 
 		case NT_METHOD_DECLARATION:
 			try {

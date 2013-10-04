@@ -455,6 +455,24 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				}
 				break;
 
+			case NT_CAST:
+				try {
+					ret = copyType(tree->node_data.nodes[0]->node_data.type);
+					objectsymtable->assertTypeIsValid(ret);
+					Type* casted = typeCheck(tree->node_data.nodes[1]);
+					if(!analyzer->isASubtypeOfB(casted, ret)) {
+						expectedstring = analyzer->getNameForType(ret);
+						erroneousstring = analyzer->getNameForType(casted);
+						freeType(casted);
+						throw string("Casting an object that is not a valid subtype");
+					}
+					freeType(casted);
+				} catch(SymbolNotFoundException* e) {
+					errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
+					delete e;
+				}
+				break;
+
 			// Ignoring these for now
 			case NT_SWITCH:
 			case NT_CURRIED:

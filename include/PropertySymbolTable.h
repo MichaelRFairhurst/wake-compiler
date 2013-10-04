@@ -20,11 +20,14 @@ class PropertySymbolTable {
 		map<string, bool> parentage;
 		Type* get(string name);
 		void addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, Node* body);
+		void addNeed(Type* returntype);
+		vector<Type*>* getNeeds();
 		string getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments);
 		TypeAnalyzer* analyzer;
 
 	private:
 		map<string, Type*> properties;
+		vector<Type*> needs;
 };
 
 #endif

@@ -92,13 +92,13 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	ProvideBindToClassConstructorArgumentNotExists,
-	"every ClassA is: provides ClassA <- ClassA(NonExistClass);",
+	"every ClassA is: needs ClassA; provides ClassA <- ClassA(NonExistClass);",
 	PTT_EXPECT(CLASSNAME_NOT_FOUND)
 )
 
 PTT_TEST_CASE(
 	ProvideBindToClassConstructorArgumentTwoNotExists,
-	"every ClassA is: provides ClassA <- ClassA(ClassA, NonExistClass);",
+	"every ClassA is: needs ClassA, ClassA @also; provides ClassA <- ClassA(ClassA, NonExistClass);",
 	PTT_EXPECT(CLASSNAME_NOT_FOUND)
 )
 
@@ -178,8 +178,8 @@ PTT_TEST_CASE(
 																									\n\
 	every Child (a Parent) is:																		\n\
 		provides																					\n\
-			Parent,																					\n\
-			Child <- Parent;																		\n\
+			Child,																					\n\
+			Parent <- Child;																		\n\
 																									\n\
 		Parent -- My(Parent)Function(Child, Parent @b, Parent -- fn(Child) @aliased) {				\n\
 			Child; @b; return @aliased(Child);														\n\
@@ -953,6 +953,146 @@ PTT_TEST_CASE(
 	TestDeclareAnIntIsScoped,
 	"every MyClass is: Int -- myfn() { if(True) { :Int = 5; } return Int; }",
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
+)
+
+PTT_TEST_CASE(
+	TestCastDownToInvalidClass,
+	"every MyClass is: method() { (cast NonExist) this; }",
+	PTT_EXPECT(CLASSNAME_NOT_FOUND)
+)
+
+PTT_TEST_CASE(
+	TestCastDownToNonSubType,
+	"every MyClass is: method() { (cast MyClass) 5; }",
+	PTT_EXPECT(TYPE_ERROR)
+)
+
+PTT_TEST_CASE(
+	TestCastDownValid,
+	"every ParentClass is:					\n\
+	every MyClass (a ParentClass) is:		\n\
+		method(ParentClass) {				\n\
+			method((cast ParentClass) this);		\n\
+		}",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	TestProvideIntOnNonIntIsBadNewsBears,
+	"every MyClass is:			\n\
+		provides MyClass <- 4;	\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+)
+
+PTT_TEST_CASE(
+	TestProvideTextOnNonTextIsBadNewsBears,
+	"every MyClass is:				\n\
+		provides MyClass <- 'text';	\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+)
+
+PTT_TEST_CASE(
+	TestProvideNotSubclassIsBadNewsBears,
+	"every ParentClass is:					\n\
+	every MyClass (a ParentClass) is:		\n\
+		provides MyClass <- ParentClass;	\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+)
+
+PTT_TEST_CASE(
+	ValidProvisions,
+	"every ParentClass is:					\n\
+	every MyClass (a ParentClass) is:		\n\
+		provides							\n\
+			Int <- 4,						\n\
+			Text <- 'Test',					\n\
+			ParentClass <- MyClass,			\n\
+			MyClass <- MyClass;				\n\
+	",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	InjectCtorInvalidSubtype,
+	"every ClassA is:						\n\
+	every ClassB is:						\n\
+		needs ClassA;						\n\
+		provides ClassB <- ClassB(ClassB);	\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+)
+
+PTT_TEST_CASE(
+	InjectCtorIsTooFewDependencies,
+	"every ClassA is:						\n\
+	every ClassB is:						\n\
+		needs ClassA, ClassB;				\n\
+		provides ClassB <- ClassB(ClassA);	\n\
+	",
+	PTT_EXPECT(MISMATCHED_INJECTION)
+)
+
+PTT_TEST_CASE(
+	InjectCtorIsTooManyDependencies,
+	"every ClassA is:								\n\
+	every ClassB is:								\n\
+		needs ClassA;								\n\
+		provides ClassB <- ClassB(ClassB, ClassB);	\n\
+	",
+	PTT_EXPECT(MISMATCHED_INJECTION)
+)
+
+PTT_TEST_CASE(
+	InjectCtorValid,
+	"every ClassA is:						\n\
+	every ClassB is:						\n\
+		needs ClassA;						\n\
+		provides ClassB <- ClassB(ClassA);	\n\
+	",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	InjectCtorSpecializationWarning,
+	"every ClassA is:						\n\
+	every ClassB is:						\n\
+		needs ClassA{Specified};			\n\
+		provides ClassB <- ClassB(ClassA);	\n\
+	",
+	PTT_EXPECT(WARNING)
+)
+
+PTT_TEST_CASE(
+	InjectCtorWithIntNotNeeded,
+	"every ClassA is:					\n\
+	every ClassB is:					\n\
+		needs ClassA;					\n\
+		provides ClassB <- ClassB(6);	\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+)
+
+PTT_TEST_CASE(
+	InjectCtorWithTextNotNeeded,
+	"every ClassA is:						\n\
+	every ClassB is:						\n\
+		needs ClassA;						\n\
+		provides ClassB <- ClassB('test');	\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+)
+
+PTT_TEST_CASE(
+	InjectCtorWithTextAndIntOK,
+	"every ClassA is:							\n\
+	every ClassB is:							\n\
+		needs Int, Text;						\n\
+		provides ClassB <- ClassB(5, 'test');	\n\
+	",
+	PTT_VALID
 )
 
 BOOST_AUTO_TEST_SUITE_END()

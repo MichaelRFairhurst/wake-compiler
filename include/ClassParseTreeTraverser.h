@@ -22,12 +22,14 @@ using namespace std;
 class ClassParseTreeTraverser {
 	public:
 		ClassParseTreeTraverser(ErrorTracker* errors, ObjectSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, string classname, TypeChecker* typechecker, MethodSignatureParseTreeTraverser* methodanalyzer);
-		void traverse(Node* tree);
+		void firstPass(Node* tree);
+		void secondPass(Node* tree);
+
+	private:
+		void checkCtorArgs(Node* tree);
 		void loadCtorArgs(Node* tree);
 		void loadProperties(Node* tree);
 		void typeCheckMethods(Node* tree);
-
-	private:
 		Node* getMethodBody(Node* methoddef);
 		Type* getMethodReturn(Node* methoddef);
 		vector<pair<string, TypeArray*> >* getMethodName(Node* methoddef);

@@ -48,6 +48,14 @@ string PropertySymbolTable::getSymbolNameOf(vector<pair<string, TypeArray*> >* s
 	return name;
 }
 
+void PropertySymbolTable::addNeed(Type* needed) {
+	needs.push_back(needed);
+}
+
+vector<Type*>* PropertySymbolTable::getNeeds() {
+	return &needs;
+}
+
 PropertySymbolTable::~PropertySymbolTable() {
 	for(map<string, Type*>::iterator it = properties.begin(); it != properties.end(); ++it) {
 		freeType(it->second);

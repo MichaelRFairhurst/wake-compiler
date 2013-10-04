@@ -23,5 +23,5 @@ void Parser::print() {
 
 Parser::~Parser() {
 	yylex_destroy();
-	/*if(parsetree)*/ freeNode(parsetree);
+	if(parsetree != NULL) freeNode(parsetree);
 }

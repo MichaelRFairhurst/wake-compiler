@@ -27,11 +27,9 @@
 
 #define NT_PROVISIONS 13
 #define NT_PROVISION 14
-#define NT_PROVIDED 15
-#define NT_PROVIDING 16
-#define NT_INJECTED_CTOR 17
-#define NT_INJECTED_CTOR_ARGS 18
-#define NT_INJECTED_CTOR_ARG 19
+#define NT_INJECTION 17
+#define NT_INJECTION_ARGS 18
+#define NT_INJECTION_ARG 19
 
 #define NT_CTOR 20
 #define NT_CTOR_ARGS 21
@@ -95,6 +93,7 @@
 #define NT_OR 72
 
 #define NT_PROPERTY 73
+#define NT_CAST 75
 
 void AddSubNode(Node* parent, Node* child);
 

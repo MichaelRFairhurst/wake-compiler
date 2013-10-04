@@ -25,6 +25,8 @@ enum SemanticErrorCode {
 	ILLEGAL_BREAK,					// Using break outside a loop or switch
 	ILLEGAL_CONTINUE,				// Using continue outside a loop or switch
 	INEXHAUSTIVE_RETURNS,			// returning conditionally in a typed function with a returnval
+	WARNING,						// Plain text warning. Not sure if this is the best place for them
+	MISMATCHED_INJECTION,			// provides HasThreeArgs <- HasThreeArgs(Only, Two);
 };
 
 class SemanticError {
