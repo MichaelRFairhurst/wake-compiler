@@ -7,6 +7,7 @@
 #include "SemanticError.h"
 #include "PropertySymbolTable.h"
 #include "TypeAnalyzer.h"
+#include "EntryPointAnalyzer.h"
 
 using namespace std;
 
@@ -20,6 +21,7 @@ class ObjectSymbolTable {
 		PropertySymbolTable* find(string name);
 		void assertTypeIsValid(Type* type);
 		TypeAnalyzer* getAnalyzer();
+		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);
 
 	private:
 		PropertySymbolTable* addingclass_symbol;

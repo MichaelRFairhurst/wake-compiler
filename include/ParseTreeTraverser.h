@@ -23,6 +23,7 @@ class ParseTreeTraverser {
 		ParseTreeTraverser(ObjectSymbolTable* table) : methodanalyzer(table), typechecker(&errors, table, &scopesymtable, &methodanalyzer) { objectsymtable = table; }
 		void traverse(Node* tree);
 		void printErrors(SemanticErrorPrinter& p);
+		bool passesForCompilation();
 
 	private:
 		void secondPass(Node* tree);

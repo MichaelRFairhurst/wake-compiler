@@ -20,14 +20,16 @@ CPPNAMES= \
 	MethodSignatureParseTreeTraverser.cpp \
 	LibraryLoader.cpp \
 	CodeGenerator.cpp \
-	AddressAllocator.cpp
+	AddressAllocator.cpp \
+	OptionsParser.cpp \
+	EntryPointAnalyzer.cpp
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
 CNAMES=tree.c type.c
 COBJS=$(addprefix bin/c/, $(CNAMES:.c=.o))
 GENNAMES=lex.yy.c y.tab.c
 GENOBJS=$(addprefix bin/gen/, $(GENNAMES:.c=.o))
-TESTNAMES=CompilerTests.cpp ObjectSymbolTableTest.cpp ParseTreeTraverserTest.cpp ScopeSymbolTableTest.cpp TypeAnalyzerTest.cpp PropertySymbolTableTest.cpp AddressAllocatorTest.cpp
+TESTNAMES=CompilerTests.cpp ObjectSymbolTableTest.cpp ParseTreeTraverserTest.cpp ScopeSymbolTableTest.cpp TypeAnalyzerTest.cpp PropertySymbolTableTest.cpp AddressAllocatorTest.cpp OptionsParserTest.cpp
 TESTOBJS=$(addprefix bin/tests/, $(TESTNAMES:.cpp=.o))
 
 wake: bin/wake

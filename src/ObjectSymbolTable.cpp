@@ -75,6 +75,14 @@ void ObjectSymbolTable::assertTypeIsValid(Type* type) {
 	}
 }
 
+void ObjectSymbolTable::printEntryPoints(EntryPointAnalyzer* entryanalyzer) {
+	for(map<string, PropertySymbolTable*>::iterator it = classes.begin(); it != classes.end(); ++it) {
+		if(!entryanalyzer->checkClassNeedsCanBeMain(it->second->getNeeds())) continue;
+		entryanalyzer->printClass(it->first);
+		it->second->printEntryPoints(entryanalyzer);
+	}
+}
+
 TypeAnalyzer* ObjectSymbolTable::getAnalyzer() {
 	return &analyzer;
 }

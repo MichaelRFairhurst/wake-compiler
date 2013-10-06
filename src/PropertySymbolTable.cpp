@@ -76,6 +76,13 @@ string PropertySymbolTable::getSymbolNameOf(vector<pair<string, TypeArray*> >* s
 	return name;
 }
 
+void PropertySymbolTable::printEntryPoints(EntryPointAnalyzer* entryanalyzer) {
+	for(map<string, pair<Type*, string> >::iterator it = properties.begin(); it != properties.end(); ++it) {
+		if(entryanalyzer->checkMethodCanBeMain(it->first, it->second.first))
+			entryanalyzer->printMethod(it->first);
+	}
+}
+
 void PropertySymbolTable::addNeed(Type* needed) {
 	needs.push_back(needed);
 }

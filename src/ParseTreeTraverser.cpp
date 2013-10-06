@@ -117,6 +117,10 @@ void ParseTreeTraverser::thirdPass(Node* tree) {
 	}
 }
 
+bool ParseTreeTraverser::passesForCompilation() {
+	return errors.passesForCompilation();
+}
+
 void ParseTreeTraverser::printErrors(SemanticErrorPrinter& printer) {
 	errors.printErrors(printer);
 }

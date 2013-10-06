@@ -15,6 +15,7 @@ class ErrorTracker {
 		void pushContext(string context);
 		void popContext();
 		void printErrors(SemanticErrorPrinter& p);
+		bool passesForCompilation();
 
 	private:
 		vector<SemanticError*> errors;

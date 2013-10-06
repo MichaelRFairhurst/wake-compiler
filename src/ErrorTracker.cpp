@@ -20,6 +20,13 @@ void ErrorTracker::printErrors(SemanticErrorPrinter& printer) {
 	}
 }
 
+bool ErrorTracker::passesForCompilation() {
+	for(vector<SemanticError*>::iterator it = errors.begin(); it != errors.end(); ++it) {
+		if((*it)->code != WARNING) return false;
+	}
+	return true;
+}
+
 ErrorTracker::~ErrorTracker() {
 	for(vector<SemanticError*>::iterator it = errors.begin(); it != errors.end(); ++it) {
 		delete *it;

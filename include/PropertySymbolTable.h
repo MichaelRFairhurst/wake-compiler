@@ -11,6 +11,7 @@ extern "C" {
 }
 
 #include "TypeAnalyzer.h"
+#include "EntryPointAnalyzer.h"
 #include "AddressAllocator.h"
 
 using namespace std;
@@ -25,6 +26,7 @@ class PropertySymbolTable {
 		void addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, Node* body);
 		void addProvision(Type* provision, Node* body);
 		void addNeed(Type* returntype);
+		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);
 		vector<Type*>* getNeeds();
 		string getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments);
 		TypeAnalyzer* analyzer;
