@@ -92,7 +92,7 @@ cast					count(); return CAST;
 --						count(); return SYM_RETURN_DECREMENT;
 \?\?\?					count(); return SYM_CURRIER;
 
-[\t ]					count();
+[\t\r ]					count();
 \n						line++; column = 1;
 
 \$+						count(); yylval.number = strlen(yytext); return SYM_SHADOW;
