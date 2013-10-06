@@ -151,12 +151,7 @@ Chainable
 
 //CURRYING
 
-	fire( Architect )IfSameAs( BadArchitect ) -- getFireArchitectComparisonLambda() {
-		return fire( ??? )IfSameAs( ??? );
-	}
-
-	// This is the legal shortform?
-	_( Architect, BadArchitect ) -- getFireArchitectComparisonLambda() {
+	fn( Architect, BadArchitect ) -- getFireArchitectComparisonLambda() {
 		return fire( ??? )IfSameAs( ??? );
 	}
 
@@ -237,11 +232,14 @@ Chainable
 			// Bind an injection to arbitrary behavior
 			User{LoggedIn} <- { return getLoggedInUser(); },
 
-			// Bind an injection to a method with currying and/or primitives and/or injections
-			FileReader <-  { getFileHandle("r", ???, FileSystemWrapper) },
+			// Bind an injection to arbitrary behavior with a parameter
+			FileReader <(Text) { return getFileHandle("r", Text, FileSystemWrapper); },
 
 			// curry constructors -- require an ID and inject a connection
 			DBRecord( ??? , DBConnection),
+
+			// curry constructors -- require an ID and inject a connection
+			ActiveRecord <- CustomActiveRecord( ??? , DBConnection),
 
 			// this is how to provide a BadArchitect when asked for an Architect....mwahahaha
 			Architect <- BadArchitect,
@@ -252,19 +250,23 @@ Chainable
 		// Contrived examples of getting a provided object
 		demonstrateGettingDependencies() {
 			// No args or label
-			Architect <- provider;
+			:Architect <- provider;
 
 			// one arg no label
-			Architect(2) <- provider;
+			:Architect <(2, 4) provider;
 
 			// no args but yes label
-			Architect{LoggedIn} <- provider;
+			:Architect{LoggedIn} <- provider;
 
 			// args and label
-			Architect{LoggedIn}(2) <- provider;
+			:Architect{LoggedIn} <(2, 4) provider;
+
+			// get as an expression
+			return :(Architect{LoggedIn} <- provider);
 		}
 
-		new(User{LoggedIn}, Provider) {
+		needs User{LoggedIn}, Provider, then {
+			// Method body
 		}
 
 //ARRAYS
@@ -302,8 +304,38 @@ Chainable
 	// Load a PHP adaptor
 	import(PHP) PHPMailer;
 
+// INITIALIZATION VS REASSIGNMENT
+
+	// Initialization only for retrievals
+	:MyClass <- Provider;
+	:MyClass @a <- Provider;
+	:@a MyClass <- Provider;
+	:MyClass{Specialized} @a <- Provider;
+	:@a MyClass{Specialized} <- Provider;
+	:MyClass = @CopyMyClass;
+	:@a MyClass = @CopyMyClass;
+	:MyClass @a = @CopyMyClass;
+	:MyClass @a = @CopyMyClass;
+
+	//Syntactic sugar:
+	:MyClass <- Provider;
+	// is actually
+	:MyClass = :(MyClass <- Provider);
+
+	// Reassignment
+	MyClass = @CopyMyClass;
+	@a = @CopyMyClass;
+	MyClass = :(MyClass{Specialty} <- Provider)
+
+// IMPLICIT MAP
+
+	// Maybe I'll do
+	:Archictect[] <- Provider;
+	:Text[] = Archictect[*.getName('Arg1', 'Arg2')];
+	// as syntactic sugar for map
+
 //PRIVATE METHODS
 //TEMPLATES!!!!!
 //CALL PARENT METHODS
 //XLANG
-//EXCEPTIONS
+//EXCEPTION:

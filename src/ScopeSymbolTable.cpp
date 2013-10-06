@@ -7,7 +7,7 @@ void ScopeSymbolTable::add(string name, Type* type) {
 		throw new SemanticError(SYMBOL_ALREADY_DEFINED, temp);
 	}
 
-	table[name] = type;
+	table[name] = pair<Type*, string>(type, allocator.allocate());
 	scopes.back().push_back(name);
 }
 
@@ -21,8 +21,8 @@ Type* ScopeSymbolTable::get(string name) {
 		throw new SemanticError(SYMBOL_NOT_DEFINED, temp);
 	}
 
-	map<string, Type*>::iterator it = table.find(name);
-	return it->second;
+	map<string, pair<Type*, string> >::iterator it = table.find(name);
+	return it->second.first;
 }
 
 Type* ScopeSymbolTable::get(Type* type) {
@@ -32,8 +32,19 @@ Type* ScopeSymbolTable::get(Type* type) {
 		throw new SemanticError(SYMBOL_NOT_DEFINED, temp);
 	}
 
-	map<string, Type*>::iterator it = table.find(name);
-	return it->second;
+	map<string, pair<Type*, string> >::iterator it = table.find(name);
+	return it->second.first;
+}
+
+string ScopeSymbolTable::getAddress(Type* type) {
+	string name = getNameForType(type);
+	map<string, pair<Type*, string> >::iterator it = table.find(name);
+	return it->second.second;
+}
+
+string ScopeSymbolTable::getAddress(string name) {
+	map<string, pair<Type*, string> >::iterator it = table.find(name);
+	return it->second.second;
 }
 
 string ScopeSymbolTable::getNameForType(Type* type) {
@@ -56,6 +67,7 @@ void ScopeSymbolTable::pushScope() {
 void ScopeSymbolTable::popScope() {
 	for(vector<string>::iterator it = scopes.back().begin(); it != scopes.back().end(); ++it) {
 		table.erase(*it);
+		allocator.deallocate();
 	}
 
 	scopes.pop_back();

@@ -9,6 +9,8 @@ extern "C" {
 	#include "type.h"
 }
 
+#include "AddressAllocator.h"
+
 using namespace std;
 
 class ScopeSymbolTable {
@@ -22,12 +24,15 @@ class ScopeSymbolTable {
 		void add(Type* type);
 		Type* get(string name);
 		Type* get(Type* type);
+		string getAddress(Type* type);
+		string getAddress(string name);
 		void pushScope();
 		void popScope();
 
 	private:
+		AddressAllocator allocator;
 		string getNameForType(Type* type);
-		map<string, Type*> table;
+		map<string, pair<Type*, string> > table;
 		vector<vector<string> > scopes;
 };
 

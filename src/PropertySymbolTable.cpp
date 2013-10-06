@@ -22,7 +22,7 @@ void PropertySymbolTable::addMethod(Type* returntype, vector<pair<string, TypeAr
 
 	method->typedata.lambda.arguments = conglomerate;
 
-	properties[name] = method;
+	properties[name] = pair<Type*,string>(method, alloc.allocate());
 }
 
 void PropertySymbolTable::addProvision(Type* provided, Node* body) {
@@ -40,14 +40,24 @@ void PropertySymbolTable::addProvision(Type* provided, Node* body) {
 
 	method->typedata.lambda.arguments = MakeTypeArray(); //TODO injections with curried ctors or arguments!
 
-	properties[name] = method;
+	properties[name] = pair<Type*,string>(method, alloc.allocate());
 }
 
 Type* PropertySymbolTable::get(string name) {
 	if(!properties.count(name))
 		throw new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Cannot find method with signature " + name);
 
-	return properties.find(name)->second;
+	return properties.find(name)->second.first;
+}
+
+string PropertySymbolTable::getAddress(string name) {
+	return properties.find(name)->second.second;
+}
+
+string PropertySymbolTable::getProvisionAddress(Type* provided) {
+	string name = analyzer->getNameForType(provided) + "<-";
+	if(provided->specialty != NULL) name += provided->specialty;
+	return properties.find(name)->second.second;
 }
 
 string PropertySymbolTable::getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments) {
@@ -75,7 +85,7 @@ vector<Type*>* PropertySymbolTable::getNeeds() {
 }
 
 PropertySymbolTable::~PropertySymbolTable() {
-	for(map<string, Type*>::iterator it = properties.begin(); it != properties.end(); ++it) {
-		freeType(it->second);
+	for(map<string, pair<Type*, string> >::iterator it = properties.begin(); it != properties.end(); ++it) {
+		freeType(it->second.first);
 	}
 }

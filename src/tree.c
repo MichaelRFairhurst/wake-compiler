@@ -83,6 +83,7 @@ void initTreeTypes() {
 	nodenames[NT_DECLARATION] = "NT_DECLARATION";
 	nodenames[NT_PROPERTY] = "NT_PROPERTY";
 	nodenames[NT_CAST] = "NT_CAST";
+	nodenames[NT_COMPILER_HINT] = "NT_COMPILER_HINT";
 	treeTypesInited = 1;
 }
 
@@ -206,6 +207,7 @@ void printtree (Node *n, int level) {
 		case NT_STRINGLIT:
 		case NT_METHOD_NAME_SEGMENT:
 		case NT_ALIAS:
+		case NT_COMPILER_HINT:
 			printf("%*c %s %s\n", level, ' ', myname, n->node_data.string);
 			break;
 		case NT_TYPEDATA:

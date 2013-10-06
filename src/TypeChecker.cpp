@@ -254,7 +254,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 			case NT_OR:
 				{
 					ret = typeCheck(tree->node_data.nodes[0]);
-					Type* cmp = typeCheck(tree->node_data.nodes[0]);
+					Type* cmp = typeCheck(tree->node_data.nodes[1]);
 
 					if(!analyzer->isPrimitiveTypeTruth(ret) || !analyzer->isPrimitiveTypeTruth(cmp)) {
 						if(analyzer->isPrimitiveTypeTruth(ret)) {
@@ -431,6 +431,8 @@ Type* TypeChecker::typeCheck(Node* tree) {
 
 					PropertySymbolTable* methodtable = objectsymtable->find(subject->typedata._class.classname);
 					Type* lambdatype = methodtable->get(methodtable->getSymbolNameOf(&method_segments));
+					AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(subject->typedata._class.classname)));
+					AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(methodtable->getSymbolNameOf(&method_segments).c_str())));
 
 					ret = copyType(lambdatype->typedata.lambda.returntype);
 				}
@@ -486,6 +488,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 						e->token = tree;
 						errors->addError(e);
 					}
+					AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(provider->typedata._class.classname)));
 					free(provider);
 				} catch(SymbolNotFoundException* e) {
 					errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));

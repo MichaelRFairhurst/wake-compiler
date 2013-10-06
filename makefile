@@ -1,5 +1,5 @@
-OPT=-O3
-#OPT=-O0 -g
+##OPT=-O3
+OPT=-O0 -g
 FLAGS=-Iinclude -Igen
 CC=cc $(FLAGS)
 CPP=g++ $(FLAGS)
@@ -18,14 +18,16 @@ CPPNAMES= \
 	TypeChecker.cpp \
 	ClassParseTreeTraverser.cpp \
 	MethodSignatureParseTreeTraverser.cpp \
-	LibraryLoader.cpp
+	LibraryLoader.cpp \
+	CodeGenerator.cpp \
+	AddressAllocator.cpp
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
 CNAMES=tree.c type.c
 COBJS=$(addprefix bin/c/, $(CNAMES:.c=.o))
 GENNAMES=lex.yy.c y.tab.c
 GENOBJS=$(addprefix bin/gen/, $(GENNAMES:.c=.o))
-TESTNAMES=CompilerTests.cpp ObjectSymbolTableTest.cpp ParseTreeTraverserTest.cpp ScopeSymbolTableTest.cpp TypeAnalyzerTest.cpp PropertySymbolTableTest.cpp
+TESTNAMES=CompilerTests.cpp ObjectSymbolTableTest.cpp ParseTreeTraverserTest.cpp ScopeSymbolTableTest.cpp TypeAnalyzerTest.cpp PropertySymbolTableTest.cpp AddressAllocatorTest.cpp
 TESTOBJS=$(addprefix bin/tests/, $(TESTNAMES:.cpp=.o))
 
 wake: bin/wake

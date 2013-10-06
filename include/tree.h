@@ -94,6 +94,7 @@
 
 #define NT_PROPERTY 73
 #define NT_CAST 75
+#define NT_COMPILER_HINT 76
 
 void AddSubNode(Node* parent, Node* child);
 

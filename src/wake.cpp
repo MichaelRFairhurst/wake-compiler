@@ -15,6 +15,7 @@ extern "C" {
 #include "ParseTreeTraverser.h"
 #include "SemanticErrorPrinter.h"
 #include "LibraryLoader.h"
+#include "CodeGenerator.h"
 
 int main(int argc, char** argv) {
 	if(argc < 2) {
@@ -38,7 +39,7 @@ int main(int argc, char** argv) {
 
 	// Parse the shit out of this
 	if(parser.parse(myfile)) exit(1);
-	//parser.print();
+	parser.print();
 
 	ObjectSymbolTable table;
 	LibraryLoader loader;
@@ -54,4 +55,11 @@ int main(int argc, char** argv) {
 		traverser.printErrors(printer);
 	//else
 		//cout << "Everything checked out!\n" << endl;
+
+	fstream file;
+	file.open("a.out", ios::out);
+	if(!file.is_open()) cout << "shit";
+	CodeGenerator gen(file, &table);
+	gen.generate(parser.getParseTree());
+	gen.setMain("PhiGeneratorTest", "runTests()");
 }

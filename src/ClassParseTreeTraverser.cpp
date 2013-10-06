@@ -309,6 +309,7 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 
 				Type* method = propertysymtable->get(name);
 				errors->pushContext("In declaration of 'every " + classname + "' method " + name);
+				AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(name.c_str())));
 
 				// Begin Method Scope For Type Analysis
 				scopesymtable->pushScope();

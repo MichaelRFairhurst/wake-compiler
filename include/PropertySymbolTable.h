@@ -11,6 +11,7 @@ extern "C" {
 }
 
 #include "TypeAnalyzer.h"
+#include "AddressAllocator.h"
 
 using namespace std;
 
@@ -19,6 +20,8 @@ class PropertySymbolTable {
 		~PropertySymbolTable();
 		map<string, bool> parentage;
 		Type* get(string name);
+		string getAddress(string name);
+		string getProvisionAddress(Type* provided);
 		void addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, Node* body);
 		void addProvision(Type* provision, Node* body);
 		void addNeed(Type* returntype);
@@ -27,7 +30,8 @@ class PropertySymbolTable {
 		TypeAnalyzer* analyzer;
 
 	private:
-		map<string, Type*> properties;
+		AddressAllocator alloc;
+		map<string, pair<Type*, string> > properties;
 		vector<Type*> needs;
 };
 
