@@ -48,6 +48,8 @@ hljs.LANGUAGES.wake = {
   ]
 }
 hljs.initHighlightingOnLoad();
+
+$(function() { setTimeout(function() {$('.goodcode, .badcode').popover({trigger: 'hover', container: 'body', placement: 'top'}); },10);});
 		</script>
 		<style type="text/css">
 .mynavbar {
@@ -76,6 +78,22 @@ span.type {
 
 span.decorator {
 	color: #5050A8;
+}
+
+span.badcode {
+	text-shadow: 1px 1px 1px rgba(253, 253, 253, 0.37);
+	font-weight: bold;
+	border: 2px solid rgba(128, 0, 0, .7);
+	background: #E6A4A4;
+	border-radius: 4px;
+}
+
+span.goodcode {
+	text-shadow: 1px 1px 1px rgba(253, 253, 253, 0.37);
+	font-weight: bold;
+	border: 2px solid rgba(0, 128, 0, .7);
+	background: #DDFFFF;
+	border-radius: 4px;
 }
 
 .label-info, .label-important {
@@ -131,15 +149,15 @@ span.decorator {
 					<span class="label label-info">Wake</span>
 					<pre><code class="wake"
 >every FibGenerator is:
-    needs Printer;
+    needs <span class="goodcode" title="Ask and you are guaranteed to receive a capable Printer.">Printer</span>;
 
-    Int -- generate( Int ) {
+    <span class="goodcode" title="The compiler lends a hand, only Ints can be returned.">Int</span> -- generate( <span class="goodcode" title="Only accept Ints, with compact syntax.">Int</span> ) {
         if(Int == 0) return 0;
         if(Int == 1) return 1;
-        return generate(Int - 1) + generate(Int - 2);
+        return <span class="goodcode" title="Compact means of calling class methods">generate</span>(Int - 1) + generate(Int - 2);
     }
 
-    Int -- sumFrom( Int )To( $Int ) {
+    Int -- <span class="goodcode" title="A uniquely clear method naming system">sumFrom( Int )To( $Int )</span> {
         :Int @sum = generate(Int);
         if(Int &gt; $Int)
             return @sum + sumFrom(Int - 1)To($Int);
@@ -148,7 +166,7 @@ span.decorator {
 
     printUpTo( Int ) {
         if(Int &gt; 0) printUpTo(Int);
-        Printer.print(generate(Int));
+        Printer.<span class="goodcode" title="Intuitive method overloading">print</span>(generate(Int));
     }</code></pre>
 				</div>
 				<div class="span6" id="javascript">
@@ -156,24 +174,24 @@ span.decorator {
 <div class="alert alert-error">Elegant and concise, but unintiuitive, unsafe, with pitfalls all around</div>
 					<span class="label label-important">Javascript</span>
 					<pre><code class="javascript"
->var FibGenerator = function(console) {
+>var <span class="badcode" title="Not clearly a class definition, and in fact, isnt always a class">FibGenerator</span> = function(<span class="badcode" title="You can ask for a console, but cannot guarantee you'll get one.">console</span>) {
 
-    this.generate = function(x) {
-    	if(x == 0) return 0;
-        if(x == 1) return 1;
-        return this.generate(x - 1) + this.generate(x - 2);
+    <span class="badcode" title="Unintuitive method syntax.">this.generate = function</span>(<span class="badcode" title="There is no way of knowing if x is a number, or even exists at all.">x</span>) {
+    	if(<span class="badcode" title="If this were misspelled (or capitalized) there would be no errors revealed until runtime.">x</span> == 0) return 0;
+        if(<span class="badcode" title="Passing a string into this function is legal, and will never equal one or zero, and therefore will result in an endless loop.">x == 1</span>) return 1;
+        return <span class="badcode" title="Overly verbose method calls">this</span>.generate(x - 1) + <span class="badcode" title="If generate were a private method, 'this' would be unusable, which is only revealable at runtime.">this</span>.generate(x - 2);
     }
 
     this.sumFromRange = function(top, bot) {
-        var sum = this.generate(top);
+        <span class="badcode" title="The var keyword is easily forgotten, resulting in overwriting global variables.">var</span> sum = <span class="badcode" title="Unsafe. Generate can be redefined to any function with any return type.">this.generate</span>(top);
         if(top &gt; bot)
-            return sum + this.sumFromRange(top - 1, bot);
+            return sum <span class="badcode" title="If either operand returns strings, the result is '12' rather than '3'.">+</span> this.sumFromRange(top - 1, bot);
         else return sum;
     }
 
     this.printUpTo = function(x) {
         if(x &gt; 0) this.printUpTo(x);
-    	console.log(this.generate(x));
+    	<span class="badcode" title="No compiler warning for using a console that may not exist.">console.log</span>(this.generate(x));
     }
 }</code></pre>
 				</div>
@@ -184,20 +202,20 @@ span.decorator {
 					<pre><code class="java"
 >class FibGenerator {
 
-    private Printer myprinter;
+    <span class="badcode" title="Part one of three in requiring a printer. Verbose, and ultimately our printer may still be null.">private Printer printer;</span>
 
-    public FibGenerator(Printer myprinter) {
-        printer = myprinter;
+    <span class="badcode" title="Allowing public constructors enables the untestable and unnecessary singleton pattern.">public</span> <span class="badcode" title="Unintuitive constructor syntax.">FibGenerator</span>(<span class="badcode" title="Repetitive type declaration">Printer</span> <span class="badcode" title="Meaningless name creation to keep myprinter distinct from printer">myprinter</span>) {
+        <span class="badcode" title="Step three in requiring a printer">printer = myprinter</span>;
     }
 
-    public int generate(int x) {
+    <span class="badcode" title="No convention over configuration, public and private must always be specified.">public</span> int generate(<span class="badcode" title="verbose type systems can encourage programmers to use uninformative names like 'x'">int x</span>) {
         if(x == 0) return 0;
         if(x == 1) return 1;
         return generate(x - 1) + generate(x - 2);
     }
 
     public int sumFromRange(int top, int bot) {
-        int sum = generate(top);
+        <span class="badcode" title="Declarations can at any point be overriding previous declarations, making the original variable unusable until scope ends, often with no compiler error.">int sum</span> = generate(top);
         if(top &gt; bot)
             return sum + sumFromRange(top - 1, bot);
         else return sum;
@@ -205,7 +223,7 @@ span.decorator {
 
     public void printUpTo = function(int x) {
         if(x &gt; 0) printUpTo(x);
-        myprinter.print(this.generate(x).toString());
+        myprinter.print(this.generate(x).<span class="badcode" title="Casting strings and ints can take micromanaging from the programmer.">toString</span>());
     }</code></pre>
 				</div>
 			</div>
