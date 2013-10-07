@@ -5,30 +5,45 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<!-- Bootstrap -->
 		<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
-		<link rel="stylesheet" href="/highlight.js/styles/default.css">
+		<link rel="stylesheet" href="/highlight.js/styles/tomorrow.css">
 		<script src="/highlight.js/highlight.pack.js"></script>
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script type="text/javascript">
 hljs.LANGUAGES.wake = {
   case_insensitive: true, // language is case-insensitive
   k: {
-    keyword: 'every if while for is a an capable with public else switch case continue default break provides needs return',
+    keyword: 'every if while for is a an capable with public else switch case continue default break provides needs return this',
     type: 'Text Int Truth Printer'
   },
 
   c: [
     {
-      className: 'string',
-      begin: '"', end: '"'
+      cN: 'decorator',
+      b: '@[a-zA-Z]+'
     },
     {
-      className: 'comment',
-      begin: '/*', end: '*/',
-      contains: [
-        {
-          className: 'doc', begin: '@\\w+'
-        }
-      ]
+      cN: 'decorator',
+      b: '\\$+'
+    },
+    {
+      cN: 'string',
+      b: '"', e: '"'
+    },
+    {
+      cN: 'number',
+      b: '[0-9]+'
+    },
+    {
+      cN: 'bold',
+      b: ':'
+    },
+    {
+      cN: 'comment',
+      b: '#>', e: '##',
+    },
+    {
+      cN: 'comment',
+      b: '//', e: '$',
     }
   ]
 }
@@ -50,8 +65,17 @@ hljs.initHighlightingOnLoad();
 	background: url(/bg.png);
 }
 
+span.bold {
+	font-weight:bold;
+	color: #3F3FA3;
+}
+
 span.type {
 	color: green;
+}
+
+span.decorator {
+	color: #5050A8;
 }
 
 .label-info, .label-important {
@@ -155,7 +179,7 @@ span.type {
 				</div>
 				<div class="span6" style="display:none" id="java">
 					<h3><a onclick="$('#java').hide();$('#javascript').show();">Javascript</a> / Java</h3>
-<div class="alert">Powerful and typesafe at the expense of clunky boilerplate</div>
+<div class="alert alert-error">Powerful and typesafe at the expense of clunky boilerplate</div>
 					<span class="label label-important">Java</span>
 					<pre><code class="java"
 >class FibGenerator {
@@ -261,6 +285,8 @@ span.type {
 				</div>
 			</div>
 
+			<hr />
+
 			<h1 id="removals">What Wake did without</h1>
 			<p>Any poor feature in a language can prevent the addition of a powerful one. We made some hard choices to create a strong cocktail of ideas.</p>
 			<table class="table">
@@ -306,6 +332,8 @@ span.type {
 				<p>We handled installing it for you, and with javascript as a compile target, you can run it all right in your browser</p>
 				<h3><a href="TryWake.php">Try Wake Online</a></h3>
 			</div>
+
+			<hr />
 
 			<h1 id="variables">Making The Most Of Wake Variables</h1>
 			<div class="alert alert-success">Variables in wake come in three forms, all with the goal of meaningful names in minimal keystrokes.</div>
@@ -356,7 +384,7 @@ span.type {
 }</code></pre>
 				</div>
 			</div>
-			<h3 id="aliasing">2. Aliasing <span class="label label-inverse">readable</span> <span class="label label-inverse">safe</span></h3>
+			<h3 id="aliases">2. Aliasing <span class="label label-inverse">readable</span> <span class="label label-inverse">safe</span></h3>
 			<p>In our previous example, calling a person's ID <code>Int</code> is a bit ambiguous. When a type isn't meaningful for a context, use aliases.</p>
 			<p>To aid the compiler, we must write <code>@</code> as a hint that its not a type. But luckily, it turns out that the same idea is useful to humans as well.</p>
 			<div class="row-fluid">
@@ -399,7 +427,7 @@ span.type {
 				</div>
 			</div>
 			<h3 id="shadowing">3. Shadowing <span class="label label-inverse">concise</span> <span class="label label-inverse">safe</span></h3>
-			<p>Following from the idea that the most meaningful name for a variable often <i>is</i> its type, we have a problem with places like 'setter' methods.</p>
+			<p>Following from the idea that the most meaningful name for a variable often <i>is</i> its type, we have a problem with places like 'setter' methods. The new value is of the same type as the old value, but they must be distinguished.</p>
 			<p>Instead of creating meaningless aliases as we arguably did with <code>@newid</code>, we can add <code>$</code> to preserve type information while also creating a unique instance</p>
 			<span class="label label-info">Wake</span>
 			<pre><code class="wake"
@@ -435,6 +463,7 @@ span.type {
         // redefinining variables is not allowed
     }</code></pre>
 
+			<hr />
 			<h1 id="classes">Classes in wake <span class="label label-inverse">concise</span> <span class="label label-inverse">readable</span></h1>
 			<p>Wake is a truly Object Oriented language, and should come with few surprises here.</p>
 			<p>In wake, everything is an object. A class declaration begins with the keyword <code>every</code> as seen below. Within that definition can be properties, dependencies, a constructor, methods, and provisions.</p>
@@ -508,7 +537,9 @@ every SubClass (a BaseClass, capable Printer) is:
 
 // Running SubClass.useThisAsPrinter will output:
 // "SubClass printing: BaseClass"</code></pre>
-			<h3 id="methods">Valid Methods in Wake <span class="label label-inverse">concise</span> <span class="label label-inverse">readable</span></h3>
+
+			<hr />
+			<h1 id="methods">Valid Methods in Wake <span class="label label-inverse">concise</span> <span class="label label-inverse">readable</span></h1>
 			<div class="alert alert-info">
 				Methods in wake can look strange at first. The changes are simple and make your APIs read like sentences.
 			</div>
