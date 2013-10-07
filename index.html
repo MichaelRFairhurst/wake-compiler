@@ -5,6 +5,35 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<!-- Bootstrap -->
 		<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+		<!--link rel="stylesheet" href="http://yandex.st/highlightjs/7.3/styles/default.min.css">
+		<script src="http://yandex.st/highlightjs/7.3/highlight.min.js"></script-->
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script type="text/javascript">
+hljs.LANGUAGES.wake = {
+  case_insensitive: true, // language is case-insensitive
+  k: {
+    keyword: 'every if while for is a an capable with public else switch case continue default break provides needs return',
+    type: 'Text Int Truth Printer'
+  },
+  
+  c: [
+    {
+      className: 'string',
+      begin: '"', end: '"'
+    },
+    {
+      className: 'comment',
+      begin: '/*', end: '*/',
+      contains: [
+        {
+          className: 'doc', begin: '@\\w+'
+        }
+      ]
+    }
+  ]
+}
+hljs.initHighlightingOnLoad();
+		</script>
 		<style type="text/css">
 .mynavbar {
 	background: rgb(255,255,255); /* Old browsers */
@@ -18,104 +47,217 @@
 }
 
 .content {
-	background: -moz-linear-gradient(-45deg,  rgba(242,249,254,0) 0%, rgba(214,240,253,1) 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,rgba(242,249,254,0)), color-stop(100%,rgba(214,240,253,1))); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(-45deg,  rgba(242,249,254,0) 0%,rgba(214,240,253,1) 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(-45deg,  rgba(242,249,254,0) 0%,rgba(214,240,253,1) 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(-45deg,  rgba(242,249,254,0) 0%,rgba(214,240,253,1) 100%); /* IE10+ */
-	background: linear-gradient(135deg,  rgba(242,249,254,0) 0%,rgba(214,240,253,1) 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00f2f9fe', endColorstr='#d6f0fd',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+	background: url(/bg.png);
+}
+
+span.type {
+	color: green;
+}
+
+.label-info, .label-important {
+	padding-bottom: 8px;
+	margin-bottom: -5px;
+	display: block;
+	padding-top: 3px;
 }
 		</style>
 	</head>
 	<body>
-		<div style="position: fixed; padding: 15px; width: 300px; height: 100%;" class="mynavbar">
+		<div style="position: fixed; padding: 15px; width: 240px; height: 100%;" class="mynavbar">
 			<ul class="nav nav-tabs nav-stacked">
 				<li><a href="#intro">Wake</a></li>
+				<li><a href="#codeinto">Quick Code Introduction</a></li>
 				<li><a href="#new">New ideas in Wake</a></li>
 				<li><a href="#removals">What we removed</a></li>
 				<li><a href="#trywake">Try wake online</a></li>
+				<li><a href="#variables">Variables</a></li>
+				<li><a href="#typevariables">- Types as Variables</a></li>
+				<li><a href="#aliases">- Aliased Variables</a></li>
+				<li><a href="#shadowing">- Shadowing Types</a></li>
+				<li><a href="#declarations">- Declaring Variables</a></li>
+				<li><a href="#classes">Classes</a></li>
+				<li><a href="#methods">Methods</a></li>
+				<li><a href="#provisions">Provisions</a></li>
+				<li><a href="#entry">Program entry points</a></li>
 			</ul>
 		</div>
-		<div class="content" style="left: 350px; right:0px; top:0px; bottom:0px; padding: 10px; position:absolute; overflow: auto" data-spy="scroll" data-target=".mynavbar">
+		<div class="content" style="left: 270px; right:0px; top:0px; bottom:0px; padding: 10px; position:absolute; overflow: auto" data-spy="scroll" data-target=".mynavbar">
 			<div class="hero-unit" id="intro">
 				<h1>Wake The Language</h1>
 				<p>
-					Wake is a fast, expressive, strongly typed language that gives you testability from the ground up.
+					Wake is a fast, expressive, typesafe language that gives you testability from the ground up.
 				</p>
 			</div>
+			<p>Throughout the docs, we'll show you how we've made the language <span class="label label-inverse">testable</span>, <span class="label label-inverse">flexible</span>, <span class="label label-inverse">readable</span>, <span class="label label-inverse">concise</span>, and <span class="label label-inverse">safe</span>.
+			<hr />
+			<h1 id="codeinto">Quick Code Introduction</h1>
+			<p>We'll compare wake to both java and javascript. You'll see friendly classes, clean code, and intuitive type safety.</p>
+			<p>or you can <b>jump straight in:</b></p>
+			<ul>
+				<li><a href="#variables">How variables work</a></li>
+				<li><a href="#methods">Valid method names &amp; APIs</a></li>
+				<li><a href="#classes">Using classes</a></li>
+				<li><a href="#provisions">Tell me about provisions</a></li>
+				<li><a href="#entry">Where does the program begin?</a></li>
+			</ul>
+			<div class="row-fluid">
+				<div class="span6">
+					<h3>Wake</h3>
+<div class="alert alert-success">Code as concise as javascript, with inheritance and typesafety and more</div>
+					<span class="label label-info">Wake</span>
+					<pre><code class="wake"
+>every FibGenerator is:
+    needs Printer;
+
+    Int -- generate( Int ) {
+        if(Int == 0) return 0;
+        if(Int == 1) return 1;
+        return generate(Int - 1) + generate(Int - 2);
+    }
+
+    Int -- sumFrom( Int )To( $Int ) {
+        :Int @sum = generate(Int);
+        if(Int &gt; $Int)
+            return @sum + sumFrom(Int - 1)To($Int);
+        else return @sum;
+    }
+
+    printUpTo( Int ) {
+        if(Int &gt; 0) printUpTo(Int);
+        Printer.print(generate(Int));
+    }</code></pre>
+				</div>
+				<div class="span6" id="javascript">
+					<h3>Javascript / <a onclick="$('#java').show();$('#javascript').hide();">Java</a></h3>
+<div class="alert alert-error">Elegant and concise, but unintiuitive, unsafe, with pitfalls all around</div>
+					<span class="label label-important">Javascript</span>
+					<pre><code class="javascript"
+>var FibGenerator = function(console) {
+
+    this.generate = function(x) {
+    	if(x == 0) return 0;
+        if(x == 1) return 1;
+        return this.generate(x - 1) + this.generate(x - 2);
+    }
+
+    this.sumFromRange = function(top, bot) {
+        var sum = this.generate(top);
+        if(top &gt; bot)
+            return sum + this.sumFromRange(top - 1, bot);
+        else return sum;
+    }
+
+    this.printUpTo = function(x) {
+        if(x &gt; 0) this.printUpTo(x);
+    	console.log(this.generate(x));
+    }
+}</code></pre>
+				</div>
+				<div class="span6" style="display:none" id="java">
+					<h3><a onclick="$('#java').hide();$('#javascript').show();">Javascript</a> / Java</h3>
+<div class="alert">Powerful and typesafe at the expense of clunky boilerplate</div>
+					<span class="label label-important">Java</span>
+					<pre><code class="java"
+>class FibGenerator {
+
+    private Printer myprinter;
+
+    public FibGenerator(Printer myprinter) {
+        printer = myprinter;
+    }
+
+    public int generate(int x) {
+        if(x == 0) return 0;
+        if(x == 1) return 1;
+        return generate(x - 1) + generate(x - 2);
+    }
+
+    public int sumFromRange(int top, int bot) {
+        int sum = generate(top);
+        if(top &gt; bot)
+            return sum + sumFromRange(top - 1, bot);
+        else return sum;
+    }
+
+    public void printUpTo = function(int x) {
+        if(x &gt; 0) printUpTo(x);
+        myprinter.print(this.generate(x).toString());
+    }</code></pre>
+				</div>
+			</div>
+			<hr />
 			<h1 id="new">New ideas in wake</h1>
 			<p>We've both created and borrowed some cutting edge ideas.</p>
 
 			<div class="row">
 				<div class="span3">
-					<h4>Provisions</h4>
+					<h4>Provisions</h4><span class="label label-inverse">testable</span> <span class="label label-inverse">flexible</span>
 				</div>
 				<div class="span5">
 					<br /><blockquote>Use provisions to keep a testable and extensible seam between every class.</blockquote>
 				</div>
 				<div class="span4">
-					<br /><i>This makes testability and flexibility a language feature.</i>
+					<br /><div class="alert alert-success">This makes testability and flexibility a language feature.</div>
 				</div>
 			</div>
 
 			<div class="row">
 				<div class="span3">
-					<h4>Type Inference</h4>
+					<h4>Type Inference</h4><span class="label label-inverse">concise</span>
 				</div>
 				<div class="span5">
 					<br /><blockquote>Keep the expressive, clean look of dynamic languages, with a safe type system.</blockquote>
 				</div>
 				<div class="span4">
-					<br /><i>This saves you time writing, reading, and refactoring code.</i>
+					<br /><div class="alert alert-success">This saves you time writing, reading, and refactoring code.</div>
 				</div>
 			</div>
 
 			<div class="row">
 				<div class="span3">
-					<h4>Constructor Properties</h4>
+					<h4>Constructor Properties</h4><span class="label label-inverse">testable</span> <span class="label label-inverse">concise</span>
 				</div>
 				<div class="span5">
 					<br /><blockquote>Reduce boiler-plate code by making constructor arguments exactly like properties.</blockquote>
 				</div>
 				<div class="span4">
-					<br /><i>This makes best practices like Aspect-Oriented-Programming intuitive.</i>
+					<br /><div class="alert alert-success">This makes best practices like Aspect-Oriented-Programming intuitive.</div>
 				</div>
 			</div>
 
 			<div class="row">
 				<div class="span3">
-					<h4>Two-way polymorphism</h4>
+					<h4>Two-way polymorphism</h4><span class="label label-inverse">testable</span> <span class="label label-inverse">flexible</span>
 				</div>
 				<div class="span5">
 					<br /><blockquote>Eventually will add this.</blockquote>
 				</div>
 				<div class="span4">
-					<br /><i>This creates testable inheritance by increasing expressive object design.</i>
+					<br /><div class="alert alert-success">This creates testable inheritance by increasing expressive object design.</div>
 				</div>
 			</div>
 
 			<div class="row">
 				<div class="span3">
-					<h4>Compilation targets as a language feature</h4>
+					<h4>Compilation targets as a language feature</h4><span class="label label-inverse">flexible</span>
 				</div>
 				<div class="span5">
 					<br /><blockquote>A goal of wake is to compile into anything -- .net, java, javascript, and assembly</blockquote>
 				</div>
 				<div class="span4">
-					<br /><i>This makes wake libraries usable in every one of your projects.</i>
+					<br /><div class="alert alert-success">This makes wake libraries usable in every one of your projects.</div>
 				</div>
 			</div>
 
 			<div class="row">
 				<div class="span3">
-					<h4>Closures</h4>
+					<h4>Closures</h4><span class="label label-inverse">flexible</span> <span class="label label-inverse">concise</span>
 				</div>
 				<div class="span5">
 					<br /><blockquote>Wake is part of a small class of strongly-typed, object oriented languages with functional coloring.</blockquote>
 				</div>
 				<div class="span4">
-					<br /><i>This adds concise, elegant, rapid-development to your scalable enterprise apps.</i>
+					<br /><div class="alert alert-success">This adds concise, elegant, rapid-development to your scalable enterprise apps.</div>
 				</div>
 			</div>
 
@@ -129,33 +271,33 @@
 				</tr>
 				<tr>
 					<td><b>Static methods</b></td>
-					<td>Using a static method from a procedure hard-codes implementation rather than interface, decreasing flexibility and testability</td>
-					<td>You can (and usually should) now use exact type names as variable names, meaning more clarity and fewer keystrokes.</td>
+					<td><div class="alert alert-error">Using a static method from a procedure hard-codes implementation rather than interface, decreasing flexibility and testability</div></td>
+					<td><span class="label label-success">FIXED</span> You can (and usually should) now use exact type names as variable names, meaning more clarity and fewer keystrokes.</td>
 				</tr>
 				<tr>
-					<td><b>The 'new' keyword</b></td>
-					<td>'New' mixes application APIs with implementations, and has been replaced with 'provisions.'</td>
-					<td>Constructors directly translate to properties since they are not functions.</td>
+					<td><b>The <code>new</code> keyword</b></td>
+					<td><div class="alert alert-error"><code>new</code> mixes application APIs with implementations, and has been replaced with 'provisions.'</div></td>
+					<td><span class="label label-success">FIXED</span> Constructors directly translate to properties since they are not functions.</td>
 				</tr>
 				<tr>
 					<td><b>Interface/extension distinction</b></td>
-					<td>A common best practice is to create an interface for every class, even before its used, resulting in junk code and extra boilerplate.</td>
-					<td>In wake you can use any class as an interface, making everything driven by APIs without any additional code.</td>
+					<td><div class="alert alert-error">A common best practice is to create an interface for every class, even before its used, resulting in junk code and extra boilerplate.</div></td>
+					<td><span class="label label-success">FIXED</span> In wake you can use any class as an interface, making everything driven by APIs without any additional code.</td>
 				</tr>
 				<tr>
 					<td><b>Abstract classes</b></td>
-					<td>Abstract classes are a combination of an interface and a class, or a means of locking a class to static methods.</td>
-					<td>We let the compiler tell you if a class is incomplete, not vice versa, without any management on your part.</td>
+					<td><div class="alert alert-error">Abstract classes are a combination of an interface and a class, or a means of locking a class to static methods.</div></td>
+					<td><span class="label label-success">FIXED</span> We let the compiler tell you if a class is incomplete, not vice versa, without any management on your part.</td>
 				</tr>
 				<tr>
 					<td><b>Primitive types</b></td>
-					<td>Primitive types are fast, but without methods they require external behavior to manipulate them.</td>
-					<td>The compiler handles autoboxing primitives into objects - Int, Truth, Text, etc - and lets you code without managing the conversion.</td>
+					<td><div class="alert alert-error">Primitive types are fast, but without methods they require external behavior to manipulate them.</div></td>
+					<td><span class="label label-success">FIXED</span> The compiler handles autoboxing primitives into objects - <code>Int</code>, <code>Truth</code>, <code>Text</code>, etc - and lets you code without managing the conversion.</td>
 				</tr>
 				<tr>
 					<td><b>Cryptic keywords</b></td>
-					<td>Abstract, virtual, volatile, and other cryptic keywords from the 1970s convey very little about what they actually do.</td>
-					<td>New programmers will find every keyword to be simple, and meaningful, from 'Truth' to 'Text' to 'capable'.</td>
+					<td><div class="alert alert-error"><code>Abstract</code>, <code>virtual</code>, <code>volatile</code>, and other cryptic keywords from the 1970s convey very little about what they actually do.</div></td>
+					<td><span class="label label-success">FIXED</span> New programmers will find every keyword to be simple, and meaningful, from <code>Truth</code> to <code>Text</code> to <code>capable</code>.</td>
 				</tr>
 			</table>
 
@@ -164,8 +306,224 @@
 				<p>We handled installing it for you, and with javascript as a compile target, you can run it all right in your browser</p>
 				<h3><a href="TryWake.php">Try Wake Online</a></h3>
 			</div>
+
+			<h1 id="variables">Making The Most Of Wake Variables</h1>
+			<div class="alert alert-success">Variables in wake come in three forms, all with the goal of meaningful names in minimal keystrokes.</div>
+			<h3 id="typevariables">1. Typenames as variables <span class="label label-inverse">concise</span> <span class="label label-inverse">readable</span></h3>
+			<p>Since we got rid of static methods, we can save you from repeating yourself meaninglessly in domain-driven code.</p>
+			<div class="row-fluid">
+				<div class="span6">
+					<span class="label label-info">Wake</span>
+					<pre><code class="wake"
+>every Person is:
+
+    // Choose to call it an ID and say its an int,
+    // or just say its an Int.
+    needs Int;
+
+    Int -- getId() {
+        return Int;
+    }
+
+    // Save yourself writing it twice, and you get
+    // the benefit of knowing Person is a Person.
+    Truth -- isSameAs(Person) {
+        return getId() == Person.getId();
+    }</code></pre>
+				</div>
+				<div class="span6">
+					<span class="label label-important">Java</span>
+					<pre><code class="java"
+>class Person {
+
+    private int id;
+
+    public Person(int myid) {
+        id = myid;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    // Either name your argument 'person' and blur
+    // the lines between static &amp; member calls,
+    // or make up a name when you really, truly
+    // only care that its a person.
+    public bool isSameAs(Person person) {
+        return getId() == person.getId();
+    }
+}</code></pre>
+				</div>
+			</div>
+			<h3 id="aliasing">2. Aliasing <span class="label label-inverse">readable</span> <span class="label label-inverse">safe</span></h3>
+			<p>In our previous example, calling a person's ID <code>Int</code> is a bit ambiguous. When a type isn't meaningful for a context, use aliases.</p>
+			<p>To aid the compiler, we must write <code>@</code> as a hint that its not a type. But luckily, it turns out that the same idea is useful to humans as well.</p>
+			<div class="row-fluid">
+				<div class="span6">
+					<span class="label label-info">Wake</span>
+					<pre><code class="wake"
+>every Person is:
+
+    // Give your int a name
+    needs Int @id;
+
+    Int -- getId() {
+        // Use your int by name
+        return @id
+    }
+
+    // Precede by type or by alias, as you wish
+    setIdThenSave(@newid Int, Truth @recursively) { ... }</code></pre>
+				</div>
+				<div class="span6">
+					<span class="label label-important">Java</span>
+					<pre><code class="java"
+>class Person {
+
+    private int id;
+
+    public Person(int myid) {
+        id = myid;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    // Requiring type first can make APIs less readable
+    public void setIdThenSave(int id, bool recursively) {
+        //...
+    }
+}</code></pre>
+				</div>
+			</div>
+			<h3 id="shadowing">3. Shadowing <span class="label label-inverse">concise</span> <span class="label label-inverse">safe</span></h3>
+			<p>Following from the idea that the most meaningful name for a variable often <i>is</i> its type, we have a problem with places like 'setter' methods.</p>
+			<p>Instead of creating meaningless aliases as we arguably did with <code>@newid</code>, we can add <code>$</code> to preserve type information while also creating a unique instance</p>
+			<span class="label label-info">Wake</span>
+			<pre><code class="wake"
+>every IntContainer is:
+
+    needs Int;
+
+    // All we really care about here is
+    // that Int and $Int are different numbers
+    Int -- setToNotGreaterThan($Int) {
+        if(Int &gt; $Int) Int = $Int;
+    }</code></pre>
+			<h3 id="declarations">Declaring variables <span class="label label-inverse">concise</span> <span class="label label-inverse">safe</span></h3>
+			<p>All these variable names are usable in declarations when preceded with <code>:</code>, or when in properties</p>
+			<span class="label label-info">Wake</span>
+			<pre><code class="wake"
+>every DeclarationExample is:
+
+    // Properties
+    with Int @a = 4;
+    with @an Int = 4;
+    with $Int = 4;
+
+    // Dependencies
+    needs @another Int, $$Int, Int @again;
+
+    // Variables in methods
+    declareThem() {
+        :Int @local = 4;
+        :@second Int = 4;
+        :$$$Int = 5;
+        :Int = 3; // Compiler error!
+        // redefinining variables is not allowed
+    }</code></pre>
+
+			<h1 id="classes">Classes in wake <span class="label label-inverse">concise</span> <span class="label label-inverse">readable</span></h1>
+			<p>Wake is a truly Object Oriented language, and should come with few surprises here.</p>
+			<p>In wake, everything is an object. A class declaration begins with the keyword <code>every</code> as seen below. Within that definition can be properties, dependencies, a constructor, methods, and provisions.</p>
+			<span class="label label-info">Wake</span>
+			<pre><code class="wake"
+>every MyClass is:
+    //Properties
+    with public Text @name;
+    with Text @ssn; // default private
+
+    //Dependencies - the object cannot exist
+    //without something first providing these
+    needs Int @id, Printer then {
+        // or 'needs nothing then'
+        // ctor body
+    }
+
+    //Provisions - see the section on them
+    provides Text{URL} &lt;- 'http://www.wakelang.com';
+
+    //Methods
+    Text -- getSSNLastFour() {
+        // ...
+    }</code></pre>
+			<h3>Dependencies <span class="label label-inverse">concise</span> <span class="label label-inverse">testable</span></h3>
+			<p>When an object is constructed, first the dependencies are all resolved by means of provisions. This means that you can simply say your object <code>needs Printer</code>, and you will always have one.</p>
+			<h3>Properties <span class="label label-inverse">flexible</span></h3>
+			<div class="alert alert-error">Calling a method which uses an uninitialized property during this property initialization process currently results in undefined behavior. In the future the compiler will prevent you from doing so, or local methods might be disallowed entirely.</div>
+			<p>At this point the object has its dependencies met, and each property is evaluated in order. Each assigned value can be a full expression referencing needs or already-evaluated properties. Then the constructor is called.</p>
+			<span class="label label-info">Wake</span>
+			<pre><code class="wake"
+>every IncrementingProperties is:
+    needs Int @starter, Printer {
+        Printer.print(@sum); // By now @sum exists
+    }
+
+    // These are evaluated after we get @starter
+    with Int @plusone = @starter + 1;
+    with Int @plustwo = @plusone + 1;
+    with Int @plusthree = @plusthree + 1;
+    with Int @sum = @starter + @plusone + @plustwo + @plusthree;</code></pre>
+			<h3 id="inheritance">Inheritance <span class="label label-inverse">testable</span> <span class="label label-inverse">flexible</span> <span class="label label-inverse">readable</span></h3>
+			<p class="alert">Inheritance is not fully implemented just yet. But this is how it will work.</p>
+			<p>Every class can be inherited with or without keeping behavior, with the keywords <code>a</code>/<code>an</code>, and <code>capable</code>. Usually in small projects the point of inheritance is to copy the code from that class, however, it is not always desirable. If you use <code>capable</code>, you must rewrite the methods of your child class. These actions are called <i>extending</i> vs <i>implementing</i>.</p>
+			<p>An additional value to implementing classes with <code>capable</code> instead of extending classes with <code>a</code>/<code>an</code>, is that you can implement multiple classes even though you can only extend one class.</p>
+			<p>An object which extends or implements another class can be used as that subclass elsewhere in the code.</p>
+			<span class="label label-info">Wake</span>
+			<pre><code class="wake"
+>every BaseClass is:
+
+    myMethod(Printer) {
+        Printer.print("BaseClass");
+    }
+
+// extend baseclass, implement Printer
+every SubClass (a BaseClass, capable Printer) is:
+    // this means we can use BaseClass.myMethod()
+
+    // and must define Printer.print()
+    print(Text) {
+	Printer.print("SubClass printing: " + Text);
+    }
+
+    useThisAsPrinter() {
+        // call BaseClass.myMethod, pretending
+        // that this is a printer
+        myMethod(this);
+    }
+
+    needs Printer; // Lets have the real thing
+
+// Running SubClass.useThisAsPrinter will output:
+// "SubClass printing: BaseClass"</code></pre>
+			<h3 id="methods">Valid Methods in Wake <span class="label label-inverse">concise</span> <span class="label label-inverse">readable</span></h3>
+			<div class="alert alert-info">
+				Methods in wake can look strange at first. The changes are simple and make your APIs read like sentences.
+			</div>
+			<p>In java, a detailed method signature may look like <code>addExaminerToContractWithMedicalCompany(Examiner examiner, MedicalCompany company)</code>. We decided we can do better. In wake you could rewrite that method as <code>add( Examiner )ToContractWith( MedicalCompany )</code>. Here are some examples:</p>
+			<span class="label label-info">Wake</span>
+			<pre><code class="wake"
+>every MethodExample is:
+    ReturnType -- methodWithReturn() {}
+    methodWithNoReturnValue() {}
+    abstractMethodWithNoImplementation();
+    methodWithArgument(Int) {}
+    methodWithArgument(@this Int) {}
+    methodWithArgument(Int @here) {}
+    methodWith(Int)ArgumentAnd(Text)Argument() {}</code></pre>
 		</div>
-		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script src="bootstrap/js/bootstrap.min.js"></script>
 	</body>
 </html>
