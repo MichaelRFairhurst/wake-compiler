@@ -19,6 +19,10 @@ hljs.LANGUAGES.wake = {
   c: [
     {
       cN: 'decorator',
+      b: '{[a-zA-Z]+}'
+    },
+    {
+      cN: 'decorator',
       b: '@[a-zA-Z]+'
     },
     {
@@ -28,6 +32,10 @@ hljs.LANGUAGES.wake = {
     {
       cN: 'string',
       b: '"', e: '"'
+    },
+    {
+      cN: 'string',
+      b: "'", e: "'"
     },
     {
       cN: 'number',
@@ -90,7 +98,7 @@ $(function() {
 	$(window).resize(resize);
 
 	$('.opennav button, .mynavbar').click(function() {
-		if(mobile);
+		if(!mobile) return;
 		menuopen = !menuopen;
 		showhideMobileMenu();
 	});
@@ -99,52 +107,52 @@ $(function() {
 		</script>
 		<style type="text/css">
 @media only screen and (max-width: 800px) {
-	
+
 	/* Force table to not be like tables anymore */
-	table, 
-	thead, 
-	tbody, 
-	th, 
-	td, 
-	tr { 
-		display: block; 
+	table,
+	thead,
+	tbody,
+	th,
+	td,
+	tr {
+		display: block;
 	}
 	th {
 		display: none;
 	}
- 
+
 	/* Hide table headers (but not display: none;, for accessibility) */
-	thead tr { 
+	thead tr {
 		position: absolute;
 		top: -9999px;
 		left: -9999px;
 	}
- 
+
 	tr { border: 1px solid #ccc; }
- 
-	td { 
+
+	td {
 		/* Behave  like a "row" */
 		border: none;
-		border-bottom: 1px solid #eee; 
+		border-bottom: 1px solid #eee;
 		position: relative;
-		padding-left: 50%; 
+		padding-left: 50%;
 		white-space: normal;
 		text-align:left;
 	}
- 
-	td:before { 
+
+	td:before {
 		/* Now like a table header */
 		position: absolute;
 		/* Top/left values mimic padding */
 		top: 6px;
 		left: 6px;
-		width: 45%; 
-		padding-right: 10px; 
+		width: 45%;
+		padding-right: 10px;
 		white-space: nowrap;
 		text-align:left;
 		font-weight: bold;
 	}
- 
+
 	/*
 	Label the data
 	*/
@@ -155,8 +163,9 @@ $(function() {
 	z-index: 200;
 	padding: 15px;
 	width: 240px;
-	height: 100%;
-	overflow-y: hidden;
+	bottom: 0px;
+	overflow-x: hidden;
+	overflow-y: auto;
 	background: rgb(255,255,255); /* Old browsers */
 	background: -moz-linear-gradient(-45deg,  rgba(255,255,255,1) 0%, rgba(243,243,243,1) 50%, rgba(237,237,237,1) 51%, rgba(255,255,255,1) 100%); /* FF3.6+ */
 	background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(50%,rgba(243,243,243,1)), color-stop(51%,rgba(237,237,237,1)), color-stop(100%,rgba(255,255,255,1))); /* Chrome,Safari4+ */
@@ -232,20 +241,41 @@ span.goodcode {
 	</head>
 	<body>
 		<div class="mynavbar">
+				<div class="btn-group" style="width: 100%">
+					<a class="btn btn-block dropdown-toggle" data-toggle="dropdown" href="#">
+						Try Wake Now
+						<span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu">
+						<li><a href="https://github.com/MichaelRFairhurst/wake-compiler">View on Github</a></li>
+						<li><a href="TryWake.php">Try it Online</a></li>
+					</ul>
+				</div>
+			<hr />
 			<ul class="nav nav-tabs nav-stacked">
 				<li><a href="#intro">Wake</a></li>
 				<li><a href="#codeinto">Quick Code Introduction</a></li>
 				<li><a href="#new">New ideas in Wake</a></li>
 				<li><a href="#removals">What we removed</a></li>
-				<li><a href="#trywake">Try wake online</a></li>
+				<li><a href="#trywake">Try Wake online</a></li>
 				<li><a href="#variables">Variables</a></li>
 				<li><a href="#typevariables">- Types as Variables</a></li>
 				<li><a href="#aliases">- Aliased Variables</a></li>
 				<li><a href="#shadowing">- Shadowing Types</a></li>
 				<li><a href="#declarations">- Declaring Variables</a></li>
 				<li><a href="#classes">Classes</a></li>
+				<li><a href="#dependencies">- Dependencies</a></li>
+				<li><a href="#properties">- Properties</a></li>
+				<li><a href="#inheritance">- Inheritance</a></li>
 				<li><a href="#methods">Methods</a></li>
+				<li><a href="#invoking">- Invoking Methods</a></li>
+				<li><a href="#overloading">- Overloading Methods</a></li>
 				<li><a href="#provisions">Provisions</a></li>
+				<li><a href="#plainprovisions">- Plain Provisions</a></li>
+				<li><a href="#specializedprovisions">- Specialized Provisions</a></li>
+				<li><a href="#primitiveprovisions">- Providing Primitive Values</a></li>
+				<li><a href="#ctorprovisions">- Constructor Provisions</a></li>
+				<li><a href="#behavioralprovisions">- Behavioral Provisions</a></li>
 				<li><a href="#entry">Program entry points</a></li>
 			</ul>
 		</div>
@@ -257,10 +287,10 @@ span.goodcode {
 					Wake is a fast, expressive, typesafe language that gives you testability from the ground up.
 				</p>
 			</div>
-			<p>Throughout the docs, we'll show you how we've made the language <span class="label label-inverse">testable</span>, <span class="label label-inverse">flexible</span>, <span class="label label-inverse">readable</span>, <span class="label label-inverse">concise</span>, and <span class="label label-inverse">safe</span>.
+			<p>Throughout the docs, we'll show you how we've made the language <span class="label label-inverse">testable</span>, <span class="label label-inverse">flexible</span>, <span class="label label-inverse">readable</span>, <span class="label label-inverse">concise</span>, and <span class="label label-inverse">safe</span>.</p>
 			<hr />
 			<h1 id="codeinto">Quick Code Introduction</h1>
-			<p>We'll compare wake to both java and javascript. You'll see friendly classes, clean code, and intuitive type safety.</p>
+			<p>We'll compare Wake to both java and javascript. You'll see friendly classes, clean code, and intuitive type safety.</p>
 			<p>or you can <b>jump straight in:</b></p>
 			<ul>
 				<li><a href="#variables">How variables work</a></li>
@@ -355,7 +385,7 @@ span.goodcode {
 				</div>
 			</div>
 			<hr />
-			<h1 id="new">New ideas in wake</h1>
+			<h1 id="new">New ideas in Wake</h1>
 			<p>We've both created and borrowed some cutting edge ideas.</p>
 
 			<div class="row">
@@ -411,10 +441,10 @@ span.goodcode {
 					<h4>Compilation targets as a language feature</h4><span class="label label-inverse">flexible</span>
 				</div>
 				<div class="span5">
-					<br /><blockquote>A goal of wake is to compile into anything -- .net, java, javascript, and assembly</blockquote>
+					<br /><blockquote>A goal of Wake is to compile into anything -- .net, java, javascript, and assembly</blockquote>
 				</div>
 				<div class="span4">
-					<br /><div class="alert alert-success">This makes wake libraries usable in every one of your projects.</div>
+					<br /><div class="alert alert-success">This makes Wake libraries usable in every one of your projects.</div>
 				</div>
 			</div>
 
@@ -453,7 +483,7 @@ span.goodcode {
 				<tr>
 					<td><b>Interface/extension distinction</b></td>
 					<td><div class="alert alert-error">A common best practice is to create an interface for every class, even before its used, resulting in junk code and extra boilerplate.</div></td>
-					<td><span class="label label-success">FIXED</span> In wake you can use any class as an interface, making everything driven by APIs without any additional code.</td>
+					<td><span class="label label-success">FIXED</span> In Wake you can use any class as an interface, making everything driven by APIs without any additional code.</td>
 				</tr>
 				<tr>
 					<td><b>Abstract classes</b></td>
@@ -481,7 +511,7 @@ span.goodcode {
 			<hr />
 
 			<h1 id="variables">Making The Most Of Wake Variables</h1>
-			<div class="alert alert-success">Variables in wake come in three forms, all with the goal of meaningful names in minimal keystrokes.</div>
+			<div class="alert alert-success">Variables in Wake come in three forms, all with the goal of meaningful names in minimal keystrokes.</div>
 			<h3 id="typevariables">1. Typenames as variables <span class="label label-inverse">concise</span> <span class="label label-inverse">readable</span></h3>
 			<p>Since we got rid of static methods, we can save you from repeating yourself meaninglessly in domain-driven code.</p>
 			<div class="row">
@@ -490,18 +520,54 @@ span.goodcode {
 					<pre><code class="wake"
 >every Person is:
 
-    // Choose to call it an ID and say its an int,
-    // or just say its an Int.
-    needs Int;
+    needs <span class="goodcode" title="You can tell the compiler its an int called ID, or, when you want, simply call it an Int.">Int</span>;
 
     Int -- getId() {
-        return Int;
+        return <span class="goodcode" title="Here we use our Int ID, that we simply chose to call 'Int.'">Int</span>;
     }
 
-    // Save yourself writing it twice, and you get
-    // the benefit of knowing Person is a Person.
-    Truth -- isSameAs(Person) {
-        return getId() == Person.getId();
+    Truth -- isSameAs(<span class="goodcode" title="Save yourself writing 'Person' twice, and you get the benefit of <i>knowing</i> that Person is a Person.">Person</span>) {
+        return getId() == <span class="goodcode" title="Clear, concise, and the programmer knows the type as well as the compiler.">Person</span>.getId();
+    }</code></pre>
+				</div>
+				<div class="span6">
+					<span class="label label-important">Java</span>
+					<pre><code class="java"
+>class Person {
+
+    private <span class="badcode" title="Here we must say its an int, and even though that is often enough to make it unique, we must also name it.">int id</span>;
+
+    public Person(int <span class="badcode" title="Here we have made a useless name to explain that this is not the same Int as the property. The programmer juggles what this means and determines it is a useless distinction.">myid</span>) {
+        id = myid;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public bool isSameAs(<span class="badcode" title="Here we write this out twice for no good reason, or we name it something else when we only truly care that this variable is a Person.">Person person</span>) {
+        return getId() == <span class="badcode" title="This looks almost exactly like a static method call, meaning descriptive variable names can actually create confusion.">person</span>.getId();
+    }
+}</code></pre>
+				</div>
+			</div>
+			<h3 id="aliases">2. Aliasing <span class="label label-inverse">readable</span> <span class="label label-inverse">safe</span></h3>
+			<p>In our previous example, calling a person's ID <code>Int</code> is a bit ambiguous. When a type isn't meaningful for a context, use aliases.</p>
+			<p>To aid the compiler, we must write <code>@</code> as a hint that its not a type. But luckily, it turns out that the same idea is useful to humans as well.</p>
+			<div class="row">
+				<div class="span6">
+					<span class="label label-info">Wake</span>
+					<pre><code class="wake"
+>every Person is:
+
+    needs Int <span class="goodcode" title="Here we give our Int a name.">@id</span>;
+
+    Int -- getId() {
+        return <span class="goodcode" title="Here we use our Int by its alias, @id. We know that it is not a typename.">@id</span>
+    }
+
+    setIdThenSave(<span class="goodcode" title="You can precede variables with aliases.">@newid Int</span>, <span class="goodcode" title="You can also precede variables by their type.">Truth @recursively</span>) {
+        ...
     }</code></pre>
 				</div>
 				<div class="span6">
@@ -519,53 +585,7 @@ span.goodcode {
         return id;
     }
 
-    // Either name your argument 'person' and blur
-    // the lines between static &amp; member calls,
-    // or make up a name when you really, truly
-    // only care that its a person.
-    public bool isSameAs(Person person) {
-        return getId() == person.getId();
-    }
-}</code></pre>
-				</div>
-			</div>
-			<h3 id="aliases">2. Aliasing <span class="label label-inverse">readable</span> <span class="label label-inverse">safe</span></h3>
-			<p>In our previous example, calling a person's ID <code>Int</code> is a bit ambiguous. When a type isn't meaningful for a context, use aliases.</p>
-			<p>To aid the compiler, we must write <code>@</code> as a hint that its not a type. But luckily, it turns out that the same idea is useful to humans as well.</p>
-			<div class="row">
-				<div class="span6">
-					<span class="label label-info">Wake</span>
-					<pre><code class="wake"
->every Person is:
-
-    // Give your int a name
-    needs Int @id;
-
-    Int -- getId() {
-        // Use your int by name
-        return @id
-    }
-
-    // Precede by type or by alias, as you wish
-    setIdThenSave(@newid Int, Truth @recursively) { ... }</code></pre>
-				</div>
-				<div class="span6">
-					<span class="label label-important">Java</span>
-					<pre><code class="java"
->class Person {
-
-    private int id;
-
-    public Person(int myid) {
-        id = myid;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    // Requiring type first can make APIs less readable
-    public void setIdThenSave(int id, bool recursively) {
+    public void setIdThenSave(<span class="badcode" title="Sometimes functions read better with types first or second, but you have no choice.">int id</span>, bool recursively) {
         //...
     }
 }</code></pre>
@@ -580,10 +600,8 @@ span.goodcode {
 
     needs Int;
 
-    // All we really care about here is
-    // that Int and $Int are different numbers
-    Int -- setToNotGreaterThan($Int) {
-        if(Int &gt; $Int) Int = $Int;
+    Int -- setToNotGreaterThan(<span class="goodcode" title="Here, all we really care about is that Int and $Int are different variables; we don't force you to come up with a unique name.">$Int</span>) {
+        if(Int &gt; <span class="goodcode" title="While this can be confusing, this is a usage of $Int the argument rather than Int the property. We let you decide when its appropriate, such as short statements and algorithms.">$Int</span>) Int = $Int;
     }</code></pre>
 			<h3 id="declarations">Declaring variables <span class="label label-inverse">concise</span> <span class="label label-inverse">safe</span></h3>
 			<p>All these variable names are usable in declarations when preceded with <code>:</code>, or when in properties</p>
@@ -591,67 +609,56 @@ span.goodcode {
 			<pre><code class="wake"
 >every DeclarationExample is:
 
-    // Properties
-    with Int @a = 4;
+    <span class="goodcode" title="Here we define an object property.">with Int @a = 4;</span>
     with @an Int = 4;
     with $Int = 4;
 
-    // Dependencies
-    needs @another Int, $$Int, Int @again;
+    <span class="goodcode" title="Here we define dependencies.">needs @another Int, $$Int, Int @again;</span>
 
-    // Variables in methods
     declareThem() {
-        :Int @local = 4;
+        <span class="goodcode" title="Here we define variables within a method.">:Int @local = 4;</span>
         :@second Int = 4;
         :$$$Int = 5;
-        :Int = 3; // Compiler error!
-        // redefinining variables is not allowed
+        <span class="badcode" title="Compiler error! In Wake you cannot redefine variables.">:Int = 3</span>;
     }</code></pre>
 
 			<hr />
-			<h1 id="classes">Classes in wake <span class="label label-inverse">concise</span> <span class="label label-inverse">readable</span></h1>
+			<h1 id="classes">Classes in Wake <span class="label label-inverse">concise</span> <span class="label label-inverse">readable</span></h1>
 			<p>Wake is a truly Object Oriented language, and should come with few surprises here.</p>
-			<p>In wake, everything is an object. A class declaration begins with the keyword <code>every</code> as seen below. Within that definition can be properties, dependencies, a constructor, methods, and provisions.</p>
+			<p>In Wake, everything is an object. A class declaration begins with the keyword <code>every</code> as seen below. Within that definition can be properties, dependencies, a constructor, methods, and provisions.</p>
 			<span class="label label-info">Wake</span>
 			<pre><code class="wake"
 >every MyClass is:
-    //Properties
-    with public Text @name;
-    with Text @ssn; // default private
+    <span class="goodcode" title="Here we have an object property.">with public Text @name;</span>
+    <span class="goodcode" title="Properties default to private.">with Text @ssn;</span>
 
-    //Dependencies - the object cannot exist
-    //without something first providing these
-    needs Int @id, Printer then {
-        // or 'needs nothing then'
-        // ctor body
+    needs <span class="goodcode" title="Here we have dependencies. The object cannot exist without them.">Int @id, Printer</span> then {
+        <span class="goodcode" title="You can declare 'needs nothing then {...} to have a constructor with no dependencies.">// constructor body</span>
     }
 
-    //Provisions - see the section on them
-    provides Text{URL} &lt;- 'http://www.wakelang.com';
+    <span class="goodcode" title="Provisions; the details are in their own section.">provides Text{URL} &lt;- 'http://www.wakelang.com';</span>
 
-    //Methods
-    Text -- getSSNLastFour() {
+    <span class="goodcode" title="A method declaration.">Text -- getSSNLastFour() {</span>
         // ...
     }</code></pre>
-			<h3>Dependencies <span class="label label-inverse">concise</span> <span class="label label-inverse">testable</span></h3>
+			<h3 id="dependencies">Dependencies <span class="label label-inverse">concise</span> <span class="label label-inverse">testable</span></h3>
 			<p>When an object is constructed, first the dependencies are all resolved by means of provisions. This means that you can simply say your object <code>needs Printer</code>, and you will always have one.</p>
-			<h3>Properties <span class="label label-inverse">flexible</span></h3>
+			<h3 id="properties">Properties <span class="label label-inverse">flexible</span></h3>
 			<div class="alert alert-error">Calling a method which uses an uninitialized property during this property initialization process currently results in undefined behavior. In the future the compiler will prevent you from doing so, or local methods might be disallowed entirely.</div>
 			<p>At this point the object has its dependencies met, and each property is evaluated in order. Each assigned value can be a full expression referencing needs or already-evaluated properties. Then the constructor is called.</p>
 			<span class="label label-info">Wake</span>
 			<pre><code class="wake"
 >every IncrementingProperties is:
     needs Int @starter, Printer {
-        Printer.print(@sum); // By now @sum exists
+        Printer.print(<span class="goodcode" title="By now, the property @sum exists.">@sum</span>);
     }
 
-    // These are evaluated after we get @starter
-    with Int @plusone = @starter + 1;
-    with Int @plustwo = @plusone + 1;
-    with Int @plusthree = @plusthree + 1;
-    with Int @sum = @starter + @plusone + @plustwo + @plusthree;</code></pre>
+    with Int <span class="goodcode" title="When @plusone is declared, @starter already exists since its a dependency.">@plusone = @starter + 1;</span>
+    with Int <span class="goodcode" title="Since @plustwo is declared after @plusone, we can use it to evaluate its initial value.">@plustwo = @plusone + 1;</span>
+    with Int <span class="goodcode" title="Since @plustwo is declared after @plusone, we can use it to evaluate its initial value.">@plusthree = @plusthree + 1;</span>
+    with Int <span class="goodcode" title="As the last property, we can use every other property to define its initial value.">@sum = @starter + @plusone + @plustwo + @plusthree;</span></code></pre>
 			<h3 id="inheritance">Inheritance <span class="label label-inverse">testable</span> <span class="label label-inverse">flexible</span> <span class="label label-inverse">readable</span></h3>
-			<p class="alert">Inheritance is not fully implemented just yet. But this is how it will work.</p>
+			<p class="alert alert-error">Inheritance is not fully implemented just yet. But this is how it will work.</p>
 			<p>Every class can be inherited with or without keeping behavior, with the keywords <code>a</code>/<code>an</code>, and <code>capable</code>. Usually in small projects the point of inheritance is to copy the code from that class, however, it is not always desirable. If you use <code>capable</code>, you must rewrite the methods of your child class. These actions are called <i>extending</i> vs <i>implementing</i>.</p>
 			<p>An additional value to implementing classes with <code>capable</code> instead of extending classes with <code>a</code>/<code>an</code>, is that you can implement multiple classes even though you can only extend one class.</p>
 			<p>An object which extends or implements another class can be used as that subclass elsewhere in the code.</p>
@@ -663,32 +670,24 @@ span.goodcode {
         Printer.print("BaseClass");
     }
 
-// extend baseclass, implement Printer
-every SubClass (a BaseClass, capable Printer) is:
-    // this means we can use BaseClass.myMethod()
+every SubClass (<span class="goodcode" title="Subclass extends BaseClass, meaning SubClass can use myMethod off of BaseClass.">a BaseClass</span>, <span class="goodcode" title="We implement Printer, meaning we must declare the method print().">capable Printer</span>) is:
 
-    // and must define Printer.print()
-    print(Text) {
-	Printer.print("SubClass printing: " + Text);
+    needs Printer;
+
+    <span class="goodcode" title="Here we define Printer.print() so we can be a capable printer.">print(Text)</span> {
+       Printer.print("SubClass printing: " + Text);
     }
 
-    useThisAsPrinter() {
-        // call BaseClass.myMethod, pretending
-        // that this is a printer
-        myMethod(this);
-    }
-
-    needs Printer; // Lets have the real thing
-
-// Running SubClass.useThisAsPrinter will output:
-// "SubClass printing: BaseClass"</code></pre>
+    <span class="goodcode" title="Running this method will output &quot;SubClass printing: BaseClass&quot;">useThisAsPrinter</span>() {
+        <span class="goodcode" title="Use BaseClass.myMethod since SubClass is a BaseClass. You can also do this with parent.myMethod()">myMethod</span>(<span class="goodcode" title="We can send 'this' as the argument of myMethod(Printer) since SubClass is a capable Printer.">this</span>);
+    }</code></pre>
 
 			<hr />
 			<h1 id="methods">Valid Methods in Wake <span class="label label-inverse">concise</span> <span class="label label-inverse">readable</span></h1>
 			<div class="alert alert-info">
-				Methods in wake can look strange at first. The changes are simple and make your APIs read like sentences.
+				Methods in Wake can look strange at first. The changes are simple and make your APIs read like sentences.
 			</div>
-			<p>In java, a detailed method signature may look like <code>addExaminerToContractWithMedicalCompany(Examiner examiner, MedicalCompany company)</code>. We decided we can do better. In wake you could rewrite that method as <code>add( Examiner )ToContractWith( MedicalCompany )</code>. Here are some examples:</p>
+			<p>In java, a detailed method signature may look like <code>addExaminerToContractWithMedicalCompany(Examiner examiner, MedicalCompany company)</code>. We decided we can do better. In Wake you could rewrite that method as <code>add( Examiner )ToContractWith( MedicalCompany )</code>. Here are some examples:</p>
 			<span class="label label-info">Wake</span>
 			<pre><code class="wake"
 >every MethodExample is:
@@ -699,6 +698,92 @@ every SubClass (a BaseClass, capable Printer) is:
     methodWithArgument(@this Int) {}
     methodWithArgument(Int @here) {}
     methodWith(Int)ArgumentAnd(Text)Argument() {}</code></pre>
+			<h3 id="invoking">Invoking Methods <span class="label label-inverse">readable</span></h3>
+			<p>Invoking methods (that is, calling a method's code on a particular object and argument set) looks almost exactly like defining one.</p>
+			<pre><code class="wake"
+>every MethodInvoker is:
+
+    methodWithArgument(Truth) {
+        <span class="goodcode" title="Now that we've defined methodWithArgument(Truth), we invoke it inside a Wake statement.">methodWithArgument(!Truth);</span>
+    }</code></pre>
+		<h3 id="overloading">Method Overloading <span class="label label-inverse">readable</span> <span class="label label-inverse">concise</span></h3>
+		<div class="alert alert-error">Method overloading can create more confusion than it prevents. It may be removed from Wake in the future.</div>
+		<p>Method overloading exists in C++ and java. A method can accept differently typed objects, and have different behaviors for each. Used properly, it creates shorter method names that focus on behavior rather than implementation.</p>
+		<pre><code class="wake"
+>every CrossTypeComparator is:
+    Truth -- compare( Text )And( $Text ) {
+        <span class="goodcode" title="Here we can write code that returns if a Text comes alphabetically before another.">//...</span>
+    }
+
+    Truth -- compare( Int )And( $Int ) {
+        <span class="goodcode" title="Here we can write code that returns if an Int is less than the other.">return Int &lt; $Int;</span>
+    }</code></pre>
+		<hr />
+		<h1 id="provisions">Provisions <span class="label label-inverse">flexible</span> <span class="label label-inverse">testable</span> <span class="label label-inverse">typesafe</span></h1>
+		<p>Testability was a huge goal of Wake's design. We were inspired by dependency injection frameworks to make a faster, typesafe means of binding dependencies to behavior. What we came up with is provisions.</p>
+		<p>What in other languages may be a static method, or a call to <code>new</code> another object, or a helper function call, instead is fetched from a provider. Here we look at how.</p>
+		<pre><code class="wake"
+>every UsesProvider is:
+
+    needs <span class="goodcode" title="This dependency will be provided by whatever provision made our UsesProvider object.">Provider</span>, <span class="goodcode" title="We can mark provisions with labels matched at compile time.">DependentClass{Special}</span> then {
+        <span class="goodcode" title="This is just syntactic sugar, it takes a Printer from our provider and assigns it to the variable Printer.">:Printer &lt;- Provider;</span>
+        <span class="goodcode" title="Here a printer is fetched from our Provider object, but not assigned to a variable.">:(Printer &lt;- Provider)</span>.print(Text);
+    }</code></pre>
+		<h3 id="plainprovisions">Defining Plain Provisions <span class="label label-inverse">concise</span> <span class="label label-inverse">typesafe</span></h3>
+		<p>A plain provision simply marks that your class can provide a type. The compiler will ensure that you can provide all of that type's dependencies as well.</p>
+		<pre><code class="wake"
+>every Provider is:
+
+    provides <span class="goodcode" title="As in UsesProvider above, this means anywhere you have a Provider you can get a Printer from it.">Printer</span>, OtherClass;</code></pre>
+
+		<h3 id="subtypeprovisions">Providing Subtypes <span class="label label-inverse">flexible</span> <span class="label label-inverse">testable</span> <span class="label label-inverse">typesafe</span></h3>
+		<p>The point of provisions is to make all dependencies or created objects be replacable with subtypes, at the creator's discretion. This is called Inversion Of Control. You can provide mock objects for testing, easily swap logging methods, and more.</p>
+		<pre><code class="wake"
+>every Provider is:
+
+    provides Printer &lt;- <span class="goodcode" title="Easily suppress output of your application by swapping one class">DisabledPrinter</span>;</code></pre>
+
+		<h3 id="specializedprovisions">Specialized Provisions <span class="label label-inverse">typesafe</span> <span class="label label-inverse">flexible</span></h3>
+		<p>Sometimes a classname is not detailed enough to know your dependencies will be properly provided. Using what we call Specialties, you can provide and require specific objects.</p>
+		<pre><code class="wake"
+>every DBProvider is:
+
+    provides
+        <span class="goodcode" title="This is just a plain provision.">User</span>,
+        <span class="goodcode" title="Here we provide a connection by name Default. Note that this is still a plain provision. This is required since we provide User.">DBConnection{Default}</span>;
+
+every User is:
+
+    needs <span class="goodcode" title="Here we require the Default DBConnection.">DBConnection{Default}</span>;</code></pre>
+		<h3 id="primitiveprovisions">Primitive Provisions <span class="label label-inverse">typesafe</span></h3>
+		<p>Primitive provisions cannot be plain, since the compiler can't tell you what Int to provide. Additionally, they must be specified, to ensure you get the right value. These are the equivalent of constants in Wake, and bind directly to a primitive value.</p>
+		<pre><code class="wake"
+>every PrimitiveProvider is:
+
+    provides Text{Username} &lt;- "MyUser", Int{Port} &lt;- 3306;</code></pre>
+
+		<h3 id="ctorprovisions">Constructor Provisions <span class="label label-inverse">flexible</span></h3>
+		<p>We call this constructor provision since it most closely resembles constructors in languages like Java. However, it is merely a way of matching provisions to specific dependencies.</p>
+		<pre><code class="wake"
+>every Provider is:
+    provides
+        Int{Port} &lt;- 3307,
+        Text{Username} &lt;- "Test",
+        DBConnection{Test} &lt;- DBConnection(<span class="goodcode" title="If a DBConnection accepts any Text username, we can create specialized connections by letting the provider find the right Username and Port.">Text{Username}, Int{Port}</span>),
+        <span class="goodcode" title="Constructor provisions do not require specialization.">User</span> &lt;- <span class="goodcode" title="Constructor provisions can be used with subtype provision simultaneously.">TestUser</span>(DBConnection{Test});</code></pre>
+		<h3 id="behavioralprovisions">Behavioral Provisions <span class="label label-inverse">flexible</span></h3>
+		<div class="alert alert-error">These are not supported quite just yet.</div>
+		<p>Provisions can be treated as a code body with a return type where necessary. Note that the end result must be a provision; however it can be used to configure objects or provide different objects conditionally, or create a singleton.</p>
+		<pre><code class="wake"
+>every Provider is:
+
+    needs <span class="goodcode" title="Require an unconfigured session.">Session</span> then {
+        Session.<span class="goodcode" title="Configure our Session so it is provided properly">loadFile</span>(<span class="goodcode" title="Retrieve our own SessionFile path">:(Text{SessionFile} &lt; this)</span>);
+    }
+
+    provides
+        Text{SessionFile},
+        Session &lt;- <span class="goodcode" title="This, together with our constructor, guarantees that we only distribute one session, and that its been properly loaded.">{ return Session; }</span>;</code></pre>
 		</div>
 		<script src="bootstrap/js/bootstrap.min.js"></script>
 	</body>
