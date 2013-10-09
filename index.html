@@ -49,10 +49,114 @@ hljs.LANGUAGES.wake = {
 }
 hljs.initHighlightingOnLoad();
 
-$(function() { setTimeout(function() {$('.goodcode, .badcode').popover({trigger: 'hover', container: 'body', placement: 'top'}); },10);});
+$(function() {
+	setTimeout(function() {$('.goodcode, .badcode').popover({trigger: 'hover', container: 'body', placement: 'top'}); },10);
+
+	var menuopen = false;
+	var mobile = false;
+	function showhideMobileMenu() {
+		$('.content').css({
+			paddingTop: '30px',
+			left: '0px'
+		});
+		$('.mynavbar').css({
+			width: '75%',
+			top: '25px',
+			display: menuopen? 'block' : 'none'
+		});
+		$('.opennav').show();
+	}
+	var resize = function() {
+		if($(window).width() < 900) {
+			mobile = true;
+			showhideMobileMenu();
+		} else {
+			mobile = false;
+			$('.content').css({
+				left: '270px',
+				paddingTop: '5px'
+			});
+			$('.mynavbar').css({
+				display: 'block',
+				width: '240px',
+				top: '0px',
+			});
+			$('.opennav').hide();
+		}
+	};
+
+	resize();
+
+	$(window).resize(resize);
+
+	$('.opennav button, .mynavbar').click(function() {
+		if(mobile);
+		menuopen = !menuopen;
+		showhideMobileMenu();
+	});
+});
+
 		</script>
 		<style type="text/css">
+@media only screen and (max-width: 800px) {
+	
+	/* Force table to not be like tables anymore */
+	table, 
+	thead, 
+	tbody, 
+	th, 
+	td, 
+	tr { 
+		display: block; 
+	}
+	th {
+		display: none;
+	}
+ 
+	/* Hide table headers (but not display: none;, for accessibility) */
+	thead tr { 
+		position: absolute;
+		top: -9999px;
+		left: -9999px;
+	}
+ 
+	tr { border: 1px solid #ccc; }
+ 
+	td { 
+		/* Behave  like a "row" */
+		border: none;
+		border-bottom: 1px solid #eee; 
+		position: relative;
+		padding-left: 50%; 
+		white-space: normal;
+		text-align:left;
+	}
+ 
+	td:before { 
+		/* Now like a table header */
+		position: absolute;
+		/* Top/left values mimic padding */
+		top: 6px;
+		left: 6px;
+		width: 45%; 
+		padding-right: 10px; 
+		white-space: nowrap;
+		text-align:left;
+		font-weight: bold;
+	}
+ 
+	/*
+	Label the data
+	*/
+	td:before { content: attr(data-title); }
+}
 .mynavbar {
+	position: fixed;
+	z-index: 200;
+	padding: 15px;
+	width: 240px;
+	height: 100%;
+	overflow-y: hidden;
 	background: rgb(255,255,255); /* Old browsers */
 	background: -moz-linear-gradient(-45deg,  rgba(255,255,255,1) 0%, rgba(243,243,243,1) 50%, rgba(237,237,237,1) 51%, rgba(255,255,255,1) 100%); /* FF3.6+ */
 	background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(50%,rgba(243,243,243,1)), color-stop(51%,rgba(237,237,237,1)), color-stop(100%,rgba(255,255,255,1))); /* Chrome,Safari4+ */
@@ -63,8 +167,29 @@ $(function() { setTimeout(function() {$('.goodcode, .badcode').popover({trigger:
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
 }
 
+.opennav {
+	z-index: 500;
+	display: none;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	width: 100%;
+	height: 25px;
+	text-align: right;
+	background: rgba(033, 022, 022, 0.8);
+}
+
 .content {
 	background: url(/bg.png);
+	overflow-x: hidden;
+	overflow-y: auto;
+	max-width: 100%;
+	left: 270px;
+	right: 0px;
+	top: 0px;
+	bottom: 0px;
+	padding: 10px;
+	position: fixed;
 }
 
 span.bold {
@@ -83,16 +208,17 @@ span.decorator {
 span.badcode {
 	text-shadow: 1px 1px 1px rgba(253, 253, 253, 0.37);
 	font-weight: bold;
-	border: 2px solid rgba(128, 0, 0, .7);
-	background: #E6A4A4;
+	border-bottom: 2px dotted rgba(128, 0, 0, .7);
+	/*background: #E6A4A4;*/
+	background: rgba(230, 164, 164, 0.44);
 	border-radius: 4px;
 }
 
 span.goodcode {
-	text-shadow: 1px 1px 1px rgba(253, 253, 253, 0.37);
-	font-weight: bold;
-	border: 2px solid rgba(0, 128, 0, .7);
-	background: #DDFFFF;
+	/*text-shadow: 1px 1px 1px rgba(253, 253, 253, 0.37);
+	font-weight: bold;*/
+	border-bottom: 2px dotted rgba(0, 128, 0, .7);
+	/*background: #DDFFFF;*/
 	border-radius: 4px;
 }
 
@@ -105,7 +231,7 @@ span.goodcode {
 		</style>
 	</head>
 	<body>
-		<div style="position: fixed; padding: 15px; width: 240px; height: 100%;" class="mynavbar">
+		<div class="mynavbar">
 			<ul class="nav nav-tabs nav-stacked">
 				<li><a href="#intro">Wake</a></li>
 				<li><a href="#codeinto">Quick Code Introduction</a></li>
@@ -123,7 +249,8 @@ span.goodcode {
 				<li><a href="#entry">Program entry points</a></li>
 			</ul>
 		</div>
-		<div class="content" style="left: 270px; right:0px; top:0px; bottom:0px; padding: 10px; position:absolute; overflow: auto" data-spy="scroll" data-target=".mynavbar">
+		<div class="opennav"><button class="btn btn-inverse btn-small"><i class="icon-align-justify icon-white"></i></button></div>
+		<div class="content" data-spy="scroll" data-target=".mynavbar">
 			<div class="hero-unit" id="intro">
 				<h1>Wake The Language</h1>
 				<p>
@@ -142,7 +269,7 @@ span.goodcode {
 				<li><a href="#provisions">Tell me about provisions</a></li>
 				<li><a href="#entry">Where does the program begin?</a></li>
 			</ul>
-			<div class="row-fluid">
+			<div class="row">
 				<div class="span6">
 					<h3>Wake</h3>
 <div class="alert alert-success">Code as concise as javascript, with inheritance and typesafety and more</div>
@@ -357,7 +484,7 @@ span.goodcode {
 			<div class="alert alert-success">Variables in wake come in three forms, all with the goal of meaningful names in minimal keystrokes.</div>
 			<h3 id="typevariables">1. Typenames as variables <span class="label label-inverse">concise</span> <span class="label label-inverse">readable</span></h3>
 			<p>Since we got rid of static methods, we can save you from repeating yourself meaninglessly in domain-driven code.</p>
-			<div class="row-fluid">
+			<div class="row">
 				<div class="span6">
 					<span class="label label-info">Wake</span>
 					<pre><code class="wake"
@@ -405,7 +532,7 @@ span.goodcode {
 			<h3 id="aliases">2. Aliasing <span class="label label-inverse">readable</span> <span class="label label-inverse">safe</span></h3>
 			<p>In our previous example, calling a person's ID <code>Int</code> is a bit ambiguous. When a type isn't meaningful for a context, use aliases.</p>
 			<p>To aid the compiler, we must write <code>@</code> as a hint that its not a type. But luckily, it turns out that the same idea is useful to humans as well.</p>
-			<div class="row-fluid">
+			<div class="row">
 				<div class="span6">
 					<span class="label label-info">Wake</span>
 					<pre><code class="wake"
