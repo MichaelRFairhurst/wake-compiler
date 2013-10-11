@@ -22,7 +22,7 @@ void CodeGenerator::generate(Node* tree) {
 			file << "(function() {";
 			{
 				// StdLib lol
-				file << "Printer=function(){this.a=function(a){console.log(a);}};";
+				file << "Printer=function(){var a='';this.a=function(b){if(process&&process.stdout&&process.stdout.write)process.stdout.write(''+b);else b+=''+a;};this.b=this.a;this.c=function(b){if(process&&process.stdout&&process.stdout.write)return this.a(b+'\\n');console.log(a + b);a='';};this.d=this.c;};System=function(){this.a=function(a){if(process)process.exit(a);}};";
 				int i;
 				for(i = 0; i < tree->subnodes; i++)
 					generate(tree->node_data.nodes[i]);
@@ -89,7 +89,7 @@ void CodeGenerator::generate(Node* tree) {
 
 				file << "){";
 				generate(tree->node_data.nodes[1]);
-				generate(tree->node_data.nodes[2]);
+				if(tree->subnodes > 2) generate(tree->node_data.nodes[2]);
 				file << "};";
 				table.popScope();
 			}
@@ -106,6 +106,10 @@ void CodeGenerator::generate(Node* tree) {
 					file << "this." << objects->find(classname)->getProvisionAddress(*it) << "()";
 				}
 				file << ");";
+			} else {
+				if(tree->node_data.nodes[1]->node_type == NT_TYPEDATA) {
+					file << "return this." << objects->find(classname)->getProvisionAddress(tree->node_data.nodes[1]->node_data.type) << "();";
+				}
 			}
 			file << "};";
 			break;
@@ -172,10 +176,14 @@ void CodeGenerator::generate(Node* tree) {
 
 				file << "." << objects->find(methodclass)->getAddress(name) << "(";
 
+				int argnum = 0;
 				int i;
 				for(i = 1; i < tree->node_data.nodes[1]->subnodes; i += 2) {
-					if(i != 1) file << ",";
-					generate(tree->node_data.nodes[1]->node_data.nodes[i]);
+					for(int b = 0; b < tree->node_data.nodes[1]->node_data.nodes[i]->subnodes; b++) {
+						if(argnum != 0) file << ",";
+						generate(tree->node_data.nodes[1]->node_data.nodes[i]->node_data.nodes[b]);
+						argnum++;
+					}
 				}
 
 				file << ")";
@@ -192,14 +200,27 @@ void CodeGenerator::generate(Node* tree) {
 			break;
 
 		case NT_PROPERTY:
+			table.add(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type);
+			file << "var ";
+			generate(tree->node_data.nodes[0]);
+			file << ";";
+			break;
+
 		case NT_DECLARATION:
 			table.add(tree->node_data.nodes[0]->node_data.type);
 			file << "var ";
 			// FALL THROUGH
 		case NT_ASSIGNMENT:
-			file << table.getAddress(tree->node_data.nodes[0]->node_data.type) << "=";
+			{
+				Node* assignednode = tree->node_data.nodes[0];
+				if(assignednode->node_type == NT_ALIAS) {
+					file << table.getAddress(string("@") + assignednode->node_data.string) << "=";
+				} else {
+					file << table.getAddress(assignednode->node_data.type) << "=";
+				}
+			}
 			generate(tree->node_data.nodes[1]);
-			file << ";";
+			//if(tree->node_type == NT_DECLARATION) file << ";";
 			break;
 
 		case NT_TYPEDATA:

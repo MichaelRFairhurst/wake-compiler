@@ -1,3 +1,5 @@
+SHELL=/bin/bash
+
 OPT=-O3
 #OPT=-O0 -g
 FLAGS=-Iinclude -Igen
@@ -32,14 +34,23 @@ GENOBJS=$(addprefix bin/gen/, $(GENNAMES:.c=.o))
 TESTNAMES=CompilerTests.cpp ObjectSymbolTableTest.cpp ParseTreeTraverserTest.cpp ScopeSymbolTableTest.cpp TypeAnalyzerTest.cpp PropertySymbolTableTest.cpp AddressAllocatorTest.cpp OptionsParserTest.cpp
 TESTOBJS=$(addprefix bin/tests/, $(TESTNAMES:.cpp=.o))
 
-wake: bin/wake
-buggered: loo wake
+chatup: bin/finaltest.js
+	@echo
+	@echo -- CHAT UP THE BIN
+	@echo
+	time node bin/finaltest.js
+	@echo
+	@echo -- BLINDING BUILD
+	@echo
+
+buggered: loo chatup
 
 chivvy: bin/test
 	@echo
 	@echo -- FANNY AROUND
 	@echo
 	./bin/test -p yes
+	touch chivvy
 	@echo
 	@echo -- NOW CHIVVY ALONG
 	@echo
@@ -50,8 +61,11 @@ bin/test: $(CPPOBJS) $(GENOBJS) $(COBJS) $(TESTOBJS)
 bin/wake: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o chivvy
 	$(CPP) $(OPT) $(CPPOBJS) bin/cpp/wake.o $(GENOBJS) $(COBJS) -o bin/wake -lfl
 	@echo
-	@echo -- CHEERIO, MATE
+	@echo -- CHEERIO
 	@echo
+
+bin/finaltest.js: bin/wake finaltest.wk
+	time wake finaltest.wk -o bin/finaltest.js
 
 bin/gen/%.o: gen/%.c
 	$(CC) $(OPT) -c $< -o $@

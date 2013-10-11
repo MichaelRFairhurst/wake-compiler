@@ -1,0 +1,444 @@
+#>
+# Test suite entry point
+##
+every Main is:
+
+	needs System, AssertsTest, Printer, MathTest, BooleanLogicTest, InheritanceTest;
+
+	provides Printer, Asserts;
+
+	with Truth @passed = True;
+	with Int @totalcount = 0;
+	with Int @passedcount = 0;
+
+	Run(Truth @result) {
+		@totalcount = @totalcount + 1;
+		if(!@result) {
+			@passed = False;
+			Printer.print("F");
+		} else {
+			Printer.print(".");
+			@passedcount = @passedcount + 1;
+		}
+	}
+
+	Main() {
+		Run(AssertsTest.testAssertTextMatches());
+		Run(AssertsTest.testAssertTextNotMatches());
+		Run(AssertsTest.testAssertIntMatches());
+		Run(AssertsTest.testAssertIntNotMatches());
+		Run(AssertsTest.testAssertTrueMatches());
+		Run(AssertsTest.testAssertTrueNotMatches());
+		Run(AssertsTest.testAssertFalseMatches());
+		Run(AssertsTest.testAssertFalseNotMatches());
+		Run(AssertsTest.testAssertTrue());
+		Run(AssertsTest.testAssertNotTrue());
+		Run(AssertsTest.testAssertFalse());
+		Run(AssertsTest.testAssertNotFalse());
+		Run(MathTest.testAddition(:(Asserts <- this)));
+		Run(MathTest.testSubtraction(:(Asserts <- this)));
+		Run(MathTest.testDivision(:(Asserts <- this)));
+		Run(MathTest.testMultiplication(:(Asserts <- this)));
+		Run(MathTest.testOrderOfOperations(:(Asserts <- this)));
+		Run(BooleanLogicTest.testOr(:(Asserts <- this)));
+		Run(BooleanLogicTest.testAnd(:(Asserts <- this)));
+		Run(BooleanLogicTest.testOrderOfOperations(:(Asserts <- this)));
+		Run(InheritanceTest.testParentGetsParentClassName(:(Asserts <- this)));
+		Run(InheritanceTest.testChildGetsChildClassName(:(Asserts <- this)));
+		Run(InheritanceTest.testChildFromProviderGetsChildClassName(:(Asserts <- this)));
+		Run(InheritanceTest.testChildAfterCastGetsChildClassName(:(Asserts <- this)));
+
+		Printer.printLine("");
+		Printer.printLine("");
+		Printer.print("TOTAL:  ");
+		Printer.printLine(@totalcount);
+		Printer.print("PASSED: ");
+		Printer.printLine(@passedcount);
+		Printer.print("FAILED: ");
+		Printer.printLine(@totalcount - @passedcount);
+		if(@passed) System.exit(0);
+		else {
+			System.exit(1);
+		}
+	}
+
+#>
+# This takes assertions and prints failures, and then reports
+# at test end if something went wrong. At that point it should
+# be discarded and you should use a new one.
+##
+every Asserts is:
+
+	needs Printer;
+
+	with Truth @hasfailed = False;
+	with Text @lasttext = "";
+
+	that(Truth @actual)Equals(Truth) {
+		if(Truth != @actual) {
+			@lasttext = "Failed asserting that ";
+			if(Truth) @lasttext = @lasttext + "True is equal to @actual False";
+			else @lasttext = @lasttext + "False is equal to @actual True";
+			Printer.printLine(@lasttext);
+			@hasfailed = True;
+		}
+	}
+
+	isFalse(Truth) {
+		that(Truth)Equals(False);
+	}
+
+	isTrue(Truth) {
+		that(Truth)Equals(True);
+	}
+
+	that(Int @actual)Equals(Int) {
+		if(Int != @actual) {
+			@lasttext = "Failed asserting that two numbers are equal" ;
+			Printer.printLine(@lasttext);
+			Printer.printLine(Int);
+			Printer.printLine(@actual);
+			@hasfailed = True;
+		}
+	}
+
+	that(Text @actual)Equals(Text) {
+		if(Text != @actual) {
+			@lasttext = "Failed asserting that " + Text + " is equal to @actual " + @actual;
+			Printer.printLine(@lasttext);
+			@hasfailed = True;
+		}
+	}
+
+	#>
+	# This is only for until we can provide and then
+	# watch an ErrorCounter instance.
+	##
+	Truth -- haveFailed() {
+		return @hasfailed;
+	}
+
+	#>
+	# This is only for until we can provide and then
+	# watch an ErrorCounter instance.
+	##
+	Truth -- allPassed() {
+		return !@hasfailed;
+	}
+
+	#>
+	# This will only exist until MockPrinter can be
+	# watched after being provided.
+	##
+	Text -- getLastText() {
+		return @lasttext;
+	}
+
+#>
+# This will make assertions once providers can
+# track it.
+##
+every MockPrinter (capable Printer) is:
+
+	#>
+	# Must be defined but all noops
+	##
+	print(Int) {}
+	print(Text) {}
+	printLine(Int) {}
+	printLine(Text) {}
+
+#>
+# Test our asserts object, with manually
+# printed and returned errors.
+##
+every AssertsTest is:
+
+	provides Printer <- MockPrinter, Asserts, MockPrinter;
+
+	needs Printer;
+
+	Truth -- testAssertTextMatches() {
+		:Asserts <- this;
+		Asserts.that("abcdefg aha!")Equals("abcdefg aha!");
+		if(!Asserts.haveFailed()) return True;
+		Printer.printLine("Failed asserting that text is equal to itself");
+		return False;
+	}
+
+	Truth -- testAssertTextNotMatches() {
+		:Asserts <- this;
+		Asserts.that("George Bush")Equals("Barack Obama");
+
+		if(Asserts.haveFailed()) {
+			if(Asserts.getLastText() == "Failed asserting that Barack Obama is equal to @actual George Bush") return True;
+
+			Printer.printLine("Incorrect failure text!");
+			Printer.printLine("Real text is " + Asserts.getLastText());
+			return False;
+		}
+
+		Printer.printLine("Failed asserting that different text is different");
+		return False;
+	}
+
+	Truth -- testAssertIntMatches() {
+		:Asserts <- this;
+		Asserts.that(10)Equals(10);
+		if(!Asserts.haveFailed()) return True;
+		Printer.printLine("Failed asserting that ints are equal to themselves");
+		return False;
+	}
+
+	Truth -- testAssertIntNotMatches() {
+		:Asserts <- this;
+		Asserts.that(45)Equals(54);
+
+		if(Asserts.haveFailed()) return True;
+
+		Printer.printLine("Failed asserting that different 54 and 45 are different");
+		return False;
+	}
+
+	Truth -- testAssertTrueMatches() {
+		:Asserts <- this;
+		Asserts.that(True)Equals(True);
+		if(!Asserts.haveFailed()) return True;
+		Printer.printLine("Failed asserting that True that True");
+		return False;
+	}
+
+	Truth -- testAssertTrueNotMatches() {
+		:Asserts <- this;
+		Asserts.that(True)Equals(False);
+
+		if(Asserts.haveFailed()) {
+			if(Asserts.getLastText() == "Failed asserting that False is equal to @actual True") return True;
+
+			Printer.printLine("Incorrect failure text!");
+			Printer.printLine("Real text is " + Asserts.getLastText());
+			return False;
+		}
+
+		Printer.printLine("Failed asserting that False is not equal to True");
+		return False;
+	}
+
+	Truth -- testAssertFalseMatches() {
+		:Asserts <- this;
+		Asserts.that(False)Equals(False);
+		if(!Asserts.haveFailed()) return True;
+		Printer.printLine("Failed asserting that False that False");
+		return False;
+	}
+
+	Truth -- testAssertFalseNotMatches() {
+		:Asserts <- this;
+		Asserts.that(False)Equals(True);
+
+		if(Asserts.haveFailed()) {
+			if(Asserts.getLastText() == "Failed asserting that True is equal to @actual False") return True;
+
+			Printer.printLine("Incorrect failure text!");
+			Printer.printLine("Real text is " + Asserts.getLastText());
+			return False;
+		}
+
+		Printer.printLine("Failed asserting that True is not equal to False");
+		return False;
+	}
+
+	Truth -- testAssertTrue() {
+		:Asserts <- this;
+		Asserts.isTrue(True);
+		if(!Asserts.haveFailed()) return True;
+		Printer.printLine("Failed asserting that True is True");
+		return False;
+	}
+
+	Truth -- testAssertNotTrue() {
+		:Asserts <- this;
+		Asserts.isTrue(False);
+
+		if(Asserts.haveFailed()) {
+			if(Asserts.getLastText() == "Failed asserting that True is equal to @actual False") return True;
+
+			Printer.printLine("Incorrect failure text!");
+			Printer.printLine("Real text is " + Asserts.getLastText());
+			return False;
+		}
+
+		Printer.printLine("Failed asserting that False is not True");
+		return False;
+	}
+
+	Truth -- testAssertFalse() {
+		:Asserts <- this;
+		Asserts.isFalse(False);
+		if(!Asserts.haveFailed()) return True;
+		Printer.printLine("Failed asserting that False is False");
+		return False;
+	}
+
+	Truth -- testAssertNotFalse() {
+		:Asserts <- this;
+		Asserts.isFalse(True);
+
+		if(Asserts.haveFailed()) {
+			if(Asserts.getLastText() == "Failed asserting that False is equal to @actual True") return True;
+
+			Printer.printLine("Incorrect failure text!");
+			Printer.printLine("Real text is " + Asserts.getLastText());
+			return False;
+		}
+
+		Printer.printLine("Failed asserting that True is not False");
+		return False;
+	}
+
+every MathTest is:
+
+	Truth -- testAddition(Asserts) {
+		Asserts.that(2 + 2)Equals(4);
+		Asserts.that(6 + 2)Equals(8);
+		Asserts.that(60000 + 20000)Equals(80000);
+		Asserts.that(0-20 + 14)Equals(0-6);
+		return Asserts.allPassed();
+	}
+
+	Truth -- testSubtraction(Asserts) {
+		Asserts.that(6 - 2)Equals(4);
+		Asserts.that(42 - 2)Equals(40);
+		Asserts.that(40 - 80)Equals(0-40);
+		return Asserts.allPassed();
+	}
+
+	Truth -- testDivision(Asserts) {
+		Asserts.that(8 / 4)Equals(2);
+		Asserts.that(10 / 4)Equals(2.5);
+		Asserts.that(10 / 20)Equals(0.5);
+		return Asserts.allPassed();
+	}
+
+	Truth -- testMultiplication(Asserts) {
+		Asserts.that(3 * 5)Equals(15);
+		Asserts.that(8 * 16)Equals(128);
+		Asserts.that(8 * 1)Equals(8);
+		Asserts.that(8 * 0.5)Equals(4);
+		return Asserts.allPassed();
+	}
+
+	Truth -- testOrderOfOperations(Asserts) {
+		Asserts.that(5 + 6 * 2)Equals(17);
+		Asserts.that(5 - 6 * 2)Equals(0-7);
+		Asserts.that(5 + 6 / 2)Equals(8);
+		Asserts.that(5 - 6 / 2)Equals(2);
+		Asserts.that(6 * 2 + 5)Equals(17);
+		Asserts.that(6 * 2 - 5)Equals(7);
+		Asserts.that(6 / 2 + 5)Equals(8);
+		Asserts.that(6 / 2 - 5)Equals(0-2);
+		return Asserts.allPassed();
+	}
+
+every BooleanLogicTest is:
+
+	Truth -- testNot(Asserts) {
+		Asserts.that(!True)Equals(False);
+		Asserts.that(!False)Equals(True);
+		return Asserts.allPassed();
+	}
+
+	Truth -- testOr(Asserts) {
+		Asserts.that(True  || True)Equals(True);
+		Asserts.that(False || True)Equals(True);
+		Asserts.that(True  || False)Equals(True);
+		Asserts.that(False || False)Equals(False);
+		return Asserts.allPassed();
+	}
+
+	Truth -- testAnd(Asserts) {
+		Asserts.that(True  && True)Equals(True);
+		Asserts.that(False && True)Equals(False);
+		Asserts.that(True  && False)Equals(False);
+		Asserts.that(False && False)Equals(False);
+		return Asserts.allPassed();
+	}
+
+	Truth -- testOrderOfOperations(Asserts) {
+		Asserts.that(True  && True  || False)Equals(True);
+		Asserts.that(True  && False || False)Equals(False);
+		Asserts.that(False && True  || False)Equals(False);
+		Asserts.that(False && False || False)Equals(False);
+		Asserts.that(True  && True  || True)Equals(True);
+		Asserts.that(True  && False || True)Equals(True);
+		Asserts.that(False && True  || True)Equals(True);
+		Asserts.that(False && False || True)Equals(True);
+		Asserts.that(True  || True  && False)Equals(True);
+		Asserts.that(True  || False && False)Equals(True);
+		Asserts.that(False || True  && False)Equals(False);
+		Asserts.that(False || False && False)Equals(False);
+		Asserts.that(True  || True  && True)Equals(True);
+		Asserts.that(True  || False && True)Equals(True);
+		Asserts.that(False || True  && True)Equals(True);
+		Asserts.that(False || False && True)Equals(False);
+		Asserts.that(!True  && True  )Equals(False);
+		Asserts.that(True   && !True )Equals(False);
+		Asserts.that(!True  && False )Equals(False);
+		Asserts.that(True   && !False)Equals(True);
+		Asserts.that(!False && True  )Equals(True);
+		Asserts.that(False  && !True )Equals(False);
+		Asserts.that(!False && False )Equals(False);
+		Asserts.that(False  && !False)Equals(False);
+		Asserts.that(!True  || True  )Equals(True);
+		Asserts.that(True   || !True )Equals(True);
+		Asserts.that(!True  || False )Equals(False);
+		Asserts.that(True   || !False)Equals(True);
+		Asserts.that(!False || True  )Equals(True);
+		Asserts.that(False  || !True )Equals(False);
+		Asserts.that(!False || False )Equals(True);
+		Asserts.that(False  || !False)Equals(True);
+		return Asserts.allPassed();
+	}
+
+every InheritanceTestParent is:
+
+	Text -- getClassName() {
+		return "InheritanceTestParent";
+	}
+
+every InheritanceTestChild (an InheritanceTestParent) is:
+
+	Text -- getClassName() {
+		return "InheritanceTestChild";
+	}
+
+every InheritanceTest is:
+
+	provides
+		InheritanceTestParent,
+		InheritanceTestChild,
+		InheritanceTestParent{SubClassed} <- InheritanceTestChild;
+
+	Truth -- testParentGetsParentClassName(Asserts) {
+		:InheritanceTestParent <- this;
+		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestParent");
+		return Asserts.allPassed();
+	}
+
+	Truth -- testChildGetsChildClassName(Asserts) {
+		:InheritanceTestChild <- this;
+		Asserts.that(InheritanceTestChild.getClassName())Equals("InheritanceTestChild");
+		return Asserts.allPassed();
+	}
+
+	Truth -- testChildFromProviderGetsChildClassName(Asserts) {
+		:InheritanceTestParent = (:(InheritanceTestParent{SubClassed} <- this));
+		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestChild");
+		return Asserts.allPassed();
+	}
+
+	Truth -- testChildAfterCastGetsChildClassName(Asserts) {
+		:InheritanceTestParent = (:(InheritanceTestChild <- this));
+		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestChild");
+		return Asserts.allPassed();
+	}

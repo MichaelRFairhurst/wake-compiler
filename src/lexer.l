@@ -22,9 +22,10 @@ char* keepInner(char* in);
 ##						count();
 <ST_BLOCKCOMMENT>##		count(); BEGIN(INITIAL);
 <ST_BLOCKCOMMENT>.		count();
+<ST_BLOCKCOMMENT>\n		line++; column = 1;
 
 <INITIAL>\/\/			count(); BEGIN(ST_LINECOMMENT);
-<ST_LINECOMMENT>\n		count(); BEGIN(INITIAL);
+<ST_LINECOMMENT>\n		line++; column = 1; BEGIN(INITIAL);
 <ST_LINECOMMENT>.		count();
 
 #[a-zA-Z0-9]+			count();
