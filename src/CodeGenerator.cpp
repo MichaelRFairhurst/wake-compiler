@@ -22,7 +22,7 @@ void CodeGenerator::generate(Node* tree) {
 			file << "(function() {";
 			{
 				// StdLib lol
-				file << "Printer=function(){var a='';this.a=function(b){if(process&&process.stdout&&process.stdout.write)process.stdout.write(''+b);else b+=''+a;};this.b=this.a;this.c=function(b){if(process&&process.stdout&&process.stdout.write)return this.a(b+'\\n');console.log(a + b);a='';};this.d=this.c;};System=function(){this.a=function(a){if(process)process.exit(a);}};";
+				file << "var printqueue='';Printer=function(){this.a=function(b){if(typeof process!='undefined'&&typeof process.stdout!='undefined'&&typeof process.stdout.write!='undefined')process.stdout.write(''+b);else printqueue+=''+b;};this.b=this.a;this.c=function(b){if(typeof process!='undefined'&&typeof process.stdout!='undefined'&&typeof process.stdout.write!='undefined')return this.a(b+'\\n');console.log(printqueue+b);printqueue='';};this.d=this.c;};System=function(){this.a=function(a){if(typeof process!='undefined'&&typeof process.exit!='undefined')process.exit(a);}};";
 				int i;
 				for(i = 0; i < tree->subnodes; i++)
 					generate(tree->node_data.nodes[i]);
