@@ -28,6 +28,7 @@ class TypeChecker {
 		Type* typeCheck(Node* n);
 		bool exhaustiveReturns(Node* n);
 		void flowAnalysis(Node* n, bool breakable, bool caseable, bool continuable);
+		bool isValidLValue(Node* N);
 
 		MethodSignatureParseTreeTraverser* methodanalyzer;
 		ErrorTracker* errors;

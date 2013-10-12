@@ -29,6 +29,7 @@ enum SemanticErrorCode {
 	MISMATCHED_INJECTION,			// provides HasThreeArgs <- HasThreeArgs(Only, Two);
 	MULTIPLE_PROVISION_DEFINITION,	// provides AClass, AClass;
 	CIRCULAR_DEPENDENCIES,			// A needs B, B needs C, C needs A, shit for everyone. Or A needs A.
+	INVALID_ASSIGNMENT,				// @it.doIt() = 5; is pushing it, bro
 };
 
 class SemanticError {

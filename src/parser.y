@@ -109,7 +109,7 @@ classbody:
 	;
 
 classprop:
-	PROVIDES provisions ';'												{ $$ = $2; }
+	PROVIDES provisions ';'														{ $$ = $2; }
 	| ctor																		{ $$ = $1; }
 	| method																	{ $$ = $1; }
 	| property																	{ $$ = $1; }
@@ -122,7 +122,6 @@ property:
 
 property_value:
 	type_declarable																{ $$ = MakeNodeFromType($1); }
-	/* The below rule has a shift/reduce that prevents 'with Int = @a = @b;' */
 	| type_declarable '=' value													{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1), $3); }
 	| type_declarable retrievalargs value										{	Node* retrieval = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1), $2);
 																					AddSubNode(retrieval, $3);
@@ -130,8 +129,8 @@ property_value:
 	;
 
 provisions:
-	provisions ',' provision									{ $$ = $1; AddSubNode($$, $3); }
-	| provision															{ $$ = MakeOneBranchNode(NT_PROVISIONS, $1); }
+	provisions ',' provision													{ $$ = $1; AddSubNode($$, $3); }
+	| provision																	{ $$ = MakeOneBranchNode(NT_PROVISIONS, $1); }
 	;
 
 provision:
@@ -446,13 +445,7 @@ expression_conditional:
 
 expression:
 	expression_conditional														{ $$ = $1; }
-	| assignable '=' expression													{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, $1, $3); }
-	;
-
-assignable:
-	type_valued																	{ $$ = $1; }
-	| IDENTIFIER '[' expression ']'												{ $$ = MakeTwoBranchNode(NT_ARRAY_ACCESS, MakeNodeFromString(NT_CLASSNAME, $1), $3); }
-	| ALIAS '[' expression ']'													{ $$ = MakeTwoBranchNode(NT_ARRAY_ACCESS, MakeNodeFromString(NT_ALIAS, $1), $3); }
+	| value '=' expression														{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, $1, $3); }
 	;
 
 retrieval:

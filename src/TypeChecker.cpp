@@ -369,16 +369,28 @@ Type* TypeChecker::typeCheck(Node* tree) {
 
 			case NT_ASSIGNMENT:
 				{
-					ret = typeCheck(tree->node_data.nodes[0]);
-					Type* assignment = typeCheck(tree->node_data.nodes[1]);
-					//TODO This leaks for invalid property names since analyzer throws a SymbolNotFoundException
-					if(!analyzer->isASubtypeOfB(assignment, ret)) {
-						expectedstring = analyzer->getNameForType(ret);
-						erroneousstring = analyzer->getNameForType(assignment);
-						freeType(assignment);
-						throw string("Invalid type in assignment");
+					if(!isValidLValue(tree->node_data.nodes[0])) {
+						errors->addError(new SemanticError(INVALID_ASSIGNMENT, "", tree));
+					} else {
+						ret = typeCheck(tree->node_data.nodes[0]);
+						if(tree->node_data.nodes[1]->node_type == NT_ARRAY_DECLARATION && tree->node_data.nodes[1]->subnodes == 0) {
+							if(!ret->arrayed) {
+								expectedstring = analyzer->getNameForType(ret);
+								erroneousstring = "[]";
+								throw string("Invalid type in assignment");
+							}
+						} else {
+							Type* assignment = typeCheck(tree->node_data.nodes[1]);
+							//TODO This leaks for invalid property names since analyzer throws a SymbolNotFoundException
+							if(!analyzer->isASubtypeOfB(assignment, ret)) {
+								expectedstring = analyzer->getNameForType(ret);
+								erroneousstring = analyzer->getNameForType(assignment);
+								freeType(assignment);
+								throw string("Invalid type in assignment");
+							}
+							freeType(assignment);
+						}
 					}
-					freeType(assignment);
 				}
 				break;
 
@@ -506,13 +518,21 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				}
 				break;
 
+			case NT_ARRAY_DECLARATION:
+				// These should all be specially handled in the other cases
+				if(!tree->subnodes) {
+					errors->addError(new SemanticError(TYPE_ERROR, "Invalid use of empty list", tree));
+				} else {
+					errors->addError(new SemanticError(WARNING, "Not supported yet", tree));
+				}
+				break;
+
 			// Ignoring these for now
 			case NT_SWITCH:
 			case NT_CURRIED:
 			case NT_INCREMENT:
 			case NT_DECREMENT:
 			// These require a common-ancestor function
-			case NT_ARRAY_DECLARATION:
 			case NT_IF_THEN_ELSE:
 			// These I will implement soon(ish)
 			case NT_MEMBER_ACCESS:
@@ -557,4 +577,15 @@ Type* TypeChecker::typeCheck(Node* tree) {
 	}
 
 	return ret;
+}
+
+bool TypeChecker::isValidLValue(Node* n) {
+	switch(n->node_type) {
+		case NT_ALIAS: return true;
+		case NT_TYPEDATA: return true;
+		case NT_ARRAY_ACCESS:
+			return isValidLValue(n->node_data.nodes[0]);
+		default:
+			return false;
+	}
 }

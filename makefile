@@ -1,7 +1,7 @@
 SHELL=/bin/bash
 
-#OPT=-O3
-OPT=-O0 -g
+OPT=-O3
+#OPT=-O0 -g
 FLAGS=-Iinclude -Igen
 CC=cc $(FLAGS)
 CPP=g++ $(FLAGS)
@@ -40,7 +40,7 @@ chatup: bin/finaltest.js
 	@echo
 	time node bin/finaltest.js
 	@echo
-	@echo -- BLINDING BUILD
+	@echo -- BLINDING BUILD, MATE
 	@echo
 
 buggered: loo chatup

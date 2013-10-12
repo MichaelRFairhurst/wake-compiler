@@ -12,7 +12,6 @@ void CodeGenerator::generate(Node* tree) {
 		case NT_CASE:
 		case NT_DEFAULTCASE:
 		case NT_IF_THEN_ELSE:
-		case NT_ARRAY_DECLARATION:
 		case NT_INCREMENT:
 		case NT_DECREMENT:
 		case NT_SWITCH:
@@ -213,14 +212,26 @@ void CodeGenerator::generate(Node* tree) {
 		case NT_ASSIGNMENT:
 			{
 				Node* assignednode = tree->node_data.nodes[0];
-				if(assignednode->node_type == NT_ALIAS) {
-					file << table.getAddress(string("@") + assignednode->node_data.string) << "=";
-				} else {
-					file << table.getAddress(assignednode->node_data.type) << "=";
-				}
+				//if(assignednode->node_type == NT_ALIAS) {
+					//file << table.getAddress(string("@") + assignednode->node_data.string) << "=";
+				//} else {
+					//file << table.getAddress(assignednode->node_data.type) << "=";
+				//}
+				generate(assignednode);
+				file << "=";
 			}
 			generate(tree->node_data.nodes[1]);
 			//if(tree->node_type == NT_DECLARATION) file << ";";
+			break;
+
+		case NT_ARRAY_DECLARATION:
+			file << "[";
+			if(tree->subnodes) {
+				int i;
+				for(i = 0; i < tree->subnodes; i++)
+					generate(tree->node_data.nodes[i]);
+			}
+			file << "]";
 			break;
 
 		case NT_TYPEDATA:

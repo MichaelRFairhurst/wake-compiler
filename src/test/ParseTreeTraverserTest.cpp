@@ -1224,4 +1224,134 @@ PTT_TEST_CASE(
 	PTT_EXPECT(CIRCULAR_DEPENDENCIES)
 );
 
+PTT_TEST_CASE(
+	DeclareArraysInvalidValues,
+	"every MyClass is:					\n\
+		assignMeToArray() {				\n\
+			:MyClass[] = this;			\n\
+		}								\n\
+		assignNumberToClassArray() {	\n\
+			:MyClass[] = 4;				\n\
+		}								\n\
+		assignTextToClassArray() {		\n\
+			:MyClass[] = 'test';		\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	DeclareEmptyArraysValid,
+	"every MyClass is:								\n\
+		declareEmptyClassArrayAndArrayArray() {		\n\
+			:MyClass[] = [];						\n\
+			:$MyClass[][] = [];						\n\
+		}											\n\
+		declareEmptyIntArrayAndArrayArray() {		\n\
+			:Int[] = [];							\n\
+			:$Int[][] = [];							\n\
+		}											\n\
+		declareEmptyStringArrayAndArrayArray() {	\n\
+			:Text[] = [];							\n\
+			:$Text[][] = [];						\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	AssignIndexesWrongTypes,
+	"every MyClass is:										\n\
+		with MyClass[] = [];								\n\
+		with Int[] = [];									\n\
+		with Text[] = [];									\n\
+		with Truth[] = [];									\n\
+		assignIntToMyClasses() { MyClass[1] = 5; }			\n\
+		assignTextToMyClasses() { MyClass[1] = 'test'; }	\n\
+		assignTruthToMyClasses() { MyClass[1] = True; }		\n\
+		assignMyClassToInts() { Int[1] = this; }			\n\
+		assignTextToInts() { Int[1] = 'test'; }				\n\
+		assignTruthToInts() { Int[1] = True; }				\n\
+		assignMyClassToTexts() { Text[1] = this; }			\n\
+		assignIntToTexts() { Text[1] = 4; }					\n\
+		assignTruthToTexts() { Text[1] = True; }			\n\
+		assignMyClassToTruths() { Truth[1] = this; }		\n\
+		assignIntToTruths() { Truth[1] = 4; }				\n\
+		assignTextToTruths() { Truth[1] = 'test'; }			\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	ValidEmptyArrayAssignments,
+	"every MyClass is:										\n\
+		with MyClass[][] = [];								\n\
+		with Int[][] = [];									\n\
+		with Text[][] = [];									\n\
+		with Truth[][] = [];								\n\
+		assignToMyClasses() { MyClass[][] = []; }			\n\
+		assignToMyClassesIndex() { MyClass[1] = []; }		\n\
+		assignToInts() { Int[][] = []; }					\n\
+		assignToIntsIndex() { Int[1] = []; }				\n\
+		assignToTexts() { Text[][] = []; }					\n\
+		assignToTextsIndex() { Text[1] = []; }				\n\
+		assignToTruths() { Truth[][] = []; }				\n\
+		assignToTruthsIndex() { Truth[1] = []; }			\n\
+	",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	InvalidEmptyArrayAssignments,
+	"every MyClass is:										\n\
+		with $Int = [];										\n\
+		with $Text = [];									\n\
+		with $MyClass = [];									\n\
+		with $Truth = [];									\n\
+		with Int[] = []; //valid							\n\
+		with Text[] = []; //valid							\n\
+		with Truth[] = []; //valid							\n\
+		with MyClass[] = []; //valid						\n\
+		assignToIntsIndex() { Int[1] = []; }				\n\
+		assignToTextsIndex() { Text[1] = []; }				\n\
+		assignToTruthsIndex() { Truth[1] = []; }			\n\
+		assignToMyClassesIndex() { MyClass[1] = []; }		\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	InvalidLeftHandAssignments,
+	"every MyClass is:						\n\
+		provides MyClass;					\n\
+		invalidAssignments() {				\n\
+			this = 5;						\n\
+			invalidAssignments() = 5;		\n\
+			this.invalidAssignments() = 5;	\n\
+			:(MyClass <- this) = 5;			\n\
+		}",
+	PTT_EXPECT(INVALID_ASSIGNMENT)
+	PTT_EXPECT(INVALID_ASSIGNMENT)
+	PTT_EXPECT(INVALID_ASSIGNMENT)
+	PTT_EXPECT(INVALID_ASSIGNMENT)
+);
+
 BOOST_AUTO_TEST_SUITE_END()

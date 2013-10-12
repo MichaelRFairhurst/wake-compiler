@@ -66,6 +66,9 @@ void SemanticErrorPrinter::print(SemanticError* e) {
 		case CIRCULAR_DEPENDENCIES:
 			cout << "Circular dependency formation";
 			break;
+		case INVALID_ASSIGNMENT:
+			cout << "Invalid assignment; you can only assign to variables and variable indices.";
+			break;
 		default:
 			cout << "bad error code provided";
 	}

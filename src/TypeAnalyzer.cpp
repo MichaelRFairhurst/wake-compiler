@@ -21,6 +21,7 @@ bool TypeAnalyzer::isASubtypeOfB(string a, string b) {
 }
 
 bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
+	if(a == NULL || b == NULL) return false;
 	if(a->arrayed != b->arrayed) return false;
 	if(a->type != b->type) return false;
 
