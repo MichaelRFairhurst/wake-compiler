@@ -3,7 +3,7 @@
 ##
 every Main is:
 
-	needs System, AssertsTest, Printer, MathTest, BooleanLogicTest, InheritanceTest;
+	needs System, AssertsTest, Printer, MathTest, BooleanLogicTest, InheritanceTest, ArrayTest;
 
 	provides Printer, Asserts;
 
@@ -47,6 +47,7 @@ every Main is:
 		Run(InheritanceTest.testChildGetsChildClassName(:(Asserts <- this)));
 		Run(InheritanceTest.testChildFromProviderGetsChildClassName(:(Asserts <- this)));
 		Run(InheritanceTest.testChildAfterCastGetsChildClassName(:(Asserts <- this)));
+		Run(ArrayTest.testSetArrayIndex(:(Asserts <- this)));
 
 		Printer.printLine("");
 		Printer.printLine("");
@@ -432,13 +433,22 @@ every InheritanceTest is:
 	}
 
 	Truth -- testChildFromProviderGetsChildClassName(Asserts) {
-		:InheritanceTestParent = (:(InheritanceTestParent{SubClassed} <- this));
+		:InheritanceTestParent = :(InheritanceTestParent{SubClassed} <- this);
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestChild");
 		return Asserts.allPassed();
 	}
 
 	Truth -- testChildAfterCastGetsChildClassName(Asserts) {
-		:InheritanceTestParent = (:(InheritanceTestChild <- this));
+		:InheritanceTestParent = :(InheritanceTestChild <- this);
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestChild");
+		return Asserts.allPassed();
+	}
+
+every ArrayTest is:
+
+	Truth -- testSetArrayIndex(Asserts) {
+		:Int[] = [];
+		Int[0] = 5;
+		Asserts.that(Int[0])Equals(5);
 		return Asserts.allPassed();
 	}

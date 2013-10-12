@@ -286,7 +286,7 @@ void CodeGenerator::generate(Node* tree) {
 		case NT_RETURN:
 			file << "return ";
 			if(tree->subnodes) generate(tree->node_data.nodes[0]);
-			file << ";";
+			//file << ";";
 			break;
 
 		case NT_INVERT:
@@ -378,7 +378,7 @@ void CodeGenerator::generate(Node* tree) {
 		case NT_AND:
 			file << "(";
 			generate(tree->node_data.nodes[0]);
-			file << "&&";
+			file << "&";
 			generate(tree->node_data.nodes[1]);
 			file << ")";
 			break;
@@ -386,13 +386,13 @@ void CodeGenerator::generate(Node* tree) {
 		case NT_OR:
 			file << "(";
 			generate(tree->node_data.nodes[0]);
-			file << "||";
+			file << "|";
 			generate(tree->node_data.nodes[1]);
 			file << ")";
 			break;
 
 		case NT_NUMBERLIT: file << tree->node_data.number; break;
-		case NT_TRUTHLIT: file << (tree->node_data.number ? "true" : "false"); break;
+		case NT_TRUTHLIT: file << (tree->node_data.number ? "1" : "0"); break;
 		case NT_STRINGLIT: file << '"'; file << tree->node_data.string; file << '"'; break;
 	}
 }

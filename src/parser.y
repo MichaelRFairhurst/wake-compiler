@@ -52,7 +52,7 @@ int yywrap()
 %token <number> TRUTH
 %token <number> SYM_SHADOW
 %token <number> SYM_ARRAYED
-%type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection injection_args provision provisions injection_arg ctor retrievabledeclarableargs value method block methodreturn methodnamesegments methodbody methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional type_valued property property_value retrievalargs retrieval objectable expression_cast
+%type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection injection_args provision provisions injection_arg ctor retrievabledeclarableargs value method block methodreturn methodnamesegments methodbody methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional type_valued property property_value retrievalargs retrieval objectable expression_cast assignable
 %type <type>  type_pure type_pure_arrayable type_declarable type_common type_lambda type_commonorlambda type_retrievable type_retrievabledeclarable
 %type <type_array> declarabletypes commonorlambdatypes
 %start file
@@ -295,9 +295,10 @@ value:
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
 	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
 	| TRUTH																		{ $$ = MakeNodeFromNumber(NT_TRUTHLIT, $1); }
+	| retrieval																	{ $$ = $1; }
 	| '(' expression ')'														{ $$ = $2; }
 	| '[' expressions ']'														{ $$ = MakeOneBranchNode(NT_ARRAY_DECLARATION, $2); }
-	| '[' ']'																	{ $$ = MakeEmptyNode(NT_ARRAY_DECLARATION); }
+	| SYM_ARRAYED																{ $$ = MakeEmptyNode(NT_ARRAY_DECLARATION); }
 	;
 
 objectable:
@@ -445,8 +446,13 @@ expression_conditional:
 
 expression:
 	expression_conditional														{ $$ = $1; }
-	| type_valued '=' expression												{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, $1, $3); }
-	| retrieval																	{ $$ = $1; }
+	| assignable '=' expression													{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, $1, $3); }
+	;
+
+assignable:
+	type_valued																	{ $$ = $1; }
+	| IDENTIFIER '[' expression ']'												{ $$ = MakeTwoBranchNode(NT_ARRAY_ACCESS, MakeNodeFromString(NT_CLASSNAME, $1), $3); }
+	| ALIAS '[' expression ']'													{ $$ = MakeTwoBranchNode(NT_ARRAY_ACCESS, MakeNodeFromString(NT_ALIAS, $1), $3); }
 	;
 
 retrieval:

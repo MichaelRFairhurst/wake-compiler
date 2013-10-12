@@ -435,6 +435,9 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(methodtable->getSymbolNameOf(&method_segments).c_str())));
 
 					ret = copyType(lambdatype->typedata.lambda.returntype);
+					freeType(subject);
+					for(vector<pair<string, TypeArray*> >::iterator it = method_segments.begin(); it != method_segments.end(); ++it)
+						freeTypeArray(it->second);
 				}
 				break;
 
@@ -442,14 +445,18 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				try {
 					Type* assignee = tree->node_data.nodes[0]->node_data.type;
 					objectsymtable->assertTypeIsValid(assignee);
-					Type* assignment = typeCheck(tree->node_data.nodes[1]);
-					if(!analyzer->isASubtypeOfB(assignment, assignee)) {
-						expectedstring = analyzer->getNameForType(assignee);
-						erroneousstring = analyzer->getNameForType(assignment);
+					if(assignee->arrayed && tree->node_data.nodes[1]->subnodes == 0 && tree->node_data.nodes[1]->node_type == NT_ARRAY_DECLARATION) {
+						// Nothing to do here but relax.
+					} else {
+						Type* assignment = typeCheck(tree->node_data.nodes[1]);
+						if(!analyzer->isASubtypeOfB(assignment, assignee)) {
+							expectedstring = analyzer->getNameForType(assignee);
+							erroneousstring = analyzer->getNameForType(assignment);
+							freeType(assignment);
+							throw string("Invalid value in declaration of variable");
+						}
 						freeType(assignment);
-						throw string("Invalid value in declaration of variable");
 					}
-					freeType(assignment);
 					scopesymtable->add(tree->node_data.nodes[0]->node_data.type);
 				} catch(SymbolNotFoundException* e) {
 					errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
@@ -476,23 +483,26 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				break;
 
 			case NT_RETRIEVAL:
-				try {
-					ret = copyType(tree->node_data.nodes[0]->node_data.type);
-					//TODO index 1 is the arguments
-					objectsymtable->assertTypeIsValid(ret);
-					Type* provider = typeCheck(tree->node_data.nodes[2]);
+				{
+					Type* provider;
 					try {
-						// TODO This does more work than we need to since it recurses
-						objectsymtable->getAnalyzer()->assertClassCanProvide(provider, ret);
-					} catch(SemanticError *e) {
-						e->token = tree;
-						errors->addError(e);
+						provider = typeCheck(tree->node_data.nodes[2]);
+						ret = copyType(tree->node_data.nodes[0]->node_data.type);
+						//TODO index 1 is the arguments
+						objectsymtable->assertTypeIsValid(ret);
+						try {
+							// TODO This does more work than we need to since it recurses
+							objectsymtable->getAnalyzer()->assertClassCanProvide(provider, ret);
+						} catch(SemanticError *e) {
+							e->token = tree;
+							errors->addError(e);
+						}
+						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(provider->typedata._class.classname)));
+					} catch(SymbolNotFoundException* e) {
+						errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
+						delete e;
 					}
-					AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(provider->typedata._class.classname)));
 					free(provider);
-				} catch(SymbolNotFoundException* e) {
-					errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
-					delete e;
 				}
 				break;
 
