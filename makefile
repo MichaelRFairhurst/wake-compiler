@@ -31,14 +31,16 @@ CNAMES=tree.c type.c
 COBJS=$(addprefix bin/c/, $(CNAMES:.c=.o))
 GENNAMES=lex.yy.c y.tab.c
 GENOBJS=$(addprefix bin/gen/, $(GENNAMES:.c=.o))
+TEST=true
 TESTNAMES=CompilerTests.cpp ObjectSymbolTableTest.cpp ParseTreeTraverserTest.cpp ScopeSymbolTableTest.cpp TypeAnalyzerTest.cpp PropertySymbolTableTest.cpp AddressAllocatorTest.cpp OptionsParserTest.cpp
 TESTOBJS=$(addprefix bin/tests/, $(TESTNAMES:.cpp=.o))
 
 chatup: bin/finaltest.js
 	@echo
 	@echo -- CHAT UP THE BIN
+	@echo -- add TEST=false to skip
 	@echo
-	time node bin/finaltest.js
+	if $(TEST) ; then time node bin/finaltest.js ; fi
 	@echo
 	@echo -- BLINDING BUILD, MATE
 	@echo
@@ -48,15 +50,17 @@ buggered: loo chatup
 chivvy: bin/test
 	@echo
 	@echo -- FANNY AROUND
+	@echo -- add TEST=false to skip
 	@echo
-	./bin/test -p yes
+	if $(TEST) ; then ./bin/test -p yes ; fi
 	touch chivvy
 	@echo
 	@echo -- NOW CHIVVY ALONG
 	@echo
 
 bin/test: $(CPPOBJS) $(GENOBJS) $(COBJS) $(TESTOBJS)
-	$(CPP) $(TESTOBJS) $(CPPOBJS) $(GENOBJS) $(COBJS) -o bin/test -lfl -lboost_unit_test_framework
+	@echo add TEST=false to skip
+	if $(TEST); then $(CPP) $(TESTOBJS) $(CPPOBJS) $(GENOBJS) $(COBJS) -o bin/test -lfl -lboost_unit_test_framework ; fi
 
 bin/wake: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o chivvy
 	$(CPP) $(OPT) $(CPPOBJS) bin/cpp/wake.o $(GENOBJS) $(COBJS) -o bin/wake -lfl
@@ -65,7 +69,7 @@ bin/wake: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o chivvy
 	@echo
 
 bin/finaltest.js: bin/wake finaltest.wk
-	time wake finaltest.wk -o bin/finaltest.js
+	time ./bin/wake finaltest.wk -o bin/finaltest.js
 
 bin/gen/%.o: gen/%.c
 	$(CC) $(OPT) -c $< -o $@
