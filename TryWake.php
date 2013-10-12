@@ -21,7 +21,7 @@ if($code) {
 <html>
 <body>
 <h1>Online Wake to Javascript compiler</h1>
-<form>
+<form method="POST">
 <textarea name="Code" cols="120" rows="15"><?php if($code): echo $code; else: ?>
 every Main is:
 
