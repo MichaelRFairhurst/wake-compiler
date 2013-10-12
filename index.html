@@ -263,6 +263,7 @@ span.goodcode {
 				<li><a href="#aliases">- Aliased Variables</a></li>
 				<li><a href="#shadowing">- Shadowing Types</a></li>
 				<li><a href="#declarations">- Declaring Variables</a></li>
+				<li><a href="#lists">- Using Lists</a></li>
 				<li><a href="#classes">Classes</a></li>
 				<li><a href="#dependencies">- Dependencies</a></li>
 				<li><a href="#properties">- Properties</a></li>
@@ -622,6 +623,20 @@ span.goodcode {
         <span class="badcode" title="Compiler error! In Wake you cannot redefine variables.">:Int = 3</span>;
     }</code></pre>
 
+			<h3 id="lists">Using Lists <span class="label label-inverse">typesafe</span></h3>
+			<div class="alert alert-error">
+				Until further releases, reading an unassigned list index results in undefined behavior, like in C/C++. Later on it will throw exceptions.
+			</div>
+			<p>Lists (called Arrays in many other languages) are a way of storing sets of a particular type. They are incredibly useful.</p>
+			<pre><code class="wake"
+>every ListUsage is:
+
+    methodWithListArgument(<span class="goodcode" title="Here we accept a list of Ints">Int[]</span>) {
+        <span class="goodcode" title="Set the first Int in the list.">Int[0] = 5;</span>
+        <span class="goodcode" title="Declare an empty list of Ints again.">:$Int[] = [];</span>
+        <span class="goodcode" title="Declare a list of Ints again, except with three starting values.">:$$Int[] = [1, 2, 3];</span>
+        <span class="goodcode" title="Declare a list lists of Ints, containing our lists of ints.">:@combined $Int[][] = [Int[], $Int[], $$Int[]];</span>
+    }</code></pre>
 			<hr />
 			<h1 id="classes">Classes in Wake <span class="label label-inverse">concise</span> <span class="label label-inverse">readable</span></h1>
 			<p>Wake is a truly Object Oriented language, and should come with few surprises here.</p>
