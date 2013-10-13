@@ -18,6 +18,7 @@ using namespace std;
 
 class PropertySymbolTable {
 	public:
+		PropertySymbolTable(TypeAnalyzer* tanalyzer, AddressAllocator* allocator);
 		~PropertySymbolTable();
 		map<string, bool> parentage;
 		Type* get(string name);
@@ -29,9 +30,11 @@ class PropertySymbolTable {
 		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);
 		vector<Type*>* getNeeds();
 		string getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments);
-		TypeAnalyzer* analyzer;
+
+		friend void propagateInheritance(PropertySymbolTable* parent, PropertySymbolTable* child, bool extend);
 
 	private:
+		TypeAnalyzer* analyzer;
 		AddressAllocator alloc;
 		map<string, pair<Type*, string> > properties;
 		vector<Type*> needs;

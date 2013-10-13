@@ -19,8 +19,7 @@ void ObjectSymbolTable::addClass(string name) {
 		throw new SemanticError(MULTIPLE_CLASS_DEFINITION);
 	}
 
-	addingclass_symbol = new PropertySymbolTable();
-	addingclass_symbol->analyzer = &analyzer;
+	addingclass_symbol = new PropertySymbolTable(&analyzer, &allocator);
 	addingclass_hassubclass = false;
 
 	classes[addingclass_name] = addingclass_symbol;
@@ -44,6 +43,12 @@ void ObjectSymbolTable::addInheritance(string childname, bool as_subclass) {
 	}
 
 	addingclass_hassubclass = addingclass_symbol->parentage[childname] = as_subclass;
+}
+
+void ObjectSymbolTable::propagateInheritance() {
+	for(map<string, PropertySymbolTable*>::iterator it = classes.begin(); it != classes.end(); ++it) {
+
+	}
 }
 
 PropertySymbolTable* ObjectSymbolTable::find(string name) {

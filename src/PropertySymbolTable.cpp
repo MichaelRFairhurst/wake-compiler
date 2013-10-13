@@ -96,3 +96,6 @@ PropertySymbolTable::~PropertySymbolTable() {
 		freeType(it->second.first);
 	}
 }
+
+void propagateInheritance(PropertySymbolTable* parent, PropertySymbolTable* child, bool extend) {
+}

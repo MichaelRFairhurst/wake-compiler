@@ -10,6 +10,9 @@ void ParseTreeTraverser::traverse(Node* tree) {
 			if(tree->subnodes > 1) traverse(tree->node_data.nodes[1]);
 			secondPass(tree->node_data.nodes[0]);
 			if(tree->subnodes > 1) secondPass(tree->node_data.nodes[1]);
+
+			objectsymtable->propagateInheritance();
+
 			thirdPass(tree->node_data.nodes[0]);
 			if(tree->subnodes > 1) thirdPass(tree->node_data.nodes[1]);
 			break;
