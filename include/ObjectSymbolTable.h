@@ -21,6 +21,7 @@ class ObjectSymbolTable {
 		void addClass(string name);
 		void addInheritance(string child, bool issubclass);
 		void propagateInheritance();
+		void propagateInheritanceToParent(string childname);
 		PropertySymbolTable* find(string name);
 		void assertTypeIsValid(Type* type);
 		TypeAnalyzer* getAnalyzer();
@@ -31,7 +32,8 @@ class ObjectSymbolTable {
 		PropertySymbolTable* addingclass_symbol;
 		std::string addingclass_name;
 		bool addingclass_hassubclass;
-		map<string, pair<PropertySymbolTable*, string address>> classes;
+		map<string, pair<PropertySymbolTable*, string> > classes;
+		map<string, pair<PropertySymbolTable*, bool> > inheritances_gathered;
 		TypeAnalyzer analyzer;
 };
 

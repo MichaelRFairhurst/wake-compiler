@@ -30,12 +30,13 @@ class PropertySymbolTable {
 		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);
 		vector<Type*>* getNeeds();
 		string getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments);
+		void assignAddresses();
 
-		friend void propagateInheritance(PropertySymbolTable* parent, PropertySymbolTable* child, bool extend);
+		friend void propagateInheritanceTables(PropertySymbolTable* parent, PropertySymbolTable* child, bool extend);
 
 	private:
 		TypeAnalyzer* analyzer;
-		AddressAllocator alloc;
+		AddressAllocator* alloc;
 		map<string, pair<Type*, string> > properties;
 		vector<Type*> needs;
 };

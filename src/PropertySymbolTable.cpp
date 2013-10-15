@@ -1,6 +1,11 @@
 #include "PropertySymbolTable.h"
 #include "SemanticError.h"
 
+PropertySymbolTable::PropertySymbolTable(TypeAnalyzer* analyzer, AddressAllocator* allocator) {
+	this->analyzer = analyzer;
+	alloc = allocator;
+}
+
 void PropertySymbolTable::addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, Node* body) {
 	string name = getSymbolNameOf(segments_arguments);
 
@@ -22,7 +27,7 @@ void PropertySymbolTable::addMethod(Type* returntype, vector<pair<string, TypeAr
 
 	method->typedata.lambda.arguments = conglomerate;
 
-	properties[name] = pair<Type*,string>(method, alloc.allocate());
+	properties[name] = pair<Type*,string>(method, string());
 }
 
 void PropertySymbolTable::addProvision(Type* provided, Node* body) {
@@ -40,7 +45,7 @@ void PropertySymbolTable::addProvision(Type* provided, Node* body) {
 
 	method->typedata.lambda.arguments = MakeTypeArray(); //TODO injections with curried ctors or arguments!
 
-	properties[name] = pair<Type*,string>(method, alloc.allocate());
+	properties[name] = pair<Type*,string>(method, string());
 }
 
 Type* PropertySymbolTable::get(string name) {
@@ -91,11 +96,25 @@ vector<Type*>* PropertySymbolTable::getNeeds() {
 	return &needs;
 }
 
+void PropertySymbolTable::assignAddresses() {
+	for(map<string, pair<Type*, string> >::iterator it = properties.begin(); it != properties.end(); ++it)
+	if(it->second.second == "")
+		it->second.second = alloc->allocate();
+}
+
 PropertySymbolTable::~PropertySymbolTable() {
 	for(map<string, pair<Type*, string> >::iterator it = properties.begin(); it != properties.end(); ++it) {
 		freeType(it->second.first);
 	}
 }
 
-void propagateInheritance(PropertySymbolTable* parent, PropertySymbolTable* child, bool extend) {
+void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable* parent, bool extend) {
+	for(map<string, pair<Type*, string> >::iterator it = parent->properties.begin(); it != parent->properties.end(); ++it) {
+		map<string, pair<Type*, string> >::iterator searcher = child->properties.find(it->first);
+		if(searcher == child->properties.end()) {
+			child->properties[it->first] = pair<Type*, string>(copyType(it->second.first), it->second.second);
+		} else {
+			searcher->second.second = it->second.second;
+		}
+	}
 }

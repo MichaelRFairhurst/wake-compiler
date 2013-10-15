@@ -8,9 +8,12 @@ void ParseTreeTraverser::traverse(Node* tree) {
 		case NT_PROGRAM:
 			traverse(tree->node_data.nodes[0]);
 			if(tree->subnodes > 1) traverse(tree->node_data.nodes[1]);
+
+			if(!passesForCompilation()) return;
 			secondPass(tree->node_data.nodes[0]);
 			if(tree->subnodes > 1) secondPass(tree->node_data.nodes[1]);
 
+			if(!passesForCompilation()) return;
 			objectsymtable->propagateInheritance();
 
 			thirdPass(tree->node_data.nodes[0]);

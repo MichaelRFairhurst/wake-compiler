@@ -43,6 +43,8 @@ void LibraryLoader::loadStdLibToTable(ObjectSymbolTable* table) {
 		table->find("Printer")->addMethod(NULL, &segments_arguments, NULL);
 	}
 
+	table->find("Printer")->assignAddresses();
+
 	table->addClass("System");
 	{
 		vector<pair<string, TypeArray*> > segments_arguments;
@@ -52,4 +54,6 @@ void LibraryLoader::loadStdLibToTable(ObjectSymbolTable* table) {
 		segments_arguments.push_back(pair<string, TypeArray*>("exit", arguments));
 		table->find("System")->addMethod(NULL, &segments_arguments, NULL);
 	}
+
+	table->find("System")->assignAddresses();
 }

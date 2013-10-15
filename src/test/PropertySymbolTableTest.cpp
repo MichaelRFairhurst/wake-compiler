@@ -5,7 +5,9 @@
 BOOST_AUTO_TEST_SUITE(PropertySymbolTableTestSuite);
 
 BOOST_AUTO_TEST_CASE(AddingNeedsAreGotten) {
-	PropertySymbolTable table;
+	TypeAnalyzer analyzer;
+	AddressAllocator alloc;
+	PropertySymbolTable table(&analyzer, &alloc);
 	Type* thefirsttype = MakeType(TYPE_CLASS);
 	Type* thesecondtype = MakeType(TYPE_CLASS);
 	table.addNeed(thefirsttype);

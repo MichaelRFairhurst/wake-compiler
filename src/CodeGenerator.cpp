@@ -21,7 +21,7 @@ void CodeGenerator::generate(Node* tree) {
 			file << "(function() {";
 			{
 				// StdLib lol
-				file << "var printqueue='';Printer=function(){this.a=function(b){if(typeof process!='undefined'&&typeof process.stdout!='undefined'&&typeof process.stdout.write!='undefined')process.stdout.write(''+b);else printqueue+=''+b;};this.b=this.a;this.c=function(b){if(typeof process!='undefined'&&typeof process.stdout!='undefined'&&typeof process.stdout.write!='undefined')return this.a(b+'\\n');console.log(printqueue+b);printqueue='';};this.d=this.c;};System=function(){this.a=function(a){if(typeof process!='undefined'&&typeof process.exit!='undefined')process.exit(a);}};";
+				file << "var printqueue='';Printer=function(){this.a=function(b){if(typeof process!='undefined'&&typeof process.stdout!='undefined'&&typeof process.stdout.write!='undefined')process.stdout.write(''+b);else printqueue+=''+b;};this.b=this.a;this.c=function(b){if(typeof process!='undefined'&&typeof process.stdout!='undefined'&&typeof process.stdout.write!='undefined')return this.a(b+'\\n');console.log(printqueue+b);printqueue='';};this.d=this.c;};System=function(){this.e=function(a){if(typeof process!='undefined'&&typeof process.exit!='undefined')process.exit(a);}};";
 				int i;
 				for(i = 0; i < tree->subnodes; i++)
 					generate(tree->node_data.nodes[i]);

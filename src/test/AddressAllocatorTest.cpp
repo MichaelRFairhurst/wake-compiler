@@ -36,4 +36,34 @@ BOOST_AUTO_TEST_CASE(TestGoesUpAndDown)
 	BOOST_REQUIRE(alloc.allocate() == "a");
 }
 
+BOOST_AUTO_TEST_CASE(TestGoesToCapsAndBack)
+{
+	AddressAllocator alloc;
+	int i;
+	for(i = 0; i < 26; i++)
+		alloc.allocate();
+
+	string allocation = alloc.allocate();
+	BOOST_REQUIRE_MESSAGE(allocation == "A", allocation + " was recieved instead of A");
+	alloc.deallocate();
+	alloc.deallocate();
+	allocation = alloc.allocate();
+	BOOST_REQUIRE_MESSAGE(allocation == "z", allocation + " was recieved instead of z");
+}
+
+BOOST_AUTO_TEST_CASE(TestGoesToDoubleAndBack)
+{
+	AddressAllocator alloc;
+	int i;
+	for(i = 0; i < 52; i++)
+		alloc.allocate();
+
+	string allocation = alloc.allocate();
+	BOOST_REQUIRE_MESSAGE(allocation == "aa", allocation + " was recieved instead of aa");
+	alloc.deallocate();
+	alloc.deallocate();
+	allocation = alloc.allocate();
+	BOOST_REQUIRE_MESSAGE(allocation == "Z", allocation + " was recieved instead of Z");
+}
+
 BOOST_AUTO_TEST_SUITE_END()
