@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <boost/optional/optional.hpp>
 
 extern "C" {
 	#include "type.h"
@@ -22,8 +23,9 @@ class ScopeSymbolTable {
 
 		void add(string name, Type* type);
 		void add(Type* type);
-		Type* get(string name);
-		Type* get(Type* type);
+		string getNameForType(Type* type);
+		boost::optional<Type*> find(string name);
+		boost::optional<Type*> find(Type* type);
 		string getAddress(Type* type);
 		string getAddress(string name);
 		void pushScope();
@@ -31,7 +33,6 @@ class ScopeSymbolTable {
 
 	private:
 		AddressAllocator allocator;
-		string getNameForType(Type* type);
 		map<string, pair<Type*, string> > table;
 		vector<vector<string> > scopes;
 };

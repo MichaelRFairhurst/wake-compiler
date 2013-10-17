@@ -11,10 +11,14 @@ extern "C" {
 	#include "tree.h"
 }
 
+#include "ObjectProperty.h"
 #include "TypeAnalyzer.h"
 #include "SemanticError.h"
 #include "EntryPointAnalyzer.h"
 #include "AddressAllocator.h"
+
+#define PROPERTY_PUBLIC 1
+#define PROPERTY_ABSTRACT 2
 
 using namespace std;
 
@@ -24,10 +28,11 @@ class PropertySymbolTable {
 		~PropertySymbolTable();
 		map<string, bool> parentage;
 		boost::optional<Type*> find(string name);
+		bool isPublic(string name);
 		string getAddress(string name);
 		string getProvisionAddress(Type* provided);
-		boost::optional<SemanticError*> addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, Node* body);
-		boost::optional<SemanticError*> addProvision(Type* provision, Node* body);
+		boost::optional<SemanticError*> addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, int flags);
+		boost::optional<SemanticError*> addProvision(Type* provision);
 		void addNeed(Type* returntype);
 		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);
 		vector<Type*>* getNeeds();
@@ -41,7 +46,7 @@ class PropertySymbolTable {
 		bool abstract;
 		TypeAnalyzer* analyzer;
 		AddressAllocator* alloc;
-		map<string, pair<Type*, string> > properties;
+		map<string, ObjectProperty*> properties;
 		vector<Type*> needs;
 };
 

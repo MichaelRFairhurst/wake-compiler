@@ -7,7 +7,7 @@ PropertySymbolTable::PropertySymbolTable(TypeAnalyzer* analyzer, AddressAllocato
 	abstract = false;
 }
 
-boost::optional<SemanticError*> PropertySymbolTable::addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, Node* body) {
+boost::optional<SemanticError*> PropertySymbolTable::addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, int flags) {
 	string name = getSymbolNameOf(segments_arguments);
 
 	if(properties.count(name)) {
@@ -15,14 +15,12 @@ boost::optional<SemanticError*> PropertySymbolTable::addMethod(Type* returntype,
 		return boost::optional<SemanticError*>(new SemanticError(MULTIPLE_METHOD_DEFINITION, temp));
 	}
 
-	if(body != NULL && body->node_type == NT_ABSTRACT_METHOD) {
-		body = NULL;
+	if(flags & PROPERTY_ABSTRACT) {
 		abstract = true;
 	}
 
 	Type* method = MakeType(TYPE_LAMBDA);
 	method->typedata.lambda.returntype = copyType(returntype);
-	method->typedata.lambda.body = body;
 
 	TypeArray* conglomerate = MakeTypeArray();
 	for(vector<pair<string, TypeArray*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
@@ -33,12 +31,16 @@ boost::optional<SemanticError*> PropertySymbolTable::addMethod(Type* returntype,
 
 	method->typedata.lambda.arguments = conglomerate;
 
-	properties[name] = pair<Type*,string>(method, string());
+	ObjectProperty* prop = new ObjectProperty;
+	prop->flags = flags;
+	prop->type = method;
+
+	properties[name] = prop;
 
 	return boost::optional<SemanticError*>();
 }
 
-boost::optional<SemanticError*> PropertySymbolTable::addProvision(Type* provided, Node* body) {
+boost::optional<SemanticError*> PropertySymbolTable::addProvision(Type* provided) {
 	string name = analyzer->getNameForType(provided) + "<-";
 	if(provided->specialty != NULL) name += provided->specialty;
 
@@ -49,11 +51,13 @@ boost::optional<SemanticError*> PropertySymbolTable::addProvision(Type* provided
 
 	Type* method = MakeType(TYPE_LAMBDA);
 	method->typedata.lambda.returntype = copyType(provided);
-	method->typedata.lambda.body = body;
 
 	method->typedata.lambda.arguments = MakeTypeArray(); //TODO injections with curried ctors or arguments!
 
-	properties[name] = pair<Type*,string>(method, string());
+	ObjectProperty* prop = new ObjectProperty;
+	prop->type = method;
+
+	properties[name] = prop;
 	return boost::optional<SemanticError*>();
 }
 
@@ -62,17 +66,17 @@ boost::optional<Type*> PropertySymbolTable::find(string name) {
 		//throw new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Cannot find method with signature " + name);
 		return boost::optional<Type*>();
 
-	return boost::optional<Type*>(properties.find(name)->second.first);
+	return boost::optional<Type*>(properties.find(name)->second->type);
 }
 
 string PropertySymbolTable::getAddress(string name) {
-	return properties.find(name)->second.second;
+	return properties.find(name)->second->address;
 }
 
 string PropertySymbolTable::getProvisionAddress(Type* provided) {
 	string name = analyzer->getNameForType(provided) + "<-";
 	if(provided->specialty != NULL) name += provided->specialty;
-	return properties.find(name)->second.second;
+	return properties.find(name)->second->address;
 }
 
 string PropertySymbolTable::getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments) {
@@ -92,8 +96,8 @@ string PropertySymbolTable::getSymbolNameOf(vector<pair<string, TypeArray*> >* s
 }
 
 void PropertySymbolTable::printEntryPoints(EntryPointAnalyzer* entryanalyzer) {
-	for(map<string, pair<Type*, string> >::iterator it = properties.begin(); it != properties.end(); ++it) {
-		if(entryanalyzer->checkMethodCanBeMain(it->first, it->second.first))
+	for(map<string, ObjectProperty*>::iterator it = properties.begin(); it != properties.end(); ++it) {
+		if(entryanalyzer->checkMethodCanBeMain(it->first, it->second->type))
 			entryanalyzer->printMethod(it->first);
 	}
 }
@@ -107,9 +111,9 @@ vector<Type*>* PropertySymbolTable::getNeeds() {
 }
 
 void PropertySymbolTable::assignAddresses() {
-	for(map<string, pair<Type*, string> >::iterator it = properties.begin(); it != properties.end(); ++it)
-	if(it->second.second == "")
-		it->second.second = alloc->allocate();
+	for(map<string, ObjectProperty*>::iterator it = properties.begin(); it != properties.end(); ++it)
+	if(it->second->address == "")
+		it->second->address = alloc->allocate();
 }
 
 bool PropertySymbolTable::isAbstract() {
@@ -117,25 +121,29 @@ bool PropertySymbolTable::isAbstract() {
 }
 
 PropertySymbolTable::~PropertySymbolTable() {
-	for(map<string, pair<Type*, string> >::iterator it = properties.begin(); it != properties.end(); ++it) {
-		freeType(it->second.first);
+	for(map<string, ObjectProperty*>::iterator it = properties.begin(); it != properties.end(); ++it) {
+		freeType(it->second->type);
+		delete it->second;
 	}
 }
 
 void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable* parent, bool extend) {
-	for(map<string, pair<Type*, string> >::iterator it = parent->properties.begin(); it != parent->properties.end(); ++it) {
-		map<string, pair<Type*, string> >::iterator searcher = child->properties.find(it->first);
+	for(map<string, ObjectProperty*>::iterator it = parent->properties.begin(); it != parent->properties.end(); ++it) {
+		map<string, ObjectProperty*>::iterator searcher = child->properties.find(it->first);
 		if(searcher == child->properties.end()) {
-			Type* inheritedtype = copyType(it->second.first);
+			ObjectProperty* propagate = new ObjectProperty;
+			propagate->type = copyType(it->second->type);
+			propagate->flags = it->second->flags;
+			propagate->address = it->second->address;
 			if(!extend) {
-				inheritedtype->typedata.lambda.body = NULL;
+				propagate->flags |= PROPERTY_ABSTRACT;
 				child->abstract = true;
-			} else if(inheritedtype->typedata.lambda.body == NULL) {
+			} else if(propagate->flags & PROPERTY_ABSTRACT) {
 				child->abstract = true;
 			}
-			child->properties[it->first] = pair<Type*, string>(inheritedtype, it->second.second);
+			child->properties[it->first] = propagate;
 		} else {
-			searcher->second.second = it->second.second;
+			searcher->second->address = it->second->address;
 		}
 	}
 }

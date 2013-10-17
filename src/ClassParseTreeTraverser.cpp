@@ -45,7 +45,7 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 
 		case NT_PROVISION:
 			try {
-				boost::optional<SemanticError*> error = propertysymtable->addProvision(tree->node_data.nodes[0]->node_data.type, tree);
+				boost::optional<SemanticError*> error = propertysymtable->addProvision(tree->node_data.nodes[0]->node_data.type);
 				if(error) {
 					(*error)->token = tree;
 					errors->addError(*error);
@@ -61,7 +61,7 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 			try {
 				vector<pair<string, TypeArray*> >* methodname = methodanalyzer->getName(tree);
 
-				boost::optional<SemanticError*> error = propertysymtable->addMethod(methodanalyzer->getReturn(tree), methodname, methodanalyzer->getBody(tree));
+				boost::optional<SemanticError*> error = propertysymtable->addMethod(methodanalyzer->getReturn(tree), methodname, methodanalyzer->getFlags(tree));
 				if(error) {
 					(*error)->token = tree;
 					errors->addError(*error);
@@ -80,11 +80,6 @@ void ClassParseTreeTraverser::secondPass(Node* tree) {
 	switch(tree->node_type) {
 		case NT_CLASSBODY:
 			{
-				/*int i = 0;
-				while(i < tree->subnodes) {
-					secondPass(tree->node_data.nodes[i]);
-					i++;
-				}*/
 				scopesymtable->pushScope();
 				loadCtorArgs(tree);
 				loadProperties(tree);

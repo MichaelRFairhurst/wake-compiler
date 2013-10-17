@@ -7,7 +7,7 @@ vector<pair<string, TypeArray*> >* MethodSignatureParseTreeTraverser::getName(No
 
 	try {
 		Node* methodname = methoddef->node_data.nodes[
-			methoddef->node_data.nodes[0]->node_type == NT_METHOD_RETURN_TYPE ? 1 : 0
+			methoddef->node_data.nodes[1]->node_type == NT_METHOD_RETURN_TYPE ? 2 : 1
 		];
 
 		for(i = 0; i < methodname->subnodes; i++) {
@@ -35,24 +35,36 @@ vector<pair<string, TypeArray*> >* MethodSignatureParseTreeTraverser::getName(No
 }
 
 Node* MethodSignatureParseTreeTraverser::getBody(Node* methoddef) {
-	if(methoddef->node_data.nodes[0]->node_type == NT_METHOD_RETURN_TYPE) {
-		return methoddef->node_data.nodes[2];
+	if(methoddef->node_data.nodes[1]->node_type == NT_METHOD_RETURN_TYPE) {
+		return methoddef->node_data.nodes[3];
 	} else {
-		return methoddef->node_data.nodes[1];
+		return methoddef->node_data.nodes[2];
 	}
 }
 
 Type* MethodSignatureParseTreeTraverser::getReturn(Node* methoddef) {
 	Type* returntype;
 
-	if(methoddef->node_data.nodes[0]->node_type == NT_METHOD_RETURN_TYPE) {
-		returntype = methoddef->node_data.nodes[0]->node_data.nodes[0]->node_data.type;
+	if(methoddef->node_data.nodes[1]->node_type == NT_METHOD_RETURN_TYPE) {
+		returntype = methoddef->node_data.nodes[1]->node_data.nodes[0]->node_data.type;
 		objectsymtable->assertTypeIsValid(returntype);
 	} else {
 		returntype = NULL;
 	}
 
 	return returntype;
+}
+
+int MethodSignatureParseTreeTraverser::getFlags(Node* methoddef) {
+	int flags = 0;
+
+	if(getBody(methoddef)->node_type == NT_ABSTRACT_METHOD)
+		flags |= PROPERTY_ABSTRACT;
+
+	if(methoddef->node_data.nodes[0]->node_type == NT_PUBLIC)
+		flags |= PROPERTY_PUBLIC;
+
+	return flags;
 }
 
 MethodSignatureParseTreeTraverser::MethodSignatureParseTreeTraverser(ObjectSymbolTable* objectsymtable) {

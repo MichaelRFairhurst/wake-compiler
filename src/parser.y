@@ -28,7 +28,7 @@ int yywrap()
 %}
 
 /* keywords */
-%token EVERY CAPABLE A_OR_AN IS RETURN FOREACH WITH PUBLIC IF ELSE WHILE IN IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST
+%token EVERY CAPABLE A_OR_AN IS RETURN FOREACH WITH PUBLIC IF ELSE WHILE IN IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE
 /* symbols */
 %token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT
 /* this too */
@@ -52,7 +52,7 @@ int yywrap()
 %token <number> TRUTH
 %token <number> SYM_SHADOW
 %token <number> SYM_ARRAYED
-%type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection injection_args provision provisions injection_arg ctor retrievabledeclarableargs value method block methodreturn methodnamesegments methodbody methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional type_valued property property_value retrievalargs retrieval objectable expression_cast
+%type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection injection_args provision provisions injection_arg ctor retrievabledeclarableargs value method block methodreturn methodnamesegments methodbody methodaccess methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional type_valued property property_value retrievalargs retrieval objectable expression_cast
 %type <type>  type_pure type_pure_arrayable type_declarable type_common type_lambda type_commonorlambda type_retrievable type_retrievabledeclarable
 %type <type_array> declarabletypes commonorlambdatypes
 %start file
@@ -178,9 +178,14 @@ retrievabledeclarableargs:
 	;
 
 method:
-	methodreturn methodnamesegments methodbody									{ $$ = MakeTwoBranchNode(NT_METHOD_DECLARATION, $1, $2); AddSubNode($$, $3); }
-	| methodnamesegments methodbody												{ $$ = MakeTwoBranchNode(NT_METHOD_DECLARATION, $1, $2); }
+	methodaccess methodreturn methodnamesegments methodbody						{ $$ = MakeTwoBranchNode(NT_METHOD_DECLARATION, $1, $2); AddSubNode($$, $3); AddSubNode($$, $4); }
+	| methodaccess methodnamesegments methodbody								{ $$ = MakeTwoBranchNode(NT_METHOD_DECLARATION, $1, $2); AddSubNode($$, $3); }
 	;
+
+methodaccess:
+	/*empty*/																	{ $$ = MakeEmptyNode(NT_PUBLIC); }
+	| PRIVATE																	{ $$ = MakeEmptyNode(NT_PRIVATE); }
+	| PUBLIC																	{ $$ = MakeEmptyNode(NT_PUBLIC); }
 
 methodreturn:
 	type_pure SYM_RETURN_DECREMENT												{ $$ = MakeOneBranchNode(NT_METHOD_RETURN_TYPE, MakeNodeFromType($1)); }

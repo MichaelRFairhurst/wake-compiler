@@ -157,6 +157,7 @@ void CodeGenerator::generate(Node* tree) {
 				if(tree->subnodes > 0) generate(tree->node_data.nodes[0]);
 				if(tree->subnodes > 1) generate(tree->node_data.nodes[1]);
 				if(tree->subnodes > 2) generate(tree->node_data.nodes[2]);
+				if(tree->subnodes > 3) generate(tree->node_data.nodes[3]);
 				file << "};";
 				table.popScope();
 			}

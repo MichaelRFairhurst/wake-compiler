@@ -38,6 +38,7 @@ return					count(); return RETURN;
 foreach					count(); return FOREACH;
 with					count(); return WITH;
 public					count(); return PUBLIC;
+private					count(); return PRIVATE;
 if						count(); return IF;
 else					count(); return ELSE;
 while					count(); return WHILE;

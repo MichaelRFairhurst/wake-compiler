@@ -9,7 +9,7 @@ BOOST_AUTO_TEST_CASE( TestSymbolTableAddsAndThenGets ) {
 	Type* type = new Type;
 	table.add("@bilbo", type);
 
-	BOOST_REQUIRE(table.get("@bilbo") == type);
+	BOOST_REQUIRE(table.find("@bilbo") == type);
 
 	delete type;
 }
@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_CASE( TestSymbolTableAddInLastStackWillGet ) {
 	table.add("@bilbo", type);
 	table.pushScope();
 
-	BOOST_REQUIRE(table.get("@bilbo") == type);
+	BOOST_REQUIRE(table.find("@bilbo") == type);
 
 	delete type;
 }
@@ -30,7 +30,7 @@ BOOST_AUTO_TEST_CASE( TestSymbolTableNotAddThrowsSemanticError ) {
 	Type* type = new Type;
 
 	try {
-		table.get("@bilbo");
+		table.find("@bilbo");
 		BOOST_CHECK_MESSAGE(false, "No exception thrown");
 	} catch(SemanticError* e) {
 		BOOST_CHECK(e->code == SYMBOL_NOT_DEFINED);
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE( TestSymbolTableAddInNewScopeNotSetOncePopped ) {
 	table.add("@bilbo", type);
 	table.popScope();
 	try {
-		table.get("@bilbo");
+		table.find("@bilbo");
 		BOOST_CHECK_MESSAGE(false, "No exception thrown");
 	} catch(SemanticError* e) {
 		BOOST_CHECK(e->code == SYMBOL_NOT_DEFINED);
@@ -115,9 +115,9 @@ BOOST_AUTO_TEST_CASE( TestSymbolsAddedByType ) {
 	table.add(aliased);
 	table.add(shadowed);
 
-	BOOST_CHECK(simple == table.get("MyClass"));
-	BOOST_CHECK(aliased == table.get("@MyClass"));
-	BOOST_CHECK(shadowed == table.get("$$$MyClass"));
+	BOOST_CHECK(simple == table.find("MyClass"));
+	BOOST_CHECK(aliased == table.find("@MyClass"));
+	BOOST_CHECK(shadowed == table.find("$$$MyClass"));
 
 	delete simple;
 	delete aliased;
@@ -141,8 +141,8 @@ BOOST_AUTO_TEST_CASE( TestGetSymbolByType ) {
 	shadowed->typedata._class.classname = "MyClass";
 	shadowed->typedata._class.shadow = 3;
 
-	BOOST_CHECK(simplep == table.get(simple));
-	BOOST_CHECK(shadowedp == table.get(shadowed));
+	BOOST_CHECK(simplep == table.find(simple));
+	BOOST_CHECK(shadowedp == table.find(shadowed));
 
 	delete simple;
 	delete shadowed;

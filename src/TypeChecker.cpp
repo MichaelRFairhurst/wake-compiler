@@ -120,11 +120,35 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				break;
 
 			case NT_ALIAS:
-				ret = copyType(scopesymtable->get(string("@") + tree->node_data.string));
+				{
+					boost::optional<Type*> variable = scopesymtable->find(string("@") + tree->node_data.string);
+					if(!variable) {
+						PropertySymbolTable* proptable = objectsymtable->find(thiscontext);
+						variable = proptable->find(string("@") + tree->node_data.string);
+					}
+					if(!variable) {
+						ret = MakeType(TYPE_MATCHALL);
+						errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Symbol by name of @" + string(tree->node_data.string) + " not found", tree));
+					} else {
+						ret = copyType(*variable);
+					}
+				}
 				break;
 
 			case NT_TYPEDATA:
-				ret = copyType(scopesymtable->get(tree->node_data.type));
+				{
+					boost::optional<Type*> variable = scopesymtable->find(tree->node_data.type);
+					if(!variable) {
+						PropertySymbolTable* proptable = objectsymtable->find(thiscontext);
+						variable = proptable->find(scopesymtable->getNameForType(tree->node_data.type));
+					}
+					if(!variable) {
+						ret = MakeType(TYPE_MATCHALL);
+						errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Symbol by name of " + scopesymtable->getNameForType(tree->node_data.type) + " not found", tree));
+					} else {
+						ret = copyType(*variable);
+					}
+				}
 				break;
 
 			case NT_THIS:

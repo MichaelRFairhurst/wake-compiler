@@ -15,17 +15,17 @@ void ScopeSymbolTable::add(Type* type) {
 	add(getNameForType(type), type);
 }
 
-Type* ScopeSymbolTable::get(string name) {
+boost::optional<Type*> ScopeSymbolTable::find(string name) {
 	if(!table.count(name)) {
 		string temp = "Symbol " + name + " not defined in this scope.";
 		throw new SemanticError(SYMBOL_NOT_DEFINED, temp);
 	}
 
 	map<string, pair<Type*, string> >::iterator it = table.find(name);
-	return it->second.first;
+	return boost::optional<Type*>(it->second.first);
 }
 
-Type* ScopeSymbolTable::get(Type* type) {
+boost::optional<Type*> ScopeSymbolTable::find(Type* type) {
 	string name = getNameForType(type);
 	if(!table.count(name)) {
 		string temp = "Symbol " + name + " not defined in this scope.";
@@ -33,7 +33,7 @@ Type* ScopeSymbolTable::get(Type* type) {
 	}
 
 	map<string, pair<Type*, string> >::iterator it = table.find(name);
-	return it->second.first;
+	return boost::optional<Type*>(it->second.first);
 }
 
 string ScopeSymbolTable::getAddress(Type* type) {

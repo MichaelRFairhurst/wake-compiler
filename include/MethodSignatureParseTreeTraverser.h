@@ -23,6 +23,7 @@ class MethodSignatureParseTreeTraverser {
 		vector<pair<string, TypeArray*> >* getName(Node* methoddef);
 		Node* getBody(Node* methoddef);
 		Type* getReturn(Node* methoddef);
+		int getFlags(Node* methoddef);
 
 	private:
 		ObjectSymbolTable* objectsymtable;

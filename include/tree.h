@@ -96,6 +96,9 @@
 #define NT_CAST 75
 #define NT_COMPILER_HINT 76
 
+#define NT_PRIVATE 77
+#define NT_PUBLIC 78
+
 void AddSubNode(Node* parent, Node* child);
 
 void PrependSubNode(Node* parent, Node* child);
