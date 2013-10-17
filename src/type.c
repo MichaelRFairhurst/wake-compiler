@@ -70,6 +70,7 @@ Type* copyType(Type* t) {
 	if(t->type == TYPE_LAMBDA) {
 		copy->typedata.lambda.arguments = copyTypeArray(t->typedata.lambda.arguments);
 		copy->typedata.lambda.returntype = copyType(t->typedata.lambda.returntype);
+		copy->typedata.lambda.body = t->typedata.lambda.body;
 	} else {
 		copy->typedata._class.classname = t->typedata._class.classname == NULL ? NULL : strdup(t->typedata._class.classname);
 		copy->typedata._class.shadow = t->typedata._class.shadow;					// number of $s

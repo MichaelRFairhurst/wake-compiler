@@ -1354,4 +1354,56 @@ PTT_TEST_CASE(
 	PTT_EXPECT(INVALID_ASSIGNMENT)
 );
 
+PTT_TEST_CASE(
+	AbstractMethodMakesClassAbstract,
+	"every MyClass is:		\n\
+		provides MyClass;	\n\
+		myMethod();",
+	PTT_EXPECT(ABSTRACT_PROVISION)
+);
+
+PTT_TEST_CASE(
+	AbstractParentMethodMakesClassAbstract,
+	"every MyClass (a ParentClass) is:	\n\
+		provides MyClass;				\n\
+	every ParentClass is:				\n\
+		myMethod();",
+	PTT_EXPECT(ABSTRACT_PROVISION)
+);
+
+PTT_TEST_CASE(
+	UnimplementedInterfaceMethodMakesClassAbstract,
+	"every MyClass (capable ParentClass) is:	\n\
+		provides MyClass;						\n\
+	every ParentClass is:						\n\
+		myMethod() { ; }",
+	PTT_EXPECT(ABSTRACT_PROVISION)
+);
+
+PTT_TEST_CASE(
+	AbstractMethodMakesClassAbstractIndirectProvision,
+	"every MyClass is:					\n\
+		provides MyClass <- MyClass;	\n\
+		myMethod();",
+	PTT_EXPECT(ABSTRACT_PROVISION)
+);
+
+PTT_TEST_CASE(
+	AbstractParentMethodMakesClassAbstractIndirectProvision,
+	"every MyClass (a ParentClass) is:	\n\
+		provides MyClass <- MyClass;	\n\
+	every ParentClass is:				\n\
+		myMethod();",
+	PTT_EXPECT(ABSTRACT_PROVISION)
+);
+
+PTT_TEST_CASE(
+	UnimplementedInterfaceMethodMakesClassAbstractIndirectProvision,
+	"every MyClass (capable ParentClass) is:	\n\
+		provides MyClass <- MyClass;			\n\
+	every ParentClass is:						\n\
+		myMethod() { ; }",
+	PTT_EXPECT(ABSTRACT_PROVISION)
+);
+
 BOOST_AUTO_TEST_SUITE_END()

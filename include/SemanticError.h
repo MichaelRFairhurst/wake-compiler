@@ -30,6 +30,7 @@ enum SemanticErrorCode {
 	MULTIPLE_PROVISION_DEFINITION,	// provides AClass, AClass;
 	CIRCULAR_DEPENDENCIES,			// A needs B, B needs C, C needs A, shit for everyone. Or A needs A.
 	INVALID_ASSIGNMENT,				// @it.doIt() = 5; is pushing it, bro
+	ABSTRACT_PROVISION,				// Providing a class directly that doesn't implement all of its methods
 };
 
 class SemanticError {

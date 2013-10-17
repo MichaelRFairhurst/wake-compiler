@@ -37,22 +37,24 @@ void ParseTreeTraverser::traverse(Node* tree) {
 			break;
 
 		case NT_CLASSNAME:
-			try {
+			{
 				errors.pushContext("In declaration of 'every " + string(tree->node_data.string) + "'");
-				objectsymtable->addClass(tree->node_data.string);
-			} catch(SemanticError* e) {
-				e->token = tree;
-				errors.addError(e);
+				boost::optional<SemanticError*> error = objectsymtable->addClass(tree->node_data.string);
+				if(error) {
+					(*error)->token = tree;
+					errors.addError(*error);
+				}
 			}
 			break;
 
 		case NT_INTERFACE:
 		case NT_SUBCLASS:
-			try {
-				objectsymtable->addInheritance(tree->node_data.string, tree->node_type == NT_SUBCLASS);
-			} catch(SemanticError* e) {
-				e->token = tree;
-				errors.addError(e);
+			{
+				boost::optional<SemanticError*> error = objectsymtable->addInheritance(tree->node_data.string, tree->node_type == NT_SUBCLASS);
+				if(error) {
+					(*error)->token = tree;
+					errors.addError((*error));
+				}
 			}
 	}
 }

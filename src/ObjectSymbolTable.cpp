@@ -12,37 +12,41 @@ ObjectSymbolTable::~ObjectSymbolTable() {
 	}
 }
 
-void ObjectSymbolTable::addClass(string name) {
+boost::optional<SemanticError*> ObjectSymbolTable::addClass(string name) {
 	addingclass_name = name;
 
 	if(classes.count(addingclass_name)) {
-		throw new SemanticError(MULTIPLE_CLASS_DEFINITION);
+		return boost::optional<SemanticError*>(new SemanticError(MULTIPLE_CLASS_DEFINITION));
 	}
 
 	addingclass_symbol = new PropertySymbolTable(&analyzer, &alloc);
 	addingclass_hassubclass = false;
 
 	classes[addingclass_name] = pair<PropertySymbolTable*, string>(addingclass_symbol, "a");
+
+	return boost::optional<SemanticError*>();
 }
 
-void ObjectSymbolTable::addInheritance(string childname, bool as_subclass) {
+boost::optional<SemanticError*> ObjectSymbolTable::addInheritance(string childname, bool as_subclass) {
 	if(addingclass_hassubclass && as_subclass) {
-		throw new SemanticError(MORE_THAN_ONE_SUBCLASS);
+		return boost::optional<SemanticError*>(new SemanticError(MORE_THAN_ONE_SUBCLASS));
 	}
 
 	if(childname == addingclass_name) {
-		throw new SemanticError(SELF_INHERITANCE);
+		return boost::optional<SemanticError*>(new SemanticError(SELF_INHERITANCE));
 	}
 
 	if(analyzer.isASubtypeOfB(childname, addingclass_name)) {
-		throw new SemanticError(CIRCULAR_INHERITANCE);
+		return boost::optional<SemanticError*>(new SemanticError(CIRCULAR_INHERITANCE));
 	}
 
 	if(addingclass_symbol->parentage.count(childname)) {
-		throw new SemanticError(MULTIPLE_INHERITANCE);
+		return boost::optional<SemanticError*>(new SemanticError(MULTIPLE_INHERITANCE));
 	}
 
 	addingclass_hassubclass = addingclass_symbol->parentage[childname] = as_subclass;
+
+	return boost::optional<SemanticError*>();
 }
 
 void ObjectSymbolTable::propagateInheritance() {

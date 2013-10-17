@@ -242,6 +242,7 @@ void freeNode(Node* n) {
 		case NT_STRINGLIT:
 		case NT_METHOD_NAME_SEGMENT:
 		case NT_ALIAS:
+		case NT_COMPILER_HINT:
 			free(n->node_data.string);
 			break;
 		case NT_TYPEDATA:

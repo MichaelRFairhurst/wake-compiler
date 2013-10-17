@@ -125,7 +125,7 @@ property_value:
 	| type_declarable '=' value													{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1), $3); }
 	| type_declarable retrievalargs value										{	Node* retrieval = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1), $2);
 																					AddSubNode(retrieval, $3);
-																					$$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType($1), retrieval);		}
+																					$$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType(copyType($1)), retrieval);		}
 	;
 
 provisions:
@@ -323,7 +323,7 @@ declaration:
 	':' type_declarable '=' value ';'											{ $$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType($2), $4); }
 	| ':' type_declarable retrievalargs value ';'								{	Node* retrieval = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($2), $3);
 																					AddSubNode(retrieval, $4);
-																					$$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType($2), retrieval);		}
+																					$$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType(copyType($2)), retrieval);		}
 	;
 
 retrievalargs:

@@ -21,6 +21,7 @@ bool TypeAnalyzer::isASubtypeOfB(string a, string b) {
 }
 
 bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
+	if(a->type == TYPE_MATCHALL || b->type == TYPE_MATCHALL) return true;
 	if(a == NULL || b == NULL) return false;
 	if(a->arrayed != b->arrayed) return false;
 	if(a->type != b->type) return false;
@@ -79,10 +80,17 @@ void TypeAnalyzer::assertNeedIsNotCircular(string classname, Type* need) {
 	}
 }
 
+void TypeAnalyzer::assertClassCanBeBound(Type* binding) {
+	PropertySymbolTable* bound = reference->find(binding->typedata._class.classname);
+	if(bound->isAbstract())
+		throw new SemanticError(ABSTRACT_PROVISION);
+}
+
 void TypeAnalyzer::assertClassCanProvide(string provider, Type* binding) {
 	string symname = getNameForType(binding) + "<-";
 	if(binding->specialty != NULL) symname += binding->specialty;
-	reference->find(provider)->get(symname);
+	if(!reference->find(provider)->find(symname))
+		throw new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, symname + "not found on class" + provider);
 
 	vector<Type*>* recurse = reference->find(binding->typedata._class.classname)->getNeeds();
 	for(vector<Type*>::iterator it = recurse->begin(); it != recurse->end(); ++it)
@@ -103,14 +111,17 @@ Type* TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
 }
 
 bool TypeAnalyzer::isPrimitiveTypeInt(Type* type) {
+	if(type->type == TYPE_MATCHALL) return true;
 	return type->type != TYPE_LAMBDA && type->typedata._class.classname == string("Int") && type->arrayed == 0;
 }
 
 bool TypeAnalyzer::isPrimitiveTypeText(Type* type) {
+	if(type->type == TYPE_MATCHALL) return true;
 	return type->type != TYPE_LAMBDA && type->typedata._class.classname == string("Text") && type->arrayed == 0;
 }
 
 bool TypeAnalyzer::isPrimitiveTypeTruth(Type* type) {
+	if(type->type == TYPE_MATCHALL) return true;
 	return type->type != TYPE_LAMBDA && type->typedata._class.classname == string("Truth") && type->arrayed == 0;
 }
 

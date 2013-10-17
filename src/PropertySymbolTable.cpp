@@ -4,14 +4,20 @@
 PropertySymbolTable::PropertySymbolTable(TypeAnalyzer* analyzer, AddressAllocator* allocator) {
 	this->analyzer = analyzer;
 	alloc = allocator;
+	abstract = false;
 }
 
-void PropertySymbolTable::addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, Node* body) {
+boost::optional<SemanticError*> PropertySymbolTable::addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, Node* body) {
 	string name = getSymbolNameOf(segments_arguments);
 
 	if(properties.count(name)) {
 		string temp = "duplicate method signature is " + name;
-		throw new SemanticError(MULTIPLE_METHOD_DEFINITION, temp);
+		return boost::optional<SemanticError*>(new SemanticError(MULTIPLE_METHOD_DEFINITION, temp));
+	}
+
+	if(body != NULL && body->node_type == NT_ABSTRACT_METHOD) {
+		body = NULL;
+		abstract = true;
 	}
 
 	Type* method = MakeType(TYPE_LAMBDA);
@@ -28,15 +34,17 @@ void PropertySymbolTable::addMethod(Type* returntype, vector<pair<string, TypeAr
 	method->typedata.lambda.arguments = conglomerate;
 
 	properties[name] = pair<Type*,string>(method, string());
+
+	return boost::optional<SemanticError*>();
 }
 
-void PropertySymbolTable::addProvision(Type* provided, Node* body) {
+boost::optional<SemanticError*> PropertySymbolTable::addProvision(Type* provided, Node* body) {
 	string name = analyzer->getNameForType(provided) + "<-";
 	if(provided->specialty != NULL) name += provided->specialty;
 
 	if(properties.count(name)) {
 		string temp = "duplicate method signature is " + name;
-		throw new SemanticError(MULTIPLE_PROVISION_DEFINITION, temp);
+		return boost::optional<SemanticError*>(new SemanticError(MULTIPLE_PROVISION_DEFINITION, temp));
 	}
 
 	Type* method = MakeType(TYPE_LAMBDA);
@@ -46,13 +54,15 @@ void PropertySymbolTable::addProvision(Type* provided, Node* body) {
 	method->typedata.lambda.arguments = MakeTypeArray(); //TODO injections with curried ctors or arguments!
 
 	properties[name] = pair<Type*,string>(method, string());
+	return boost::optional<SemanticError*>();
 }
 
-Type* PropertySymbolTable::get(string name) {
+boost::optional<Type*> PropertySymbolTable::find(string name) {
 	if(!properties.count(name))
-		throw new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Cannot find method with signature " + name);
+		//throw new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Cannot find method with signature " + name);
+		return boost::optional<Type*>();
 
-	return properties.find(name)->second.first;
+	return boost::optional<Type*>(properties.find(name)->second.first);
 }
 
 string PropertySymbolTable::getAddress(string name) {
@@ -102,6 +112,10 @@ void PropertySymbolTable::assignAddresses() {
 		it->second.second = alloc->allocate();
 }
 
+bool PropertySymbolTable::isAbstract() {
+	return abstract;
+}
+
 PropertySymbolTable::~PropertySymbolTable() {
 	for(map<string, pair<Type*, string> >::iterator it = properties.begin(); it != properties.end(); ++it) {
 		freeType(it->second.first);
@@ -112,7 +126,14 @@ void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable*
 	for(map<string, pair<Type*, string> >::iterator it = parent->properties.begin(); it != parent->properties.end(); ++it) {
 		map<string, pair<Type*, string> >::iterator searcher = child->properties.find(it->first);
 		if(searcher == child->properties.end()) {
-			child->properties[it->first] = pair<Type*, string>(copyType(it->second.first), it->second.second);
+			Type* inheritedtype = copyType(it->second.first);
+			if(!extend) {
+				inheritedtype->typedata.lambda.body = NULL;
+				child->abstract = true;
+			} else if(inheritedtype->typedata.lambda.body == NULL) {
+				child->abstract = true;
+			}
+			child->properties[it->first] = pair<Type*, string>(inheritedtype, it->second.second);
 		} else {
 			searcher->second.second = it->second.second;
 		}

@@ -142,7 +142,7 @@ void CodeGenerator::generate(Node* tree) {
 			table.pushScope();
 			{
 				string name = tree->node_data.nodes[tree->subnodes - 1]->node_data.string;
-				TypeArray* arguments = objects->find(classname)->get(name)->typedata.lambda.arguments;
+				TypeArray* arguments = (*objects->find(classname)->find(name))->typedata.lambda.arguments;
 				int i;
 
 				file << "this." << objects->find(classname)->getAddress(name) << "=function(";

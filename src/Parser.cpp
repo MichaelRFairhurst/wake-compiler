@@ -4,11 +4,13 @@
 extern "C" int yylex_destroy  (void);
 
 bool Parser::parse(const char* input) {
+	parsetree = NULL;
 	yy_scan_string(input);
 	return yyparse();
 }
 
 bool Parser::parse(FILE* input) {
+	parsetree = NULL;
 	yyin = input;
 	return yyparse();
 }
@@ -22,6 +24,6 @@ void Parser::print() {
 }
 
 Parser::~Parser() {
-	//yylex_destroy();
-	//if(parsetree != NULL) freeNode(parsetree);
+	yylex_destroy();
+	if(parsetree != NULL) freeNode(parsetree);
 }

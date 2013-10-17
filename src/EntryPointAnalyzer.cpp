@@ -22,10 +22,8 @@ bool EntryPointAnalyzer::checkMethodCanBeMain(string methodname, Type* method) {
 
 bool EntryPointAnalyzer::checkMethodCanBeMain(string classname, string methodname, ObjectSymbolTable* table) {
 	try {
-		return checkMethodCanBeMain(methodname, table->find(classname)->get(methodname));
-	} catch(SemanticError* e) {
-		delete e;
-		return false;
+		boost::optional<Type*> method = table->find(classname)->find(methodname);
+		return method ? checkMethodCanBeMain(methodname, *method) : false;
 	} catch(SymbolNotFoundException* e) {
 		delete e;
 		return false;

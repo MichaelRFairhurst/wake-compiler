@@ -3,6 +3,7 @@
 
 #define TYPE_LAMBDA 1
 #define TYPE_CLASS 2
+#define TYPE_MATCHALL 3
 
 struct TypeArray;
 

@@ -67,7 +67,10 @@ void SemanticErrorPrinter::print(SemanticError* e) {
 			cout << "Circular dependency formation";
 			break;
 		case INVALID_ASSIGNMENT:
-			cout << "Invalid assignment; you can only assign to variables and variable indices.";
+			cout << "Invalid assignment; you can only assign to variables and variable indices";
+			break;
+		case ABSTRACT_PROVISION:
+			cout << "Provided class does not define all of its methods or parent/interface methods";
 			break;
 		default:
 			cout << "bad error code provided";

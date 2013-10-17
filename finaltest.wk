@@ -44,9 +44,15 @@ every Main is:
 		Run(BooleanLogicTest.testAnd(:(Asserts <- this)));
 		Run(BooleanLogicTest.testOrderOfOperations(:(Asserts <- this)));
 		Run(InheritanceTest.testParentGetsParentClassName(:(Asserts <- this)));
-		Run(InheritanceTest.testChildGetsChildClassName(:(Asserts <- this)));
-		Run(InheritanceTest.testChildFromProviderGetsChildClassName(:(Asserts <- this)));
-		Run(InheritanceTest.testChildAfterCastGetsChildClassName(:(Asserts <- this)));
+		Run(InheritanceTest.testOverrideChildGetsChildClassName(:(Asserts <- this)));
+		Run(InheritanceTest.testOverrideChildFromProviderGetsChildClassName(:(Asserts <- this)));
+		Run(InheritanceTest.testOverrideChildAfterCastGetsChildClassName(:(Asserts <- this)));
+		Run(InheritanceTest.testFallthroughChildGetsChildClassName(:(Asserts <- this )));
+		Run(InheritanceTest.testFallthroughChildFromProviderGetsChildClassName(:(Asserts <- this )));
+		Run(InheritanceTest.testFallthroughChildAfterCastGetsChildClassName(:(Asserts <- this )));
+		Run(InheritanceTest.testImplementingChildGetsChildClassName(:(Asserts <- this )));
+		Run(InheritanceTest.testImplementingChildFromProviderGetsChildClassName(:(Asserts <- this )));
+		Run(InheritanceTest.testImplementingChildAfterCastGetsChildClassName(:(Asserts <- this )));
 		Run(ArrayTest.testSetArrayIndex(:(Asserts <- this)));
 		Run(ArrayTest.testResetArrayIndex(:(Asserts <- this)));
 		Run(ArrayTest.testSetArrayArrayIndexIndex(:(Asserts <- this)));
@@ -407,23 +413,32 @@ every BooleanLogicTest is:
 	}
 
 every InheritanceTestParent is:
-
 	Text -- getClassName() {
 		return "InheritanceTestParent";
 	}
 
-every InheritanceTestChild (an InheritanceTestParent) is:
-
+every InheritanceTestOverride (an InheritanceTestParent) is:
 	Text -- getClassName() {
-		return "InheritanceTestChild";
+		return "InheritanceTestOverride";
 	}
+
+
+every InheritanceTestInterface (capable InheritanceTestParent) is:
+	Text -- getClassName() {
+		return "InheritanceTestInterface";
+	}
+every InheritanceTestFallthrough (an InheritanceTestParent) is:
 
 every InheritanceTest is:
 
 	provides
 		InheritanceTestParent,
-		InheritanceTestChild,
-		InheritanceTestParent{SubClassed} <- InheritanceTestChild;
+		InheritanceTestOverride,
+		InheritanceTestFallthrough,
+		InheritanceTestInterface,
+		InheritanceTestParent{Override} <- InheritanceTestOverride,
+		InheritanceTestParent{Fallthrough} <- InheritanceTestFallthrough,
+		InheritanceTestParent{Interface} <- InheritanceTestInterface;
 
 	Truth -- testParentGetsParentClassName(Asserts) {
 		:InheritanceTestParent <- this;
@@ -431,21 +446,60 @@ every InheritanceTest is:
 		return Asserts.allPassed();
 	}
 
-	Truth -- testChildGetsChildClassName(Asserts) {
-		:InheritanceTestChild <- this;
-		Asserts.that(InheritanceTestChild.getClassName())Equals("InheritanceTestChild");
+	Truth -- testOverrideChildGetsChildClassName(Asserts) {
+		:InheritanceTestOverride <- this;
+		Asserts.that(InheritanceTestOverride.getClassName())Equals("InheritanceTestOverride");
 		return Asserts.allPassed();
 	}
 
-	Truth -- testChildFromProviderGetsChildClassName(Asserts) {
-		:InheritanceTestParent = :(InheritanceTestParent{SubClassed} <- this);
-		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestChild");
+	Truth -- testOverrideChildFromProviderGetsChildClassName(Asserts) {
+		:InheritanceTestParent = :(InheritanceTestParent{Override} <- this);
+		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestOverride");
 		return Asserts.allPassed();
 	}
 
-	Truth -- testChildAfterCastGetsChildClassName(Asserts) {
-		:InheritanceTestParent = :(InheritanceTestChild <- this);
-		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestChild");
+	Truth -- testOverrideChildAfterCastGetsChildClassName(Asserts) {
+		:InheritanceTestParent = :(InheritanceTestOverride <- this);
+		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestOverride");
+		return Asserts.allPassed();
+	}
+
+	Truth -- testFallthroughChildGetsChildClassName(Asserts) {
+		return False;
+		:InheritanceTestFallthrough <- this;
+		Asserts.that(InheritanceTestFallthrough.getClassName())Equals("InheritanceTestParent");
+		return Asserts.allPassed();
+	}
+
+	Truth -- testFallthroughChildFromProviderGetsChildClassName(Asserts) {
+		return False;
+		:InheritanceTestParent = :(InheritanceTestParent{Fallthrough} <- this);
+		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestParent");
+		return Asserts.allPassed();
+	}
+
+	Truth -- testFallthroughChildAfterCastGetsChildClassName(Asserts) {
+		return False;
+		:InheritanceTestParent = :(InheritanceTestFallthrough <- this);
+		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestParent");
+		return Asserts.allPassed();
+	}
+
+	Truth -- testImplementingChildGetsChildClassName(Asserts) {
+		:InheritanceTestInterface <- this;
+		Asserts.that(InheritanceTestInterface.getClassName())Equals("InheritanceTestInterface");
+		return Asserts.allPassed();
+	}
+
+	Truth -- testImplementingChildFromProviderGetsChildClassName(Asserts) {
+		:InheritanceTestParent = :(InheritanceTestParent{Interface} <- this);
+		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestInterface");
+		return Asserts.allPassed();
+	}
+
+	Truth -- testImplementingChildAfterCastGetsChildClassName(Asserts) {
+		:InheritanceTestParent = :(InheritanceTestInterface <- this);
+		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestInterface");
 		return Asserts.allPassed();
 	}
 

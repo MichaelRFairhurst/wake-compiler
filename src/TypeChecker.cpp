@@ -164,8 +164,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 						expectedstring = "Int' or 'Text";
 						erroneousstring = analyzer->getNameForType(ret);
 						freeType(additive); freeType(ret);
-						ret = MakeType(TYPE_CLASS);
-						ret->typedata._class.classname = strdup("Int");
+						ret = MakeType(TYPE_ERROR);
 
 						throw string("Only numerics or Texts can be added/concatenated");
 					}
@@ -428,7 +427,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					int i = 0;
 					while(i < methodname->subnodes) {
 						string name = methodname->node_data.nodes[i]->node_data.string;
-						TypeArray* args = MakeTypeArray(); // TODO must delete
+						TypeArray* args = MakeTypeArray();
 						i++;
 
 						if(methodname->subnodes > i) {
@@ -442,11 +441,18 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					}
 
 					PropertySymbolTable* methodtable = objectsymtable->find(subject->typedata._class.classname);
-					Type* lambdatype = methodtable->get(methodtable->getSymbolNameOf(&method_segments));
+					boost::optional<Type*> lambdatype = methodtable->find(methodtable->getSymbolNameOf(&method_segments));
+
+					if(lambdatype) {
+						ret = copyType((*lambdatype)->typedata.lambda.returntype);
+					} else {
+						errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Couldn't find property " + methodtable->getSymbolNameOf(&method_segments) + " on class" + subject->typedata._class.classname, tree));
+						ret = MakeType(TYPE_MATCHALL);
+					}
+
 					AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(subject->typedata._class.classname)));
 					AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(methodtable->getSymbolNameOf(&method_segments).c_str())));
 
-					ret = copyType(lambdatype->typedata.lambda.returntype);
 					freeType(subject);
 					for(vector<pair<string, TypeArray*> >::iterator it = method_segments.begin(); it != method_segments.end(); ++it)
 						freeTypeArray(it->second);
@@ -514,7 +520,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 						errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
 						delete e;
 					}
-					free(provider);
+					freeType(provider);
 				}
 				break;
 

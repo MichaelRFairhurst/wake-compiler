@@ -45,7 +45,11 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 
 		case NT_PROVISION:
 			try {
-				propertysymtable->addProvision(tree->node_data.nodes[0]->node_data.type, tree);
+				boost::optional<SemanticError*> error = propertysymtable->addProvision(tree->node_data.nodes[0]->node_data.type, tree);
+				if(error) {
+					(*error)->token = tree;
+					errors->addError(*error);
+				}
 				objectsymtable->assertTypeIsValid(tree->node_data.nodes[0]->node_data.type);
 			} catch(SemanticError* e) {
 				e->token = tree;
@@ -57,11 +61,10 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 			try {
 				vector<pair<string, TypeArray*> >* methodname = methodanalyzer->getName(tree);
 
-				try {
-					propertysymtable->addMethod(methodanalyzer->getReturn(tree), methodname, methodanalyzer->getBody(tree));
-				} catch(SemanticError* e) {
-					delete methodname;
-					throw e;
+				boost::optional<SemanticError*> error = propertysymtable->addMethod(methodanalyzer->getReturn(tree), methodname, methodanalyzer->getBody(tree));
+				if(error) {
+					(*error)->token = tree;
+					errors->addError(*error);
 				}
 
 				delete methodname;
@@ -220,7 +223,11 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 
 							if(!objectsymtable->getAnalyzer()->isASubtypeOfB(served->node_data.type, provision))
 								errors->addError(new SemanticError(TYPE_ERROR, "Bound class is not a subtype of provided class", tree));
-							else objectsymtable->getAnalyzer()->assertClassCanProvide(classname, served->node_data.type); // Test that this class Ctor is recursively provided
+
+							else {
+								objectsymtable->getAnalyzer()->assertClassCanBeBound(served->node_data.type); // Test that this class isn't abstract
+								objectsymtable->getAnalyzer()->assertClassCanProvide(classname, served->node_data.type); // Test that this class Ctor is recursively provided
+							}
 						} catch(SemanticError* e) {
 							e->token = tree;
 							errors->addError(e);
@@ -277,6 +284,7 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 			} else {
 				try {
 					// if we merely 'provide SomeClass' we must check we provide all its dependencies
+					objectsymtable->getAnalyzer()->assertClassCanBeBound(tree->node_data.nodes[0]->node_data.type); // Test that this class isn't abstract
 					objectsymtable->getAnalyzer()->assertClassCanProvide(classname, tree->node_data.nodes[0]->node_data.type);
 				} catch(SemanticError *e) {
 					e->token = tree;
@@ -307,7 +315,10 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 					return;
 				}
 
-				Type* method = propertysymtable->get(name);
+				boost::optional<Type*> optmethod = propertysymtable->find(name);
+				if(!optmethod) return;
+				Type* method = *optmethod;
+
 				errors->pushContext("In declaration of 'every " + classname + "' method " + name);
 				AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(name.c_str())));
 

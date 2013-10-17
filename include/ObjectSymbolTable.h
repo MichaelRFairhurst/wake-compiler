@@ -5,6 +5,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <boost/optional/optional.hpp>
 #include "SemanticError.h"
 #include "PropertySymbolTable.h"
 #include "TypeAnalyzer.h"
@@ -18,8 +19,8 @@ class ObjectSymbolTable {
 		ObjectSymbolTable();
 		~ObjectSymbolTable();
 
-		void addClass(string name);
-		void addInheritance(string child, bool issubclass);
+		boost::optional<SemanticError*> addClass(string name);
+		boost::optional<SemanticError*> addInheritance(string child, bool issubclass);
 		void propagateInheritance();
 		void propagateInheritanceToParent(string childname);
 		PropertySymbolTable* find(string name);

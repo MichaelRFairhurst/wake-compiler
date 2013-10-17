@@ -13,34 +13,38 @@ void LibraryLoader::loadStdLibToTable(ObjectSymbolTable* table) {
 	{
 		vector<pair<string, TypeArray*> > segments_arguments;
 		TypeArray* arguments = MakeTypeArray();
-		Type* text = MakeType(TYPE_CLASS);text->typedata._class.classname = "Text";
+		Type* text = MakeType(TYPE_CLASS);text->typedata._class.classname = strdup("Text");
 		AddTypeToTypeArray(text, arguments);
 		segments_arguments.push_back(pair<string, TypeArray*>("print", arguments));
 		table->find("Printer")->addMethod(NULL, &segments_arguments, NULL);
+		freeTypeArray(arguments);
 	}
 	{
 		vector<pair<string, TypeArray*> > segments_arguments;
 		TypeArray* arguments = MakeTypeArray();
-		Type* text = MakeType(TYPE_CLASS);text->typedata._class.classname = "Int";
+		Type* text = MakeType(TYPE_CLASS);text->typedata._class.classname = strdup("Int");
 		AddTypeToTypeArray(text, arguments);
 		segments_arguments.push_back(pair<string, TypeArray*>("print", arguments));
 		table->find("Printer")->addMethod(NULL, &segments_arguments, NULL);
+		freeTypeArray(arguments);
 	}
 	{
 		vector<pair<string, TypeArray*> > segments_arguments;
 		TypeArray* arguments = MakeTypeArray();
-		Type* text = MakeType(TYPE_CLASS);text->typedata._class.classname = "Text";
+		Type* text = MakeType(TYPE_CLASS);text->typedata._class.classname = strdup("Text");
 		AddTypeToTypeArray(text, arguments);
 		segments_arguments.push_back(pair<string, TypeArray*>("printLine", arguments));
 		table->find("Printer")->addMethod(NULL, &segments_arguments, NULL);
+		freeTypeArray(arguments);
 	}
 	{
 		vector<pair<string, TypeArray*> > segments_arguments;
 		TypeArray* arguments = MakeTypeArray();
-		Type* text = MakeType(TYPE_CLASS);text->typedata._class.classname = "Int";
+		Type* text = MakeType(TYPE_CLASS);text->typedata._class.classname = strdup("Int");
 		AddTypeToTypeArray(text, arguments);
 		segments_arguments.push_back(pair<string, TypeArray*>("printLine", arguments));
 		table->find("Printer")->addMethod(NULL, &segments_arguments, NULL);
+		freeTypeArray(arguments);
 	}
 
 	table->find("Printer")->assignAddresses();
@@ -49,10 +53,11 @@ void LibraryLoader::loadStdLibToTable(ObjectSymbolTable* table) {
 	{
 		vector<pair<string, TypeArray*> > segments_arguments;
 		TypeArray* arguments = MakeTypeArray();
-		Type* text = MakeType(TYPE_CLASS);text->typedata._class.classname = "Int";
+		Type* text = MakeType(TYPE_CLASS);text->typedata._class.classname = strdup("Int");
 		AddTypeToTypeArray(text, arguments);
 		segments_arguments.push_back(pair<string, TypeArray*>("exit", arguments));
 		table->find("System")->addMethod(NULL, &segments_arguments, NULL);
+		freeTypeArray(arguments);
 	}
 
 	table->find("System")->assignAddresses();
