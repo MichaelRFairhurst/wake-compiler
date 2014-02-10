@@ -84,7 +84,7 @@ bin/c/%.o: src/%.c gen/y.tab.h
 	$(CC) $(OPT) -c $< -o $@
 
 gen/y.tab.h: src/parser.y
-	yacc -dgv -o gen/y.tab.c src/parser.y
+	bison -dgv -o gen/y.tab.c src/parser.y
 
 gen/parsegraph.svg: gen/y.tab.h
 	dot -v -Tsvg gen/y.dot -o parsegraph.svg
