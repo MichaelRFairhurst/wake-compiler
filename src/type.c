@@ -8,6 +8,7 @@ Type* MakeType(int type) {
 	thetype->arrayed = 0;
 	thetype->specialty = NULL;
 	thetype->alias = NULL;
+	thetype->optional = 0;
 	switch(type) {
 		case TYPE_CLASS:
 			thetype->typedata._class.shadow = 0;
@@ -67,6 +68,7 @@ Type* copyType(Type* t) {
 
 	Type* copy = malloc(sizeof(Type));
 	copy->type = t->type;
+	copy->optional = t->optional;
 	if(t->type == TYPE_LAMBDA) {
 		copy->typedata.lambda.arguments = copyTypeArray(t->typedata.lambda.arguments);
 		copy->typedata.lambda.returntype = copyType(t->typedata.lambda.returntype);

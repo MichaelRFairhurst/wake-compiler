@@ -23,6 +23,8 @@ class ScopeSymbolTable {
 
 		void add(string name, Type* type);
 		void add(Type* type);
+		void addOverwriting(string name, Type* type);
+		void addOverwriting(Type* type);
 		string getNameForType(Type* type);
 		boost::optional<Type*> find(string name);
 		boost::optional<Type*> find(Type* type);

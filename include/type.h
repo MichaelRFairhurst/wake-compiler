@@ -4,6 +4,7 @@
 #define TYPE_LAMBDA 1
 #define TYPE_CLASS 2
 #define TYPE_MATCHALL 3
+#define TYPE_NOTHING 4
 
 struct TypeArray;
 
@@ -23,6 +24,7 @@ typedef struct Type {
 	int arrayed;						// number of []
 	char* alias;						// this should be moved....
 	char* specialty;					// {Alive}
+	int optional;
 } Type;
 
 typedef struct TypeArray {

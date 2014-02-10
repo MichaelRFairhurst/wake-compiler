@@ -72,6 +72,12 @@ void SemanticErrorPrinter::print(SemanticError* e) {
 		case ABSTRACT_PROVISION:
 			cout << "Provided class does not define all of its methods or parent/interface methods";
 			break;
+		case DIRECT_USE_OF_OPTIONAL_TYPE:
+			cout << "Direct usage of an optional type. Wrap it in a T exists { } statement";
+			break;
+		case EXISTS_ON_NONOPTIONAL_TYPE:
+			cout << "Calling T exists { } on a nonoptional type, statement does nothing";
+			break;
 		default:
 			cout << "bad error code provided";
 	}

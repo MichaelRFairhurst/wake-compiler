@@ -31,6 +31,8 @@ enum SemanticErrorCode {
 	CIRCULAR_DEPENDENCIES,			// A needs B, B needs C, C needs A, shit for everyone. Or A needs A.
 	INVALID_ASSIGNMENT,				// @it.doIt() = 5; is pushing it, bro
 	ABSTRACT_PROVISION,				// Providing a class directly that doesn't implement all of its methods
+	DIRECT_USE_OF_OPTIONAL_TYPE,	// :Printer = nothing;
+	EXISTS_ON_NONOPTIONAL_TYPE,		// needs Printer; Printer exists { }
 };
 
 class SemanticError {

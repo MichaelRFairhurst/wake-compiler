@@ -259,6 +259,15 @@ void CodeGenerator::generate(Node* tree) {
 			file << "]";
 			break;
 
+		case NT_EXISTS:
+			file << "if(";
+			generate(tree->node_data.nodes[0]);
+			file << "!=null){";
+			generate(tree->node_data.nodes[1]);
+			file << "}";
+			break;
+
+
 		case NT_IF_ELSE:
 			file << "if(";
 			generate(tree->node_data.nodes[0]);
@@ -406,6 +415,7 @@ void CodeGenerator::generate(Node* tree) {
 		case NT_NUMBERLIT: file << tree->node_data.number; break;
 		case NT_TRUTHLIT: file << (tree->node_data.number ? "1" : "0"); break;
 		case NT_STRINGLIT: file << '"'; file << tree->node_data.string; file << '"'; break;
+		case NT_NOTHING: file << "null"; break;
 	}
 }
 

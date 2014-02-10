@@ -15,6 +15,15 @@ void ScopeSymbolTable::add(Type* type) {
 	add(getNameForType(type), type);
 }
 
+void ScopeSymbolTable::addOverwriting(string name, Type* type) {
+	table[name] = pair<Type*, string>(type, allocator.allocate());
+	scopes.back().push_back(name);
+}
+
+void ScopeSymbolTable::addOverwriting(Type* type) {
+	addOverwriting(getNameForType(type), type);
+}
+
 boost::optional<Type*> ScopeSymbolTable::find(string name) {
 	if(!table.count(name)) {
 		string temp = "Symbol " + name + " not defined in this scope.";

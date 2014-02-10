@@ -28,7 +28,7 @@ int yywrap()
 %}
 
 /* keywords */
-%token EVERY CAPABLE A_OR_AN IS RETURN FOREACH WITH PUBLIC IF ELSE WHILE IN IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE
+%token EVERY CAPABLE A_OR_AN IS RETURN FOREACH WITH PUBLIC IF ELSE WHILE IN IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE EXISTS
 /* symbols */
 %token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT
 /* this too */
@@ -52,8 +52,8 @@ int yywrap()
 %token <number> TRUTH
 %token <number> SYM_SHADOW
 %token <number> SYM_ARRAYED
-%type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection injection_args provision provisions injection_arg ctor retrievabledeclarableargs value method block methodreturn methodnamesegments methodbody methodaccess methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional type_valued property property_value retrievalargs retrieval objectable expression_cast
-%type <type>  type_pure type_pure_arrayable type_declarable type_common type_lambda type_commonorlambda type_retrievable type_retrievabledeclarable
+%type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection injection_args provision provisions injection_arg ctor retrievabledeclarableargs value method block methodreturn methodnamesegments methodbody methodaccess methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional type_valued property property_value retrievalargs retrieval objectable expression_cast
+%type <type>  type_pure type_pure_arrayable type_pure_arrayable_nonoptional type_declarable_nonoptional type_declarable type_common type_lambda type_commonorlambda type_retrievable type_retrievabledeclarable
 %type <type_array> declarabletypes commonorlambdatypes
 %start file
 %%
@@ -121,9 +121,9 @@ property:
 	;
 
 property_value:
-	type_declarable																{ $$ = MakeNodeFromType($1); }
-	| type_declarable '=' value													{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1), $3); }
-	| type_declarable retrievalargs value										{	Node* retrieval = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1), $2);
+	type_declarable													{ $$ = MakeNodeFromType($1); }
+	| type_declarable '=' value										{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1), $3); }
+	| type_declarable retrievalargs value								{	Node* retrieval = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1), $2);
 																					AddSubNode(retrieval, $3);
 																					$$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType(copyType($1)), retrieval);		}
 	;
@@ -197,6 +197,11 @@ type_pure:
 	;
 
 type_pure_arrayable:
+	type_pure_arrayable_nonoptional												{ $$ = $1; }
+	| type_pure_arrayable_nonoptional '?'										{ $$ = $1; $$->optional = 1; }
+	;
+
+type_pure_arrayable_nonoptional:
 	IDENTIFIER																	{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; }
 	| FN '(' ')'																{ $$ = MakeType(TYPE_LAMBDA); }
 	| FN '(' commonorlambdatypes ')'											{ $$ = MakeType(TYPE_LAMBDA); $$->typedata.lambda.arguments = $3; }
@@ -237,7 +242,7 @@ type_valued:
 	| ALIAS																		{ $$ = MakeNodeFromString(NT_ALIAS, $1); }
 	;
 
-type_declarable:
+type_declarable_nonoptional:
 	type_common																	{ $$ = $1; }
 	| SYM_SHADOW type_common													{ $$ = $2; $$->typedata._class.shadow = $1; }
 	| ALIAS type_common															{ $$ = $2; $$->alias = $1; }
@@ -245,6 +250,10 @@ type_declarable:
 	| ALIAS type_lambda															{ $$ = $2; $$->alias = $1; }
 	| type_lambda ALIAS															{ $$ = $1; $$->alias = $2; }
 	;
+
+type_declarable:
+	type_declarable_nonoptional													{ $$ = $1; }
+	| type_declarable_nonoptional '?'											{ $$ = $1; $$->optional = 1; }
 
 type_lambda:
 	FN '(' ')'																	{ $$ = MakeType(TYPE_LAMBDA); }
@@ -303,6 +312,7 @@ value:
 	| '(' expression ')'														{ $$ = $2; }
 	| '[' expressions ']'														{ $$ = MakeOneBranchNode(NT_ARRAY_DECLARATION, $2); }
 	| SYM_ARRAYED																{ $$ = MakeEmptyNode(NT_ARRAY_DECLARATION); }
+	| NOTHING																	{ $$ = MakeEmptyNode(NT_NOTHING); }
 	;
 
 objectable:
@@ -342,6 +352,7 @@ statement:
 	| selectionstatement														{ $$ = $1; }
 	| iterationstatement														{ $$ = $1; }
 	| jumpstatement																{ $$ = $1; }
+	| existsstatement															{ $$ = $1; }
 	| block																		{ $$ = $1; }
 	;
 
@@ -352,6 +363,10 @@ emptystatement:
 labelstatement:
 	CASE expression ':'															{ $$ = MakeOneBranchNode(NT_CASE, $2); }
 	| DEFAULT ':'																{ $$ = MakeEmptyNode(NT_DEFAULTCASE); }
+	;
+
+existsstatement:
+	type_valued EXISTS statement												{ $$ = MakeTwoBranchNode(NT_EXISTS, $1, $3); }
 	;
 
 selectionstatement:

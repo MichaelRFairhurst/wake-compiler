@@ -156,6 +156,10 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				ret->typedata._class.classname = strdup(thiscontext.c_str());
 				break;
 
+			case NT_NOTHING:
+				ret = MakeType(TYPE_NOTHING);
+				break;
+
 			case NT_PARENT:
 				throw string("not yet implemented");
 				break;
@@ -467,6 +471,11 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					PropertySymbolTable* methodtable = objectsymtable->find(subject->typedata._class.classname);
 					boost::optional<Type*> lambdatype = methodtable->find(methodtable->getSymbolNameOf(&method_segments));
 
+					if(subject->optional) {
+						errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Calling " + methodtable->getSymbolNameOf(&method_segments) + " on optional type" + subject->typedata._class.classname + ". You must first wrap object in an exists { } clause.", tree));
+						ret = MakeType(TYPE_MATCHALL);
+					}
+
 					if(lambdatype) {
 						ret = copyType((*lambdatype)->typedata.lambda.returntype);
 					} else {
@@ -554,6 +563,30 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					errors->addError(new SemanticError(TYPE_ERROR, "Invalid use of empty list", tree));
 				} else {
 					errors->addError(new SemanticError(WARNING, "Not supported yet", tree));
+				}
+				break;
+
+			case NT_EXISTS:
+				try {
+					Type* ret = typeCheck(tree->node_data.nodes[0]);
+
+					if(!ret->optional) {
+						errors->addError(new SemanticError(EXISTS_ON_NONOPTIONAL_TYPE, "exists { } statement uses a nonoptional type", tree)); // @todo better error message!
+						break;
+					}
+
+					objectsymtable->assertTypeIsValid(ret);
+
+					Type* real = copyType(ret);
+					real->optional = 0;
+
+					scopesymtable->addOverwriting(real);
+					freeType(typeCheck(tree->node_data.nodes[1]));
+					scopesymtable->addOverwriting(ret);
+					freeType(real);
+				} catch(SymbolNotFoundException* e) {
+					errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
+					delete e;
 				}
 				break;
 

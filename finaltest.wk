@@ -3,7 +3,7 @@
 ##
 every Main is:
 
-	needs System, AssertsTest, Printer, MathTest, BooleanLogicTest, InheritanceTest, ArrayTest;
+	needs System, AssertsTest, Printer, MathTest, BooleanLogicTest, InheritanceTest, ArrayTest, OptionalTypeTest;
 
 	provides Printer, Asserts;
 
@@ -43,6 +43,8 @@ every Main is:
 		Run(BooleanLogicTest.testOr(:(Asserts <- this)));
 		Run(BooleanLogicTest.testAnd(:(Asserts <- this)));
 		Run(BooleanLogicTest.testOrderOfOperations(:(Asserts <- this)));
+		//Run(TernaryOperatorTest.testTrue(:(Asserts <- this)));
+		//Run(TernaryOperatorTest.testFalse(:(Asserts <- this)));
 		Run(InheritanceTest.testParentGetsParentClassName(:(Asserts <- this)));
 		Run(InheritanceTest.testOverrideChildGetsChildClassName(:(Asserts <- this)));
 		Run(InheritanceTest.testOverrideChildFromProviderGetsChildClassName(:(Asserts <- this)));
@@ -59,6 +61,8 @@ every Main is:
 		Run(ArrayTest.testResetArrayArrayIndexIndex(:(Asserts <- this)));
 		Run(ArrayTest.testSetMultipleArrayIndices(:(Asserts <- this)));
 		Run(ArrayTest.testSetMultipleArrayArrayIndicesIndices(:(Asserts <- this)));
+		Run(OptionalTypeTest.testOptionalIntNeverSet());
+		Run(OptionalTypeTest.testOptionalIntSet());
 
 		Printer.printLine("");
 		Printer.printLine("");
@@ -440,6 +444,8 @@ every InheritanceTest is:
 		InheritanceTestParent{Fallthrough} <- InheritanceTestFallthrough,
 		InheritanceTestParent{Interface} <- InheritanceTestInterface;
 
+	needs Printer;
+
 	Truth -- testParentGetsParentClassName(Asserts) {
 		:InheritanceTestParent <- this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestParent");
@@ -465,6 +471,7 @@ every InheritanceTest is:
 	}
 
 	Truth -- testFallthroughChildGetsChildClassName(Asserts) {
+		Printer.print("Skip");
 		return False;
 		:InheritanceTestFallthrough <- this;
 		Asserts.that(InheritanceTestFallthrough.getClassName())Equals("InheritanceTestParent");
@@ -472,6 +479,7 @@ every InheritanceTest is:
 	}
 
 	Truth -- testFallthroughChildFromProviderGetsChildClassName(Asserts) {
+		Printer.print("Skip");
 		return False;
 		:InheritanceTestParent = :(InheritanceTestParent{Fallthrough} <- this);
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestParent");
@@ -479,6 +487,7 @@ every InheritanceTest is:
 	}
 
 	Truth -- testFallthroughChildAfterCastGetsChildClassName(Asserts) {
+		Printer.print("Skip");
 		return False;
 		:InheritanceTestParent = :(InheritanceTestFallthrough <- this);
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestParent");
@@ -571,4 +580,34 @@ every ArrayTest is:
 		Asserts.that(Int[2][1])Equals(7);
 		Asserts.that(Int[2][2])Equals(8);
 		return Asserts.allPassed();
+	}
+
+#>
+every TernaryOperatorTest is:
+
+	Truth -- testTrue(Asserts) {
+		return True ? True : False;
+	}
+
+	Truth -- testFalse(Asserts) {
+		return False ? False : True;
+	}
+##
+
+every OptionalTypeTest is:
+
+	Truth -- testOptionalIntNeverSet() {
+		:Int? = nothing;
+		Int exists {
+			return False;
+		}
+		return True;
+	}
+
+	Truth -- testOptionalIntSet() {
+		:Int? = 5;
+		Int exists {
+			return Int == 5;
+		}
+		return False;
 	}

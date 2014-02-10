@@ -23,6 +23,7 @@ bool TypeAnalyzer::isASubtypeOfB(string a, string b) {
 bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 	if(a->type == TYPE_MATCHALL || b->type == TYPE_MATCHALL) return true;
 	if(a == NULL || b == NULL) return false;
+	if(a->type == TYPE_NOTHING) return b->optional;
 	if(a->arrayed != b->arrayed) return false;
 	if(a->type != b->type) return false;
 
@@ -47,7 +48,9 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 		return true;
 
 	} else {
-		if(string(a->typedata._class.classname) == b->typedata._class.classname) return true;
+		if(string(a->typedata._class.classname) == b->typedata._class.classname) {
+			return a->optional <= b->optional;
+		}
 
 		try {
 
@@ -133,8 +136,13 @@ string TypeAnalyzer::getNameForType(Type* type) {
 		return name;
 	}
 
+	if(type->type == TYPE_NOTHING) {
+		return "[NOTHING]";
+	}
+
 	if(type->type == TYPE_CLASS) {
 		name = type->typedata._class.classname;
+		if(type->optional) name += "?";
 	} else {
 		name = getNameForType(type->typedata.lambda.returntype);
 		name += "--(";

@@ -41,63 +41,65 @@
 #define NT_METHOD_NAME_SEGMENT 26
 
 #define NT_THIS 27
-#define NT_PARENT 28
-#define NT_TYPE_ARRAY 29
-#define NT_TYPEDATA 30
-#define NT_CLASSNAME 31
-#define NT_CURRIED 32
-#define NT_STRINGLIT 33
-#define NT_NUMBERLIT 34
-#define NT_TRUTHLIT 35
-#define NT_ALIAS 36
+#define NT_NOTHING 28
+#define NT_PARENT 29
+#define NT_TYPE_ARRAY 30
+#define NT_TYPEDATA 31
+#define NT_CLASSNAME 32
+#define NT_CURRIED 33
+#define NT_STRINGLIT 34
+#define NT_NUMBERLIT 35
+#define NT_TRUTHLIT 36
+#define NT_ALIAS 37
 
-#define NT_ARRAY_ACCESS 37
-#define NT_MEMBER_ACCESS 38
-#define NT_METHOD_INVOCATION 39
-#define NT_LAMBDA_INVOCATION 40
+#define NT_ARRAY_ACCESS 38
+#define NT_MEMBER_ACCESS 39
+#define NT_METHOD_INVOCATION 40
+#define NT_LAMBDA_INVOCATION 41
 
-#define NT_BLOCK 41
-#define NT_EXPRESSIONS 42
-#define NT_RETRIEVALS_STATEMENTS 43
-#define NT_RETRIEVAL 44
-#define NT_ASSIGNMENT 45
-#define NT_DECLARATION 74
+#define NT_BLOCK 42
+#define NT_EXPRESSIONS 43
+#define NT_RETRIEVALS_STATEMENTS 44
+#define NT_RETRIEVAL 45
+#define NT_ASSIGNMENT 46
+#define NT_DECLARATION 75
 
-#define NT_CASE 46
-#define NT_DEFAULTCASE 47
-#define NT_IF_ELSE 48
-#define NT_SWITCH 49
-#define NT_WHILE 50
-#define NT_FOR 51
-#define NT_BREAK 52
-#define NT_CONTINUE 53
-#define NT_RETURN 54
-#define NT_IF_THEN_ELSE 55
+#define NT_CASE 47
+#define NT_DEFAULTCASE 48
+#define NT_IF_ELSE 49
+#define NT_SWITCH 50
+#define NT_WHILE 51
+#define NT_FOR 52
+#define NT_BREAK 53
+#define NT_CONTINUE 54
+#define NT_RETURN 55
+#define NT_IF_THEN_ELSE 56
+#define NT_EXISTS 57
 
-#define NT_VALUES 56
-#define NT_ARRAY_DECLARATION 57
-#define NT_INCREMENT 58
-#define NT_DECREMENT 59
-#define NT_INVERT 60
-#define NT_MULTIPLY 61
-#define NT_DIVIDE 62
-#define NT_ADD 63
-#define NT_SUBTRACT 64
-#define NT_LESSTHAN 65
-#define NT_GREATERTHAN 66
-#define NT_LESSTHANEQUAL 67
-#define NT_GREATERTHANEQUAL 68
-#define NT_EQUALITY 69
-#define NT_INEQUALITY 70
-#define NT_AND 71
-#define NT_OR 72
+#define NT_VALUES 58
+#define NT_ARRAY_DECLARATION 59
+#define NT_INCREMENT 60
+#define NT_DECREMENT 61
+#define NT_INVERT 62
+#define NT_MULTIPLY 63
+#define NT_DIVIDE 64
+#define NT_ADD 65
+#define NT_SUBTRACT 66
+#define NT_LESSTHAN 67
+#define NT_GREATERTHAN 68
+#define NT_LESSTHANEQUAL 69
+#define NT_GREATERTHANEQUAL 70
+#define NT_EQUALITY 71
+#define NT_INEQUALITY 72
+#define NT_AND 73
+#define NT_OR 74
 
-#define NT_PROPERTY 73
-#define NT_CAST 75
-#define NT_COMPILER_HINT 76
+#define NT_PROPERTY 76
+#define NT_CAST 77
+#define NT_COMPILER_HINT 78
 
-#define NT_PRIVATE 77
-#define NT_PUBLIC 78
+#define NT_PRIVATE 79
+#define NT_PUBLIC 80
 
 void AddSubNode(Node* parent, Node* child);
 

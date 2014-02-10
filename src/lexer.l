@@ -59,6 +59,7 @@ parent					count(); return PARENT;
 fn						count(); return FN;
 nothing					count(); return NOTHING;
 cast					count(); return CAST;
+exists					count(); return EXISTS;
 
 :						count(); return ':';
 @						count(); return '@';

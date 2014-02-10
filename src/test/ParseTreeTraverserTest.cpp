@@ -1406,4 +1406,201 @@ PTT_TEST_CASE(
 	PTT_EXPECT(ABSTRACT_PROVISION)
 );
 
+PTT_TEST_CASE(
+	UsingAOptionalTypeIsError,
+	"every MyClass is:							\n\
+		myMethod(Printer?) {					\n\
+			Printer.print(\"erroneous usage\");	\n\
+		}",
+	PTT_EXPECT(DIRECT_USE_OF_OPTIONAL_TYPE)
+);
+
+PTT_TEST_CASE(
+	AssignmentOfOptionalTypeAsRealTypeIsError,
+	"every MyClass is:				\n\
+		assignment(Printer?) {		\n\
+			:$Printer = Printer;	\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	AssignmentOfOptionalTypeToOptionalTypeIsValid,
+	"every MyClass is:				\n\
+		assignment(Printer?) {		\n\
+			:$Printer? = Printer;	\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	ReturnOfOptionalTypeAsRealTypeIsError,
+	"every MyClass is:						\n\
+		Printer -- returnment(Printer?) {	\n\
+			return Printer;					\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	ReturnOfOptionalTypeAsOptionalTypeIsValid,
+	"every MyClass is:						\n\
+		Printer? -- returnment(Printer?) {	\n\
+			return Printer;					\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	ArgumentOfOptionalTypeAsRealTypeIsError,
+	"every MyClass is:			\n\
+		optional(Printer?) {	\n\
+			real(Printer);		\n\
+		}						\n\
+		real(Printer) {			\n\
+		}",
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+);
+
+PTT_TEST_CASE(
+	ArgumentOfOptionalTypeAsOptionalTypeIsValid,
+	"every MyClass is:			\n\
+		optional(Printer?) {	\n\
+			real(Printer);		\n\
+		}						\n\
+		real(Printer?) {		\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	NullAssignmentToRealTypeIsError,
+	"every MyClass is:			\n\
+		myMethod(Printer) {		\n\
+			Printer = nothing;	\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	NullAssignmentToOptionalTypeIsValid,
+	"every MyClass is:			\n\
+		myMethod(Printer?) {	\n\
+			Printer = nothing;	\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	NullReturnOfRealTypeIsError,
+	"every MyClass is:			\n\
+		Printer -- myMethod() { \n\
+			return nothing;		\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	NullReturnOfOptionalTypeIsValid,
+	"every MyClass is:				\n\
+		Printer? -- myMethod() {	\n\
+			return nothing;			\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	NullArgumentOfRealArgumentIsError,
+	"every MyClass is:		\n\
+		real(Printer) {		\n\
+			real(nothing);	\n\
+		}",
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+);
+
+PTT_TEST_CASE(
+	ExistsClauseOnRealTypeNotAllowed,
+	"every MyClass is:			\n\
+		myMethod(Printer) {		\n\
+			Printer exists {}	\n\
+		}",
+	PTT_EXPECT(EXISTS_ON_NONOPTIONAL_TYPE)
+);
+
+PTT_TEST_CASE(
+	ExistsClauseMakesOptionalTypeUsable,
+	"every MyClass is:						\n\
+		myMethod(Printer?) {				\n\
+			Printer exists {				\n\
+				Printer.print(\"yay!\");	\n\
+			}								\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	ExistsClauseMakesOptionalTypeAssignable,
+	"every MyClass is:					\n\
+		myMethod(Printer?) {			\n\
+			Printer exists {			\n\
+				:$Printer = Printer;	\n\
+			}							\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	ExistsClauseMakesOptionalTypeReturnable,
+	"every MyClass is:					\n\
+		needs $Printer;					\n\
+		Printer -- myMethod(Printer?) {	\n\
+			Printer exists {			\n\
+				return Printer;			\n\
+			}							\n\
+			return $Printer;			\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	ExistsClauseMakesOptionalTypeValidAsArgument,
+	"every MyClass is:			\n\
+		optional(Printer?) {	\n\
+			Printer exists {	\n\
+				real(Printer);	\n\
+			}					\n\
+		}						\n\
+		real(Printer) {			\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	AfterExistClauseOptionalsRemainOptional,
+	"every MyClass is:					\n\
+		usage(Printer?) {				\n\
+			Printer exists {}			\n\
+			Printer.print(\"a\");		\n\
+		}								\n\
+		assignment(Printer?) {			\n\
+			Printer exists {}			\n\
+			:$Printer = Printer;		\n\
+		}								\n\
+		Printer -- returnin(Printer?) {	\n\
+			Printer exists {}			\n\
+			return Printer;				\n\
+		}								\n\
+		optional(Printer?) {			\n\
+			Printer exists {}			\n\
+			real(Printer);				\n\
+		}								\n\
+		real(Printer) {					\n\
+		}",
+	PTT_EXPECT(DIRECT_USE_OF_OPTIONAL_TYPE)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+);
+
+
 BOOST_AUTO_TEST_SUITE_END()
