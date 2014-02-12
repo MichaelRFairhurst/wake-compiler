@@ -263,6 +263,7 @@ span.goodcode {
 				<li><a href="#aliases">- Aliased Variables</a></li>
 				<li><a href="#shadowing">- Shadowing Types</a></li>
 				<li><a href="#declarations">- Declaring Variables</a></li>
+				<li><a href="#optionals">- Optional Types</a></li>
 				<li><a href="#lists">- Using Lists</a></li>
 				<li><a href="#classes">Classes</a></li>
 				<li><a href="#dependencies">- Dependencies</a></li>
@@ -623,6 +624,22 @@ span.goodcode {
         <span class="badcode" title="Compiler error! In Wake you cannot redefine variables.">:Int = 3</span>;
     }</code></pre>
 
+			<h3 id="optionals">Optional Types <span class="label label-inverse">typesafe</span></h3>
+			<p>Wake will guarantee the existence of most variables, arguments, and return types. This prevents rogue NullPointerExceptions, or segfaults, or fatal errors that large apps in other languages frequently succumb to.</p>
+			<p>The flip side to this is that when a value may not exist, it must be declared <i>optional</i> with <code>?</code>. Before using an optional type, the compiler ensures you have accounted for the possibility of it not existing with <code>exists</code> clauses.</p>
+			<pre><code class="wake"
+>every OptionalTypeUsage is:
+
+    Int? -- mayReturnAnIntAndAcceptsAn(Int?) {
+        <span class="goodcode" title="You can always assign a real type to an optional one.">Int = 5;</span>
+        <span class="goodcode" title="You can always set an optional type to Nothing.">Int = Nothing;</span>
+        <span class="goodcode" title="This checks if Int is not Nothing. Inside this block, Int is no longer an optional type.">if Int exists {</span>
+            return Int + 7;
+        } else {
+            return Nothing;
+        }
+    }
+</code></pre>
 			<h3 id="lists">Using Lists <span class="label label-inverse">typesafe</span></h3>
 			<div class="alert alert-error">
 				Until further releases, reading an unassigned list index results in undefined behavior, like in C/C++. Later on it will throw exceptions.
