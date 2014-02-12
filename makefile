@@ -45,8 +45,6 @@ chatup: bin/finaltest.js
 	@echo -- BLINDING BUILD, MATE
 	@echo
 
-buggered: loo chatup
-
 chivvy: bin/test
 	@echo
 	@echo -- FANNY AROUND
@@ -71,25 +69,25 @@ bin/wake: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o chivvy
 bin/finaltest.js: bin/wake finaltest.wk
 	time ./bin/wake finaltest.wk -o bin/finaltest.js
 
-bin/gen/%.o: gen/%.c
+bin/gen/%.o: gen/%.c gen/y.tab.c
 	$(CC) $(OPT) -c $< -o $@
 
 bin/tests/%.o: src/test/%.cpp
 	$(CPP) -g -c $< -o $@
 
-bin/cpp/%.o: src/%.cpp gen/y.tab.h
+bin/cpp/%.o: src/%.cpp gen/y.tab.c
 	$(CPP) $(OPT) -c $< -o $@
 
-bin/c/%.o: src/%.c gen/y.tab.h
+bin/c/%.o: src/%.c gen/y.tab.c
 	$(CC) $(OPT) -c $< -o $@
 
-gen/y.tab.h: src/parser.y
+gen/y.tab.c: src/parser.y
 	bison -dgv -o gen/y.tab.c src/parser.y
 
-gen/parsegraph.svg: gen/y.tab.h
+gen/parsegraph.svg: gen/y.tab.c
 	dot -v -Tsvg gen/y.dot -o parsegraph.svg
 
-gen/lex.yy.c: src/lexer.l gen/y.tab.h
+gen/lex.yy.c: src/lexer.l gen/y.tab.c
 	flex -o gen/lex.yy.c src/lexer.l
 
 loo:
