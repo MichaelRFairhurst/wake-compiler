@@ -265,6 +265,11 @@ void CodeGenerator::generate(Node* tree) {
 			file << "!=null){";
 			generate(tree->node_data.nodes[1]);
 			file << "}";
+			if(tree->subnodes > 2) {
+				file << "else{";
+				generate(tree->node_data.nodes[2]);
+				file << "};";
+			}
 			break;
 
 

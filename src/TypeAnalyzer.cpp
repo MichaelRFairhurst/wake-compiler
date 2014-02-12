@@ -115,17 +115,17 @@ Type* TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
 
 bool TypeAnalyzer::isPrimitiveTypeInt(Type* type) {
 	if(type->type == TYPE_MATCHALL) return true;
-	return type->type != TYPE_LAMBDA && type->typedata._class.classname == string("Int") && type->arrayed == 0;
+	return type->type != TYPE_LAMBDA && type->typedata._class.classname == string("Int") && type->arrayed == 0 && type->optional == 0;
 }
 
 bool TypeAnalyzer::isPrimitiveTypeText(Type* type) {
 	if(type->type == TYPE_MATCHALL) return true;
-	return type->type != TYPE_LAMBDA && type->typedata._class.classname == string("Text") && type->arrayed == 0;
+	return type->type != TYPE_LAMBDA && type->typedata._class.classname == string("Text") && type->arrayed == 0 && type->optional == 0;
 }
 
 bool TypeAnalyzer::isPrimitiveTypeTruth(Type* type) {
 	if(type->type == TYPE_MATCHALL) return true;
-	return type->type != TYPE_LAMBDA && type->typedata._class.classname == string("Truth") && type->arrayed == 0;
+	return type->type != TYPE_LAMBDA && type->typedata._class.classname == string("Truth") && type->arrayed == 0 && type->optional == 0;
 }
 
 string TypeAnalyzer::getNameForType(Type* type) {

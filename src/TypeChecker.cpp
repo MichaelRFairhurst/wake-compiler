@@ -26,6 +26,8 @@ bool TypeChecker::exhaustiveReturns(Node* tree) {
 		case NT_WHILE:
 			// Loops are always conditional and therefore never exhaustive
 			return false;
+
+		case NT_EXISTS:
 		case NT_IF_ELSE:
 			// If no else, then not exhaustive
 			if(tree->subnodes == 2) return false;
@@ -584,6 +586,9 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					freeType(typeCheck(tree->node_data.nodes[1]));
 					scopesymtable->addOverwriting(ret);
 					freeType(real);
+					if(tree->subnodes > 2) {
+						freeType(typeCheck(tree->node_data.nodes[2]));
+					}
 				} catch(SymbolNotFoundException* e) {
 					errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
 					delete e;

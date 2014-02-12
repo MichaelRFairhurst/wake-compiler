@@ -63,6 +63,8 @@ every Main is:
 		Run(ArrayTest.testSetMultipleArrayArrayIndicesIndices(:(Asserts <- this)));
 		Run(OptionalTypeTest.testOptionalIntNeverSet());
 		Run(OptionalTypeTest.testOptionalIntSet());
+		Run(OptionalTypeTest.testOptionalIntNotSetWillHitElse());
+		Run(OptionalTypeTest.testOptionalIntSetWontHitElse());
 
 		Printer.printLine("");
 		Printer.printLine("");
@@ -598,7 +600,7 @@ every OptionalTypeTest is:
 
 	Truth -- testOptionalIntNeverSet() {
 		:Int? = nothing;
-		Int exists {
+		if Int exists {
 			return False;
 		}
 		return True;
@@ -606,8 +608,24 @@ every OptionalTypeTest is:
 
 	Truth -- testOptionalIntSet() {
 		:Int? = 5;
-		Int exists {
+		if Int exists {
 			return Int == 5;
 		}
 		return False;
+	}
+
+	Truth -- testOptionalIntNotSetWillHitElse() {
+		:Int? = nothing;
+		if Int exists {} else {
+			return True;
+		}
+		return False;
+	}
+
+	Truth -- testOptionalIntSetWontHitElse() {
+		:Int? = 5;
+		if Int exists {} else {
+			return False;
+		}
+		return True;
 	}

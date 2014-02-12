@@ -1520,9 +1520,9 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	ExistsClauseOnRealTypeNotAllowed,
-	"every MyClass is:			\n\
-		myMethod(Printer) {		\n\
-			Printer exists {}	\n\
+	"every MyClass is:				\n\
+		myMethod(Printer) {			\n\
+			if Printer exists {}	\n\
 		}",
 	PTT_EXPECT(EXISTS_ON_NONOPTIONAL_TYPE)
 );
@@ -1531,7 +1531,7 @@ PTT_TEST_CASE(
 	ExistsClauseMakesOptionalTypeUsable,
 	"every MyClass is:						\n\
 		myMethod(Printer?) {				\n\
-			Printer exists {				\n\
+			if Printer exists {				\n\
 				Printer.print(\"yay!\");	\n\
 			}								\n\
 		}",
@@ -1542,7 +1542,7 @@ PTT_TEST_CASE(
 	ExistsClauseMakesOptionalTypeAssignable,
 	"every MyClass is:					\n\
 		myMethod(Printer?) {			\n\
-			Printer exists {			\n\
+			if Printer exists {			\n\
 				:$Printer = Printer;	\n\
 			}							\n\
 		}",
@@ -1554,7 +1554,7 @@ PTT_TEST_CASE(
 	"every MyClass is:					\n\
 		needs $Printer;					\n\
 		Printer -- myMethod(Printer?) {	\n\
-			Printer exists {			\n\
+			if Printer exists {			\n\
 				return Printer;			\n\
 			}							\n\
 			return $Printer;			\n\
@@ -1566,7 +1566,7 @@ PTT_TEST_CASE(
 	ExistsClauseMakesOptionalTypeValidAsArgument,
 	"every MyClass is:			\n\
 		optional(Printer?) {	\n\
-			Printer exists {	\n\
+			if Printer exists {	\n\
 				real(Printer);	\n\
 			}					\n\
 		}						\n\
@@ -1579,19 +1579,19 @@ PTT_TEST_CASE(
 	AfterExistClauseOptionalsRemainOptional,
 	"every MyClass is:					\n\
 		usage(Printer?) {				\n\
-			Printer exists {}			\n\
+			if Printer exists {}		\n\
 			Printer.print(\"a\");		\n\
 		}								\n\
 		assignment(Printer?) {			\n\
-			Printer exists {}			\n\
+			if Printer exists {}		\n\
 			:$Printer = Printer;		\n\
 		}								\n\
 		Printer -- returnin(Printer?) {	\n\
-			Printer exists {}			\n\
+			if Printer exists {}		\n\
 			return Printer;				\n\
 		}								\n\
 		optional(Printer?) {			\n\
-			Printer exists {}			\n\
+			if Printer exists {}		\n\
 			real(Printer);				\n\
 		}								\n\
 		real(Printer) {					\n\
@@ -1602,5 +1602,86 @@ PTT_TEST_CASE(
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 );
 
+PTT_TEST_CASE(
+	OptionalIntsTruthsAndTextsCantBeUsed,
+	"every MyClass is:											\n\
+		addOptionalInts(Int?, $Int?) { Int + $Int; }			\n\
+		subtractOptionalInts(Int?, $Int?) { Int - $Int; }		\n\
+		divideOptionalInts(Int?, $Int?) { Int / $Int; }			\n\
+		multiplyOptionalInts(Int?, $Int?) { Int * $Int; }		\n\
+		concatOptionalTexts(Text?, $Text?) { Text * Text; }		\n\
+		notOptionalTruth(Truth?) { !Truth; }					\n\
+		andOptionalTruths(Truth?, $Truth?) { Truth && $Truth; }	\n\
+		orOptionalTruths(Truth?, $Truth?) { Truth || $Truth; }	\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	ExistsElseStatementIsTypeChecked,
+	"every MyClass is:				\n\
+		myMethod() {				\n\
+			:Int? = 4;				\n\
+			if Int exists {} else { \n\
+				Int + 4;			\n\
+			}						\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	ReturningWithinExistsIsNotExhaustive,
+	"every MyClass is:				\n\
+		Truth -- myMethod(Int?) {	\n\
+			if Int exists {			\n\
+				return True;		\n\
+			}						\n\
+		}",
+	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
+);
+
+PTT_TEST_CASE(
+	ReturningWithinExistsElseIsNotExhaustive,
+	"every MyClass is:				\n\
+		Truth -- myMethod(Int?) {	\n\
+			if Int exists {			\n\
+			} else {				\n\
+				return True;		\n\
+			}						\n\
+		}",
+	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
+);
+
+PTT_TEST_CASE(
+	ReturningWithinExistsWithAnElseIsNotExhaustive,
+	"every MyClass is:				\n\
+		Truth -- myMethod(Int?) {	\n\
+			if Int exists {			\n\
+				return True;		\n\
+			} else {				\n\
+			}						\n\
+		}",
+	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
+);
+
+PTT_TEST_CASE(
+	ReturningWithinExistsAndElseIsExhaustive,
+	"every MyClass is:				\n\
+		Truth -- myMethod(Int?) {	\n\
+			if Int exists {			\n\
+				return True;		\n\
+			} else {				\n\
+				return False;		\n\
+			}						\n\
+		}",
+	PTT_VALID
+);
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -366,7 +366,8 @@ labelstatement:
 	;
 
 existsstatement:
-	type_valued EXISTS statement												{ $$ = MakeTwoBranchNode(NT_EXISTS, $1, $3); }
+	IF type_valued EXISTS statement												{ $$ = MakeTwoBranchNode(NT_EXISTS, $2, $4); }
+	| IF type_valued EXISTS statement ELSE statement							{ $$ = MakeTwoBranchNode(NT_EXISTS, $2, $4); AddSubNode($$, $6); }
 	;
 
 selectionstatement:
