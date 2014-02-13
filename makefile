@@ -24,7 +24,8 @@ CPPNAMES= \
 	CodeGenerator.cpp \
 	AddressAllocator.cpp \
 	OptionsParser.cpp \
-	EntryPointAnalyzer.cpp
+	EntryPointAnalyzer.cpp \
+	Linker.cpp
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
 CNAMES=tree.c type.c parseUtil.c
