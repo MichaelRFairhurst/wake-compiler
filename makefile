@@ -27,9 +27,9 @@ CPPNAMES= \
 	EntryPointAnalyzer.cpp
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
-CNAMES=tree.c type.c
+CNAMES=tree.c type.c parseUtil.c
 COBJS=$(addprefix bin/c/, $(CNAMES:.c=.o))
-GENNAMES=lex.wake.c wake.tab.c
+GENNAMES=lex.wake.c wake.tab.c objectfile.tab.c lex.objectfile.c
 GENOBJS=$(addprefix bin/gen/, $(GENNAMES:.c=.o))
 TEST=true
 TESTNAMES=CompilerTests.cpp ObjectSymbolTableTest.cpp ParseTreeTraverserTest.cpp ScopeSymbolTableTest.cpp TypeAnalyzerTest.cpp PropertySymbolTableTest.cpp AddressAllocatorTest.cpp OptionsParserTest.cpp
@@ -86,6 +86,12 @@ gen/wake.tab.c: src/wakeparser.y
 
 gen/lex.wake.c: src/wakelexer.l gen/wake.tab.c
 	flex -P wake -o gen/lex.wake.c src/wakelexer.l
+
+gen/objectfile.tab.c: src/objectfileparser.y
+	bison -p objectfile -dgv -o gen/objectfile.tab.c src/objectfileparser.y
+
+gen/lex.objectfile.c: src/objectfilelexer.l gen/objectfile.tab.c
+	flex -P objectfile -o gen/lex.objectfile.c src/objectfilelexer.l
 
 loo:
 	@echo
