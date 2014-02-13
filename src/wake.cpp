@@ -5,7 +5,7 @@ extern "C" {
 	#include "type.h"
 	#include "node.h"
 	#include "tree.h"
-	#include "y.tab.h"
+	#include "wake.tab.h"
 	extern int yyparse();
 	extern Node* parsetree;
 	extern FILE *yyin;

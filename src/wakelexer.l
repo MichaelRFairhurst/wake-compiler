@@ -1,7 +1,7 @@
 %{
 #include <stdio.h>
 #include "tree.h"
-#include "y.tab.h"
+#include "wake.tab.h"
 
 extern YYSTYPE wakelval;
 extern int line;

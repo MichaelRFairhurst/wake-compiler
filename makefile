@@ -29,7 +29,7 @@ CPPNAMES= \
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
 CNAMES=tree.c type.c
 COBJS=$(addprefix bin/c/, $(CNAMES:.c=.o))
-GENNAMES=lex.yy.c y.tab.c
+GENNAMES=lex.wake.c wake.tab.c
 GENOBJS=$(addprefix bin/gen/, $(GENNAMES:.c=.o))
 TEST=true
 TESTNAMES=CompilerTests.cpp ObjectSymbolTableTest.cpp ParseTreeTraverserTest.cpp ScopeSymbolTableTest.cpp TypeAnalyzerTest.cpp PropertySymbolTableTest.cpp AddressAllocatorTest.cpp OptionsParserTest.cpp
@@ -69,26 +69,23 @@ bin/wake: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o chivvy
 bin/finaltest.js: bin/wake finaltest.wk
 	time ./bin/wake finaltest.wk -o bin/finaltest.js
 
-bin/gen/%.o: gen/%.c gen/y.tab.c
+bin/gen/%.o: gen/%.c gen/wake.tab.c
 	$(CC) $(OPT) -c $< -o $@
 
 bin/tests/%.o: src/test/%.cpp
 	$(CPP) -g -c $< -o $@
 
-bin/cpp/%.o: src/%.cpp gen/y.tab.c
+bin/cpp/%.o: src/%.cpp gen/wake.tab.c
 	$(CPP) $(OPT) -c $< -o $@
 
-bin/c/%.o: src/%.c gen/y.tab.c
+bin/c/%.o: src/%.c gen/wake.tab.c
 	$(CC) $(OPT) -c $< -o $@
 
-gen/y.tab.c: src/wakeparser.y
-	bison -p wake -dgv -o gen/y.tab.c src/wakeparser.y
+gen/wake.tab.c: src/wakeparser.y
+	bison -p wake -dgv -o gen/wake.tab.c src/wakeparser.y
 
-gen/parsegraph.svg: gen/y.tab.c
-	dot -v -Tsvg gen/y.dot -o parsegraph.svg
-
-gen/lex.yy.c: src/wakelexer.l gen/y.tab.c
-	flex -P wake -o gen/lex.yy.c src/wakelexer.l
+gen/lex.wake.c: src/wakelexer.l gen/wake.tab.c
+	flex -P wake -o gen/lex.wake.c src/wakelexer.l
 
 loo:
 	@echo

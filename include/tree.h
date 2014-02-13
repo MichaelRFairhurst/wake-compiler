@@ -5,7 +5,7 @@
 #include <string.h>
 #include "node.h"
 #include "type.h"
-#include "y.tab.h"
+#include "wake.tab.h"
 
 #define NT_PROGRAM 0
 

@@ -7,7 +7,7 @@ extern "C" {
 	#include "type.h"
 	#include "node.h"
 	#include "tree.h"
-	#include "y.tab.h"
+	#include "wake.tab.h"
 	extern int wakeparse();
 	extern void wake_scan_string(const char* string);
 	extern Node* parsetree;
