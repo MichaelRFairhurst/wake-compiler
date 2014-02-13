@@ -1,7 +1,7 @@
 SHELL=/bin/bash
 
 #OPT=-O3
-OPT=-O0 -g
+OPT=-O3
 FLAGS=-Iinclude -Igen
 CC=cc $(FLAGS)
 CPP=g++ $(FLAGS)
@@ -76,10 +76,10 @@ bin/gen/%.o: gen/%.c gen/wake.tab.c
 bin/tests/%.o: src/test/%.cpp
 	$(CPP) -g -c $< -o $@
 
-bin/cpp/%.o: src/%.cpp gen/wake.tab.c
+bin/cpp/%.o: src/%.cpp gen/wake.tab.c gen/objectfile.tab.c
 	$(CPP) $(OPT) -c $< -o $@
 
-bin/c/%.o: src/%.c gen/wake.tab.c
+bin/c/%.o: src/%.c gen/wake.tab.c gen/objectfile.tab.c
 	$(CC) $(OPT) -c $< -o $@
 
 gen/wake.tab.c: src/wakeparser.y
