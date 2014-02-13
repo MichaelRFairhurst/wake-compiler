@@ -3,7 +3,7 @@
 #include "tree.h"
 #include "y.tab.h"
 
-extern YYSTYPE yylval;
+extern YYSTYPE wakelval;
 extern int line;
 extern int column;
 
@@ -98,17 +98,17 @@ exists					count(); return EXISTS;
 [\t\r ]					count();
 \n						line++; column = 1;
 
-\$+						count(); yylval.number = strlen(yytext); return SYM_SHADOW;
-(\[\])+					count(); yylval.number = strlen(yytext)>>1; return SYM_ARRAYED;
+\$+						count(); wakelval.number = strlen(waketext); return SYM_SHADOW;
+(\[\])+					count(); wakelval.number = strlen(waketext)>>1; return SYM_ARRAYED;
 
-True					count(); yylval.number = 1; return TRUTH;
-False					count(); yylval.number = 0; return TRUTH;
-[0-9]+(\.[0-9]+)?		count(); yylval.number = atof(yytext); return NUMBER;
-\{[a-zA-Z0-9]+\}		count(); yylval.string = keepInner(yytext); return SPECIALTY;
-[a-zA-Z0-9]+			count(); yylval.string = strdup(yytext); return IDENTIFIER;
-@[a-zA-Z0-9]+			count(); yylval.string = strdup(&yytext[1]); return ALIAS;
-\"(\\.|[^\\"])*\"		count(); yylval.string = unEscapeStringLiteral(keepInner(yytext), '"'); return(STRING);
-'(\\.|[^\'])*\'			count(); yylval.string = unEscapeStringLiteral(keepInner(yytext), '\''); return(STRING);
+True					count(); wakelval.number = 1; return TRUTH;
+False					count(); wakelval.number = 0; return TRUTH;
+[0-9]+(\.[0-9]+)?		count(); wakelval.number = atof(waketext); return NUMBER;
+\{[a-zA-Z0-9]+\}		count(); wakelval.string = keepInner(waketext); return SPECIALTY;
+[a-zA-Z0-9]+			count(); wakelval.string = strdup(waketext); return IDENTIFIER;
+@[a-zA-Z0-9]+			count(); wakelval.string = strdup(&waketext[1]); return ALIAS;
+\"(\\.|[^\\"])*\"		count(); wakelval.string = unEscapeStringLiteral(keepInner(waketext), '"'); return(STRING);
+'(\\.|[^\'])*\'			count(); wakelval.string = unEscapeStringLiteral(keepInner(waketext), '\''); return(STRING);
 
 .						count(); return ERRORTOKEN;
 %%
@@ -117,8 +117,8 @@ void count()
 {
 	int i;
 
-	for (i = 0; yytext[i] != '\0'; i++)
-	switch(yytext[i]) {
+	for (i = 0; waketext[i] != '\0'; i++)
+	switch(waketext[i]) {
 		case '\t':
 			column += 4 - ((column + 1) % 4); break;
 		case '\n':

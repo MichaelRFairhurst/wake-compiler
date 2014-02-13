@@ -1,18 +1,18 @@
 #include "Parser.h"
 #include <iostream>
 
-extern "C" int yylex_destroy  (void);
+extern "C" int wakelex_destroy  (void);
 
 bool Parser::parse(const char* input) {
 	parsetree = NULL;
-	yy_scan_string(input);
-	return yyparse();
+	wake_scan_string(input);
+	return wakeparse();
 }
 
 bool Parser::parse(FILE* input) {
 	parsetree = NULL;
-	yyin = input;
-	return yyparse();
+	wakein = input;
+	return wakeparse();
 }
 
 Node* Parser::getParseTree() {
@@ -24,6 +24,6 @@ void Parser::print() {
 }
 
 Parser::~Parser() {
-	yylex_destroy();
+	wakelex_destroy();
 	if(parsetree != NULL) freeNode(parsetree);
 }

@@ -81,14 +81,14 @@ bin/cpp/%.o: src/%.cpp gen/y.tab.c
 bin/c/%.o: src/%.c gen/y.tab.c
 	$(CC) $(OPT) -c $< -o $@
 
-gen/y.tab.c: src/parser.y
-	bison -dgv -o gen/y.tab.c src/parser.y
+gen/y.tab.c: src/wakeparser.y
+	bison -p wake -dgv -o gen/y.tab.c src/wakeparser.y
 
 gen/parsegraph.svg: gen/y.tab.c
 	dot -v -Tsvg gen/y.dot -o parsegraph.svg
 
-gen/lex.yy.c: src/lexer.l gen/y.tab.c
-	flex -o gen/lex.yy.c src/lexer.l
+gen/lex.yy.c: src/wakelexer.l gen/y.tab.c
+	flex -P wake -o gen/lex.yy.c src/wakelexer.l
 
 loo:
 	@echo

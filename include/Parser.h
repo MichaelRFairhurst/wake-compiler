@@ -8,10 +8,10 @@ extern "C" {
 	#include "node.h"
 	#include "tree.h"
 	#include "y.tab.h"
-	extern int yyparse();
-	extern void yy_scan_string(const char* string);
+	extern int wakeparse();
+	extern void wake_scan_string(const char* string);
 	extern Node* parsetree;
-	extern FILE *yyin;
+	extern FILE *wakein;
 }
 
 class Parser {

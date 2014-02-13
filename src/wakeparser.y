@@ -8,19 +8,19 @@
 
 int line = 1;
 int column = 1;
-extern char* yytext;
+extern char* waketext;
 Node* parsetree;
 
-void yyerror(const char *str)
+void wakeerror(const char *str)
 {
         fprintf(stderr, "[ Error                             ]\n");
         fprintf(stderr, "[ On line %d col %d                 ]\n", line, column);
         fprintf(stderr, "[ %s                                ]\n", str);
-        fprintf(stderr, "[ Unexpected %s                     ]\n", yytext);
+        fprintf(stderr, "[ Unexpected %s                     ]\n", waketext);
         fprintf(stderr, "[ yeah this spacing aint pretty yet ]\n");
 }
 
-int yywrap()
+int wakewrap()
 {
         return 1;
 }
