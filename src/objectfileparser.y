@@ -1,8 +1,12 @@
 %{
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <objectfile.h>
 
 extern char* objectfiletext;
+
+objectfile* myobjectfile;
 
 void objectfileerror(const char *str)
 {
@@ -32,7 +36,10 @@ int objectfilewrap()
 
 file: classes properties usages
 
-classes: CLASSES symbollist
+classes: CLASSES symbollist			{
+										myobjectfile->classcount = myobjectfile->propertycount;
+										myobjectfile->classes = myobjectfile->properties;
+									}
 
 properties: PROPERTIES symbollist
 
@@ -41,9 +48,18 @@ usages: USAGES symbolusages
 symbolusages: /* empty*/
 	| symbolusages symbolusage
 
-symbolusage: NUMBER SYMBOL
+symbolusage: NUMBER SYMBOL			{
+										symbolusage* mysymbolusage = malloc(sizeof(symbolusage));
+										mysymbolusage->pos = $1;
+										mysymbolusage->symbol = $2;
+										myobjectfile->usages = realloc(myobjectfile->usages, ++myobjectfile->usagecount * sizeof(symbolusage*));
+										myobjectfile->usages[myobjectfile->usagecount-1] = mysymbolusage;
+									}
 
 symbollist: /*empty*/
-	| symbollist SYMBOL
+	| symbollist SYMBOL				{
+										myobjectfile->properties = realloc(myobjectfile->properties, ++myobjectfile->propertycount * sizeof(char*));
+										myobjectfile->properties[myobjectfile->propertycount-1] = $2;
+									}
 
 %%
