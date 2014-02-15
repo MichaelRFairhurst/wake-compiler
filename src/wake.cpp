@@ -15,7 +15,7 @@ extern "C" {
 #include "ParseTreeTraverser.h"
 #include "SemanticErrorPrinter.h"
 #include "LibraryLoader.h"
-#include "CodeGenerator.h"
+#include "ObjectFileGenerator.h"
 #include "OptionsParser.h"
 #include "EntryPointAnalyzer.h"
 
@@ -84,7 +84,7 @@ int main(int argc, char** argv) {
 
 	fstream file;
 	file.open(options->outfilename.c_str(), ios::out);
-	CodeGenerator gen(file, &table);
+	ObjectFileGenerator gen(file, &table);
 	gen.generate(parser.getParseTree());
 	gen.setMain(options->mainclass, options->mainmethod);
 }

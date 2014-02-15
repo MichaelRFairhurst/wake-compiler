@@ -29,7 +29,6 @@ class ObjectSymbolTable {
 		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);
 
 	private:
-		AddressAllocator alloc;
 		PropertySymbolTable* addingclass_symbol;
 		std::string addingclass_name;
 		bool addingclass_hassubclass;

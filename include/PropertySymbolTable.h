@@ -15,7 +15,6 @@ extern "C" {
 #include "TypeAnalyzer.h"
 #include "SemanticError.h"
 #include "EntryPointAnalyzer.h"
-#include "AddressAllocator.h"
 
 #define PROPERTY_PUBLIC 1
 #define PROPERTY_ABSTRACT 2
@@ -24,7 +23,7 @@ using namespace std;
 
 class PropertySymbolTable {
 	public:
-		PropertySymbolTable(TypeAnalyzer* tanalyzer, AddressAllocator* allocator);
+		PropertySymbolTable(TypeAnalyzer* tanalyzer);
 		~PropertySymbolTable();
 		map<string, bool> parentage;
 		boost::optional<Type*> find(string name);
@@ -37,7 +36,6 @@ class PropertySymbolTable {
 		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);
 		vector<Type*>* getNeeds();
 		string getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments);
-		void assignAddresses();
 		bool isAbstract();
 
 		friend void propagateInheritanceTables(PropertySymbolTable* parent, PropertySymbolTable* child, bool extend);
@@ -45,7 +43,6 @@ class PropertySymbolTable {
 	private:
 		bool abstract;
 		TypeAnalyzer* analyzer;
-		AddressAllocator* alloc;
 		map<string, ObjectProperty*> properties;
 		vector<Type*> needs;
 };

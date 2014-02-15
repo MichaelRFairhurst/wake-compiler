@@ -47,8 +47,6 @@ void LibraryLoader::loadStdLibToTable(ObjectSymbolTable* table) {
 		freeTypeArray(arguments);
 	}
 
-	table->find("Printer")->assignAddresses();
-
 	table->addClass("System");
 	{
 		vector<pair<string, TypeArray*> > segments_arguments;
@@ -60,5 +58,4 @@ void LibraryLoader::loadStdLibToTable(ObjectSymbolTable* table) {
 		freeTypeArray(arguments);
 	}
 
-	table->find("System")->assignAddresses();
 }

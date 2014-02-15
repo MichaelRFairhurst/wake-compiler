@@ -21,7 +21,7 @@ CPPNAMES= \
 	ClassParseTreeTraverser.cpp \
 	MethodSignatureParseTreeTraverser.cpp \
 	LibraryLoader.cpp \
-	CodeGenerator.cpp \
+	ObjectFileGenerator.cpp \
 	AddressAllocator.cpp \
 	OptionsParser.cpp \
 	EntryPointAnalyzer.cpp \

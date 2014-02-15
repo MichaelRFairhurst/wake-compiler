@@ -1,9 +1,8 @@
 #include "PropertySymbolTable.h"
 #include "SemanticError.h"
 
-PropertySymbolTable::PropertySymbolTable(TypeAnalyzer* analyzer, AddressAllocator* allocator) {
+PropertySymbolTable::PropertySymbolTable(TypeAnalyzer* analyzer) {
 	this->analyzer = analyzer;
-	alloc = allocator;
 	abstract = false;
 }
 
@@ -108,12 +107,6 @@ void PropertySymbolTable::addNeed(Type* needed) {
 
 vector<Type*>* PropertySymbolTable::getNeeds() {
 	return &needs;
-}
-
-void PropertySymbolTable::assignAddresses() {
-	for(map<string, ObjectProperty*>::iterator it = properties.begin(); it != properties.end(); ++it)
-	if(it->second->address == "")
-		it->second->address = alloc->allocate();
 }
 
 bool PropertySymbolTable::isAbstract() {

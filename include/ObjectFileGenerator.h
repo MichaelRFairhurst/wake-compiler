@@ -13,11 +13,11 @@ extern "C" {
 
 using namespace std;
 
-class CodeGenerator {
+class ObjectFileGenerator {
 
 	public:
-		CodeGenerator(fstream& file, ObjectSymbolTable* objects) : file(file) {this->objects = objects;}
-		~CodeGenerator();
+		ObjectFileGenerator(fstream& file, ObjectSymbolTable* objects) : file(file) {this->objects = objects;}
+		~ObjectFileGenerator();
 		void generate(Node* tree);
 		void generateRecursiveConstructors(string ctorname);
 		void setMain(string classname, string methodname);

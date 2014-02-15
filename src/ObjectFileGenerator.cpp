@@ -1,6 +1,6 @@
-#include "CodeGenerator.h"
+#include "ObjectFileGenerator.h"
 
-void CodeGenerator::generate(Node* tree) {
+void ObjectFileGenerator::generate(Node* tree) {
 	switch(tree->node_type) {
 		case NT_IMPORT:
 		case NT_IMPORTSET:
@@ -424,14 +424,14 @@ void CodeGenerator::generate(Node* tree) {
 	}
 }
 
-void CodeGenerator::setMain(string classname, string methodname) {
+void ObjectFileGenerator::setMain(string classname, string methodname) {
 	file << "(";
 	generateRecursiveConstructors(classname);
 	file << ")." << objects->find(classname)->getAddress(methodname) << "();})();";
 }
 
 /*
-void CodeGenerator::generateRecursiveProvisions(Type* provision) {
+void ObjectFileGenerator::generateRecursiveProvisions(Type* provision) {
 	file << "new " << provision->typedata._class.classname << "(";
 
 	vector<Type*>* needs = objects->find(ctedclass)->getNeeds();
@@ -443,7 +443,7 @@ void CodeGenerator::generateRecursiveProvisions(Type* provision) {
 	file << ");";
 }*/
 
-void CodeGenerator::generateRecursiveConstructors(string ctedclass) {
+void ObjectFileGenerator::generateRecursiveConstructors(string ctedclass) {
 	file << "new " << ctedclass << "(";
 
 	vector<Type*>* needs = objects->find(ctedclass)->getNeeds();
@@ -455,6 +455,6 @@ void CodeGenerator::generateRecursiveConstructors(string ctedclass) {
 	file << ")";
 }
 
-CodeGenerator::~CodeGenerator() {
+ObjectFileGenerator::~ObjectFileGenerator() {
 	file.close();
 }

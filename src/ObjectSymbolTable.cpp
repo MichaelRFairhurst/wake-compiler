@@ -19,7 +19,7 @@ boost::optional<SemanticError*> ObjectSymbolTable::addClass(string name) {
 		return boost::optional<SemanticError*>(new SemanticError(MULTIPLE_CLASS_DEFINITION));
 	}
 
-	addingclass_symbol = new PropertySymbolTable(&analyzer, &alloc);
+	addingclass_symbol = new PropertySymbolTable(&analyzer);
 	addingclass_hassubclass = false;
 
 	classes[addingclass_name] = pair<PropertySymbolTable*, string>(addingclass_symbol, "a");
@@ -72,8 +72,6 @@ void ObjectSymbolTable::propagateInheritanceToParent(string childname) {
 		propagateInheritanceToParent(it->first);
 		propagateInheritanceTables(current->first, find(it->first), it->second);
 	}
-
-	current->first->assignAddresses();
 
 	current->second = true;
 }
