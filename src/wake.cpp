@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <iostream>
+#include <sstream>
+#include <fstream>
 
 extern "C" {
 	#include "type.h"
@@ -16,6 +18,8 @@ extern "C" {
 #include "SemanticErrorPrinter.h"
 #include "LibraryLoader.h"
 #include "ObjectFileGenerator.h"
+#include "ObjectFileHeaderData.h"
+#include "ObjectFileHeaderRenderer.h"
 #include "OptionsParser.h"
 #include "EntryPointAnalyzer.h"
 
@@ -82,9 +86,14 @@ int main(int argc, char** argv) {
 		}
 	}
 
+	basic_ostringstream<char> object;
 	fstream file;
+	ObjectFileHeaderData header;
 	file.open(options->outfilename.c_str(), ios::out);
-	ObjectFileGenerator gen(file, &table);
+	ObjectFileGenerator gen(object, &table, &header);
 	gen.generate(parser.getParseTree());
 	gen.setMain(options->mainclass, options->mainmethod);
+	ObjectFileHeaderRenderer renderer;
+	renderer.writeOut(file, &header);
+	file << object.str();
 }

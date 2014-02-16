@@ -83,7 +83,8 @@ void ObjectFileGenerator::generate(Node* tree) {
 				for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
 					table.add(*it);
 					if(it != needs->begin()) file << ",";
-					file << table.getAddress(*it);
+					//file << table.getAddress(*it);
+					header->addClassUsage(file.tellp(), typeanalyzer.getNameForType(*it));
 				}
 
 				file << "){";
@@ -145,7 +146,10 @@ void ObjectFileGenerator::generate(Node* tree) {
 				TypeArray* arguments = (*objects->find(classname)->find(name))->typedata.lambda.arguments;
 				int i;
 
-				file << "this." << objects->find(classname)->getAddress(name) << "=function(";
+				//file << "this." << objects->find(classname)->getAddress(name) << "=function(";
+				file << "this.";
+				header->addPropertyUsage(file.tellp(), name);
+				file << "=function(";
 
 				for(i = 0; i < arguments->typecount; i++) {
 					if(i != 0) file << ",";
@@ -174,7 +178,10 @@ void ObjectFileGenerator::generate(Node* tree) {
 				string methodclass = tree->node_data.nodes[tree->subnodes - 2]->node_data.string;
 				string name = tree->node_data.nodes[tree->subnodes - 1]->node_data.string;
 
-				file << "." << objects->find(methodclass)->getAddress(name) << "(";
+				//file << "." << objects->find(methodclass)->getAddress(name) << "(";
+				file << ".";
+				header->addPropertyUsage(file.tellp(), name);
+				file << "(";
 
 				int argnum = 0;
 				int i;
@@ -453,8 +460,4 @@ void ObjectFileGenerator::generateRecursiveConstructors(string ctedclass) {
 	}
 
 	file << ")";
-}
-
-ObjectFileGenerator::~ObjectFileGenerator() {
-	file.close();
 }

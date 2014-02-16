@@ -1,7 +1,7 @@
 SHELL=/bin/bash
 
 #OPT=-O3
-OPT=-O3
+OPT=-O0 -g
 FLAGS=-Iinclude -Igen
 CC=cc $(FLAGS)
 CPP=g++ $(FLAGS)
@@ -22,6 +22,8 @@ CPPNAMES= \
 	MethodSignatureParseTreeTraverser.cpp \
 	LibraryLoader.cpp \
 	ObjectFileGenerator.cpp \
+	ObjectFileHeaderData.cpp \
+	ObjectFileHeaderRenderer.cpp \
 	AddressAllocator.cpp \
 	OptionsParser.cpp \
 	EntryPointAnalyzer.cpp \
@@ -33,7 +35,7 @@ COBJS=$(addprefix bin/c/, $(CNAMES:.c=.o))
 GENNAMES=lex.wake.c wake.tab.c objectfile.tab.c lex.objectfile.c
 GENOBJS=$(addprefix bin/gen/, $(GENNAMES:.c=.o))
 TEST=true
-TESTNAMES=CompilerTests.cpp ObjectSymbolTableTest.cpp ParseTreeTraverserTest.cpp ScopeSymbolTableTest.cpp TypeAnalyzerTest.cpp PropertySymbolTableTest.cpp AddressAllocatorTest.cpp OptionsParserTest.cpp
+TESTNAMES=CompilerTests.cpp ObjectSymbolTableTest.cpp ParseTreeTraverserTest.cpp ScopeSymbolTableTest.cpp TypeAnalyzerTest.cpp PropertySymbolTableTest.cpp AddressAllocatorTest.cpp OptionsParserTest.cpp ObjectFileHeaderDataTest.cpp
 TESTOBJS=$(addprefix bin/tests/, $(TESTNAMES:.cpp=.o))
 
 chatup: bin/finaltest.js
@@ -89,7 +91,7 @@ gen/lex.wake.c: src/wakelexer.l gen/wake.tab.c
 	flex -P wake -o gen/lex.wake.c src/wakelexer.l
 
 gen/objectfile.tab.c: src/objectfileparser.y
-	bison -p objectfile -dgv -o gen/objectfile.tab.c src/objectfileparser.y
+	bison -p objectfile -dg -o gen/objectfile.tab.c src/objectfileparser.y
 
 gen/lex.objectfile.c: src/objectfilelexer.l gen/objectfile.tab.c
 	flex -P objectfile -o gen/lex.objectfile.c src/objectfilelexer.l
