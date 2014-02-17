@@ -14,6 +14,7 @@ extern "C" {
 }
 
 #include "Parser.h"
+#include "Linker.h"
 #include "ParseTreeTraverser.h"
 #include "SemanticErrorPrinter.h"
 #include "LibraryLoader.h"
@@ -23,31 +24,13 @@ extern "C" {
 #include "OptionsParser.h"
 #include "EntryPointAnalyzer.h"
 
-int main(int argc, char** argv) {
-	OptionsParser optionsparser;
-	Options* options = optionsparser.parse(argc, argv);
-	if(options->showVersion) {
-		printf("[ Wake    ---- std compiler ]\n");
-		printf("[ v0.01   Michael Fairhurst ]\n");
-		exit(0);
-	}
+void compileFile(Options* options) {
 
-	if(options->showHelp) {
-		printf("usage: wake flags filename\n");
-		printf("flags: -o|--out file             - compile to this file\n");
-		printf("       -c|--mainclass class      - begin execution with this file\n");
-		printf("       -m|--mainemethod method   - begin execution with this method\n");
-		printf("       -v|--version              - show version and exit\n");
-		printf("       -h|--help                 - show help and exit\n");
-		printf("       -l|--listmains            - list compilable entrypoints\n");
-		exit(0);
-	}
-
-	if(options->infilename == "") {
+	if(options->compileFilename == "") {
 		printf("[ no file provided ]\n"); exit(1);
 	}
 
-	FILE *myfile = fopen(options->infilename.c_str(), "r");
+	FILE *myfile = fopen(options->compileFilename.c_str(), "r");
 
 	if (!myfile) {
 		printf("[ couldn't open file ]\n");
@@ -75,25 +58,67 @@ int main(int argc, char** argv) {
 		exit(4);
 	}
 
+	basic_ostringstream<char> object;
+	ObjectFileHeaderData header;
+
+	ObjectFileGenerator gen(object, &table, &header);
+	gen.generate(parser.getParseTree());
+	//gen.setMain(options->mainclass, options->mainmethod);
+
+	fstream file;
+	ObjectFileHeaderRenderer renderer;
+
+	file.open(options->outFilename.c_str(), ios::out);
+	renderer.writeOut(file, &header);
+	file << object.str();
+}
+
+int main(int argc, char** argv) {
+	OptionsParser optionsparser;
+	Options* options = optionsparser.parse(argc, argv);
+	if(options->showVersion) {
+		printf("[ Wake    ---- std compiler ]\n");
+		printf("[ v0.01   Michael Fairhurst ]\n");
+		exit(0);
+	}
+
+	if(options->showHelp) {
+		printf("usage: wake flags filename\n");
+		printf("flags: -o|--out file             - compile to this file\n");
+		printf("       -c|--mainclass class      - begin execution with this file\n");
+		printf("       -m|--mainemethod method   - begin execution with this method\n");
+		printf("       -v|--version              - show version and exit\n");
+		printf("       -h|--help                 - show help and exit\n");
+		printf("       -i|--listmains            - list compilable entrypoints\n");
+		printf("       -l|--link                 - link compiled files into an executable\n");
+		exit(0);
+	}
+
+	if(!options->link) compileFile(options);
+	else {
+		Linker linker;
+		for(std::vector<std::string>::iterator it = options->linkFilenames.begin(); it != options->linkFilenames.end(); ++it) {
+			linker.loadObject(*it);
+		}
+
+		fstream file;
+		file.open(options->outFilename.c_str(), ios::out);
+
+		linker.write(file);
+
+	/* @TODO generate main!
 	EntryPointAnalyzer entrypointanalyzer;
 	if(options->listMains) {
 		table.printEntryPoints(&entrypointanalyzer);
 		exit(0);
 	} else {
 		if(!entrypointanalyzer.checkMethodCanBeMain(options->mainclass, options->mainmethod, &table)) {
-			printf("Entry point %s.%s in not valid, cannot continue.\nTry wake yourfile -l to get entry points\n", options->mainclass.c_str(), options->mainmethod.c_str());
+			printf("Entry point %s.%s in not valid, cannot continue.\nTry wake yourfile --listmains to get entry points\n", options->mainclass.c_str(), options->mainmethod.c_str());
 			exit(5);
 		}
 	}
+	*/
 
-	basic_ostringstream<char> object;
-	fstream file;
-	ObjectFileHeaderData header;
-	file.open(options->outfilename.c_str(), ios::out);
-	ObjectFileGenerator gen(object, &table, &header);
-	gen.generate(parser.getParseTree());
-	gen.setMain(options->mainclass, options->mainmethod);
-	ObjectFileHeaderRenderer renderer;
-	renderer.writeOut(file, &header);
-	file << object.str();
+	}
+
 }

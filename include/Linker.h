@@ -3,7 +3,8 @@
 
 #include <string>
 #include <vector>
-#include <fstream>
+#include <iostream>
+#include <map>
 
 #include "PropertySymbolTable.h"
 
@@ -14,17 +15,11 @@ extern "C" {
 class Linker {
 
 	public:
-		Linker(PropertySymbolTable symtable) : symtable(symtable) {}
-
 		void loadObject(std::string filename);
-		void write(std::fstream& objectfile);
+		void write(std::ostream& objectfile);
 
 	private:
-		PropertySymbolTable& symtable;
-		objectfile** objectFiles;
-		int objectFileCount;
-		std::vector<std::string> files;
-
+		std::vector<objectfile*> files;
 
 };
 

@@ -5,14 +5,15 @@
 using namespace std;
 
 Options* OptionsParser::parse(int argc, char** argv) {
-	int i = 0;
+	int i = 1;
 
 	Options* options = new Options;
 	options->hasErrors = false;
+	options->link = false;
 	options->showHelp = false;
 	options->listMains = false;
 	options->showVersion = false;
-	options->outfilename = "a.out";
+	options->outFilename = "a.out";
 	options->mainclass = "Main";
 	options->mainmethod = "Main()";
 
@@ -22,9 +23,10 @@ Options* OptionsParser::parse(int argc, char** argv) {
 		if(i < argc) nextarg = argv[i];
 
 		if(arg.at(0) != '-') {
-			if(arg == "wake") continue;
+			//if(arg == "wake") continue;
 
-			options->infilename = arg;
+			if(options->link) options->linkFilenames.push_back(arg);
+			else options->compileFilename = arg;
 		}
 
 		else if(arg == "-v" || arg == "--version") {
@@ -35,12 +37,12 @@ Options* OptionsParser::parse(int argc, char** argv) {
 			options->showHelp = true;
 		}
 
-		else if(arg == "-l" || arg == "--listmains") {
+		else if(arg == "-i" || arg == "--listmains") {
 			options->listMains = true;
 		}
 
 		else if(arg == "-o" || arg == "--out") {
-			options->outfilename = nextarg; i++;
+			options->outFilename = nextarg; i++;
 		}
 
 		else if(arg == "-c" || arg == "--mainclass") {
@@ -49,6 +51,10 @@ Options* OptionsParser::parse(int argc, char** argv) {
 
 		else if(arg == "-m" || arg == "--mainmethod") {
 			options->mainmethod = nextarg; i++;
+		}
+
+		else if(arg == "-l" || arg == "--link") {
+			options->link = true;
 		}
 
 		else {

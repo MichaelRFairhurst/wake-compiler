@@ -15,8 +15,10 @@ BOOST_AUTO_TEST_CASE(TestDefaults) {
 	BOOST_CHECK(options->showVersion == false);
 	BOOST_CHECK(options->hasErrors == false);
 	BOOST_CHECK(options->listMains == false);
-	BOOST_CHECK(options->infilename == "");
-	BOOST_CHECK(options->outfilename == "a.out");
+	BOOST_CHECK(options->link == false);
+	BOOST_CHECK(options->linkFilenames.size() == 0);
+	BOOST_CHECK(options->compileFilename == "");
+	BOOST_CHECK(options->outFilename == "a.out");
 	BOOST_CHECK(options->mainclass == "Main");
 	BOOST_CHECK(options->mainmethod == "Main()");
 	delete options;
@@ -85,7 +87,7 @@ BOOST_AUTO_TEST_CASE(TestListMainsLong) {
 BOOST_AUTO_TEST_CASE(TestListMainsShort) {
 	OptionsParser p;
 	char wake[5] = "wake";
-	char list[3] = "-l";
+	char list[3] = "-i";
 	char* args[2] = {wake, list};
 
 	Options* options = p.parse(2, args);
@@ -103,7 +105,7 @@ BOOST_AUTO_TEST_CASE(TestOutfileLong) {
 
 	Options* options = p.parse(3, args);
 
-	BOOST_CHECK(options->outfilename == "myexec");
+	BOOST_CHECK(options->outFilename == "myexec");
 	delete options;
 }
 
@@ -116,7 +118,7 @@ BOOST_AUTO_TEST_CASE(TestOutfileShort) {
 
 	Options* options = p.parse(3, args);
 
-	BOOST_CHECK(options->outfilename == "myexec");
+	BOOST_CHECK(options->outFilename == "myexec");
 	delete options;
 }
 
@@ -128,14 +130,14 @@ BOOST_AUTO_TEST_CASE(TestInfileSimple) {
 
 	Options* options = p.parse(2, args);
 
-	BOOST_CHECK(options->infilename == "myfile.wk");
+	BOOST_CHECK(options->compileFilename == "myfile.wk");
 	delete options;
 }
 
 BOOST_AUTO_TEST_CASE(TestInfileComplex) {
 	OptionsParser p;
 	char wake[5] = "wake";
-	char list[3] = "-l";
+	char list[3] = "-i";
 	char out[3] = "-o";
 	char outfile[7] = "myexec";
 	char file[10] = "myfile.wk";
@@ -143,7 +145,41 @@ BOOST_AUTO_TEST_CASE(TestInfileComplex) {
 
 	Options* options = p.parse(5, args);
 
-	BOOST_CHECK(options->infilename == "myfile.wk");
+	BOOST_CHECK(options->compileFilename == "myfile.wk");
+	delete options;
+}
+
+BOOST_AUTO_TEST_CASE(TestLinkOneFile) {
+	OptionsParser p;
+	char wake[5] = "wake";
+	char link[7] = "--link";
+	char file[9] = "myfile.o";
+	char* args[3] = {wake, link, file};
+
+	Options* options = p.parse(3, args);
+
+	BOOST_CHECK(options->link == true);
+	BOOST_CHECK(options->linkFilenames.size() == 1);
+	BOOST_CHECK(options->compileFilename == "");
+	BOOST_CHECK(options->linkFilenames[0] == "myfile.o");
+	delete options;
+}
+
+BOOST_AUTO_TEST_CASE(TestLinkTwoFiles) {
+	OptionsParser p;
+	char wake[5] = "wake";
+	char link[7] = "--link";
+	char file1[9] = "myfile.o";
+	char file2[8] = "file2.o";
+	char* args[4] = {wake, link, file1, file2};
+
+	Options* options = p.parse(4, args);
+
+	BOOST_CHECK(options->link == true);
+	BOOST_CHECK(options->linkFilenames.size() == 2);
+	BOOST_CHECK(options->compileFilename == "");
+	BOOST_CHECK(options->linkFilenames[0] == "myfile.o");
+	BOOST_CHECK(options->linkFilenames[1] == "file2.o");
 	delete options;
 }
 

@@ -72,10 +72,10 @@ string PropertySymbolTable::getAddress(string name) {
 	return properties.find(name)->second->address;
 }
 
-string PropertySymbolTable::getProvisionAddress(Type* provided) {
+string PropertySymbolTable::getProvisionSymbol(Type* provided) {
 	string name = analyzer->getNameForType(provided) + "<-";
 	if(provided->specialty != NULL) name += provided->specialty;
-	return properties.find(name)->second->address;
+	return name;
 }
 
 string PropertySymbolTable::getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments) {

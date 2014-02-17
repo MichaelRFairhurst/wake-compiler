@@ -39,6 +39,8 @@ file: classes properties usages
 classes: CLASSES symbollist			{
 										myobjectfile->classcount = myobjectfile->propertycount;
 										myobjectfile->classes = myobjectfile->properties;
+										myobjectfile->propertycount = 0;
+										myobjectfile->properties = NULL;
 									}
 
 properties: PROPERTIES symbollist

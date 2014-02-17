@@ -27,9 +27,9 @@ void ObjectFileHeaderRenderer::writeOut(std::ostream& out, ObjectFileHeaderData*
 	while(classusei < classusages.size() || propertyusei < propertyusages.size()) {
 		std::pair<int, std::string> pair;
 
-		if(classusei = classusages.size()) {
+		if(classusei == classusages.size()) {
 			pair = propertyusages[propertyusei++];
-		} else if(propertyusei = propertyusages.size()) {
+		} else if(propertyusei == propertyusages.size()) {
 			pair = classusages[classusei++];
 		} else {
 			int classuseloc = classusages[classusei].first;
@@ -41,5 +41,5 @@ void ObjectFileHeaderRenderer::writeOut(std::ostream& out, ObjectFileHeaderData*
 		out << pair.first << " {" << pair.second << "} ";
 	}
 
-	out << "%-end-%";
+	out << "%-END-%\n";
 }

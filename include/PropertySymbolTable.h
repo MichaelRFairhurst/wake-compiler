@@ -29,7 +29,7 @@ class PropertySymbolTable {
 		boost::optional<Type*> find(string name);
 		bool isPublic(string name);
 		string getAddress(string name);
-		string getProvisionAddress(Type* provided);
+		string getProvisionSymbol(Type* provided);
 		boost::optional<SemanticError*> addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, int flags);
 		boost::optional<SemanticError*> addProvision(Type* provision);
 		void addNeed(Type* returntype);

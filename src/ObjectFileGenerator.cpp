@@ -18,10 +18,10 @@ void ObjectFileGenerator::generate(Node* tree) {
 			return;
 
 		case NT_PROGRAM:
-			file << "(function() {";
+			//file << "(function() {";
 			{
 				// StdLib lol
-				file << "var printqueue='';Printer=function(){this.a=function(b){if(typeof process!='undefined'&&typeof process.stdout!='undefined'&&typeof process.stdout.write!='undefined')process.stdout.write(''+b);else printqueue+=''+b;};this.b=this.a;this.c=function(b){if(typeof process!='undefined'&&typeof process.stdout!='undefined'&&typeof process.stdout.write!='undefined')return this.a(b+'\\n');console.log(printqueue+b);printqueue='';};this.d=this.c;};System=function(){this.e=function(a){if(typeof process!='undefined'&&typeof process.exit!='undefined')process.exit(a);}};";
+				//file << "var printqueue='';Printer=function(){this.a=function(b){if(typeof process!='undefined'&&typeof process.stdout!='undefined'&&typeof process.stdout.write!='undefined')process.stdout.write(''+b);else printqueue+=''+b;};this.b=this.a;this.c=function(b){if(typeof process!='undefined'&&typeof process.stdout!='undefined'&&typeof process.stdout.write!='undefined')return this.a(b+'\\n');console.log(printqueue+b);printqueue='';};this.d=this.c;};System=function(){this.e=function(a){if(typeof process!='undefined'&&typeof process.exit!='undefined')process.exit(a);}};";
 				int i;
 				for(i = 0; i < tree->subnodes; i++)
 					generate(tree->node_data.nodes[i]);
@@ -77,14 +77,15 @@ void ObjectFileGenerator::generate(Node* tree) {
 			{
 				table.pushScope();
 				classname = tree->node_data.nodes[0]->node_data.string;
-				file << classname << "=function(";
+				header->addClassUsage(file.tellp(), classname);
+				file << "=function(";
 
 				vector<Type*>* needs = objects->find(classname)->getNeeds();
 				for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
 					table.add(*it);
 					if(it != needs->begin()) file << ",";
-					//file << table.getAddress(*it);
-					header->addClassUsage(file.tellp(), typeanalyzer.getNameForType(*it));
+					file << table.getAddress(*it);
+					//header->addClassUsage(file.tellp(), typeanalyzer.getNameForType(*it));
 				}
 
 				file << "){";
@@ -96,19 +97,27 @@ void ObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_PROVISION:
-			file << "this." << objects->find(classname)->getProvisionAddress(tree->node_data.nodes[0]->node_data.type) << "=function(){";
+			file << "this.";
+			header->addPropertyUsage(file.tellp(), objects->find(classname)->getProvisionSymbol(tree->node_data.nodes[0]->node_data.type));
+			file << "=function(){";
 			if(tree->subnodes == 1) {
 				string provisionname = tree->node_data.nodes[0]->node_data.type->typedata._class.classname;
-				file << "return new " << provisionname << "(";
+				file << "return new ";
+				header->addClassUsage(file.tellp(), provisionname);
+				file << "(";
 				vector<Type*>* needs = objects->find(provisionname)->getNeeds();
 				for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
 					if(it != needs->begin()) file << ",";
-					file << "this." << objects->find(classname)->getProvisionAddress(*it) << "()";
+					file << "this.";
+					header->addPropertyUsage(file.tellp(), objects->find(classname)->getProvisionSymbol(*it));
+					file << "()";
 				}
 				file << ");";
 			} else {
 				if(tree->node_data.nodes[1]->node_type == NT_TYPEDATA) {
-					file << "return this." << objects->find(classname)->getProvisionAddress(tree->node_data.nodes[1]->node_data.type) << "();";
+					file << "return this.";
+					header->addPropertyUsage(file.tellp(), objects->find(classname)->getProvisionSymbol(tree->node_data.nodes[1]->node_data.type));
+					file << "();";
 				}
 			}
 			file << "};";
@@ -202,7 +211,9 @@ void ObjectFileGenerator::generate(Node* tree) {
 				generate(tree->node_data.nodes[2]);
 				string providerclass = tree->node_data.nodes[tree->subnodes - 1]->node_data.string;
 
-				file << "." << objects->find(providerclass)->getProvisionAddress(tree->node_data.nodes[0]->node_data.type) << "()";
+				file << ".";
+				header->addPropertyUsage(file.tellp(), objects->find(providerclass)->getProvisionSymbol(tree->node_data.nodes[0]->node_data.type));
+				file << "()";
 			}
 			break;
 
@@ -255,7 +266,9 @@ void ObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_SUBCLASS:
-			file << "this.prototype = new " << tree->node_data.string << "();";
+			file << "this.prototype = new ";
+			header->addClassUsage(file.tellp(), tree->node_data.string);
+			file << "();";
 			break;
 
 		case NT_ARRAY_ACCESS:
@@ -431,11 +444,13 @@ void ObjectFileGenerator::generate(Node* tree) {
 	}
 }
 
+/*
 void ObjectFileGenerator::setMain(string classname, string methodname) {
 	file << "(";
 	generateRecursiveConstructors(classname);
 	file << ")." << objects->find(classname)->getAddress(methodname) << "();})();";
 }
+*/
 
 /*
 void ObjectFileGenerator::generateRecursiveProvisions(Type* provision) {
@@ -450,6 +465,7 @@ void ObjectFileGenerator::generateRecursiveProvisions(Type* provision) {
 	file << ");";
 }*/
 
+/*
 void ObjectFileGenerator::generateRecursiveConstructors(string ctedclass) {
 	file << "new " << ctedclass << "(";
 
@@ -461,3 +477,4 @@ void ObjectFileGenerator::generateRecursiveConstructors(string ctedclass) {
 
 	file << ")";
 }
+*/
