@@ -1,0 +1,30 @@
+%-CLASSES-%
+	11 {Printer}
+	401 {System}
+
+%-PROPERTIES-%
+	30 {print(Text)}
+	36 {print(Int)}
+	215 {printLine(Text)}
+	221 {printLine(Int)}
+	358 {print(Int)}
+	420 {exit(Int)}
+
+%-END-%
+
+var b='';
+=function(){
+	this.=this.=function(a){
+		if(typeof process!='undefined'&&typeof process.stdout!='undefined'&&typeof process.stdout.write!='undefined')process.stdout.write(''+a);
+		else b+=''+a;
+	};
+	this.=this.=function(a){
+		if(typeof process!='undefined'&&typeof process.stdout!='undefined'&&typeof process.stdout.write!='undefined')return this.(a+'\\n');
+		console.log(b+a);b='';
+	};
+};
+=function(){
+	this.=function(a){
+		if(typeof process!='undefined'&&typeof process.exit!='undefined')process.exit(a);
+	};
+};

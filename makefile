@@ -44,7 +44,7 @@ chatup: bin/finaltest.js
 	@echo -- CHAT UP THE BIN
 	@echo -- add TEST=false to skip
 	@echo
-	if $(TEST) ; then time node bin/finaltest.js ; fi
+	@echo SKIPPING "if $(TEST) ; then time node bin/finaltest.js ; fi"
 	@echo
 	@echo -- BLINDING BUILD, MATE
 	@echo
@@ -70,8 +70,11 @@ bin/wake: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o chivvy
 	@echo -- CHEERIO
 	@echo
 
-bin/finaltest.js: bin/wake finaltest.wk
-	time ./bin/wake finaltest.wk -o bin/finaltest.js
+bin/finaltest.js: bin/wakeobj/finaltest.o src/wakelib/std.o
+	time ./bin/wake -l bin/wakeobj/finaltest.o src/wakelib/std.o -o bin/finaltest.js
+
+bin/wakeobj/finaltest.o: bin/wake finaltest.wk
+	time ./bin/wake finaltest.wk -o bin/wakeobj/finaltest.o
 
 bin/gen/%.o: gen/%.c gen/wake.tab.c
 	$(CC) $(OPT) -c $< -o $@
