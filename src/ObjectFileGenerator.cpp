@@ -444,30 +444,18 @@ void ObjectFileGenerator::generate(Node* tree) {
 	}
 }
 
-/*
 void ObjectFileGenerator::setMain(string classname, string methodname) {
 	file << "(";
 	generateRecursiveConstructors(classname);
-	file << ")." << objects->find(classname)->getAddress(methodname) << "();})();";
+	file << ").";
+	header->addPropertyUsage(file.tellp(), methodname);
+	file << "();";
 }
-*/
 
-/*
-void ObjectFileGenerator::generateRecursiveProvisions(Type* provision) {
-	file << "new " << provision->typedata._class.classname << "(";
-
-	vector<Type*>* needs = objects->find(ctedclass)->getNeeds();
-	for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
-		file << "this." << objects->find(classname)->getProvisionAddress(it) << "()";
-		if(it != needs->begin()) file << ",";
-		generateRecursiveConstructors(*it);
-	}
-	file << ");";
-}*/
-
-/*
 void ObjectFileGenerator::generateRecursiveConstructors(string ctedclass) {
-	file << "new " << ctedclass << "(";
+	file << "new ";
+	header->addClassUsage(file.tellp(), ctedclass);
+	file << "(";
 
 	vector<Type*>* needs = objects->find(ctedclass)->getNeeds();
 	for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
@@ -477,4 +465,3 @@ void ObjectFileGenerator::generateRecursiveConstructors(string ctedclass) {
 
 	file << ")";
 }
-*/

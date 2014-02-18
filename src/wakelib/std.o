@@ -1,6 +1,6 @@
 %-CLASSES-%
 	11 {Printer}
-	401 {System}
+	400 {System}
 
 %-PROPERTIES-%
 	30 {print(Text)}
@@ -8,7 +8,7 @@
 	215 {printLine(Text)}
 	221 {printLine(Int)}
 	358 {print(Int)}
-	420 {exit(Int)}
+	419 {exit(Int)}
 
 %-END-%
 
@@ -19,7 +19,7 @@ var b='';
 		else b+=''+a;
 	};
 	this.=this.=function(a){
-		if(typeof process!='undefined'&&typeof process.stdout!='undefined'&&typeof process.stdout.write!='undefined')return this.(a+'\\n');
+		if(typeof process!='undefined'&&typeof process.stdout!='undefined'&&typeof process.stdout.write!='undefined')return this.(a+'\n');
 		console.log(b+a);b='';
 	};
 };

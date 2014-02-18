@@ -65,7 +65,18 @@ void compileFile(Options* options) {
 
 	ObjectFileGenerator gen(object, &table, &header);
 	gen.generate(parser.getParseTree());
-	//gen.setMain(options->mainclass, options->mainmethod);
+	// @TODO generate main in linking stage
+	EntryPointAnalyzer entrypointanalyzer;
+	if(options->listMains) {
+		table.printEntryPoints(&entrypointanalyzer);
+		exit(0);
+	} else {
+		if(!entrypointanalyzer.checkMethodCanBeMain(options->mainclass, options->mainmethod, &table)) {
+			printf("Entry point %s.%s in not valid, cannot continue.\nTry wake yourfile --listmains to get entry points\n", options->mainclass.c_str(), options->mainmethod.c_str());
+			exit(5);
+		}
+	}
+	gen.setMain(options->mainclass, options->mainmethod);
 
 	fstream file;
 	ObjectFileHeaderRenderer renderer;

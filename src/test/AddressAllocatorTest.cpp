@@ -66,4 +66,38 @@ BOOST_AUTO_TEST_CASE(TestGoesToDoubleAndBack)
 	BOOST_REQUIRE_MESSAGE(allocation == "Z", allocation + " was recieved instead of Z");
 }
 
+BOOST_AUTO_TEST_CASE(TestCountsUpLikeBackwardsDigits)
+{
+	AddressAllocator alloc;
+	int i;
+	for(i = 0; i < 52; i++)
+		alloc.allocate();
+
+	string allocation = alloc.allocate();
+	BOOST_REQUIRE_MESSAGE(allocation == "aa", allocation + " was recieved instead of aa");
+	allocation = alloc.allocate();
+	BOOST_REQUIRE_MESSAGE(allocation == "ba", allocation + " was recieved instead of ba");
+	allocation = alloc.allocate();
+	BOOST_REQUIRE_MESSAGE(allocation == "ca", allocation + " was recieved instead of ca");
+	allocation = alloc.allocate();
+	BOOST_REQUIRE_MESSAGE(allocation == "da", allocation + " was recieved instead of da");
+}
+
+BOOST_AUTO_TEST_CASE(TestCountsUpSecondDigitToo)
+{
+	AddressAllocator alloc;
+	int i;
+	for(i = 0; i < 104; i++)
+		alloc.allocate();
+
+	string allocation = alloc.allocate();
+	BOOST_REQUIRE_MESSAGE(allocation == "ab", allocation + " was recieved instead of ab");
+	allocation = alloc.allocate();
+	BOOST_REQUIRE_MESSAGE(allocation == "bb", allocation + " was recieved instead of bb");
+	allocation = alloc.allocate();
+	BOOST_REQUIRE_MESSAGE(allocation == "cb", allocation + " was recieved instead of cb");
+	allocation = alloc.allocate();
+	BOOST_REQUIRE_MESSAGE(allocation == "db", allocation + " was recieved instead of db");
+}
+
 BOOST_AUTO_TEST_SUITE_END()

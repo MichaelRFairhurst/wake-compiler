@@ -36,7 +36,7 @@ void Linker::loadObject(string filename) {
 }
 
 void Linker::write(ostream& outfile) {
-	//outfile << "(function(){";
+	outfile << "(function(){";
 	for(vector<ObjectFileHeaderData*>::iterator file = files.begin(); file != files.end(); ++file) {
 		/* Read whole file into memory */
 		/* @TODO not read whole file into memory */
@@ -76,23 +76,5 @@ void Linker::write(ostream& outfile) {
 
 	}
 
+	outfile << "})();";
 }
-
-/*
-void ObjectFileGenerator::setMain(string classname, string methodname) {
-	file << "(";
-	generateRecursiveConstructors(classname);
-	file << ")." << objects->find(classname)->getAddress(methodname) << "();})();";
-}
-
-void ObjectFileGenerator::generateRecursiveConstructors(string ctedclass) {
-	file << "new " << ctedclass << "(";
-
-	vector<Type*>* needs = objects->find(ctedclass)->getNeeds();
-	for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
-		if(it != needs->begin()) file << ",";
-		generateRecursiveConstructors((*it)->typedata._class.classname);
-	}
-
-	file << ")";
-}*/

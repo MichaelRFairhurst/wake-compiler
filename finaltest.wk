@@ -9,11 +9,15 @@ every Main is:
 
 	with Truth @passed = True;
 	with Int @totalcount = 0;
+	with Int @failedcount = 0;
 	with Int @passedcount = 0;
+	with Text[] @failed = [];
 
-	Run(Truth @result) {
+	Run(Truth @result, Text @test) {
 		@totalcount = @totalcount + 1;
 		if(!@result) {
+			@failed[@failedcount] = @test;
+			@failedcount = @failedcount + 1;
 			@passed = False;
 			Printer.print("F");
 		} else {
@@ -23,48 +27,48 @@ every Main is:
 	}
 
 	Main() {
-		Run(AssertsTest.testAssertTextMatches());
-		Run(AssertsTest.testAssertTextNotMatches());
-		Run(AssertsTest.testAssertIntMatches());
-		Run(AssertsTest.testAssertIntNotMatches());
-		Run(AssertsTest.testAssertTrueMatches());
-		Run(AssertsTest.testAssertTrueNotMatches());
-		Run(AssertsTest.testAssertFalseMatches());
-		Run(AssertsTest.testAssertFalseNotMatches());
-		Run(AssertsTest.testAssertTrue());
-		Run(AssertsTest.testAssertNotTrue());
-		Run(AssertsTest.testAssertFalse());
-		Run(AssertsTest.testAssertNotFalse());
-		Run(MathTest.testAddition(:(Asserts <- this)));
-		Run(MathTest.testSubtraction(:(Asserts <- this)));
-		Run(MathTest.testDivision(:(Asserts <- this)));
-		Run(MathTest.testMultiplication(:(Asserts <- this)));
-		Run(MathTest.testOrderOfOperations(:(Asserts <- this)));
-		Run(BooleanLogicTest.testOr(:(Asserts <- this)));
-		Run(BooleanLogicTest.testAnd(:(Asserts <- this)));
-		Run(BooleanLogicTest.testOrderOfOperations(:(Asserts <- this)));
+		Run(AssertsTest.testAssertTextMatches(), "testAssertTextMatches");
+		Run(AssertsTest.testAssertTextNotMatches(), "testAssertTextNotMatches");
+		Run(AssertsTest.testAssertIntMatches(), "testAssertIntMatches");
+		Run(AssertsTest.testAssertIntNotMatches(), "testAssertIntNotMatches");
+		Run(AssertsTest.testAssertTrueMatches(), "testAssertTrueMatches");
+		Run(AssertsTest.testAssertTrueNotMatches(), "testAssertTrueNotMatches");
+		Run(AssertsTest.testAssertFalseMatches(), "testAssertFalseMatches");
+		Run(AssertsTest.testAssertFalseNotMatches(), "testAssertFalseNotMatches");
+		Run(AssertsTest.testAssertTrue(), "testAssertTrue");
+		Run(AssertsTest.testAssertNotTrue(), "testAssertNotTrue");
+		Run(AssertsTest.testAssertFalse(), "testAssertFalse");
+		Run(AssertsTest.testAssertNotFalse(), "testAssertNotFalse");
+		Run(MathTest.testAddition(:(Asserts <- this)), "testAddition");
+		Run(MathTest.testSubtraction(:(Asserts <- this)), "testSubtraction");
+		Run(MathTest.testDivision(:(Asserts <- this)), "testDivision");
+		Run(MathTest.testMultiplication(:(Asserts <- this)), "testMultiplication");
+		Run(MathTest.testOrderOfOperations(:(Asserts <- this)), "testOrderOfOperations");
+		Run(BooleanLogicTest.testOr(:(Asserts <- this)), "testOr");
+		Run(BooleanLogicTest.testAnd(:(Asserts <- this)), "testAnd");
+		Run(BooleanLogicTest.testOrderOfOperations(:(Asserts <- this)), "testOrderOfOperations");
 		//Run(TernaryOperatorTest.testTrue(:(Asserts <- this)));
 		//Run(TernaryOperatorTest.testFalse(:(Asserts <- this)));
-		Run(InheritanceTest.testParentGetsParentClassName(:(Asserts <- this)));
-		Run(InheritanceTest.testOverrideChildGetsChildClassName(:(Asserts <- this)));
-		Run(InheritanceTest.testOverrideChildFromProviderGetsChildClassName(:(Asserts <- this)));
-		Run(InheritanceTest.testOverrideChildAfterCastGetsChildClassName(:(Asserts <- this)));
-		Run(InheritanceTest.testFallthroughChildGetsChildClassName(:(Asserts <- this )));
-		Run(InheritanceTest.testFallthroughChildFromProviderGetsChildClassName(:(Asserts <- this )));
-		Run(InheritanceTest.testFallthroughChildAfterCastGetsChildClassName(:(Asserts <- this )));
-		Run(InheritanceTest.testImplementingChildGetsChildClassName(:(Asserts <- this )));
-		Run(InheritanceTest.testImplementingChildFromProviderGetsChildClassName(:(Asserts <- this )));
-		Run(InheritanceTest.testImplementingChildAfterCastGetsChildClassName(:(Asserts <- this )));
-		Run(ArrayTest.testSetArrayIndex(:(Asserts <- this)));
-		Run(ArrayTest.testResetArrayIndex(:(Asserts <- this)));
-		Run(ArrayTest.testSetArrayArrayIndexIndex(:(Asserts <- this)));
-		Run(ArrayTest.testResetArrayArrayIndexIndex(:(Asserts <- this)));
-		Run(ArrayTest.testSetMultipleArrayIndices(:(Asserts <- this)));
-		Run(ArrayTest.testSetMultipleArrayArrayIndicesIndices(:(Asserts <- this)));
-		Run(OptionalTypeTest.testOptionalIntNeverSet());
-		Run(OptionalTypeTest.testOptionalIntSet());
-		Run(OptionalTypeTest.testOptionalIntNotSetWillHitElse());
-		Run(OptionalTypeTest.testOptionalIntSetWontHitElse());
+		Run(InheritanceTest.testParentGetsParentClassName(:(Asserts <- this)), "testParentgetsParentClassname");
+		Run(InheritanceTest.testOverrideChildGetsChildClassName(:(Asserts <- this)), "testOverrideChildGetsChildClassname");
+		Run(InheritanceTest.testOverrideChildFromProviderGetsChildClassName(:(Asserts <- this)), "testOvverideChildFromProviderGetsChildClassName");
+		Run(InheritanceTest.testOverrideChildAfterCastGetsChildClassName(:(Asserts <- this)), "testOverrideChildAfterCastGetsChildClassname");
+		Run(InheritanceTest.testFallthroughChildGetsChildClassName(:(Asserts <- this )), "testFallthroughChildGetsChildClassname");
+		Run(InheritanceTest.testFallthroughChildFromProviderGetsChildClassName(:(Asserts <- this )), "testFallthroughChildFromProviderGetsChildClassName");
+		Run(InheritanceTest.testFallthroughChildAfterCastGetsChildClassName(:(Asserts <- this )), "testFallthroughChildAfterCastGetsChildClassname");
+		Run(InheritanceTest.testImplementingChildGetsChildClassName(:(Asserts <- this )), "testImplementingChildGetsChildClassName");
+		Run(InheritanceTest.testImplementingChildFromProviderGetsChildClassName(:(Asserts <- this )), "testImplementingChildFromProiderGetsChildClassName");
+		Run(InheritanceTest.testImplementingChildAfterCastGetsChildClassName(:(Asserts <- this )), "testImplementingChildAfterCastGetsChildClassName");
+		Run(ArrayTest.testSetArrayIndex(:(Asserts <- this)), "testSetArrayIndex");
+		Run(ArrayTest.testResetArrayIndex(:(Asserts <- this)), "testResetArrayIndex");
+		Run(ArrayTest.testSetArrayArrayIndexIndex(:(Asserts <- this)), "testSetArrayArrayIndexIndex");
+		Run(ArrayTest.testResetArrayArrayIndexIndex(:(Asserts <- this)), "tsetResetArrayArrayIndexIndex");
+		Run(ArrayTest.testSetMultipleArrayIndices(:(Asserts <- this)), "testSetMultipleArrayIndices");
+		Run(ArrayTest.testSetMultipleArrayArrayIndicesIndices(:(Asserts <- this)), "testSetMultipleArrayArrayIndicesIndices");
+		Run(OptionalTypeTest.testOptionalIntNeverSet(), "testOptionalIntNeverSet");
+		Run(OptionalTypeTest.testOptionalIntSet(), "teestOptionalIntSet");
+		Run(OptionalTypeTest.testOptionalIntNotSetWillHitElse(), "testOptionalIntNotSetWillHitElse");
+		Run(OptionalTypeTest.testOptionalIntSetWontHitElse(), "testOptionalIntSetWontHitElse");
 
 		Printer.printLine("");
 		Printer.printLine("");
@@ -73,11 +77,18 @@ every Main is:
 		Printer.print("PASSED: ");
 		Printer.printLine(@passedcount);
 		Printer.print("FAILED: ");
-		Printer.printLine(@totalcount - @passedcount);
+		Printer.printLine(@failedcount);
+
 		if(@passed) System.exit(0);
-		else {
-			System.exit(1);
+		Printer.printLine("FAILURES:");
+
+		:Int = 0;
+		while(Int < @failedcount) {
+			Printer.printLine(@failed[Int]);
+			Int = Int + 1;
 		}
+
+		System.exit(1);
 	}
 
 #>
