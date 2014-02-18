@@ -7,13 +7,11 @@ typedef struct {
 } symbolusage;
 
 typedef struct {
+	int classusagecount;
+	symbolusage** classusages;
+	int propertyusagecount;
+	symbolusage** propertyusages;
 	char* filename;
-	int classcount;
-	char** classes;
-	int propertycount;
-	char** properties;
-	int usagecount;
-	symbolusage** usages;
 } objectfile;
 
 #endif

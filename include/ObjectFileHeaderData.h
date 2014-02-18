@@ -9,6 +9,11 @@
 class ObjectFileHeaderData {
 
 	public:
+		ObjectFileHeaderData(objectfile*);
+		ObjectFileHeaderData();
+
+		void setFilename(std::string filename);
+		std::string getFilename();
 		void addClassUsage(int location, std::string symbol);
 		void addPropertyUsage(int location, std::string symbol);
 		void addNeed(std::string classname, std::string need);
@@ -20,6 +25,7 @@ class ObjectFileHeaderData {
 		std::vector<std::pair<int, std::string> > getClassUsages();
 
 	private:
+		std::string filename;
 		std::vector<std::pair<std::string, std::vector<std::string> > > needs;
 		std::vector<std::string> classes;
 		std::vector<std::string> properties;

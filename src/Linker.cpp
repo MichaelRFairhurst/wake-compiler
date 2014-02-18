@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include <algorithm>
 #include "Linker.h"
 #include <fstream>
@@ -17,26 +18,29 @@ extern "C" {
 
 void Linker::loadObject(string filename) {
 	myobjectfile = (objectfile*) malloc(sizeof(objectfile));
-	myobjectfile->classcount = 0;
-	myobjectfile->propertycount = 0;
-	myobjectfile->usagecount = 0;
-	myobjectfile->classes = NULL;
-	myobjectfile->properties = NULL;
-	myobjectfile->usages = NULL;
-	myobjectfile->filename = "bin/finaltest.js";//cstrdup(filename.c_str());
+	myobjectfile->classusagecount = 0;
+	myobjectfile->propertyusagecount = 0;
+	myobjectfile->classusages = NULL;
+	myobjectfile->propertyusages = NULL;
+	myobjectfile->filename = strdup(filename.c_str());
 
 	objectfilein = fopen(filename.c_str(), "r");
 	objectfileparse();
 	fclose(objectfilein);
+	objectfilelex_destroy();
 
-	files.push_back(myobjectfile);
+	files.push_back(new ObjectFileHeaderData(myobjectfile));
+	free(myobjectfile->classusages);
+	free(myobjectfile->propertyusages);
+	free(myobjectfile);
 }
 
 void Linker::write(ostream& outfile) {
-	for(vector<objectfile*>::iterator file = files.begin(); file != files.end(); ++file) {
+	outfile << "(function(){";
+	for(vector<ObjectFileHeaderData*>::iterator file = files.begin(); file != files.end(); ++file) {
 		/* Read whole file into memory */
 		/* @TODO not read whole file into memory */
-		std::ifstream ifs((*file)->filename);
+		std::ifstream ifs((*file)->getFilename().c_str());
 
 		ifs.seekg(0, std::ios::end);
 		std::streamsize f_size = ifs.tellg();
@@ -53,12 +57,18 @@ void Linker::write(ostream& outfile) {
 
 		it = it + 8;
 
-		int usagei, i;
-		for(i = 0, usagei = 0; it != buffer.end(); ++it, i++) {
-			if(usagei < (*file)->usagecount && (*file)->usages[usagei]->pos == i) {
-				//outfile << (*file)->usages[usagei]->symbol; // @TODO useg symbol table to address
-				outfile << "METHOD"; // test valid syntax
-				usagei++;
+		int classusei, propusei, i;
+		std::vector<std::pair<int, std::string> > classUsages = (*file)->getClassUsages();
+		std::vector<std::pair<int, std::string> > propUsages = (*file)->getPropertyUsages();
+		for(i = 0, classusei = 0, propusei = 0; it != buffer.end(); ++it, i++) {
+			if(classusei < classUsages.size() && classUsages[classusei].first == i) {
+				if(!classTable.symbolExists(classUsages[classusei].second)) classTable.addSymbol(classUsages[classusei].second);
+				outfile << classTable.getAddress(classUsages[classusei].second);
+				classusei++;
+			} else if(propusei < (*file)->getPropertyUsages().size() && (*file)->getPropertyUsages()[propusei].first == i) {
+				if(!propertyTable.symbolExists(propUsages[propusei].second)) propertyTable.addSymbol(propUsages[propusei].second);
+				outfile << propertyTable.getAddress(propUsages[propusei].second);
+				propusei++;
 			}
 
 			outfile << *it;
@@ -67,3 +77,22 @@ void Linker::write(ostream& outfile) {
 	}
 
 }
+
+/*
+void ObjectFileGenerator::setMain(string classname, string methodname) {
+	file << "(";
+	generateRecursiveConstructors(classname);
+	file << ")." << objects->find(classname)->getAddress(methodname) << "();})();";
+}
+
+void ObjectFileGenerator::generateRecursiveConstructors(string ctedclass) {
+	file << "new " << ctedclass << "(";
+
+	vector<Type*>* needs = objects->find(ctedclass)->getNeeds();
+	for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
+		if(it != needs->begin()) file << ",";
+		generateRecursiveConstructors((*it)->typedata._class.classname);
+	}
+
+	file << ")";
+}*/

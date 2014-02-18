@@ -4,9 +4,9 @@
 #include <string>
 #include <vector>
 #include <iostream>
-#include <map>
 
-#include "PropertySymbolTable.h"
+#include "SimpleAddressTable.h"
+#include "ObjectFileHeaderData.h"
 
 extern "C" {
 	#include "objectfile.h"
@@ -15,11 +15,17 @@ extern "C" {
 class Linker {
 
 	public:
+		Linker(SimpleAddressTable& classTable, SimpleAddressTable& propertyTable) : classTable(classTable), propertyTable(propertyTable) {};
 		void loadObject(std::string filename);
 		void write(std::ostream& objectfile);
+		void setMain(string classname, string methodname);
+		void generateRecursiveConstructors(string ctedclass);
 
 	private:
-		std::vector<objectfile*> files;
+		std::vector<ObjectFileHeaderData*> files;
+		SimpleAddressTable& classTable;
+		SimpleAddressTable& propertyTable;
+
 
 };
 

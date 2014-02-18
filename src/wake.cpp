@@ -23,6 +23,8 @@ extern "C" {
 #include "ObjectFileHeaderRenderer.h"
 #include "OptionsParser.h"
 #include "EntryPointAnalyzer.h"
+#include "AddressAllocator.h"
+#include "SimpleAddressTable.h"
 
 void compileFile(Options* options) {
 
@@ -96,7 +98,11 @@ int main(int argc, char** argv) {
 
 	if(!options->link) compileFile(options);
 	else {
-		Linker linker;
+		AddressAllocator classAllocator;
+		AddressAllocator propAllocator;
+		SimpleAddressTable classTable(classAllocator);
+		SimpleAddressTable propTable(propAllocator);
+		Linker linker(classTable, propTable);
 		for(std::vector<std::string>::iterator it = options->linkFilenames.begin(); it != options->linkFilenames.end(); ++it) {
 			linker.loadObject(*it);
 		}

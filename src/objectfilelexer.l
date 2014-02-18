@@ -11,7 +11,6 @@ extern YYSTYPE objectfilelval;
 
 "%-CLASSES-%"			return CLASSES;
 "%-PROPERTIES-%"		return PROPERTIES;
-"%-USAGES-%"			return USAGES;
 "%-END-%"				yyterminate();
 
 [0-9]+(\.[0-9]+)?		objectfilelval.number = atoi(objectfiletext); return NUMBER;
