@@ -36,7 +36,7 @@ void Linker::loadObject(string filename) {
 }
 
 void Linker::write(ostream& outfile) {
-	outfile << "(function(){";
+	//outfile << "(function(){";
 	for(vector<ObjectFileHeaderData*>::iterator file = files.begin(); file != files.end(); ++file) {
 		/* Read whole file into memory */
 		/* @TODO not read whole file into memory */
@@ -63,7 +63,7 @@ void Linker::write(ostream& outfile) {
 		for(i = 0, classusei = 0, propusei = 0; it != buffer.end(); ++it, i++) {
 			if(classusei < classUsages.size() && classUsages[classusei].first == i) {
 				if(!classTable.symbolExists(classUsages[classusei].second)) classTable.addSymbol(classUsages[classusei].second);
-				outfile << classTable.getAddress(classUsages[classusei].second);
+				outfile << "_" << classTable.getAddress(classUsages[classusei].second);
 				classusei++;
 			} else if(propusei < (*file)->getPropertyUsages().size() && (*file)->getPropertyUsages()[propusei].first == i) {
 				if(!propertyTable.symbolExists(propUsages[propusei].second)) propertyTable.addSymbol(propUsages[propusei].second);
