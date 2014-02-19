@@ -37,13 +37,14 @@ class PropertySymbolTable {
 		vector<Type*>* getNeeds();
 		string getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments);
 		bool isAbstract();
+		string classname;
+		map<string, ObjectProperty*> properties;
 
 		friend void propagateInheritanceTables(PropertySymbolTable* parent, PropertySymbolTable* child, bool extend);
 
 	private:
 		bool abstract;
 		TypeAnalyzer* analyzer;
-		map<string, ObjectProperty*> properties;
 		vector<Type*> needs;
 };
 

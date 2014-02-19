@@ -28,15 +28,28 @@ CPPNAMES= \
 	OptionsParser.cpp \
 	EntryPointAnalyzer.cpp \
 	Linker.cpp \
-	SimpleAddressTable.cpp
+	SimpleAddressTable.cpp \
+	TableFileWriter.cpp
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
 CNAMES=tree.c type.c parseUtil.c
 COBJS=$(addprefix bin/c/, $(CNAMES:.c=.o))
 GENNAMES=lex.wake.c wake.tab.c objectfile.tab.c lex.objectfile.c
 GENOBJS=$(addprefix bin/gen/, $(GENNAMES:.c=.o))
+
 TEST=true
-TESTNAMES=CompilerTests.cpp ObjectSymbolTableTest.cpp ParseTreeTraverserTest.cpp ScopeSymbolTableTest.cpp TypeAnalyzerTest.cpp PropertySymbolTableTest.cpp AddressAllocatorTest.cpp OptionsParserTest.cpp ObjectFileHeaderDataTest.cpp
+
+TESTNAMES=CompilerTests.cpp \
+	ObjectSymbolTableTest.cpp \
+	ParseTreeTraverserTest.cpp \
+	ScopeSymbolTableTest.cpp \
+	TypeAnalyzerTest.cpp \
+	PropertySymbolTableTest.cpp \
+	AddressAllocatorTest.cpp \
+	OptionsParserTest.cpp \
+	ObjectFileHeaderDataTest.cpp \
+	TableFileWriterTest.cpp
+
 TESTOBJS=$(addprefix bin/tests/, $(TESTNAMES:.cpp=.o))
 
 chatup: bin/finaltest.js
