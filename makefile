@@ -34,7 +34,7 @@ CPPNAMES= \
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
 CNAMES=tree.c type.c parseUtil.c
 COBJS=$(addprefix bin/c/, $(CNAMES:.c=.o))
-GENNAMES=lex.wake.c wake.tab.c objectfile.tab.c lex.objectfile.c
+GENNAMES=lex.wake.c wake.tab.c objectfile.tab.c lex.objectfile.c tablefile.tab.c lex.tablefile.c
 GENOBJS=$(addprefix bin/gen/, $(GENNAMES:.c=.o))
 
 TEST=true
@@ -112,6 +112,12 @@ gen/objectfile.tab.c: src/objectfileparser.y
 
 gen/lex.objectfile.c: src/objectfilelexer.l gen/objectfile.tab.c
 	flex -P objectfile -o gen/lex.objectfile.c src/objectfilelexer.l
+
+gen/tablefile.tab.c: src/tablefileparser.y
+	bison -p tablefile -dg -o gen/tablefile.tab.c src/tablefileparser.y
+
+gen/lex.tablefile.c: src/tablefilelexer.l gen/tablefile.tab.c
+	flex -P tablefile -o gen/lex.tablefile.c src/tablefilelexer.l
 
 loo:
 	@echo
