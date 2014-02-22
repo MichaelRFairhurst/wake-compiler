@@ -29,7 +29,8 @@ CPPNAMES= \
 	EntryPointAnalyzer.cpp \
 	Linker.cpp \
 	SimpleAddressTable.cpp \
-	TableFileWriter.cpp
+	TableFileWriter.cpp \
+	TableFileReader.cpp
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
 CNAMES=tree.c type.c parseUtil.c
