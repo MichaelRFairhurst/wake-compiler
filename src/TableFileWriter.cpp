@@ -51,11 +51,12 @@ void TableFileWriter::writeType(ostream& out, Type* type) {
 			writeType(out, type->typedata.lambda.returntype);
 		}
 
-		dataptr[0] = 0x04;
-		out.write(dataptr, 1);
 		for(int i = 0; i < type->typedata.lambda.arguments->typecount; i++) {
 			writeType(out, type->typedata.lambda.arguments->types[i]);
 		}
+
+		dataptr[0] = 0x04;
+		out.write(dataptr, 1);
 	}
 
 	dataptr[0] = (char) type->arrayed;

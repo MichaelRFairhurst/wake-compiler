@@ -54,7 +54,6 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 	ASSERTCHAR('p'); ASSERTCHAR('r'); ASSERTCHAR('i'); ASSERTCHAR('n'); ASSERTCHAR('t'); ASSERTCHAR('('); ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t'); ASSERTCHAR(')');
 	ASSERTCHAR(1); // Flagged public
 	ASSERTCHAR(2); // Lambda
-	ASSERTCHAR(4); // Arguments
 		ASSERTCHAR(1); // Type
 		ASSERTCHAR(4); // class name ength
 		ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t');
@@ -63,6 +62,7 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 		ASSERTCHAR(0); // alias length
 		ASSERTCHAR(0); // specialty length
 		ASSERTCHAR(0); // optionality
+	ASSERTCHAR(4); // end arguments
 	ASSERTCHAR(0); // arrayed
 	ASSERTCHAR(0); // alias length
 	ASSERTCHAR(0); // specialty length

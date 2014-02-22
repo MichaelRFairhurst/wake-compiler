@@ -8,31 +8,25 @@ file = namelength (1 byte) | name | Types | 0x00 | Properties
 	Types = Type*
 	Type = ClassType or LambdaType
     ClassType = 0x01 | classnamelength (1 byte) | classname | shadow (1 byte int) | arrayed (1 byte int)
-	LambdaType = 0x02 | ReturnType | 0x04 Types
+	LambdaType = 0x02 | ReturnType | Types | 0x04
 	ReturnType = (0x03 | Type) or nothing
 
 
 Memory Layout
 
-     File                Property             Type
- ------------          ------------       ------------
-| namelength |        | namelength |     |    0x01    |
- ------------          ------------       ------------
-|    name    |        |    name    |     | namelength |
-|    ...     |        |    ...     |      ------------
-|    ...     |        |    ...     |     |    name    |
- ------------          ------------      |    ....    |
-|   Needs    |        |   flags    |     |    ....    |
-                                          ------------
-                                         |   shadow   |
-                                          ------------
-                                         |   arrayed  |
-                                          ------------
-
-        To Be Completed Later                  OR
-
-                                          ------------
-                                         |    0x02    |
-                                          ------------
-									     |
-
+     File          Property                    Type                   ReturnType      Typecommon
+ ------------    ------------    ------------        ------------    ------------    ------------
+| namelength |  | namelength |  |    0x01    |      |    0x02    |  |    0x03    |  |   arrayed  |
+ ------------    ------------    ------------        ------------    ------------    ------------
+|    name    |  |    name    |  | namelength |      | ReturnType |  |    Type    |  | alias len  |
+|    ...     |  |    ...     |   ------------       |    ...     |  |     ...    |   ------------
+|    ...     |  |    ...     |  |    name    |  OR   ------------    ------------   |   alias    |
+ ------------    ------------   |    ....    |      |    Types   |                  |    ...     |
+|   Needs    |  |   flags    |  |    ....    |      |     ...    |    Or Nothing     ------------
+|    ...     |   ------------    ------------        ------------                   | specialtyl |
+ ------------   |    Type    |  |   shadow   |      |    0x04    |                   ------------
+|   0x00     |   ------------    ------------        ------------                   | specialty  |
+ ------------                   | Typecommon |      | Typecommon |                  |    ...     |
+| Properties |                   ------------        ------------                    ------------
+|    ...     |                                                                      |  optional  |
+ ------------                                                                        ------------
