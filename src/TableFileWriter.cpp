@@ -1,44 +1,94 @@
 #include "TableFileWriter.h"
 
 void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
-	out << "{" << table->classname << "}";
-	out << (table->isAbstract() ? "Y" : "N");
-	out << "E";
+	char* dataptr = (char*) malloc(1);
+
+	dataptr[0] = (char) table->classname.size();
+	out.write(dataptr, 1);
+	out.write(table->classname.c_str(), table->classname.size());
+
+	dataptr[0] = (char) table->isAbstract();
+	out.write(dataptr, 1);
+
 	for(vector<Type*>::iterator it = table->getNeeds()->begin(); it != table->getNeeds()->end(); ++it) {
 		writeType(out, *it);
 	}
-	out << "M";
+
+	dataptr[0] = 0x00;
+	out.write(dataptr, 1);
+
 	for(map<string, ObjectProperty*>::iterator it = table->properties.begin(); it != table->properties.end(); ++it) {
-		out << "{" << it->first << "}";
+		dataptr[0] = (char) it->first.size();
+		out.write(dataptr, 1);
+		out.write(it->first.c_str(), it->first.size());
+
 		writeProperty(out, it->second);
 	}
+	free(dataptr);
 }
 
 void TableFileWriter::writeType(ostream& out, Type* type) {
+	char * dataptr = (char*) malloc(1);
 	if(type->type == TYPE_CLASS) {
-		out << "T";
-		out << "{" << type->typedata._class.classname << "}";
-		out << type->typedata._class.shadow << " ";
-	} else {
-		out << "L";
-		if(type->typedata.lambda.returntype != NULL)
-			writeType(out, type->typedata.lambda.returntype);
+		dataptr[0] = 0x01;
+		out.write(dataptr, 1);
 
+		dataptr[0] = (char) strlen(type->typedata._class.classname);
+		out.write(dataptr, 1);
+
+		out.write(type->typedata._class.classname, strlen(type->typedata._class.classname));
+
+		dataptr[0] = (char) type->typedata._class.shadow;
+		out.write(dataptr, 1);
+	} else {
+		dataptr[0] = 0x02;
+		out.write(dataptr, 1);
+
+		if(type->typedata.lambda.returntype != NULL) {
+			dataptr[0] = 0x03;
+			out.write(dataptr, 1);
+
+			writeType(out, type->typedata.lambda.returntype);
+		}
+
+		dataptr[0] = 0x04;
+		out.write(dataptr, 1);
 		for(int i = 0; i < type->typedata.lambda.arguments->typecount; i++) {
 			writeType(out, type->typedata.lambda.arguments->types[i]);
 		}
 	}
 
-	out << type->arrayed << " {";
-	if(type->alias != NULL) out << type->alias;
-	out << "}{";
-	if(type->specialty != NULL) out << type->specialty;
-	out << "}" << type->optional << " ";
+	dataptr[0] = (char) type->arrayed;
+	out.write(dataptr, 1);
+
+	if(type->alias != NULL) {
+		dataptr[0] = strlen(type->alias);
+		out.write(dataptr, 1);
+		out.write(type->alias, strlen(type->alias));
+	} else {
+		dataptr[0] = 0;
+		out.write(dataptr, 1);
+	}
+
+	if(type->specialty != NULL) {
+		dataptr[0] = strlen(type->specialty);
+		out.write(dataptr, 1);
+		out.write(type->specialty, strlen(type->specialty));
+	} else {
+		dataptr[0] = 0;
+		out.write(dataptr, 1);
+	}
+
+	dataptr[0] = type->optional;
+	out.write(dataptr, 1);
+	free(dataptr);
 }
 
 void TableFileWriter::writeProperty(ostream& out, ObjectProperty* property) {
-	if(property->flags & PROPERTY_PUBLIC) out << "P";
-	if(property->flags & PROPERTY_ABSTRACT) out << "B";
+	char * dataptr = (char*) malloc(1);
+	dataptr[0] = (char) property->flags;
+	out.write(dataptr, 1);
 
 	writeType(out, property->type);
+	free(dataptr);
 }

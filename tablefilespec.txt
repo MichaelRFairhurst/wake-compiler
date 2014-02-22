@@ -1,0 +1,38 @@
+b0     - classname length (L)
+bL     - true/false - class is abstract
+bL + 1 - e
+
+file = namelength (1 byte) | name | Types | 0x00 | Properties
+  where
+	Properties = propertynamelength (1 byte) | propertyname | flags (1 byte) | Type
+	Types = Type*
+	Type = ClassType or LambdaType
+    ClassType = 0x01 | classnamelength (1 byte) | classname | shadow (1 byte int) | arrayed (1 byte int)
+	LambdaType = 0x02 | ReturnType | 0x04 Types
+	ReturnType = (0x03 | Type) or nothing
+
+
+Memory Layout
+
+     File                Property             Type
+ ------------          ------------       ------------
+| namelength |        | namelength |     |    0x01    |
+ ------------          ------------       ------------
+|    name    |        |    name    |     | namelength |
+|    ...     |        |    ...     |      ------------
+|    ...     |        |    ...     |     |    name    |
+ ------------          ------------      |    ....    |
+|   Needs    |        |   flags    |     |    ....    |
+                                          ------------
+                                         |   shadow   |
+                                          ------------
+                                         |   arrayed  |
+                                          ------------
+
+        To Be Completed Later                  OR
+
+                                          ------------
+                                         |    0x02    |
+                                          ------------
+									     |
+
