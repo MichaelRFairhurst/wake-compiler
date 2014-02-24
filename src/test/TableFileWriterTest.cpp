@@ -2,7 +2,6 @@
 #include "TableFileWriter.h"
 #include <sstream>
 #include <string>
-#include <fstream>
 #include "type.h"
 
 #define ASSERTCHAR(v) BOOST_CHECK_MESSAGE(dataptr[i++] == v, "Expected " #v " in stream at pos " + std::to_string(i) + " got " + std::to_string((unsigned char) dataptr[i]));
@@ -24,7 +23,6 @@ BOOST_AUTO_TEST_CASE(TestWritesSimple)
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
 	ASSERTCHAR(0); // methoods
-	ASSERTCHAR(0); // whaa?
 }
 
 BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)

@@ -140,3 +140,7 @@ void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable*
 		}
 	}
 }
+
+bool PropertySymbolTable::isPublic(string name) {
+	return properties.find(name)->second->flags & PROPERTY_PUBLIC;
+}

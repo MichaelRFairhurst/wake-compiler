@@ -1,7 +1,7 @@
 SHELL=/bin/bash
 
-OPT=-O3
-#OPT=-O0 -g
+#OPT=-O3
+OPT=-O0 -g
 FLAGS=-Iinclude -Igen
 CC=cc $(FLAGS)
 CPP=g++ $(FLAGS) -std=c++11
@@ -49,7 +49,8 @@ TESTNAMES=CompilerTests.cpp \
 	AddressAllocatorTest.cpp \
 	OptionsParserTest.cpp \
 	ObjectFileHeaderDataTest.cpp \
-	TableFileWriterTest.cpp
+	TableFileWriterTest.cpp \
+	TableFileReaderTest.cpp
 
 TESTOBJS=$(addprefix bin/tests/, $(TESTNAMES:.cpp=.o))
 

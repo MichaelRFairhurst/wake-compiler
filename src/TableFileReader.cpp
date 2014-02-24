@@ -1,13 +1,17 @@
 #include "TableFileReader.h"
+#include "ObjectProperty.h"
+#include <iostream>
 
 void TableFileReader::read(PropertySymbolTable* table, istream& s) {
-	std::string classname = readString(s);
+	table->classname = readString(s);
+	table->abstract = readUInt8(s);
 	unsigned char tag;
 	while(tag = readUInt8(s)) {
 		table->addNeed(readTypeByTag(tag, s));
 	}
 
 	while(true) {
+		//readUInt8(s);
 		s.peek(); // trigger EOF
 		if(s.eof()) break;
 		readMethod(table, s);
@@ -16,6 +20,7 @@ void TableFileReader::read(PropertySymbolTable* table, istream& s) {
 
 std::string TableFileReader::readString(istream& s) {
 	char* strb = readCString(s);
+	if(strb == NULL) return NULL;
 	std::string str(strb);
 	free(strb);
 	return str;
@@ -68,7 +73,12 @@ Type* TableFileReader::readLambdaType(istream& s) {
 
 	while(tag != 0x04) {
 		AddTypeToTypeArray(readTypeByTag(tag, s), type->typedata.lambda.arguments);
+		tag = readUInt8(s);
 	}
+
+	readTypeCommon(type, s);
+
+	return type;
 }
 
 void TableFileReader::readTypeCommon(Type* type, istream& s) {
@@ -79,6 +89,9 @@ void TableFileReader::readTypeCommon(Type* type, istream& s) {
 }
 
 void TableFileReader::readMethod(PropertySymbolTable* table, istream& s) {
+	ObjectProperty* prop = new ObjectProperty();
 	string name = readString(s);
-	int flags = readUInt8(s);
+	prop->flags = readUInt8(s);
+	prop->type = readType(s);
+	table->properties[name] = prop;
 }
