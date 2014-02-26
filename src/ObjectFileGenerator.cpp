@@ -53,7 +53,6 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_VALUES:
 		case NT_CLASSSET:
 		case NT_EXPRESSIONS:
-		case NT_INHERITANCE:
 		case NT_INHERITANCESET:
 		case NT_PROVISIONS:
 		case NT_INTERFACE:
@@ -266,9 +265,8 @@ void ObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_SUBCLASS:
-			file << "this.prototype = new ";
 			header->addClassUsage(file.tellp(), tree->node_data.string);
-			file << "();";
+			file << ".call(this);";
 			break;
 
 		case NT_ARRAY_ACCESS:

@@ -484,24 +484,18 @@ every InheritanceTest is:
 	}
 
 	Truth -- testFallthroughChildGetsChildClassName(Asserts) {
-		Printer.print("Skip");
-		return False;
 		:InheritanceTestFallthrough <- this;
 		Asserts.that(InheritanceTestFallthrough.getClassName())Equals("InheritanceTestParent");
 		return Asserts.allPassed();
 	}
 
 	Truth -- testFallthroughChildFromProviderGetsChildClassName(Asserts) {
-		Printer.print("Skip");
-		return False;
 		:InheritanceTestParent = :(InheritanceTestParent{Fallthrough} <- this);
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestParent");
 		return Asserts.allPassed();
 	}
 
 	Truth -- testFallthroughChildAfterCastGetsChildClassName(Asserts) {
-		Printer.print("Skip");
-		return False;
 		:InheritanceTestParent = :(InheritanceTestFallthrough <- this);
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestParent");
 		return Asserts.allPassed();
