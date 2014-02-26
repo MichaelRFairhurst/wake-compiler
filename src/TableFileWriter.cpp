@@ -24,6 +24,18 @@ void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 
 		writeProperty(out, it->second);
 	}
+
+	dataptr[0] = 0x05;
+	out.write(dataptr, 1);
+
+	for(map<string, bool>::iterator it = table->parentage.begin(); it != table->parentage.end(); ++it) {
+		dataptr[0] = (char) it->first.size();
+		out.write(dataptr, 1);
+		out.write(it->first.c_str(), it->first.size());
+
+		dataptr[0] = (char) it->second;
+		out.write(dataptr, 1);
+	}
 	free(dataptr);
 }
 

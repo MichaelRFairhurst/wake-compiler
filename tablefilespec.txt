@@ -1,9 +1,6 @@
-b0     - classname length (L)
-bL     - true/false - class is abstract
-bL + 1 - e
-
-file = namelength (1 byte) | name | Types | 0x00 | Properties
+file = namelength (1 byte) | name | Types | 0x00 | Properties | 0x00 | Inheritances
   where
+	Inheritance = parentnamelength (1 byte) | parentname | Bool extends (1 byte)
 	Properties = propertynamelength (1 byte) | propertyname | flags (1 byte) | Type
 	Types = Type*
 	Type = ClassType or LambdaType
@@ -14,15 +11,15 @@ file = namelength (1 byte) | name | Types | 0x00 | Properties
 
 Memory Layout
 
-     File          Property                    Type                   ReturnType      Typecommon
- ------------    ------------    ------------        ------------    ------------    ------------
-| namelength |  | namelength |  |    0x01    |      |    0x02    |  |    0x03    |  |   arrayed  |
- ------------    ------------    ------------        ------------    ------------    ------------
-|    name    |  |    name    |  | namelength |      | ReturnType |  |    Type    |  | alias len  |
-|    ...     |  |    ...     |   ------------       |    ...     |  |     ...    |   ------------
-|    ...     |  |    ...     |  |    name    |  OR   ------------    ------------   |   alias    |
- ------------    ------------   |    ....    |      |    Types   |                  |    ...     |
-|   Needs    |  |   flags    |  |    ....    |      |     ...    |    Or Nothing     ------------
+     File          Property                    Type                   ReturnType      Typecommon      Inheritance
+ ------------    ------------    ------------        ------------    ------------    ------------    ------------
+| namelength |  | namelength |  |    0x01    |      |    0x02    |  |    0x03    |  |   arrayed  |  | NameLength |
+ ------------    ------------    ------------        ------------    ------------    ------------    ------------
+|    name    |  |    name    |  | namelength |      | ReturnType |  |    Type    |  | alias len  |  |    Name    |
+|    ...     |  |    ...     |   ------------       |    ...     |  |     ...    |   ------------   |    ...     |
+|    ...     |  |    ...     |  |    name    |  OR   ------------    ------------   |   alias    |   ------------
+ ------------    ------------   |    ....    |      |    Types   |                  |    ...     |  | Bool extend|
+|   Needs    |  |   flags    |  |    ....    |      |     ...    |    Or Nothing     ------------    ------------
 |    ...     |   ------------    ------------        ------------                   | specialtyl |
  ------------   |    Type    |  |   shadow   |      |    0x04    |                   ------------
 |   0x00     |   ------------    ------------        ------------                   | specialty  |
@@ -30,3 +27,8 @@ Memory Layout
 | Properties |                   ------------        ------------                    ------------
 |    ...     |                                                                      |  optional  |
  ------------                                                                        ------------
+|   0x00     |
+ ------------
+|Inheritances|
+|    ...     |
+ ------------

@@ -8,11 +8,11 @@ BOOST_AUTO_TEST_SUITE(TableFileReaderTest)
 
 BOOST_AUTO_TEST_CASE(TestReadsSimple)
 {
-					// classname length 9  classname   not abstract begin methods end methods
-	char* dataptr = "\011"                 "classname" "\000"       "\000"        "\004";
+					// classname length 9  classname   not abstract begin methods begin inheritance
+	char* dataptr = "\011"                 "classname" "\000"       "\000"        "\005";
 
 	std::stringstream in;
-	in.write(dataptr, 12);
+	in.write(dataptr, 13);
 
 	TableFileReader reader;
 
@@ -24,6 +24,7 @@ BOOST_AUTO_TEST_CASE(TestReadsSimple)
 	BOOST_CHECK(table.isAbstract() == false);
 	BOOST_CHECK(table.getNeeds()->size() == 0);
 	BOOST_CHECK(table.properties.size() == 0);
+	BOOST_CHECK(table.parentage.size() == 0);
 }
 
 BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
@@ -48,10 +49,11 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 					"\000" // arrayed
 					"\000" // alias length
 					"\000" // specialty length
-					"\000"; // optionality
+					"\000" // optionality
+					"\005"; // begin inheritance
 
 	std::stringstream in;
-	in.write(dataptr, 42);
+	in.write(dataptr, 43);
 
 	TableFileReader reader;
 
@@ -63,6 +65,7 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 	BOOST_CHECK(table.isAbstract() == false);
 	BOOST_CHECK(table.getNeeds()->size() == 0);
 	BOOST_CHECK(table.properties.size() == 1);
+	BOOST_CHECK(table.parentage.size() == 0);
 	BOOST_CHECK(table.isPublic("print(Text)") == true);
 	BOOST_CHECK((*table.find("print(Text)"))->type == TYPE_LAMBDA);
 	BOOST_CHECK((*table.find("print(Text)"))->typedata.lambda.returntype == NULL);
@@ -93,10 +96,11 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 					"\000" // alias length
 					"\000" // spec length
 					"\000" // optional
-					"\000"; // methods
+					"\000" // methods
+					"\005"; // begin inheritance
 
 	std::stringstream in;
-	in.write(dataptr, 23);
+	in.write(dataptr, 24);
 
 	TableFileReader reader;
 
@@ -115,6 +119,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 	BOOST_CHECK(table.getNeeds()->at(0)->specialty == NULL);
 	BOOST_CHECK(table.getNeeds()->at(0)->optional == NULL);
 	BOOST_CHECK(table.properties.size() == 0);
+	BOOST_CHECK(table.parentage.size() == 0);
 }
 
 BOOST_AUTO_TEST_CASE(TestWritesNeeds)
@@ -138,10 +143,11 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 					"\000" // alias length
 					"\000" // spec length
 					"\000" // optional
-					"\000"; // methods
+					"\000" // methods
+					"\005"; // begin inheritance
 
 	std::stringstream in;
-	in.write(dataptr, 37);
+	in.write(dataptr, 38);
 
 	TableFileReader reader;
 
@@ -167,6 +173,39 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	BOOST_CHECK(table.getNeeds()->at(1)->specialty == NULL);
 	BOOST_CHECK(table.getNeeds()->at(1)->optional == NULL);
 	BOOST_CHECK(table.properties.size() == 0);
+	BOOST_CHECK(table.parentage.size() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(TestReadsInheritance)
+{
+	char* dataptr = "\011" // classname len
+					"classname"
+					"\000" // not abstract
+					"\000" // begin methods
+					"\005" // begin inheritance
+					"\010" // parent legnth 8
+					"myparent"
+					"\001" // does extend
+					"\013" // parent length 11
+					"myinterface"
+					"\000"; // doesn't extend
+
+	std::stringstream in;
+	in.write(dataptr, 36);
+
+	TableFileReader reader;
+
+	TypeAnalyzer tanalyzer;
+	PropertySymbolTable table(&tanalyzer);
+	reader.read(&table, in);
+
+	BOOST_CHECK(table.classname == string("classname"));
+	BOOST_CHECK(table.isAbstract() == false);
+	BOOST_CHECK(table.getNeeds()->size() == 0);
+	BOOST_CHECK(table.properties.size() == 0);
+	BOOST_CHECK(table.parentage.size() == 2);
+	BOOST_CHECK(table.parentage["myparent"] == true);
+	BOOST_CHECK(table.parentage["myinterface"] == false);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

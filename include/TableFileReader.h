@@ -19,6 +19,7 @@ class TableFileReader {
 		char* readCString(istream& s);
 		unsigned char readUInt8(istream& s);
 		void readMethod(PropertySymbolTable* table, istream& s);
+		void readInheritance(PropertySymbolTable* table, istream& s);
 		Type* readType(istream& s);
 		void readTypeCommon(Type* type, istream& s);
 		Type* readTypeByTag(int tag, istream& s);

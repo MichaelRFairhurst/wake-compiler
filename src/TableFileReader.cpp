@@ -11,10 +11,16 @@ void TableFileReader::read(PropertySymbolTable* table, istream& s) {
 	}
 
 	while(true) {
-		//readUInt8(s);
+		tag = readUInt8(s);
+		if(tag == 0x05) break;
+		s.putback(tag);// TODO make tag an argument on readMethod
+		readMethod(table, s);
+	}
+
+	while(true) {
 		s.peek(); // trigger EOF
 		if(s.eof()) break;
-		readMethod(table, s);
+		readInheritance(table, s);
 	}
 }
 
@@ -94,4 +100,8 @@ void TableFileReader::readMethod(PropertySymbolTable* table, istream& s) {
 	prop->flags = readUInt8(s);
 	prop->type = readType(s);
 	table->properties[name] = prop;
+}
+
+void TableFileReader::readInheritance(PropertySymbolTable* table, istream& s) {
+	table->parentage[readString(s)] = readUInt8(s);;
 }

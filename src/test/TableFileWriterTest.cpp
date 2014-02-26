@@ -5,7 +5,7 @@
 #include "type.h"
 
 #define ASSERTCHAR(v) BOOST_CHECK_MESSAGE(dataptr[i++] == v, "Expected " #v " in stream at pos " + std::to_string(i) + " got " + std::to_string((unsigned char) dataptr[i]));
-#define ASSERTLENGTH(l) char* dataptr = (char*) malloc(l); out.read(dataptr, l); out.peek() /* trigger EOF check*/; BOOST_CHECK_MESSAGE(out.eof(), "wrong length"); int i = 0;
+#define ASSERTLENGTH(l) char* dataptr = (char*) malloc(l); out.read(dataptr, l); BOOST_CHECK_MESSAGE(!out.eof(), "too short"); out.peek(); BOOST_CHECK_MESSAGE(out.eof(), "too long"); int i = 0;
 
 BOOST_AUTO_TEST_SUITE(TableFileWriterTest)
 
@@ -17,12 +17,13 @@ BOOST_AUTO_TEST_CASE(TestWritesSimple)
 	PropertySymbolTable table(&tanalyzer);
 	table.classname = "classname";
 	writer.write(out, &table);
-	ASSERTLENGTH(12);
+	ASSERTLENGTH(13);
 
 	ASSERTCHAR(9);
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
-	ASSERTCHAR(0); // methoods
+	ASSERTCHAR(0); // methods
+	ASSERTCHAR(5); // inheritance
 }
 
 BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
@@ -43,7 +44,7 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 
 	writer.write(out, &table);
 
-	ASSERTLENGTH(42);
+	ASSERTLENGTH(43);
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
@@ -65,6 +66,7 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 	ASSERTCHAR(0); // alias length
 	ASSERTCHAR(0); // specialty length
 	ASSERTCHAR(0); // optionality
+	ASSERTCHAR(5); // inheritance
 }
 
 BOOST_AUTO_TEST_CASE(TestWritesNeed)
@@ -79,7 +81,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 	table.classname = "classname";
 
 	writer.write(out, &table);
-	ASSERTLENGTH(23);
+	ASSERTLENGTH(24);
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
@@ -92,6 +94,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 	ASSERTCHAR(0); // spec length
 	ASSERTCHAR(0); // optional
 	ASSERTCHAR(0); // methods
+	ASSERTCHAR(5); // inheritance
 }
 
 BOOST_AUTO_TEST_CASE(TestWritesNeeds)
@@ -109,7 +112,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 
 	writer.write(out, &table);
 
-	ASSERTLENGTH(37);
+	ASSERTLENGTH(38);
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
@@ -130,6 +133,32 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	ASSERTCHAR(0); // spec length
 	ASSERTCHAR(0); // optional
 	ASSERTCHAR(0); // methods
+	ASSERTCHAR(5); // inheritance
+}
+
+BOOST_AUTO_TEST_CASE(TestWritesInheritance)
+{
+	std::stringstream out;
+	TableFileWriter writer;
+	TypeAnalyzer tanalyzer;
+	PropertySymbolTable table(&tanalyzer);
+	table.classname = "classname";
+	table.parentage["myparent"] = true;
+	table.parentage["myinterface"] = false;
+	writer.write(out, &table);
+	ASSERTLENGTH(36);
+
+	ASSERTCHAR(9);
+	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
+	ASSERTCHAR(0); // not abstract
+	ASSERTCHAR(0); // methods
+	ASSERTCHAR(5); // inheritance
+	ASSERTCHAR(11); // "myinterface" length
+	ASSERTCHAR('m'); ASSERTCHAR('y'); ASSERTCHAR('i'); ASSERTCHAR('n'); ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('r'); ASSERTCHAR('f'); ASSERTCHAR('a'); ASSERTCHAR('c'); ASSERTCHAR('e');
+	ASSERTCHAR(0);
+	ASSERTCHAR(8); // "myparent" length
+	ASSERTCHAR('m'); ASSERTCHAR('y'); ASSERTCHAR('p'); ASSERTCHAR('a'); ASSERTCHAR('r'); ASSERTCHAR('e'); ASSERTCHAR('n'); ASSERTCHAR('t');
+	ASSERTCHAR(1);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
