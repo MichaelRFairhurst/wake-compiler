@@ -5,6 +5,7 @@ OPT=-O0 -g
 FLAGS=-Iinclude -Igen
 CC=cc $(FLAGS)
 CPP=g++ $(FLAGS) -std=c++11
+TEST=true
 
 CPPNAMES= \
 	ObjectSymbolTable.cpp \
@@ -33,12 +34,15 @@ CPPNAMES= \
 	TableFileReader.cpp
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
+
+WAKETABLENAMES=Printer.wk System.wk
+WAKETABLEOBJS=$(addprefix bin/waketable/, $(WAKETABLENAMES:.wk=.table))
+
 CNAMES=tree.c type.c parseUtil.c
 COBJS=$(addprefix bin/c/, $(CNAMES:.c=.o))
+
 GENNAMES=lex.wake.c wake.tab.c objectfile.tab.c lex.objectfile.c
 GENOBJS=$(addprefix bin/gen/, $(GENNAMES:.c=.o))
-
-TEST=true
 
 TESTNAMES=CompilerTests.cpp \
 	ObjectSymbolTableTest.cpp \
@@ -88,7 +92,7 @@ bin/wake: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o chivvy
 bin/finaltest.js: bin/wakeobj/finaltest.o src/wakelib/std.o
 	time ./bin/wake -l src/wakelib/std.o bin/wakeobj/finaltest.o -o bin/finaltest.js
 
-bin/wakeobj/finaltest.o: bin/wake finaltest.wk
+bin/wakeobj/finaltest.o: bin/wake finaltest.wk $(WAKETABLEOBJS)
 	time ./bin/wake finaltest.wk -o bin/wakeobj/finaltest.o
 
 bin/gen/%.o: gen/%.c gen/wake.tab.c
@@ -96,6 +100,9 @@ bin/gen/%.o: gen/%.c gen/wake.tab.c
 
 bin/tests/%.o: src/test/%.cpp
 	$(CPP) -g -c $< -o $@
+
+bin/waketable/%.table: src/waketables/%.wk bin/wake
+	./bin/wake -t $< -o $@
 
 bin/cpp/%.o: src/%.cpp gen/wake.tab.c gen/objectfile.tab.c
 	$(CPP) $(OPT) -c $< -o $@
@@ -125,7 +132,8 @@ loo:
 	rm bin/gen/* || :
 	rm bin/c/* || :
 	rm bin/wake || :
-	rm bin/wake || :
+	rm bin/wakeobj/* || :
+	rm bin/waketables/* || :
 	rm bin/finaltest.js || :
 	@echo
 	@echo -- CLEANED MY ARSE

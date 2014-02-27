@@ -1,0 +1,7 @@
+#>
+# This only defines the signatures, and will be used to
+# generate an importable .table file
+##
+every System is:
+
+	exit(Int) {}
