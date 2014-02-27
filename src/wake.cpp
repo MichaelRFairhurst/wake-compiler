@@ -24,7 +24,17 @@ extern "C" {
 #include "OptionsParser.h"
 #include "EntryPointAnalyzer.h"
 #include "AddressAllocator.h"
+#include "TableFileWriter.h"
 #include "SimpleAddressTable.h"
+
+void compileTableFile(const char* filename, ObjectSymbolTable& table) {
+	fstream file;
+	file.open(filename, ios::out);
+	TableFileWriter writer;
+
+	// Write out the first class only, for now
+	writer.write(file, table.classes.begin()->second);
+}
 
 void compileFile(Options* options) {
 
@@ -60,6 +70,11 @@ void compileFile(Options* options) {
 		exit(4);
 	}
 
+	if(options->table) {
+		compileTableFile(options->outFilename.c_str(), table);
+		return;
+	}
+
 	basic_ostringstream<char> object;
 	ObjectFileHeaderData header;
 
@@ -84,9 +99,6 @@ void compileFile(Options* options) {
 	file.open(options->outFilename.c_str(), ios::out);
 	renderer.writeOut(file, &header);
 	file << object.str();
-}
-
-void compileTableFile(Options* options) {
 }
 
 int main(int argc, char** argv) {
