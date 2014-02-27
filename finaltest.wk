@@ -1,3 +1,6 @@
+import Printer;
+import System;
+
 #>
 # Test suite entry point
 ##

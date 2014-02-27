@@ -1,7 +1,14 @@
 #include "LibraryLoader.h"
+#include <fstream>
+#include "TableFileReader.h"
 
-void LibraryLoader::loadToTable(ObjectSymbolTable* table) {
-	loadStdLibToTable(table);
+void LibraryLoader::loadImport(string importname, string importpath, ObjectSymbolTable& objtable) {
+	fstream importfile;
+	importfile.open(importpath + "/" + importname + ".table");
+	TableFileReader reader;
+
+	objtable.addClass(importname);
+	reader.read(objtable.find(importname), importfile);
 }
 
 void LibraryLoader::loadStdLibToTable(ObjectSymbolTable* table) {
@@ -9,6 +16,7 @@ void LibraryLoader::loadStdLibToTable(ObjectSymbolTable* table) {
 	table->addClass("Truth");
 	table->addClass("Int");
 
+	/*
 	table->addClass("Printer");
 	{
 		vector<pair<string, TypeArray*> > segments_arguments;
@@ -57,5 +65,6 @@ void LibraryLoader::loadStdLibToTable(ObjectSymbolTable* table) {
 		table->find("System")->addMethod(NULL, &segments_arguments, PROPERTY_PUBLIC);
 		freeTypeArray(arguments);
 	}
+	*/
 
 }

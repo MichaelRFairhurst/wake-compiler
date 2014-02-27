@@ -11,9 +11,7 @@ extern "C" {
 class LibraryLoader {
 
 	public:
-		void loadToTable(ObjectSymbolTable* table);
-
-	private:
+		void loadImport(string importname, string importpath, ObjectSymbolTable& objtable);
 		void loadStdLibToTable(ObjectSymbolTable* table);
 
 };

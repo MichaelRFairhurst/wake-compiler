@@ -70,7 +70,7 @@ imports:
 	;
 
 import:
-	IMPORT importtarget STRING ';'												{ $$ = MakeTwoBranchNode(NT_IMPORT, $2, MakeNodeFromString(NT_IMPORTPATH, $3)); }
+	IMPORT importtarget IDENTIFIER ';'												{ $$ = MakeTwoBranchNode(NT_IMPORT, $2, MakeNodeFromString(NT_IMPORTPATH, $3)); }
 	;
 
 importtarget:

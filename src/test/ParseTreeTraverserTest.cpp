@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_SUITE( ObjectSymbolTableTest )
 		Parser p; \
 		ObjectSymbolTable table; \
 		LibraryLoader loader; \
-		loader.loadToTable(&table); \
+		loader.loadStdLibToTable(&table); \
 		ParseTreeTraverser t(&table); \
 		MockSemanticErrorPrinter e; \
 		p.parse( CODE ); \
@@ -1408,9 +1408,9 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	UsingAOptionalTypeIsError,
-	"every MyClass is:							\n\
-		myMethod(Printer?) {					\n\
-			Printer.print(\"erroneous usage\");	\n\
+	"every MyClass is:					\n\
+		myMethod(MyClass?) {			\n\
+			MyClass.myMethod(MyClass);	\n\
 		}",
 	PTT_EXPECT(DIRECT_USE_OF_OPTIONAL_TYPE)
 );
@@ -1418,8 +1418,8 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	AssignmentOfOptionalTypeAsRealTypeIsError,
 	"every MyClass is:				\n\
-		assignment(Printer?) {		\n\
-			:$Printer = Printer;	\n\
+		assignment(MyClass?) {		\n\
+			:$MyClass = MyClass;	\n\
 		}",
 	PTT_EXPECT(TYPE_ERROR)
 );
@@ -1427,8 +1427,8 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	AssignmentOfOptionalTypeToOptionalTypeIsValid,
 	"every MyClass is:				\n\
-		assignment(Printer?) {		\n\
-			:$Printer? = Printer;	\n\
+		assignment(MyClass?) {		\n\
+			:$MyClass? = MyClass;	\n\
 		}",
 	PTT_VALID
 );
@@ -1436,8 +1436,8 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ReturnOfOptionalTypeAsRealTypeIsError,
 	"every MyClass is:						\n\
-		Printer -- returnment(Printer?) {	\n\
-			return Printer;					\n\
+		MyClass -- returnment(MyClass?) {	\n\
+			return MyClass;					\n\
 		}",
 	PTT_EXPECT(TYPE_ERROR)
 );
@@ -1445,8 +1445,8 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ReturnOfOptionalTypeAsOptionalTypeIsValid,
 	"every MyClass is:						\n\
-		Printer? -- returnment(Printer?) {	\n\
-			return Printer;					\n\
+		MyClass? -- returnment(MyClass?) {	\n\
+			return MyClass;					\n\
 		}",
 	PTT_VALID
 );
@@ -1454,10 +1454,10 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ArgumentOfOptionalTypeAsRealTypeIsError,
 	"every MyClass is:			\n\
-		optional(Printer?) {	\n\
-			real(Printer);		\n\
+		optional(MyClass?) {	\n\
+			real(MyClass);		\n\
 		}						\n\
-		real(Printer) {			\n\
+		real(MyClass) {			\n\
 		}",
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 );
@@ -1465,10 +1465,10 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ArgumentOfOptionalTypeAsOptionalTypeIsValid,
 	"every MyClass is:			\n\
-		optional(Printer?) {	\n\
-			real(Printer);		\n\
+		optional(MyClass?) {	\n\
+			real(MyClass);		\n\
 		}						\n\
-		real(Printer?) {		\n\
+		real(MyClass?) {		\n\
 		}",
 	PTT_VALID
 );
@@ -1476,8 +1476,8 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	NullAssignmentToRealTypeIsError,
 	"every MyClass is:			\n\
-		myMethod(Printer) {		\n\
-			Printer = nothing;	\n\
+		myMethod(MyClass) {		\n\
+			MyClass = nothing;	\n\
 		}",
 	PTT_EXPECT(TYPE_ERROR)
 );
@@ -1485,8 +1485,8 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	NullAssignmentToOptionalTypeIsValid,
 	"every MyClass is:			\n\
-		myMethod(Printer?) {	\n\
-			Printer = nothing;	\n\
+		myMethod(MyClass?) {	\n\
+			MyClass = nothing;	\n\
 		}",
 	PTT_VALID
 );
@@ -1494,7 +1494,7 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	NullReturnOfRealTypeIsError,
 	"every MyClass is:			\n\
-		Printer -- myMethod() { \n\
+		MyClass -- myMethod() { \n\
 			return nothing;		\n\
 		}",
 	PTT_EXPECT(TYPE_ERROR)
@@ -1503,7 +1503,7 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	NullReturnOfOptionalTypeIsValid,
 	"every MyClass is:				\n\
-		Printer? -- myMethod() {	\n\
+		MyClass? -- myMethod() {	\n\
 			return nothing;			\n\
 		}",
 	PTT_VALID
@@ -1512,7 +1512,7 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	NullArgumentOfRealArgumentIsError,
 	"every MyClass is:		\n\
-		real(Printer) {		\n\
+		real(MyClass) {		\n\
 			real(nothing);	\n\
 		}",
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
@@ -1521,19 +1521,20 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ExistsClauseOnRealTypeNotAllowed,
 	"every MyClass is:				\n\
-		myMethod(Printer) {			\n\
-			if Printer exists {}	\n\
+		myMethod(MyClass) {			\n\
+			if MyClass exists {}	\n\
 		}",
 	PTT_EXPECT(EXISTS_ON_NONOPTIONAL_TYPE)
 );
 
 PTT_TEST_CASE(
 	ExistsClauseMakesOptionalTypeUsable,
-	"every MyClass is:						\n\
-		myMethod(Printer?) {				\n\
-			if Printer exists {				\n\
-				Printer.print(\"yay!\");	\n\
-			}								\n\
+	"every MyClass is:				\n\
+		method() {}					\n\
+		myMethod(MyClass?) {		\n\
+			if MyClass exists {		\n\
+				MyClass.method();	\n\
+			}						\n\
 		}",
 	PTT_VALID
 );
@@ -1541,9 +1542,9 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ExistsClauseMakesOptionalTypeAssignable,
 	"every MyClass is:					\n\
-		myMethod(Printer?) {			\n\
-			if Printer exists {			\n\
-				:$Printer = Printer;	\n\
+		myMethod(MyClass?) {			\n\
+			if MyClass exists {			\n\
+				:$MyClass = MyClass;	\n\
 			}							\n\
 		}",
 	PTT_VALID
@@ -1551,13 +1552,13 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	ExistsClauseMakesOptionalTypeReturnable,
-	"every MyClass is:					\n\
-		needs $Printer;					\n\
-		Printer -- myMethod(Printer?) {	\n\
-			if Printer exists {			\n\
-				return Printer;			\n\
-			}							\n\
-			return $Printer;			\n\
+	"every MyClass is:			\n\
+		needs $Int;				\n\
+		Int -- myMethod(Int?) {	\n\
+			if Int exists {		\n\
+				return Int;		\n\
+			}					\n\
+			return $Int;		\n\
 		}",
 	PTT_VALID
 );
@@ -1565,12 +1566,12 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ExistsClauseMakesOptionalTypeValidAsArgument,
 	"every MyClass is:			\n\
-		optional(Printer?) {	\n\
-			if Printer exists {	\n\
-				real(Printer);	\n\
+		optional(MyClass?) {	\n\
+			if MyClass exists {	\n\
+				real(MyClass);	\n\
 			}					\n\
 		}						\n\
-		real(Printer) {			\n\
+		real(MyClass) {			\n\
 		}",
 	PTT_VALID
 );
@@ -1578,23 +1579,24 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	AfterExistClauseOptionalsRemainOptional,
 	"every MyClass is:					\n\
-		usage(Printer?) {				\n\
-			if Printer exists {}		\n\
-			Printer.print(\"a\");		\n\
+		print(Text) {}					\n\
+		usage(MyClass?) {				\n\
+			if MyClass exists {}		\n\
+			MyClass.print(\"a\");		\n\
 		}								\n\
-		assignment(Printer?) {			\n\
-			if Printer exists {}		\n\
-			:$Printer = Printer;		\n\
+		assignment(MyClass?) {			\n\
+			if MyClass exists {}		\n\
+			:$MyClass = MyClass;		\n\
 		}								\n\
-		Printer -- returnin(Printer?) {	\n\
-			if Printer exists {}		\n\
-			return Printer;				\n\
+		MyClass -- returnin(MyClass?) {	\n\
+			if MyClass exists {}		\n\
+			return MyClass;				\n\
 		}								\n\
-		optional(Printer?) {			\n\
-			if Printer exists {}		\n\
-			real(Printer);				\n\
+		optional(MyClass?) {			\n\
+			if MyClass exists {}		\n\
+			real(MyClass);				\n\
 		}								\n\
-		real(Printer) {					\n\
+		real(MyClass) {					\n\
 		}",
 	PTT_EXPECT(DIRECT_USE_OF_OPTIONAL_TYPE)
 	PTT_EXPECT(TYPE_ERROR)

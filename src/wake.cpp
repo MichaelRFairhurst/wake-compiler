@@ -26,14 +26,15 @@ extern "C" {
 #include "AddressAllocator.h"
 #include "TableFileWriter.h"
 #include "SimpleAddressTable.h"
+#include "ImportParseTreeTraverser.h"
 
 void compileTableFile(const char* filename, ObjectSymbolTable& table) {
 	fstream file;
 	file.open(filename, ios::out);
 	TableFileWriter writer;
 
-	// Write out the first class only, for now
-	writer.write(file, table.classes.begin()->second);
+	// Write out the first class only, for now. Which is the last class or we get Int
+	writer.write(file, (table.classes.end()--)->second);
 }
 
 void compileFile(Options* options) {
@@ -57,7 +58,9 @@ void compileFile(Options* options) {
 
 	ObjectSymbolTable table;
 	LibraryLoader loader;
-	loader.loadToTable(&table);
+	loader.loadStdLibToTable(&table);
+	ImportParseTreeTraverser importer;
+	importer.traverse(parser.getParseTree(), table, loader);
 
 	// Now do all the semantic analysis
 	ParseTreeTraverser traverser(&table);

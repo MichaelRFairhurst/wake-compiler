@@ -20,6 +20,7 @@ boost::optional<SemanticError*> ObjectSymbolTable::addClass(string name) {
 	}
 
 	addingclass_symbol = new PropertySymbolTable(&analyzer);
+	addingclass_symbol->classname = name;
 	addingclass_hassubclass = false;
 
 	classes[addingclass_name] = addingclass_symbol;
