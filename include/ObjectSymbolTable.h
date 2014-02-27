@@ -28,11 +28,13 @@ class ObjectSymbolTable {
 		TypeAnalyzer* getAnalyzer();
 		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);
 
+		// Mabe not great to be public but solves immediate problems
+		map<string, PropertySymbolTable*> classes;
+
 	private:
 		PropertySymbolTable* addingclass_symbol;
 		std::string addingclass_name;
 		bool addingclass_hassubclass;
-		map<string, pair<PropertySymbolTable*, string> > classes;
 		map<string, pair<PropertySymbolTable*, bool> > inheritances_gathered;
 		TypeAnalyzer analyzer;
 };

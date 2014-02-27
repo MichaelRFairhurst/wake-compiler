@@ -7,8 +7,8 @@ ObjectSymbolTable::ObjectSymbolTable() {
 }
 
 ObjectSymbolTable::~ObjectSymbolTable() {
-	for(map<string, pair<PropertySymbolTable*, string> >::iterator it = classes.begin(); it != classes.end(); ++it) {
-		delete it->second.first;
+	for(map<string, PropertySymbolTable*>::iterator it = classes.begin(); it != classes.end(); ++it) {
+		delete it->second;
 	}
 }
 
@@ -22,7 +22,7 @@ boost::optional<SemanticError*> ObjectSymbolTable::addClass(string name) {
 	addingclass_symbol = new PropertySymbolTable(&analyzer);
 	addingclass_hassubclass = false;
 
-	classes[addingclass_name] = pair<PropertySymbolTable*, string>(addingclass_symbol, "a");
+	classes[addingclass_name] = addingclass_symbol;
 
 	return boost::optional<SemanticError*>();
 }
@@ -51,8 +51,8 @@ boost::optional<SemanticError*> ObjectSymbolTable::addInheritance(string childna
 
 void ObjectSymbolTable::propagateInheritance() {
 	map<string, pair<PropertySymbolTable*, bool> > passed;
-	for(map<string, pair<PropertySymbolTable*, string> >::iterator it = classes.begin(); it != classes.end(); ++it) {
-		inheritances_gathered[it->first] = pair<PropertySymbolTable*, bool>(it->second.first, false);
+	for(map<string, PropertySymbolTable*>::iterator it = classes.begin(); it != classes.end(); ++it) {
+		inheritances_gathered[it->first] = pair<PropertySymbolTable*, bool>(it->second, false);
 	}
 
 	for(map<string, pair<PropertySymbolTable*, bool> >::iterator it = inheritances_gathered.begin(); it != inheritances_gathered.end(); ++it) {
@@ -77,7 +77,7 @@ void ObjectSymbolTable::propagateInheritanceToParent(string childname) {
 }
 
 PropertySymbolTable* ObjectSymbolTable::find(string name) {
-	std::map<string, pair<PropertySymbolTable*, string> >::iterator searcher = classes.find(name);
+	std::map<string, PropertySymbolTable*>::iterator searcher = classes.find(name);
 	if(!classes.count(name)) {
 		SymbolNotFoundException* error = new SymbolNotFoundException();
 		error->errormsg = "Could not find symbol ";
@@ -86,7 +86,7 @@ PropertySymbolTable* ObjectSymbolTable::find(string name) {
 		throw error;
 	}
 
-	return searcher->second.first;
+	return searcher->second;
 }
 
 void ObjectSymbolTable::assertTypeIsValid(Type* type) {
@@ -106,10 +106,10 @@ void ObjectSymbolTable::assertTypeIsValid(Type* type) {
 }
 
 void ObjectSymbolTable::printEntryPoints(EntryPointAnalyzer* entryanalyzer) {
-	for(map<string, pair<PropertySymbolTable*, string> >::iterator it = classes.begin(); it != classes.end(); ++it) {
-		if(!entryanalyzer->checkClassNeedsCanBeMain(it->second.first->getNeeds())) continue;
+	for(map<string, PropertySymbolTable*>::iterator it = classes.begin(); it != classes.end(); ++it) {
+		if(!entryanalyzer->checkClassNeedsCanBeMain(it->second->getNeeds())) continue;
 		entryanalyzer->printClass(it->first);
-		it->second.first->printEntryPoints(entryanalyzer);
+		it->second->printEntryPoints(entryanalyzer);
 	}
 }
 
