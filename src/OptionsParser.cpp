@@ -57,6 +57,10 @@ Options* OptionsParser::parse(int argc, char** argv) {
 			options->link = true;
 		}
 
+		else if(arg == "-t" || arg == "--table") {
+			options->table = true;
+		}
+
 		else {
 			options->hasErrors = true;
 		}

@@ -86,6 +86,9 @@ void compileFile(Options* options) {
 	file << object.str();
 }
 
+void compileTableFile(Options* options) {
+}
+
 int main(int argc, char** argv) {
 	OptionsParser optionsparser;
 	Options* options = optionsparser.parse(argc, argv);

@@ -11,6 +11,8 @@ struct Options {
 	bool showVersion;
 
 	bool link;
+	bool table;
+
 	std::vector<std::string> linkFilenames;
 	std::string mainclass;
 	std::string mainmethod;

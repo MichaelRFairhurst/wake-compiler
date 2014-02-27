@@ -183,4 +183,38 @@ BOOST_AUTO_TEST_CASE(TestLinkTwoFiles) {
 	delete options;
 }
 
+BOOST_AUTO_TEST_CASE(TestTableFileLong) {
+	OptionsParser p;
+	char wake[5] = "wake";
+	char table[8] = "--table";
+	char file[10] = "myfile.wk";
+	char* args[3] = {wake, table, file};
+
+	Options* options = p.parse(3, args);
+
+	BOOST_CHECK(options->link == false);
+	BOOST_CHECK(options->table == true);
+	BOOST_CHECK(options->linkFilenames.size() == 0);
+	BOOST_CHECK(options->compileFilename == "myfile.wk");
+	BOOST_CHECK(options->outFilename == "a.out");
+	delete options;
+}
+
+BOOST_AUTO_TEST_CASE(TestTableFileShort) {
+	OptionsParser p;
+	char wake[5] = "wake";
+	char table[3] = "-t";
+	char file[10] = "myfile.wk";
+	char* args[3] = {wake, table, file};
+
+	Options* options = p.parse(3, args);
+
+	BOOST_CHECK(options->link == false);
+	BOOST_CHECK(options->table == true);
+	BOOST_CHECK(options->linkFilenames.size() == 0);
+	BOOST_CHECK(options->compileFilename == "myfile.wk");
+	BOOST_CHECK(options->outFilename == "a.out");
+	delete options;
+}
+
 BOOST_AUTO_TEST_SUITE_END()
