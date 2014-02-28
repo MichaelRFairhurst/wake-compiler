@@ -125,6 +125,8 @@ int main(int argc, char** argv) {
 		printf("       -h|--help                 - show help and exit\n");
 		printf("       -i|--listmains            - list compilable entrypoints\n");
 		printf("       -l|--link                 - link compiled files into an executable\n");
+		printf("       -t|--table                - only generate table files\n");
+		printf("       -d|--tabledir             - dir for finding and creating .table files\n");
 		exit(0);
 	}
 
