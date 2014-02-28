@@ -103,7 +103,7 @@ bin/tests/%.o: src/test/%.cpp
 	$(CPP) -g -c $< -o $@
 
 bin/waketable/%.table: src/waketables/%.wk bin/wake
-	./bin/wake -t $< -o $@
+	./bin/wake -t $< -d bin/waketable
 
 bin/cpp/%.o: src/%.cpp gen/wake.tab.c gen/objectfile.tab.c
 	$(CPP) $(OPT) -c $< -o $@
@@ -134,7 +134,7 @@ loo:
 	rm bin/c/* || :
 	rm bin/wake || :
 	rm bin/wakeobj/* || :
-	rm bin/waketables/* || :
+	rm bin/waketable/* || :
 	rm bin/finaltest.js || :
 	@echo
 	@echo -- CLEANED MY ARSE

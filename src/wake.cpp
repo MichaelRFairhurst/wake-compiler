@@ -28,13 +28,14 @@ extern "C" {
 #include "SimpleAddressTable.h"
 #include "ImportParseTreeTraverser.h"
 
-void compileTableFile(const char* filename, ObjectSymbolTable& table) {
-	fstream file;
-	file.open(filename, ios::out);
-	TableFileWriter writer;
-
-	// Write out the first class only, for now. Which is the last class or we get Int
-	writer.write(file, (table.classes.end()--)->second);
+void writeTableFiles(std::string dirname, ObjectSymbolTable& table) {
+	for(auto it = table.classes.begin(); it != table.classes.end(); ++it) {
+		PropertySymbolTable* ptable = it->second;
+		fstream file;
+		file.open((dirname + "/" + ptable->classname + ".table").c_str(), ios::out);
+		TableFileWriter writer;
+		writer.write(file, ptable);
+	}
 }
 
 void compileFile(Options* options) {
@@ -74,7 +75,7 @@ void compileFile(Options* options) {
 	}
 
 	if(options->table) {
-		compileTableFile(options->outFilename.c_str(), table);
+		writeTableFiles(options->tabledir, table);
 		return;
 	}
 
@@ -102,6 +103,8 @@ void compileFile(Options* options) {
 	file.open(options->outFilename.c_str(), ios::out);
 	renderer.writeOut(file, &header);
 	file << object.str();
+
+	writeTableFiles(options->tabledir.c_str(), table);
 }
 
 int main(int argc, char** argv) {
