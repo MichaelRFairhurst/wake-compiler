@@ -1,7 +1,7 @@
 SHELL=/bin/bash
 
-OPT=-O3
-#OPT=-O0 -g
+#OPT=-O3
+OPT=-O0 -g
 FLAGS=-Iinclude -Igen
 CC=cc $(FLAGS)
 CPP=g++ $(FLAGS) -std=c++11
@@ -82,16 +82,16 @@ chivvy: bin/test
 
 bin/test: $(CPPOBJS) $(GENOBJS) $(COBJS) $(TESTOBJS)
 	@echo add TEST=false to skip
-	if $(TEST); then $(CPP) $(TESTOBJS) $(CPPOBJS) $(GENOBJS) $(COBJS) -o bin/test -lfl -lboost_unit_test_framework ; fi
+	if $(TEST); then $(CPP) $(TESTOBJS) $(CPPOBJS) $(GENOBJS) $(COBJS) -o bin/test -lfl -lboost_unit_test_framework -lboost_filesystem -lboost_system ; fi
 
 bin/wake: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o chivvy
-	$(CPP) $(OPT) $(CPPOBJS) bin/cpp/wake.o $(GENOBJS) $(COBJS) -o bin/wake -lfl
+	$(CPP) $(OPT) $(CPPOBJS) bin/cpp/wake.o $(GENOBJS) $(COBJS) -o bin/wake -lfl -lboost_filesystem -lboost_system
 	@echo
 	@echo -- CHEERIO
 	@echo
 
 bin/finaltest.js: bin/wakeobj/finaltest.o src/wakelib/std.o
-	time ./bin/wake -l src/wakelib/std.o bin/wakeobj/finaltest.o -o bin/finaltest.js
+	time ./bin/wake -d bin/waketable -l src/wakelib/std.o bin/wakeobj/finaltest.o -o bin/finaltest.js
 
 bin/wakeobj/finaltest.o: bin/wake finaltest.wk $(WAKETABLEOBJS)
 	time ./bin/wake -d bin/waketable finaltest.wk -o bin/wakeobj/finaltest.o

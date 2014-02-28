@@ -134,12 +134,15 @@ int main(int argc, char** argv) {
 	else {
 		AddressAllocator classAllocator;
 		AddressAllocator propAllocator;
+		ObjectSymbolTable table;
 		SimpleAddressTable classTable(classAllocator);
 		SimpleAddressTable propTable(propAllocator);
 		Linker linker(classTable, propTable);
 		for(std::vector<std::string>::iterator it = options->linkFilenames.begin(); it != options->linkFilenames.end(); ++it) {
 			linker.loadObject(*it);
 		}
+
+		linker.loadTables(options->tabledir, table);
 
 		fstream file;
 		file.open(options->outFilename.c_str(), ios::out);

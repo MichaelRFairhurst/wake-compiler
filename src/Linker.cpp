@@ -2,9 +2,13 @@
 #include <string.h>
 #include <algorithm>
 #include "Linker.h"
+#include "TableFileReader.h"
+#include <boost/filesystem.hpp>
 #include <fstream>
+#include <iostream>
 
 using namespace std;
+using namespace boost::filesystem;
 
 extern "C" {
 	#include "objectfile.tab.h"
@@ -14,6 +18,23 @@ extern "C" {
 	extern void objectfile_scan_string(const char* string);
 	extern objectfile* myobjectfile;
 	extern FILE *objectfilein;
+}
+
+void Linker::loadTables(string dirname, ObjectSymbolTable& table) {
+	if (!exists(dirname)) throw string("Directory " + dirname + " does not exist");
+
+	TableFileReader reader;
+	fstream file;
+	directory_iterator end_itr; // default construction yields past-the-end
+
+	for(directory_iterator itr(dirname); itr != end_itr; ++itr)
+	if(!is_directory(itr->status())) {
+		cout << itr->path().string() << endl;
+		file.open(itr->path().string());
+		PropertySymbolTable* ptable = table.getEmptyPropertySymbolTable();
+		reader.read(ptable, file);
+		table.importClass(ptable);
+	}
 }
 
 void Linker::loadObject(string filename) {
