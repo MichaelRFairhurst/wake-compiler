@@ -16,6 +16,7 @@ struct Options {
 	std::vector<std::string> linkFilenames;
 	std::string mainclass;
 	std::string mainmethod;
+	std::string tabledir;
 
 	std::string compileFilename;
 	std::string outFilename;

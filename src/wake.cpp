@@ -60,7 +60,7 @@ void compileFile(Options* options) {
 	LibraryLoader loader;
 	loader.loadStdLibToTable(&table);
 	ImportParseTreeTraverser importer;
-	importer.traverse(parser.getParseTree(), table, loader);
+	importer.traverse(parser.getParseTree(), table, loader, options->tabledir);
 
 	// Now do all the semantic analysis
 	ParseTreeTraverser traverser(&table);

@@ -16,6 +16,8 @@ BOOST_AUTO_TEST_CASE(TestDefaults) {
 	BOOST_CHECK(options->hasErrors == false);
 	BOOST_CHECK(options->listMains == false);
 	BOOST_CHECK(options->link == false);
+	BOOST_CHECK(options->table == false);
+	BOOST_CHECK(options->tabledir == ".");
 	BOOST_CHECK(options->linkFilenames.size() == 0);
 	BOOST_CHECK(options->compileFilename == "");
 	BOOST_CHECK(options->outFilename == "a.out");
@@ -213,6 +215,42 @@ BOOST_AUTO_TEST_CASE(TestTableFileShort) {
 	BOOST_CHECK(options->table == true);
 	BOOST_CHECK(options->linkFilenames.size() == 0);
 	BOOST_CHECK(options->compileFilename == "myfile.wk");
+	BOOST_CHECK(options->outFilename == "a.out");
+	delete options;
+}
+
+BOOST_AUTO_TEST_CASE(TestTableDir) {
+	OptionsParser p;
+	char wake[5] = "wake";
+	char tabledir[11] = "--tabledir";
+	char name[9] = "tabledir";
+	char* args[3] = {wake, tabledir, name};
+
+	Options* options = p.parse(3, args);
+
+	BOOST_CHECK(options->link == false);
+	BOOST_CHECK(options->table == false);
+	BOOST_CHECK(options->tabledir == "tabledir");
+	BOOST_CHECK(options->linkFilenames.size() == 0);
+	BOOST_CHECK(options->compileFilename == "");
+	BOOST_CHECK(options->outFilename == "a.out");
+	delete options;
+}
+
+BOOST_AUTO_TEST_CASE(TestTableDirShort) {
+	OptionsParser p;
+	char wake[5] = "wake";
+	char tabledir[3] = "-d";
+	char name[9] = "tabledir";
+	char* args[3] = {wake, tabledir, name};
+
+	Options* options = p.parse(3, args);
+
+	BOOST_CHECK(options->link == false);
+	BOOST_CHECK(options->table == false);
+	BOOST_CHECK(options->tabledir == "tabledir");
+	BOOST_CHECK(options->linkFilenames.size() == 0);
+	BOOST_CHECK(options->compileFilename == "");
 	BOOST_CHECK(options->outFilename == "a.out");
 	delete options;
 }

@@ -13,7 +13,9 @@ Options* OptionsParser::parse(int argc, char** argv) {
 	options->showHelp = false;
 	options->listMains = false;
 	options->showVersion = false;
+	options->table = false;
 	options->outFilename = "a.out";
+	options->tabledir = ".";
 	options->mainclass = "Main";
 	options->mainmethod = "Main()";
 
@@ -59,6 +61,10 @@ Options* OptionsParser::parse(int argc, char** argv) {
 
 		else if(arg == "-t" || arg == "--table") {
 			options->table = true;
+		}
+
+		else if(arg == "-d" || arg == "--tabledir") {
+			options->tabledir = nextarg; i++;
 		}
 
 		else {

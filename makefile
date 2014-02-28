@@ -1,7 +1,7 @@
 SHELL=/bin/bash
 
-#OPT=-O3
-OPT=-O0 -g
+OPT=-O3
+#OPT=-O0 -g
 FLAGS=-Iinclude -Igen
 CC=cc $(FLAGS)
 CPP=g++ $(FLAGS) -std=c++11
@@ -94,7 +94,7 @@ bin/finaltest.js: bin/wakeobj/finaltest.o src/wakelib/std.o
 	time ./bin/wake -l src/wakelib/std.o bin/wakeobj/finaltest.o -o bin/finaltest.js
 
 bin/wakeobj/finaltest.o: bin/wake finaltest.wk $(WAKETABLEOBJS)
-	time ./bin/wake finaltest.wk -o bin/wakeobj/finaltest.o
+	time ./bin/wake -d bin/waketable finaltest.wk -o bin/wakeobj/finaltest.o
 
 bin/gen/%.o: gen/%.c gen/wake.tab.c
 	$(CC) $(OPT) -c $< -o $@

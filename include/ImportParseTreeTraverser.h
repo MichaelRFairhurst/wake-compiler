@@ -3,6 +3,7 @@
 
 #include "LibraryLoader.h"
 #include "ObjectSymbolTable.h"
+#include <string>
 
 extern "C" {
 	#include "tree.h"
@@ -11,7 +12,7 @@ extern "C" {
 class ImportParseTreeTraverser {
 
 	public:
-		void traverse(Node* tree, ObjectSymbolTable& o, LibraryLoader& l);
+		void traverse(Node* tree, ObjectSymbolTable& o, LibraryLoader& l, std::string dirname);
 
 };
 
