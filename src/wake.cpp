@@ -29,12 +29,12 @@ extern "C" {
 #include "ImportParseTreeTraverser.h"
 
 void writeTableFiles(std::string dirname, ObjectSymbolTable& table) {
-	for(auto it = table.classes.begin(); it != table.classes.end(); ++it) {
-		PropertySymbolTable* ptable = it->second;
+	vector<PropertySymbolTable*> tables = table.getDefinedClasses();
+	for(auto it = tables.begin(); it != tables.end(); ++it) {
 		fstream file;
-		file.open((dirname + "/" + ptable->classname + ".table").c_str(), ios::out);
+		file.open((dirname + "/" + (*it)->classname + ".table").c_str(), ios::out);
 		TableFileWriter writer;
-		writer.write(file, ptable);
+		writer.write(file, *it);
 	}
 }
 

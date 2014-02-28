@@ -21,6 +21,11 @@ class ObjectSymbolTable {
 
 		boost::optional<SemanticError*> addClass(string name);
 		boost::optional<SemanticError*> addInheritance(string child, bool issubclass);
+
+		PropertySymbolTable* getEmptyPropertySymbolTable();
+		boost::optional<SemanticError*> importClass(PropertySymbolTable* table);
+		vector<PropertySymbolTable*> getDefinedClasses();
+
 		void propagateInheritance();
 		void propagateInheritanceToParent(string childname);
 		PropertySymbolTable* find(string name);
@@ -28,10 +33,10 @@ class ObjectSymbolTable {
 		TypeAnalyzer* getAnalyzer();
 		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);
 
-		// Mabe not great to be public but solves immediate problems
-		map<string, PropertySymbolTable*> classes;
-
 	private:
+
+		// TRUE means defined, FALSE means imported
+		map<string, pair<PropertySymbolTable*, bool> > classes;
 		PropertySymbolTable* addingclass_symbol;
 		std::string addingclass_name;
 		bool addingclass_hassubclass;

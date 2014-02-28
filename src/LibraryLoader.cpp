@@ -7,13 +7,22 @@ void LibraryLoader::loadImport(string importname, string importpath, ObjectSymbo
 	importfile.open(importpath + "/" + importname + ".table");
 	TableFileReader reader;
 
-	objtable.addClass(importname);
-	reader.read(objtable.find(importname), importfile);
+	PropertySymbolTable* table = objtable.getEmptyPropertySymbolTable();
+	reader.read(table, importfile);
+	objtable.importClass(table);
 }
 
 void LibraryLoader::loadStdLibToTable(ObjectSymbolTable* table) {
-	table->addClass("Text");
-	table->addClass("Truth");
-	table->addClass("Int");
+	PropertySymbolTable* ptable = table->getEmptyPropertySymbolTable();
+	ptable->classname = "Text";
+	table->importClass(ptable);
+
+	ptable = table->getEmptyPropertySymbolTable();
+	ptable->classname = "Truth";
+	table->importClass(ptable);
+
+	ptable = table->getEmptyPropertySymbolTable();
+	ptable->classname = "Int";
+	table->importClass(ptable);
 
 }

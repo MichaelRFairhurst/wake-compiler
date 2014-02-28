@@ -7,8 +7,8 @@ ObjectSymbolTable::ObjectSymbolTable() {
 }
 
 ObjectSymbolTable::~ObjectSymbolTable() {
-	for(map<string, PropertySymbolTable*>::iterator it = classes.begin(); it != classes.end(); ++it) {
-		delete it->second;
+	for(map<string, pair<PropertySymbolTable*, bool> >::iterator it = classes.begin(); it != classes.end(); ++it) {
+		delete it->second.first;
 	}
 }
 
@@ -23,9 +23,32 @@ boost::optional<SemanticError*> ObjectSymbolTable::addClass(string name) {
 	addingclass_symbol->classname = name;
 	addingclass_hassubclass = false;
 
-	classes[addingclass_name] = addingclass_symbol;
+	classes[addingclass_name] = pair<PropertySymbolTable*, bool>(addingclass_symbol, true);
 
 	return boost::optional<SemanticError*>();
+}
+
+boost::optional<SemanticError*> ObjectSymbolTable::importClass(PropertySymbolTable* table) {
+	if(classes.count(addingclass_name)) {
+		return boost::optional<SemanticError*>(new SemanticError(MULTIPLE_CLASS_DEFINITION));
+	}
+
+	classes[table->classname] = pair<PropertySymbolTable*, bool>(table, false);
+	return boost::optional<SemanticError*>();
+}
+
+PropertySymbolTable* ObjectSymbolTable::getEmptyPropertySymbolTable() {
+	return new PropertySymbolTable(&analyzer);
+}
+
+vector<PropertySymbolTable*> ObjectSymbolTable::getDefinedClasses() {
+	vector<PropertySymbolTable*> response;
+
+	for(map<string, pair<PropertySymbolTable*, bool> >::iterator it = classes.begin(); it != classes.end(); ++it) {
+		if(it->second.second) response.push_back(it->second.first);
+	}
+
+	return response;
 }
 
 boost::optional<SemanticError*> ObjectSymbolTable::addInheritance(string childname, bool as_subclass) {
@@ -52,8 +75,8 @@ boost::optional<SemanticError*> ObjectSymbolTable::addInheritance(string childna
 
 void ObjectSymbolTable::propagateInheritance() {
 	map<string, pair<PropertySymbolTable*, bool> > passed;
-	for(map<string, PropertySymbolTable*>::iterator it = classes.begin(); it != classes.end(); ++it) {
-		inheritances_gathered[it->first] = pair<PropertySymbolTable*, bool>(it->second, false);
+	for(map<string, pair<PropertySymbolTable*, bool> >::iterator it = classes.begin(); it != classes.end(); ++it) {
+		inheritances_gathered[it->first] = pair<PropertySymbolTable*, bool>(it->second.first, false);
 	}
 
 	for(map<string, pair<PropertySymbolTable*, bool> >::iterator it = inheritances_gathered.begin(); it != inheritances_gathered.end(); ++it) {
@@ -78,7 +101,7 @@ void ObjectSymbolTable::propagateInheritanceToParent(string childname) {
 }
 
 PropertySymbolTable* ObjectSymbolTable::find(string name) {
-	std::map<string, PropertySymbolTable*>::iterator searcher = classes.find(name);
+	std::map<string, pair<PropertySymbolTable*, bool> >::iterator searcher = classes.find(name);
 	if(!classes.count(name)) {
 		SymbolNotFoundException* error = new SymbolNotFoundException();
 		error->errormsg = "Could not find symbol ";
@@ -87,7 +110,7 @@ PropertySymbolTable* ObjectSymbolTable::find(string name) {
 		throw error;
 	}
 
-	return searcher->second;
+	return searcher->second.first;
 }
 
 void ObjectSymbolTable::assertTypeIsValid(Type* type) {
@@ -107,10 +130,10 @@ void ObjectSymbolTable::assertTypeIsValid(Type* type) {
 }
 
 void ObjectSymbolTable::printEntryPoints(EntryPointAnalyzer* entryanalyzer) {
-	for(map<string, PropertySymbolTable*>::iterator it = classes.begin(); it != classes.end(); ++it) {
-		if(!entryanalyzer->checkClassNeedsCanBeMain(it->second->getNeeds())) continue;
+	for(map<string, pair<PropertySymbolTable*, bool> >::iterator it = classes.begin(); it != classes.end(); ++it) {
+		if(!entryanalyzer->checkClassNeedsCanBeMain(it->second.first->getNeeds())) continue;
 		entryanalyzer->printClass(it->first);
-		it->second->printEntryPoints(entryanalyzer);
+		it->second.first->printEntryPoints(entryanalyzer);
 	}
 }
 
