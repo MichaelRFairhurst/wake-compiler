@@ -36,8 +36,8 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 					"\013" // method name length of 11
 					"print(Text)"
 					"\001" // Flagged public
-					"\002" // Lambda
-						"\001" // Type
+					"\001" // Lambda
+						"\002" // Type
 						"\004" // class name ength
 						"Text"
 						"\000" // shadow
@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 	char* dataptr = "\011" // classname length of 9
 					"classname"
 					"\000" // not abstract
-					"\001" // type
+					"\002" // type
 					"\004" // classname length
 					"Text"
 					"\000" // shadow
@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	char* dataptr = "\011" // classname length of 9
 					"classname"
 					"\000" // not abstract
-					"\001" // type
+					"\002" // type
 					"\004" // classname length
 					"Text"
 					"\000" // shadow
@@ -135,7 +135,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 					"\000" // alias length
 					"\000" // spec length
 					"\000" // optional
-					"\001" // type
+					"\002" // type
 					"\007" // classname length
 					"Printer"
 					"\000" // shadow

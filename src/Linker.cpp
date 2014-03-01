@@ -29,11 +29,13 @@ void Linker::loadTables(string dirname, ObjectSymbolTable& table) {
 
 	for(directory_iterator itr(dirname); itr != end_itr; ++itr)
 	if(!is_directory(itr->status())) {
-		cout << itr->path().string() << endl;
-		file.open(itr->path().string());
+		string fname = itr->path().string();
+		if(fname.substr(fname.size() - 6) != ".table") continue;
+		file.open(fname);
 		PropertySymbolTable* ptable = table.getEmptyPropertySymbolTable();
 		reader.read(ptable, file);
 		table.importClass(ptable);
+		file.close();
 	}
 }
 

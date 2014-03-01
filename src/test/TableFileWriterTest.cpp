@@ -52,8 +52,8 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 	ASSERTCHAR(11); // method name length
 	ASSERTCHAR('p'); ASSERTCHAR('r'); ASSERTCHAR('i'); ASSERTCHAR('n'); ASSERTCHAR('t'); ASSERTCHAR('('); ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t'); ASSERTCHAR(')');
 	ASSERTCHAR(1); // Flagged public
-	ASSERTCHAR(2); // Lambda
-		ASSERTCHAR(1); // Type
+	ASSERTCHAR(1); // Lambda
+		ASSERTCHAR(2); // Type
 		ASSERTCHAR(4); // class name ength
 		ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t');
 		ASSERTCHAR(0); // shadow
@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
-	ASSERTCHAR(1); // type
+	ASSERTCHAR(2); // type
 	ASSERTCHAR(4); // classname length
 	ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t');
 	ASSERTCHAR(0); // shadow
@@ -116,7 +116,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
-	ASSERTCHAR(1); // type
+	ASSERTCHAR(2); // type
 	ASSERTCHAR(4); // classname length
 	ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t');
 	ASSERTCHAR(0); // shadow
@@ -124,7 +124,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	ASSERTCHAR(0); // alias length
 	ASSERTCHAR(0); // spec length
 	ASSERTCHAR(0); // optional
-	ASSERTCHAR(1); // type
+	ASSERTCHAR(2); // type
 	ASSERTCHAR(7); // classname length
 	ASSERTCHAR('P'); ASSERTCHAR('r'); ASSERTCHAR('i'); ASSERTCHAR('n'); ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('r');
 	ASSERTCHAR(0); // shadow

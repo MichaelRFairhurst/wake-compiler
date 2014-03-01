@@ -34,11 +34,15 @@ std::string TableFileReader::readString(istream& s) {
 
 char* TableFileReader::readCString(istream& s) {
 	unsigned char len = readUInt8(s);
-	if(len == 0) return NULL;
+	if(len == 0) {
+		//cout << "Read string NULL" << endl;
+		return NULL;
+	}
 
 	char* strb = (char*) malloc(len + 1);
 	s.read(strb, len);
 	strb[len] = 0;
+	//cout << "Read string " << strb << endl;
 	return strb;
 }
 
@@ -47,18 +51,22 @@ unsigned char TableFileReader::readUInt8(istream& s) {
 	s.read(uint8p, 1);
 	unsigned char uint8 = *uint8p;
 	free(uint8p);
+	//cout << "Read uint8 " << ((int) uint8) << endl;
 	return uint8;
 }
 
 Type* TableFileReader::readType(istream& s) {
+	//cout << "reading type" << endl;
 	return readTypeByTag(readUInt8(s), s);
 }
 
 Type* TableFileReader::readTypeByTag(int tag, istream& s) {
-	return tag == 0x01 ? readClassType(s) : readLambdaType(s);
+	//cout << "reading type by tag " << tag << endl;
+	return tag == TYPE_CLASS ? readClassType(s) : readLambdaType(s);
 }
 
 Type* TableFileReader::readClassType(istream &s) {
+	//cout << "reading class type" << endl;
 	Type* type = MakeType(TYPE_CLASS);
 	type->typedata._class.classname = readCString(s);
 	type->typedata._class.shadow = readUInt8(s);
@@ -69,15 +77,19 @@ Type* TableFileReader::readClassType(istream &s) {
 }
 
 Type* TableFileReader::readLambdaType(istream& s) {
+	//cout << "reading lambda" << endl;
 	Type* type = MakeType(TYPE_LAMBDA);
 	type->typedata.lambda.arguments = MakeTypeArray();
 
 	int tag = readUInt8(s);
 	if(tag == 0x03) {
-		type->typedata.lambda.returntype = readTypeByTag(tag, s);
+		//cout << "reading lambda return" << endl;
+		type->typedata.lambda.returntype = readType(s);
+		tag = readUInt8(s);
 	}
 
 	while(tag != 0x04) {
+		//cout << "reading lambda arg" << endl;
 		AddTypeToTypeArray(readTypeByTag(tag, s), type->typedata.lambda.arguments);
 		tag = readUInt8(s);
 	}
@@ -88,6 +100,7 @@ Type* TableFileReader::readLambdaType(istream& s) {
 }
 
 void TableFileReader::readTypeCommon(Type* type, istream& s) {
+	//cout << "reading type common" << endl;
 	type->arrayed = readUInt8(s);
 	type->alias = readCString(s);
 	type->specialty = readCString(s);
@@ -95,6 +108,7 @@ void TableFileReader::readTypeCommon(Type* type, istream& s) {
 }
 
 void TableFileReader::readMethod(PropertySymbolTable* table, istream& s) {
+	//cout << "reading method" << endl;
 	ObjectProperty* prop = new ObjectProperty();
 	string name = readString(s);
 	prop->flags = readUInt8(s);
@@ -103,5 +117,6 @@ void TableFileReader::readMethod(PropertySymbolTable* table, istream& s) {
 }
 
 void TableFileReader::readInheritance(PropertySymbolTable* table, istream& s) {
+	//cout << "reading inheritance" << endl;
 	table->parentage[readString(s)] = readUInt8(s);;
 }

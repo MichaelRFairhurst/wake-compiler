@@ -42,7 +42,7 @@ void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 void TableFileWriter::writeType(ostream& out, Type* type) {
 	char * dataptr = (char*) malloc(1);
 	if(type->type == TYPE_CLASS) {
-		dataptr[0] = 0x01;
+		dataptr[0] = TYPE_CLASS;
 		out.write(dataptr, 1);
 
 		dataptr[0] = (char) strlen(type->typedata._class.classname);
@@ -53,7 +53,7 @@ void TableFileWriter::writeType(ostream& out, Type* type) {
 		dataptr[0] = (char) type->typedata._class.shadow;
 		out.write(dataptr, 1);
 	} else {
-		dataptr[0] = 0x02;
+		dataptr[0] = TYPE_LAMBDA;
 		out.write(dataptr, 1);
 
 		if(type->typedata.lambda.returntype != NULL) {
