@@ -1,0 +1,8 @@
+import InheritanceTestParent;
+
+every InheritanceTestInterface (capable InheritanceTestParent) is:
+
+Text -- getClassName() {
+	return "InheritanceTestInterface";
+}
+

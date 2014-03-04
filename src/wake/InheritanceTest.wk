@@ -1,0 +1,80 @@
+import Printer;
+
+import Asserts;
+import InheritanceTestParent;
+import InheritanceTestOverride;
+import InheritanceTestFallthrough;
+import InheritanceTestInterface;
+
+every InheritanceTest is:
+
+	provides
+		InheritanceTestParent,
+		InheritanceTestOverride,
+		InheritanceTestFallthrough,
+		InheritanceTestInterface,
+		InheritanceTestParent{Override} <- InheritanceTestOverride,
+		InheritanceTestParent{Fallthrough} <- InheritanceTestFallthrough,
+		InheritanceTestParent{Interface} <- InheritanceTestInterface;
+
+	needs Printer;
+
+	Truth -- testParentGetsParentClassName(Asserts) {
+		:InheritanceTestParent <- this;
+		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestParent");
+		return Asserts.allPassed();
+	}
+
+	Truth -- testOverrideChildGetsChildClassName(Asserts) {
+		:InheritanceTestOverride <- this;
+		Asserts.that(InheritanceTestOverride.getClassName())Equals("InheritanceTestOverride");
+		return Asserts.allPassed();
+	}
+
+	Truth -- testOverrideChildFromProviderGetsChildClassName(Asserts) {
+		:InheritanceTestParent = :(InheritanceTestParent{Override} <- this);
+		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestOverride");
+		return Asserts.allPassed();
+	}
+
+	Truth -- testOverrideChildAfterCastGetsChildClassName(Asserts) {
+		:InheritanceTestParent = :(InheritanceTestOverride <- this);
+		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestOverride");
+		return Asserts.allPassed();
+	}
+
+	Truth -- testFallthroughChildGetsChildClassName(Asserts) {
+		:InheritanceTestFallthrough <- this;
+		Asserts.that(InheritanceTestFallthrough.getClassName())Equals("InheritanceTestParent");
+		return Asserts.allPassed();
+	}
+
+	Truth -- testFallthroughChildFromProviderGetsChildClassName(Asserts) {
+		:InheritanceTestParent = :(InheritanceTestParent{Fallthrough} <- this);
+		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestParent");
+		return Asserts.allPassed();
+	}
+
+	Truth -- testFallthroughChildAfterCastGetsChildClassName(Asserts) {
+		:InheritanceTestParent = :(InheritanceTestFallthrough <- this);
+		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestParent");
+		return Asserts.allPassed();
+	}
+
+	Truth -- testImplementingChildGetsChildClassName(Asserts) {
+		:InheritanceTestInterface <- this;
+		Asserts.that(InheritanceTestInterface.getClassName())Equals("InheritanceTestInterface");
+		return Asserts.allPassed();
+	}
+
+	Truth -- testImplementingChildFromProviderGetsChildClassName(Asserts) {
+		:InheritanceTestParent = :(InheritanceTestParent{Interface} <- this);
+		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestInterface");
+		return Asserts.allPassed();
+	}
+
+	Truth -- testImplementingChildAfterCastGetsChildClassName(Asserts) {
+		:InheritanceTestParent = :(InheritanceTestInterface <- this);
+		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestInterface");
+		return Asserts.allPassed();
+	}

@@ -1,0 +1,7 @@
+import InheritanceTestParent;
+
+every InheritanceTestOverride (an InheritanceTestParent) is:
+
+Text -- getClassName() {
+	return "InheritanceTestOverride";
+}

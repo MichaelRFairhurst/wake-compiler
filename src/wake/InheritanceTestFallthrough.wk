@@ -1,0 +1,3 @@
+import InheritanceTestParent;
+
+every InheritanceTestFallthrough (an InheritanceTestParent) is:

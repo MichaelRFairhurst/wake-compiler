@@ -1,0 +1,45 @@
+import Asserts;
+
+every MathTest is:
+
+	Truth -- testAddition(Asserts) {
+		Asserts.that(2 + 2)Equals(4);
+		Asserts.that(6 + 2)Equals(8);
+		Asserts.that(60000 + 20000)Equals(80000);
+		Asserts.that(0-20 + 14)Equals(0-6);
+		return Asserts.allPassed();
+	}
+
+	Truth -- testSubtraction(Asserts) {
+		Asserts.that(6 - 2)Equals(4);
+		Asserts.that(42 - 2)Equals(40);
+		Asserts.that(40 - 80)Equals(0-40);
+		return Asserts.allPassed();
+	}
+
+	Truth -- testDivision(Asserts) {
+		Asserts.that(8 / 4)Equals(2);
+		Asserts.that(10 / 4)Equals(2.5);
+		Asserts.that(10 / 20)Equals(0.5);
+		return Asserts.allPassed();
+	}
+
+	Truth -- testMultiplication(Asserts) {
+		Asserts.that(3 * 5)Equals(15);
+		Asserts.that(8 * 16)Equals(128);
+		Asserts.that(8 * 1)Equals(8);
+		Asserts.that(8 * 0.5)Equals(4);
+		return Asserts.allPassed();
+	}
+
+	Truth -- testOrderOfOperations(Asserts) {
+		Asserts.that(5 + 6 * 2)Equals(17);
+		Asserts.that(5 - 6 * 2)Equals(0-7);
+		Asserts.that(5 + 6 / 2)Equals(8);
+		Asserts.that(5 - 6 / 2)Equals(2);
+		Asserts.that(6 * 2 + 5)Equals(17);
+		Asserts.that(6 * 2 - 5)Equals(7);
+		Asserts.that(6 / 2 + 5)Equals(8);
+		Asserts.that(6 / 2 - 5)Equals(0-2);
+		return Asserts.allPassed();
+	}

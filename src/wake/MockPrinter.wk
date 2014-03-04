@@ -1,0 +1,15 @@
+import Printer;
+
+#>
+# This will make assertions once providers can
+# track it.
+##
+every MockPrinter (capable Printer) is:
+
+	#>
+	# Must be defined but all noops
+	##
+	print(Int) {}
+	print(Text) {}
+	printLine(Int) {}
+	printLine(Text) {}

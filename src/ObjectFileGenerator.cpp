@@ -18,15 +18,11 @@ void ObjectFileGenerator::generate(Node* tree) {
 			return;
 
 		case NT_PROGRAM:
-			//file << "(function() {";
 			{
-				// StdLib lol
-				//file << "var printqueue='';Printer=function(){this.a=function(b){if(typeof process!='undefined'&&typeof process.stdout!='undefined'&&typeof process.stdout.write!='undefined')process.stdout.write(''+b);else printqueue+=''+b;};this.b=this.a;this.c=function(b){if(typeof process!='undefined'&&typeof process.stdout!='undefined'&&typeof process.stdout.write!='undefined')return this.a(b+'\\n');console.log(printqueue+b);printqueue='';};this.d=this.c;};System=function(){this.e=function(a){if(typeof process!='undefined'&&typeof process.exit!='undefined')process.exit(a);}};";
 				int i;
 				for(i = 0; i < tree->subnodes; i++)
 					generate(tree->node_data.nodes[i]);
 			}
-			//file << "})();";
 			break;
 
 		case NT_RETRIEVALS_STATEMENTS:
@@ -440,26 +436,4 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_STRINGLIT: file << '"'; file << tree->node_data.string; file << '"'; break;
 		case NT_NOTHING: file << "null"; break;
 	}
-}
-
-void ObjectFileGenerator::setMain(string classname, string methodname) {
-	file << "(";
-	generateRecursiveConstructors(classname);
-	file << ").";
-	header->addPropertyUsage(file.tellp(), methodname);
-	file << "();";
-}
-
-void ObjectFileGenerator::generateRecursiveConstructors(string ctedclass) {
-	file << "new ";
-	header->addClassUsage(file.tellp(), ctedclass);
-	file << "(";
-
-	vector<Type*>* needs = objects->find(ctedclass)->getNeeds();
-	for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
-		if(it != needs->begin()) file << ",";
-		generateRecursiveConstructors((*it)->typedata._class.classname);
-	}
-
-	file << ")";
 }

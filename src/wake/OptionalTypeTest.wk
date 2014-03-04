@@ -1,0 +1,33 @@
+every OptionalTypeTest is:
+
+	Truth -- testOptionalIntNeverSet() {
+		:Int? = nothing;
+		if Int exists {
+			return False;
+		}
+		return True;
+	}
+
+	Truth -- testOptionalIntSet() {
+		:Int? = 5;
+		if Int exists {
+			return Int == 5;
+		}
+		return False;
+	}
+
+	Truth -- testOptionalIntNotSetWillHitElse() {
+		:Int? = nothing;
+		if Int exists {} else {
+			return True;
+		}
+		return False;
+	}
+
+	Truth -- testOptionalIntSetWontHitElse() {
+		:Int? = 5;
+		if Int exists {} else {
+			return False;
+		}
+		return True;
+	}

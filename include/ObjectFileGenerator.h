@@ -20,8 +20,6 @@ class ObjectFileGenerator {
 	public:
 		ObjectFileGenerator(ostream& file, ObjectSymbolTable* objects, ObjectFileHeaderData* header) : file(file) {this->objects = objects; this->header = header;}
 		void generate(Node* tree);
-		void generateRecursiveConstructors(string ctorname);
-		void setMain(string classname, string methodname);
 
 	private:
 		TypeAnalyzer typeanalyzer;

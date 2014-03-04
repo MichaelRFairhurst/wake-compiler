@@ -1,0 +1,115 @@
+import Printer;
+import System;
+
+import Asserts;
+import AssertsTest;
+import MathTest;
+import BooleanLogicTest;
+import InheritanceTest;
+import ArrayTest;
+import OptionalTypeTest;
+
+#>
+# Test suite entry point
+##
+every Main is:
+
+	needs System, AssertsTest, Printer, MathTest, BooleanLogicTest, InheritanceTest, ArrayTest, OptionalTypeTest;
+
+	provides Printer, Asserts;
+
+	with Truth @passed = True;
+	with Int @totalcount = 0;
+	with Int @failedcount = 0;
+	with Int @passedcount = 0;
+	with Text[] @failed = [];
+
+	Run(Truth @result, Text @test) {
+		@totalcount = @totalcount + 1;
+		if(!@result) {
+			@failed[@failedcount] = @test;
+			@failedcount = @failedcount + 1;
+			@passed = False;
+			Printer.print("F");
+		} else {
+			Printer.print(".");
+			@passedcount = @passedcount + 1;
+		}
+	}
+
+	Main() {
+		Run(AssertsTest.testAssertTextMatches(), "testAssertTextMatches");
+		Run(AssertsTest.testAssertTextNotMatches(), "testAssertTextNotMatches");
+		Run(AssertsTest.testAssertIntMatches(), "testAssertIntMatches");
+		Run(AssertsTest.testAssertIntNotMatches(), "testAssertIntNotMatches");
+		Run(AssertsTest.testAssertTrueMatches(), "testAssertTrueMatches");
+		Run(AssertsTest.testAssertTrueNotMatches(), "testAssertTrueNotMatches");
+		Run(AssertsTest.testAssertFalseMatches(), "testAssertFalseMatches");
+		Run(AssertsTest.testAssertFalseNotMatches(), "testAssertFalseNotMatches");
+		Run(AssertsTest.testAssertTrue(), "testAssertTrue");
+		Run(AssertsTest.testAssertNotTrue(), "testAssertNotTrue");
+		Run(AssertsTest.testAssertFalse(), "testAssertFalse");
+		Run(AssertsTest.testAssertNotFalse(), "testAssertNotFalse");
+		Run(MathTest.testAddition(:(Asserts <- this)), "testAddition");
+		Run(MathTest.testSubtraction(:(Asserts <- this)), "testSubtraction");
+		Run(MathTest.testDivision(:(Asserts <- this)), "testDivision");
+		Run(MathTest.testMultiplication(:(Asserts <- this)), "testMultiplication");
+		Run(MathTest.testOrderOfOperations(:(Asserts <- this)), "testOrderOfOperations");
+		Run(BooleanLogicTest.testOr(:(Asserts <- this)), "testOr");
+		Run(BooleanLogicTest.testAnd(:(Asserts <- this)), "testAnd");
+		Run(BooleanLogicTest.testOrderOfOperations(:(Asserts <- this)), "testOrderOfOperations");
+		//Run(TernaryOperatorTest.testTrue(:(Asserts <- this)));
+		//Run(TernaryOperatorTest.testFalse(:(Asserts <- this)));
+		Run(InheritanceTest.testParentGetsParentClassName(:(Asserts <- this)), "testParentgetsParentClassname");
+		Run(InheritanceTest.testOverrideChildGetsChildClassName(:(Asserts <- this)), "testOverrideChildGetsChildClassname");
+		Run(InheritanceTest.testOverrideChildFromProviderGetsChildClassName(:(Asserts <- this)), "testOvverideChildFromProviderGetsChildClassName");
+		Run(InheritanceTest.testOverrideChildAfterCastGetsChildClassName(:(Asserts <- this)), "testOverrideChildAfterCastGetsChildClassname");
+		Run(InheritanceTest.testFallthroughChildGetsChildClassName(:(Asserts <- this )), "testFallthroughChildGetsChildClassname");
+		Run(InheritanceTest.testFallthroughChildFromProviderGetsChildClassName(:(Asserts <- this )), "testFallthroughChildFromProviderGetsChildClassName");
+		Run(InheritanceTest.testFallthroughChildAfterCastGetsChildClassName(:(Asserts <- this )), "testFallthroughChildAfterCastGetsChildClassname");
+		Run(InheritanceTest.testImplementingChildGetsChildClassName(:(Asserts <- this )), "testImplementingChildGetsChildClassName");
+		Run(InheritanceTest.testImplementingChildFromProviderGetsChildClassName(:(Asserts <- this )), "testImplementingChildFromProiderGetsChildClassName");
+		Run(InheritanceTest.testImplementingChildAfterCastGetsChildClassName(:(Asserts <- this )), "testImplementingChildAfterCastGetsChildClassName");
+		Run(ArrayTest.testSetArrayIndex(:(Asserts <- this)), "testSetArrayIndex");
+		Run(ArrayTest.testResetArrayIndex(:(Asserts <- this)), "testResetArrayIndex");
+		Run(ArrayTest.testSetArrayArrayIndexIndex(:(Asserts <- this)), "testSetArrayArrayIndexIndex");
+		Run(ArrayTest.testResetArrayArrayIndexIndex(:(Asserts <- this)), "tsetResetArrayArrayIndexIndex");
+		Run(ArrayTest.testSetMultipleArrayIndices(:(Asserts <- this)), "testSetMultipleArrayIndices");
+		Run(ArrayTest.testSetMultipleArrayArrayIndicesIndices(:(Asserts <- this)), "testSetMultipleArrayArrayIndicesIndices");
+		Run(OptionalTypeTest.testOptionalIntNeverSet(), "testOptionalIntNeverSet");
+		Run(OptionalTypeTest.testOptionalIntSet(), "teestOptionalIntSet");
+		Run(OptionalTypeTest.testOptionalIntNotSetWillHitElse(), "testOptionalIntNotSetWillHitElse");
+		Run(OptionalTypeTest.testOptionalIntSetWontHitElse(), "testOptionalIntSetWontHitElse");
+
+		Printer.printLine("");
+		Printer.printLine("");
+		Printer.print("TOTAL:  ");
+		Printer.printLine(@totalcount);
+		Printer.print("PASSED: ");
+		Printer.printLine(@passedcount);
+		Printer.print("FAILED: ");
+		Printer.printLine(@failedcount);
+
+		if(@passed) System.exit(0);
+		Printer.printLine("FAILURES:");
+
+		:Int = 0;
+		while(Int < @failedcount) {
+			Printer.printLine(@failed[Int]);
+			Int = Int + 1;
+		}
+
+		System.exit(1);
+	}
+
+#>
+every TernaryOperatorTest is:
+
+	Truth -- testTrue(Asserts) {
+		return True ? True : False;
+	}
+
+	Truth -- testFalse(Asserts) {
+		return False ? False : True;
+	}
+##

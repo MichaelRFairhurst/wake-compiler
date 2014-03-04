@@ -1,0 +1,152 @@
+import Printer;
+
+import Asserts;
+import MockPrinter;
+
+#>
+# Test our asserts object, with manually
+# printed and returned errors.
+##
+every AssertsTest is:
+
+	provides Printer <- MockPrinter, Asserts, MockPrinter;
+
+	needs Printer;
+
+	Truth -- testAssertTextMatches() {
+		:Asserts <- this;
+		Asserts.that("abcdefg aha!")Equals("abcdefg aha!");
+		if(!Asserts.haveFailed()) return True;
+		Printer.printLine("Failed asserting that text is equal to itself");
+		return False;
+	}
+
+	Truth -- testAssertTextNotMatches() {
+		:Asserts <- this;
+		Asserts.that("George Bush")Equals("Barack Obama");
+
+		if(Asserts.haveFailed()) {
+			if(Asserts.getLastText() == "Failed asserting that Barack Obama is equal to @actual George Bush") return True;
+
+			Printer.printLine("Incorrect failure text!");
+			Printer.printLine("Real text is " + Asserts.getLastText());
+			return False;
+		}
+
+		Printer.printLine("Failed asserting that different text is different");
+		return False;
+	}
+
+	Truth -- testAssertIntMatches() {
+		:Asserts <- this;
+		Asserts.that(10)Equals(10);
+		if(!Asserts.haveFailed()) return True;
+		Printer.printLine("Failed asserting that ints are equal to themselves");
+		return False;
+	}
+
+	Truth -- testAssertIntNotMatches() {
+		:Asserts <- this;
+		Asserts.that(45)Equals(54);
+
+		if(Asserts.haveFailed()) return True;
+
+		Printer.printLine("Failed asserting that different 54 and 45 are different");
+		return False;
+	}
+
+	Truth -- testAssertTrueMatches() {
+		:Asserts <- this;
+		Asserts.that(True)Equals(True);
+		if(!Asserts.haveFailed()) return True;
+		Printer.printLine("Failed asserting that True that True");
+		return False;
+	}
+
+	Truth -- testAssertTrueNotMatches() {
+		:Asserts <- this;
+		Asserts.that(True)Equals(False);
+
+		if(Asserts.haveFailed()) {
+			if(Asserts.getLastText() == "Failed asserting that False is equal to @actual True") return True;
+
+			Printer.printLine("Incorrect failure text!");
+			Printer.printLine("Real text is " + Asserts.getLastText());
+			return False;
+		}
+
+		Printer.printLine("Failed asserting that False is not equal to True");
+		return False;
+	}
+
+	Truth -- testAssertFalseMatches() {
+		:Asserts <- this;
+		Asserts.that(False)Equals(False);
+		if(!Asserts.haveFailed()) return True;
+		Printer.printLine("Failed asserting that False that False");
+		return False;
+	}
+
+	Truth -- testAssertFalseNotMatches() {
+		:Asserts <- this;
+		Asserts.that(False)Equals(True);
+
+		if(Asserts.haveFailed()) {
+			if(Asserts.getLastText() == "Failed asserting that True is equal to @actual False") return True;
+
+			Printer.printLine("Incorrect failure text!");
+			Printer.printLine("Real text is " + Asserts.getLastText());
+			return False;
+		}
+
+		Printer.printLine("Failed asserting that True is not equal to False");
+		return False;
+	}
+
+	Truth -- testAssertTrue() {
+		:Asserts <- this;
+		Asserts.isTrue(True);
+		if(!Asserts.haveFailed()) return True;
+		Printer.printLine("Failed asserting that True is True");
+		return False;
+	}
+
+	Truth -- testAssertNotTrue() {
+		:Asserts <- this;
+		Asserts.isTrue(False);
+
+		if(Asserts.haveFailed()) {
+			if(Asserts.getLastText() == "Failed asserting that True is equal to @actual False") return True;
+
+			Printer.printLine("Incorrect failure text!");
+			Printer.printLine("Real text is " + Asserts.getLastText());
+			return False;
+		}
+
+		Printer.printLine("Failed asserting that False is not True");
+		return False;
+	}
+
+	Truth -- testAssertFalse() {
+		:Asserts <- this;
+		Asserts.isFalse(False);
+		if(!Asserts.haveFailed()) return True;
+		Printer.printLine("Failed asserting that False is False");
+		return False;
+	}
+
+	Truth -- testAssertNotFalse() {
+		:Asserts <- this;
+		Asserts.isFalse(True);
+
+		if(Asserts.haveFailed()) {
+			if(Asserts.getLastText() == "Failed asserting that False is equal to @actual True") return True;
+
+			Printer.printLine("Incorrect failure text!");
+			Printer.printLine("Real text is " + Asserts.getLastText());
+			return False;
+		}
+
+		Printer.printLine("Failed asserting that True is not False");
+		return False;
+	}

@@ -1,0 +1,73 @@
+import Printer;
+
+#>
+# This takes assertions and prints failures, and then reports
+# at test end if something went wrong. At that point it should
+# be discarded and you should use a new one.
+##
+every Asserts is:
+
+	needs Printer;
+
+	with Truth @hasfailed = False;
+	with Text @lasttext = "";
+
+	that(Truth @actual)Equals(Truth) {
+		if(Truth != @actual) {
+			@lasttext = "Failed asserting that ";
+			if(Truth) @lasttext = @lasttext + "True is equal to @actual False";
+			else @lasttext = @lasttext + "False is equal to @actual True";
+			Printer.printLine(@lasttext);
+			@hasfailed = True;
+		}
+	}
+
+	isFalse(Truth) {
+		that(Truth)Equals(False);
+	}
+
+	isTrue(Truth) {
+		that(Truth)Equals(True);
+	}
+
+	that(Int @actual)Equals(Int) {
+		if(Int != @actual) {
+			@lasttext = "Failed asserting that two numbers are equal" ;
+			Printer.printLine(@lasttext);
+			Printer.printLine(Int);
+			Printer.printLine(@actual);
+			@hasfailed = True;
+		}
+	}
+
+	that(Text @actual)Equals(Text) {
+		if(Text != @actual) {
+			@lasttext = "Failed asserting that " + Text + " is equal to @actual " + @actual;
+			Printer.printLine(@lasttext);
+			@hasfailed = True;
+		}
+	}
+
+	#>
+	# This is only for until we can provide and then
+	# watch an ErrorCounter instance.
+	##
+	Truth -- haveFailed() {
+		return @hasfailed;
+	}
+
+	#>
+	# This is only for until we can provide and then
+	# watch an ErrorCounter instance.
+	##
+	Truth -- allPassed() {
+		return !@hasfailed;
+	}
+
+	#>
+	# This will only exist until MockPrinter can be
+	# watched after being provided.
+	##
+	Text -- getLastText() {
+		return @lasttext;
+	}

@@ -1,0 +1,71 @@
+import Asserts;
+
+every ArrayTest is:
+
+	Truth -- testSetArrayIndex(Asserts) {
+		:Int[] = [];
+		Int[0] = 5;
+		Asserts.that(Int[0])Equals(5);
+		return Asserts.allPassed();
+	}
+
+	Truth -- testResetArrayIndex(Asserts) {
+		:Int[] = [];
+		Int[0] = 5;
+		Int[0] = 3;
+		Asserts.that(Int[0])Equals(3);
+		return Asserts.allPassed();
+	}
+
+	Truth -- testSetArrayArrayIndexIndex(Asserts) {
+		:Int[][] = [];
+		Int[0] = [];
+		Int[0][0] = 3;
+		Asserts.that(Int[0][0])Equals(3);
+		return Asserts.allPassed();
+	}
+
+	Truth -- testResetArrayArrayIndexIndex(Asserts) {
+		:Int[][] = [];
+		Int[0] = [];
+		Int[0][0] = 3;
+		Int[0][0] = 5;
+		Asserts.that(Int[0][0])Equals(5);
+		return Asserts.allPassed();
+	}
+
+	Truth -- testSetMultipleArrayIndices(Asserts) {
+		:Int[] = [];
+		Int[0] = 5;
+		Int[1] = 6;
+		Int[2] = 7;
+		Int[3] = 8;
+		Asserts.that(Int[0])Equals(5);
+		Asserts.that(Int[1])Equals(6);
+		Asserts.that(Int[2])Equals(7);
+		Asserts.that(Int[3])Equals(8);
+		return Asserts.allPassed();
+	}
+
+	Truth -- testSetMultipleArrayArrayIndicesIndices(Asserts) {
+		:Int[][] = [];
+		Int[0] = [];
+		Int[1] = [];
+		Int[0][0] = 5;
+		Int[0][1] = 6;
+		Int[0][2] = 7;
+		Int[1][0] = 6;
+		Int[1][1] = 7;
+		Int[1][2] = 8;
+		Int[2] = Int[1];
+		Asserts.that(Int[0][0])Equals(5);
+		Asserts.that(Int[0][1])Equals(6);
+		Asserts.that(Int[0][2])Equals(7);
+		Asserts.that(Int[1][0])Equals(6);
+		Asserts.that(Int[1][1])Equals(7);
+		Asserts.that(Int[1][2])Equals(8);
+		Asserts.that(Int[2][0])Equals(6);
+		Asserts.that(Int[2][1])Equals(7);
+		Asserts.that(Int[2][2])Equals(8);
+		return Asserts.allPassed();
+	}

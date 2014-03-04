@@ -98,6 +98,28 @@ void Linker::write(ostream& outfile) {
 		}
 
 	}
+}
 
-	outfile << "})();";
+void Linker::setMain(ostream& file, string classname, string methodname, ObjectSymbolTable& table) {
+	file << "(";
+	generateRecursiveConstructors(file, classname, table);
+	file << ").";
+	file << propertyTable.getAddress(methodname);
+	file << "();";
+
+	file << "})();";
+}
+
+void Linker::generateRecursiveConstructors(ostream& file, string ctedclass, ObjectSymbolTable& table) {
+	file << "new ";
+	file << "_" << classTable.getAddress(ctedclass);
+	file << "(";
+
+	vector<Type*>* needs = table.find(ctedclass)->getNeeds();
+	for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
+		if(it != needs->begin()) file << ",";
+		generateRecursiveConstructors(file, (*it)->typedata._class.classname, table);
+	}
+
+	file << ")";
 }

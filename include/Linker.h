@@ -21,8 +21,8 @@ class Linker {
 		void loadTables(string dirname, ObjectSymbolTable& table);
 		void loadObject(std::string filename);
 		void write(std::ostream& objectfile);
-		void setMain(string classname, string methodname);
-		void generateRecursiveConstructors(string ctedclass);
+		void setMain(ostream& outfile, string classname, string methodname, ObjectSymbolTable& table);
+		void generateRecursiveConstructors(ostream& outfile, string ctedclass, ObjectSymbolTable& table);
 
 	private:
 		std::vector<ObjectFileHeaderData*> files;

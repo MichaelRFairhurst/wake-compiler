@@ -1,0 +1,5 @@
+every InheritanceTestParent is:
+
+Text -- getClassName() {
+	return "InheritanceTestParent";
+}

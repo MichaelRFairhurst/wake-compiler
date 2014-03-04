@@ -1,7 +1,7 @@
 SHELL=/bin/bash
 
-#OPT=-O3
-OPT=-O0 -g
+OPT=-O3
+#OPT=-O0 -g
 FLAGS=-Iinclude -Igen
 CC=cc $(FLAGS)
 CPP=g++ $(FLAGS) -std=c++11
@@ -35,6 +35,22 @@ CPPNAMES= \
 	ImportParseTreeTraverser.cpp
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
+
+WAKENAMES=ArrayTest.wk \
+			InheritanceTestFallthrough.wk \
+			InheritanceTest.wk \
+			OptionalTypeTest.wk \
+			AssertsTest.wk \
+			InheritanceTestInterface.wk \
+			Main.wk \
+			Asserts.wk \
+			InheritanceTestOverride.wk \
+			MathTest.wk \
+			BooleanLogicTest.wk \
+			InheritanceTestParent.wk \
+			MockPrinter.wk
+
+WAKEOBJS=$(addprefix bin/wakeobj/, $(WAKENAMES:.wk=.o))
 
 WAKETABLENAMES=Printer.wk System.wk
 WAKETABLEOBJS=$(addprefix bin/waketable/, $(WAKETABLENAMES:.wk=.table))
@@ -90,11 +106,41 @@ bin/wake: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o chivvy
 	@echo -- CHEERIO
 	@echo
 
-bin/finaltest.js: bin/wakeobj/finaltest.o src/wakelib/std.o
-	time ./bin/wake -d bin/waketable -l src/wakelib/std.o bin/wakeobj/finaltest.o -o bin/finaltest.js
+bin/finaltest.js: $(WAKEOBJS) src/wakelib/std.o
+	time ./bin/wake -d bin/waketable -l src/wakelib/std.o $(WAKEOBJS) -o bin/finaltest.js
 
-bin/wakeobj/finaltest.o: bin/wake finaltest.wk $(WAKETABLEOBJS)
-	time ./bin/wake -d bin/waketable finaltest.wk -o bin/wakeobj/finaltest.o
+bin/wakeobj/Main.o: src/wake/Main.wk bin/wake bin/wakeobj/Asserts.o bin/wakeobj/ArrayTest.o bin/wakeobj/MathTest.o bin/wakeobj/AssertsTest.o bin/wakeobj/BooleanLogicTest.o bin/wakeobj/OptionalTypeTest.o bin/wakeobj/InheritanceTest.o $(WAKETABLEOBJS)
+	time ./bin/wake -d bin/waketable $< -o $@
+
+bin/wakeobj/MockPrinter.o: src/wake/MockPrinter.wk bin/wake bin/waketable/Printer.table
+	time ./bin/wake -d bin/waketable $< -o $@
+
+bin/wakeobj/ArrayTest.o: src/wake/ArrayTest.wk bin/wake bin/wakeobj/Asserts.o
+	time ./bin/wake -d bin/waketable $< -o $@
+
+bin/wakeobj/MathTest.o: src/wake/MathTest.wk bin/wake bin/wakeobj/Asserts.o
+	time ./bin/wake -d bin/waketable $< -o $@
+
+bin/wakeobj/BooleanLogicTest.o: src/wake/BooleanLogicTest.wk bin/wake bin/wakeobj/Asserts.o
+	time ./bin/wake -d bin/waketable $< -o $@
+
+bin/wakeobj/AssertsTest.o: src/wake/AssertsTest.wk bin/wake bin/wakeobj/Asserts.o bin/wakeobj/MockPrinter.o
+	time ./bin/wake -d bin/waketable $< -o $@
+
+bin/wakeobj/InheritanceTestOverride.o: src/wake/InheritanceTestOverride.wk bin/wake bin/wakeobj/InheritanceTestParent.o
+	time ./bin/wake -d bin/waketable $< -o $@
+
+bin/wakeobj/InheritanceTestFallthrough.o: src/wake/InheritanceTestFallthrough.wk bin/wake bin/wakeobj/InheritanceTestParent.o
+	time ./bin/wake -d bin/waketable $< -o $@
+
+bin/wakeobj/InheritanceTestInterface.o: src/wake/InheritanceTestInterface.wk bin/wake bin/wakeobj/InheritanceTestParent.o
+	time ./bin/wake -d bin/waketable $< -o $@
+
+bin/wakeobj/InheritanceTest.o: src/wake/InheritanceTest.wk bin/wake bin/wakeobj/InheritanceTestInterface.o bin/wakeobj/InheritanceTestOverride.o bin/wakeobj/InheritanceTestFallthrough.o bin/wakeobj/Asserts.o
+	time ./bin/wake -d bin/waketable $< -o $@
+
+bin/wakeobj/%.o: src/wake/%.wk bin/wake $(WAKETABLEOBJS)
+	time ./bin/wake -d bin/waketable $< -o $@
 
 bin/gen/%.o: gen/%.c gen/wake.tab.c
 	$(CC) $(OPT) -c $< -o $@
