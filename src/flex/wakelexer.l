@@ -59,6 +59,7 @@ fn						count(); return FN;
 nothing					count(); return NOTHING;
 cast					count(); return CAST;
 exists					count(); return EXISTS;
+var						count(); return VAR;
 
 :						count(); return ':';
 @						count(); return '@';

@@ -93,7 +93,7 @@ every Main is:
 		if(passed) System.exit(0);
 		Printer.printLine("FAILURES:");
 
-		:Int = 0;
+		var Int = 0;
 		while(Int < failedcount) {
 			Printer.printLine(failed[Int]);
 			Int = Int + 1;

@@ -28,7 +28,7 @@ int wakewrap()
 %}
 
 /* keywords */
-%token EVERY CAPABLE A_OR_AN IS RETURN FOREACH WITH PUBLIC IF ELSE WHILE IN IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE EXISTS
+%token EVERY CAPABLE A_OR_AN IS RETURN FOREACH WITH PUBLIC IF ELSE WHILE IN IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE EXISTS VAR
 /* symbols */
 %token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT
 /* this too */
@@ -342,8 +342,8 @@ declarationorstatement:
 	;
 
 declaration:
-	':' type_declarable '=' value ';'											{ $$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType($2), $4); }
-	| ':' type_declarable retrievalargs value ';'								{	Node* retrieval = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($2), $3);
+	VAR type_declarable '=' value ';'											{ $$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType($2), $4); }
+	| VAR type_declarable retrievalargs value ';'								{	Node* retrieval = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($2), $3);
 																					AddSubNode(retrieval, $4);
 																					$$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType(copyType($2)), retrieval);		}
 	;

@@ -3,14 +3,14 @@ import Asserts;
 every ArrayTest is:
 
 	Truth -- testSetArrayIndex(Asserts) {
-		:Int[] = [];
+		var Int[] = [];
 		Int[0] = 5;
 		Asserts.that(Int[0])Equals(5);
 		return Asserts.allPassed();
 	}
 
 	Truth -- testResetArrayIndex(Asserts) {
-		:Int[] = [];
+		var Int[] = [];
 		Int[0] = 5;
 		Int[0] = 3;
 		Asserts.that(Int[0])Equals(3);
@@ -18,7 +18,7 @@ every ArrayTest is:
 	}
 
 	Truth -- testSetArrayArrayIndexIndex(Asserts) {
-		:Int[][] = [];
+		var Int[][] = [];
 		Int[0] = [];
 		Int[0][0] = 3;
 		Asserts.that(Int[0][0])Equals(3);
@@ -26,7 +26,7 @@ every ArrayTest is:
 	}
 
 	Truth -- testResetArrayArrayIndexIndex(Asserts) {
-		:Int[][] = [];
+		var Int[][] = [];
 		Int[0] = [];
 		Int[0][0] = 3;
 		Int[0][0] = 5;
@@ -35,7 +35,7 @@ every ArrayTest is:
 	}
 
 	Truth -- testSetMultipleArrayIndices(Asserts) {
-		:Int[] = [];
+		var Int[] = [];
 		Int[0] = 5;
 		Int[1] = 6;
 		Int[2] = 7;
@@ -48,7 +48,7 @@ every ArrayTest is:
 	}
 
 	Truth -- testSetMultipleArrayArrayIndicesIndices(Asserts) {
-		:Int[][] = [];
+		var Int[][] = [];
 		Int[0] = [];
 		Int[1] = [];
 		Int[0][0] = 5;

@@ -14,7 +14,7 @@ every AssertsTest is:
 	needs Printer;
 
 	Truth -- testAssertTextMatches() {
-		:Asserts <- this;
+		var Asserts <- this;
 		Asserts.that("abcdefg aha!")Equals("abcdefg aha!");
 		if(!Asserts.haveFailed()) return True;
 		Printer.printLine("Failed asserting that text is equal to itself");
@@ -22,7 +22,7 @@ every AssertsTest is:
 	}
 
 	Truth -- testAssertTextNotMatches() {
-		:Asserts <- this;
+		var Asserts <- this;
 		Asserts.that("George Bush")Equals("Barack Obama");
 
 		if(Asserts.haveFailed()) {
@@ -38,7 +38,7 @@ every AssertsTest is:
 	}
 
 	Truth -- testAssertIntMatches() {
-		:Asserts <- this;
+		var Asserts <- this;
 		Asserts.that(10)Equals(10);
 		if(!Asserts.haveFailed()) return True;
 		Printer.printLine("Failed asserting that ints are equal to themselves");
@@ -46,7 +46,7 @@ every AssertsTest is:
 	}
 
 	Truth -- testAssertIntNotMatches() {
-		:Asserts <- this;
+		var Asserts <- this;
 		Asserts.that(45)Equals(54);
 
 		if(Asserts.haveFailed()) return True;
@@ -56,7 +56,7 @@ every AssertsTest is:
 	}
 
 	Truth -- testAssertTrueMatches() {
-		:Asserts <- this;
+		var Asserts <- this;
 		Asserts.that(True)Equals(True);
 		if(!Asserts.haveFailed()) return True;
 		Printer.printLine("Failed asserting that True that True");
@@ -64,7 +64,7 @@ every AssertsTest is:
 	}
 
 	Truth -- testAssertTrueNotMatches() {
-		:Asserts <- this;
+		var Asserts <- this;
 		Asserts.that(True)Equals(False);
 
 		if(Asserts.haveFailed()) {
@@ -80,7 +80,7 @@ every AssertsTest is:
 	}
 
 	Truth -- testAssertFalseMatches() {
-		:Asserts <- this;
+		var Asserts <- this;
 		Asserts.that(False)Equals(False);
 		if(!Asserts.haveFailed()) return True;
 		Printer.printLine("Failed asserting that False that False");
@@ -88,7 +88,7 @@ every AssertsTest is:
 	}
 
 	Truth -- testAssertFalseNotMatches() {
-		:Asserts <- this;
+		var Asserts <- this;
 		Asserts.that(False)Equals(True);
 
 		if(Asserts.haveFailed()) {
@@ -104,7 +104,7 @@ every AssertsTest is:
 	}
 
 	Truth -- testAssertTrue() {
-		:Asserts <- this;
+		var Asserts <- this;
 		Asserts.isTrue(True);
 		if(!Asserts.haveFailed()) return True;
 		Printer.printLine("Failed asserting that True is True");
@@ -112,7 +112,7 @@ every AssertsTest is:
 	}
 
 	Truth -- testAssertNotTrue() {
-		:Asserts <- this;
+		var Asserts <- this;
 		Asserts.isTrue(False);
 
 		if(Asserts.haveFailed()) {
@@ -128,7 +128,7 @@ every AssertsTest is:
 	}
 
 	Truth -- testAssertFalse() {
-		:Asserts <- this;
+		var Asserts <- this;
 		Asserts.isFalse(False);
 		if(!Asserts.haveFailed()) return True;
 		Printer.printLine("Failed asserting that False is False");
@@ -136,7 +136,7 @@ every AssertsTest is:
 	}
 
 	Truth -- testAssertNotFalse() {
-		:Asserts <- this;
+		var Asserts <- this;
 		Asserts.isFalse(True);
 
 		if(Asserts.haveFailed()) {

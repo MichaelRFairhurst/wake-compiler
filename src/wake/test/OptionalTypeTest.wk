@@ -1,7 +1,7 @@
 every OptionalTypeTest is:
 
 	Truth -- testOptionalIntNeverSet() {
-		:Int? = nothing;
+		var Int? = nothing;
 		if Int exists {
 			return False;
 		}
@@ -9,7 +9,7 @@ every OptionalTypeTest is:
 	}
 
 	Truth -- testOptionalIntSet() {
-		:Int? = 5;
+		var Int? = 5;
 		if Int exists {
 			return Int == 5;
 		}
@@ -17,7 +17,7 @@ every OptionalTypeTest is:
 	}
 
 	Truth -- testOptionalIntNotSetWillHitElse() {
-		:Int? = nothing;
+		var Int? = nothing;
 		if Int exists {} else {
 			return True;
 		}
@@ -25,7 +25,7 @@ every OptionalTypeTest is:
 	}
 
 	Truth -- testOptionalIntSetWontHitElse() {
-		:Int? = 5;
+		var Int? = 5;
 		if Int exists {} else {
 			return False;
 		}

@@ -934,25 +934,25 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	TestDeclareAnInt,
-	"every MyClass is: Int -- myfn() { :Int = 5; return Int; }",
+	"every MyClass is: Int -- myfn() { var Int = 5; return Int; }",
 	PTT_VALID
 )
 
 PTT_TEST_CASE(
 	TestDeclareAnIntWithBadType,
-	"every MyClass is: myfn() { :Int = 'test'; }",
+	"every MyClass is: myfn() { var Int = 'test'; }",
 	PTT_EXPECT(TYPE_ERROR)
 )
 
 PTT_TEST_CASE(
 	TestDeclareAnIntWithUnknownType,
-	"every MyClass is: myfn() { :LInt = 'test'; }",
+	"every MyClass is: myfn() { var LInt = 'test'; }",
 	PTT_EXPECT(CLASSNAME_NOT_FOUND)
 )
 
 PTT_TEST_CASE(
 	TestDeclareAnIntIsScoped,
-	"every MyClass is: Int -- myfn() { if(True) { :Int = 5; } return Int; }",
+	"every MyClass is: Int -- myfn() { if(True) { var Int = 5; } return Int; }",
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 )
 
@@ -1228,13 +1228,13 @@ PTT_TEST_CASE(
 	DeclareArraysInvalidValues,
 	"every MyClass is:					\n\
 		assignMeToArray() {				\n\
-			:MyClass[] = this;			\n\
+			var MyClass[] = this;			\n\
 		}								\n\
 		assignNumberToClassArray() {	\n\
-			:MyClass[] = 4;				\n\
+			var MyClass[] = 4;				\n\
 		}								\n\
 		assignTextToClassArray() {		\n\
-			:MyClass[] = 'test';		\n\
+			var MyClass[] = 'test';		\n\
 		}",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -1245,16 +1245,16 @@ PTT_TEST_CASE(
 	DeclareEmptyArraysValid,
 	"every MyClass is:								\n\
 		declareEmptyClassArrayAndArrayArray() {		\n\
-			:MyClass[] = [];						\n\
-			:$MyClass[][] = [];						\n\
+			var MyClass[] = [];						\n\
+			var $MyClass[][] = [];						\n\
 		}											\n\
 		declareEmptyIntArrayAndArrayArray() {		\n\
-			:Int[] = [];							\n\
-			:$Int[][] = [];							\n\
+			var Int[] = [];							\n\
+			var $Int[][] = [];							\n\
 		}											\n\
 		declareEmptyStringArrayAndArrayArray() {	\n\
-			:Text[] = [];							\n\
-			:$Text[][] = [];						\n\
+			var Text[] = [];							\n\
+			var $Text[][] = [];						\n\
 		}",
 	PTT_VALID
 );
@@ -1419,7 +1419,7 @@ PTT_TEST_CASE(
 	AssignmentOfOptionalTypeAsRealTypeIsError,
 	"every MyClass is:				\n\
 		assignment(MyClass?) {		\n\
-			:$MyClass = MyClass;	\n\
+			var $MyClass = MyClass;	\n\
 		}",
 	PTT_EXPECT(TYPE_ERROR)
 );
@@ -1428,7 +1428,7 @@ PTT_TEST_CASE(
 	AssignmentOfOptionalTypeToOptionalTypeIsValid,
 	"every MyClass is:				\n\
 		assignment(MyClass?) {		\n\
-			:$MyClass? = MyClass;	\n\
+			var $MyClass? = MyClass;	\n\
 		}",
 	PTT_VALID
 );
@@ -1544,7 +1544,7 @@ PTT_TEST_CASE(
 	"every MyClass is:					\n\
 		myMethod(MyClass?) {			\n\
 			if MyClass exists {			\n\
-				:$MyClass = MyClass;	\n\
+				var $MyClass = MyClass;	\n\
 			}							\n\
 		}",
 	PTT_VALID
@@ -1586,7 +1586,7 @@ PTT_TEST_CASE(
 		}								\n\
 		assignment(MyClass?) {			\n\
 			if MyClass exists {}		\n\
-			:$MyClass = MyClass;		\n\
+			var $MyClass = MyClass;		\n\
 		}								\n\
 		MyClass -- returnin(MyClass?) {	\n\
 			if MyClass exists {}		\n\
@@ -1630,7 +1630,7 @@ PTT_TEST_CASE(
 	ExistsElseStatementIsTypeChecked,
 	"every MyClass is:				\n\
 		myMethod() {				\n\
-			:Int? = 4;				\n\
+			var Int? = 4;				\n\
 			if Int exists {} else { \n\
 				Int + 4;			\n\
 			}						\n\
