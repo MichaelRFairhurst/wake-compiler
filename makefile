@@ -106,68 +106,65 @@ bin/wake: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o chivvy
 	@echo -- CHEERIO
 	@echo
 
-bin/finaltest.js: $(WAKEOBJS) src/wakelib/std.o
-	time ./bin/wake -d bin/waketable -l src/wakelib/std.o $(WAKEOBJS) -o bin/finaltest.js
+bin/finaltest.js: $(WAKEOBJS) src/wake/stdlib/myobj/std.o
+	time ./bin/wake -d bin/waketable -l src/wake/stdlib/myobj/std.o $(WAKEOBJS) -o bin/finaltest.js
 
-bin/wakeobj/Main.o: src/wake/Main.wk bin/wake bin/wakeobj/Asserts.o bin/wakeobj/ArrayTest.o bin/wakeobj/MathTest.o bin/wakeobj/AssertsTest.o bin/wakeobj/BooleanLogicTest.o bin/wakeobj/OptionalTypeTest.o bin/wakeobj/InheritanceTest.o $(WAKETABLEOBJS)
+bin/wakeobj/Main.o: src/wake/test/Main.wk bin/wake bin/wakeobj/Asserts.o bin/wakeobj/ArrayTest.o bin/wakeobj/MathTest.o bin/wakeobj/AssertsTest.o bin/wakeobj/BooleanLogicTest.o bin/wakeobj/OptionalTypeTest.o bin/wakeobj/InheritanceTest.o $(WAKETABLEOBJS)
 	time ./bin/wake -d bin/waketable $< -o $@
 
-bin/wakeobj/MockPrinter.o: src/wake/MockPrinter.wk bin/wake bin/waketable/Printer.table
+bin/wakeobj/MockPrinter.o: src/wake/test/MockPrinter.wk bin/wake bin/waketable/Printer.table
 	time ./bin/wake -d bin/waketable $< -o $@
 
-bin/wakeobj/ArrayTest.o: src/wake/ArrayTest.wk bin/wake bin/wakeobj/Asserts.o
+bin/wakeobj/ArrayTest.o: src/wake/test/ArrayTest.wk bin/wake bin/wakeobj/Asserts.o
 	time ./bin/wake -d bin/waketable $< -o $@
 
-bin/wakeobj/MathTest.o: src/wake/MathTest.wk bin/wake bin/wakeobj/Asserts.o
+bin/wakeobj/MathTest.o: src/wake/test/MathTest.wk bin/wake bin/wakeobj/Asserts.o
 	time ./bin/wake -d bin/waketable $< -o $@
 
-bin/wakeobj/BooleanLogicTest.o: src/wake/BooleanLogicTest.wk bin/wake bin/wakeobj/Asserts.o
+bin/wakeobj/BooleanLogicTest.o: src/wake/test/BooleanLogicTest.wk bin/wake bin/wakeobj/Asserts.o
 	time ./bin/wake -d bin/waketable $< -o $@
 
-bin/wakeobj/AssertsTest.o: src/wake/AssertsTest.wk bin/wake bin/wakeobj/Asserts.o bin/wakeobj/MockPrinter.o
+bin/wakeobj/AssertsTest.o: src/wake/test/AssertsTest.wk bin/wake bin/wakeobj/Asserts.o bin/wakeobj/MockPrinter.o
 	time ./bin/wake -d bin/waketable $< -o $@
 
-bin/wakeobj/InheritanceTestOverride.o: src/wake/InheritanceTestOverride.wk bin/wake bin/wakeobj/InheritanceTestParent.o
+bin/wakeobj/InheritanceTestOverride.o: src/wake/test/InheritanceTestOverride.wk bin/wake bin/wakeobj/InheritanceTestParent.o
 	time ./bin/wake -d bin/waketable $< -o $@
 
-bin/wakeobj/InheritanceTestFallthrough.o: src/wake/InheritanceTestFallthrough.wk bin/wake bin/wakeobj/InheritanceTestParent.o
+bin/wakeobj/InheritanceTestFallthrough.o: src/wake/test/InheritanceTestFallthrough.wk bin/wake bin/wakeobj/InheritanceTestParent.o
 	time ./bin/wake -d bin/waketable $< -o $@
 
-bin/wakeobj/InheritanceTestInterface.o: src/wake/InheritanceTestInterface.wk bin/wake bin/wakeobj/InheritanceTestParent.o
+bin/wakeobj/InheritanceTestInterface.o: src/wake/test/InheritanceTestInterface.wk bin/wake bin/wakeobj/InheritanceTestParent.o
 	time ./bin/wake -d bin/waketable $< -o $@
 
-bin/wakeobj/InheritanceTest.o: src/wake/InheritanceTest.wk bin/wake bin/wakeobj/InheritanceTestInterface.o bin/wakeobj/InheritanceTestOverride.o bin/wakeobj/InheritanceTestFallthrough.o bin/wakeobj/Asserts.o
+bin/wakeobj/InheritanceTest.o: src/wake/test/InheritanceTest.wk bin/wake bin/wakeobj/InheritanceTestInterface.o bin/wakeobj/InheritanceTestOverride.o bin/wakeobj/InheritanceTestFallthrough.o bin/wakeobj/Asserts.o
 	time ./bin/wake -d bin/waketable $< -o $@
 
-bin/wakeobj/%.o: src/wake/%.wk bin/wake $(WAKETABLEOBJS)
+bin/wakeobj/Asserts.o: src/wake/stdlib/Asserts.wk bin/wake $(WAKETABLEOBJS)
+	time ./bin/wake -d bin/waketable $< -o $@
+
+bin/wakeobj/%.o: src/wake/test/%.wk bin/wake $(WAKETABLEOBJS)
 	time ./bin/wake -d bin/waketable $< -o $@
 
 bin/gen/%.o: gen/%.c gen/wake.tab.c
 	$(CC) $(OPT) -c $< -o $@
 
-bin/tests/%.o: src/test/%.cpp
+bin/tests/%.o: src/cpp/test/%.cpp
 	$(CPP) -g -c $< -o $@
 
-bin/waketable/%.table: src/waketables/%.wk bin/wake
+bin/waketable/%.table: src/wake/stdlib/tables/%.wk bin/wake
 	./bin/wake -t $< -d bin/waketable
 
-bin/cpp/%.o: src/%.cpp gen/wake.tab.c gen/objectfile.tab.c
+bin/cpp/%.o: src/cpp/%.cpp gen/wake.tab.c gen/objectfile.tab.c
 	$(CPP) $(OPT) -c $< -o $@
 
-bin/c/%.o: src/%.c gen/wake.tab.c gen/objectfile.tab.c
+bin/c/%.o: src/c/%.c gen/wake.tab.c gen/objectfile.tab.c
 	$(CC) $(OPT) -c $< -o $@
 
-gen/wake.tab.c: src/wakeparser.y
-	bison -p wake -dg -o gen/wake.tab.c src/wakeparser.y
+gen/%.tab.c: src/bison/%parser.y
+	bison -p $* -dg -o $@ $<
 
-gen/lex.wake.c: src/wakelexer.l gen/wake.tab.c
-	flex -P wake -o gen/lex.wake.c src/wakelexer.l
-
-gen/objectfile.tab.c: src/objectfileparser.y
-	bison -p objectfile -dg -o gen/objectfile.tab.c src/objectfileparser.y
-
-gen/lex.objectfile.c: src/objectfilelexer.l gen/objectfile.tab.c
-	flex -P objectfile -o gen/lex.objectfile.c src/objectfilelexer.l
+gen/lex.%.c: src/flex/%lexer.l gen/wake.tab.c gen/objectfile.tab.c
+	flex -P $* -o $@ $<
 
 loo:
 	@echo
