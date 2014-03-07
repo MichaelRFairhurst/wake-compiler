@@ -25,19 +25,12 @@ BOOST_AUTO_TEST_CASE( TestSymbolTableAddInLastStackWillGet ) {
 	delete type;
 }
 
-BOOST_AUTO_TEST_CASE( TestSymbolTableNotAddThrowsSemanticError ) {
+BOOST_AUTO_TEST_CASE( TestSymbolTableNotAddedGetsEmptyOptional) {
 	ScopeSymbolTable table;
-	Type* type = new Type;
+	boost::optional<Type*> type;
 
-	try {
-		table.find("@bilbo");
-		BOOST_CHECK_MESSAGE(false, "No exception thrown");
-	} catch(SemanticError* e) {
-		BOOST_CHECK(e->code == SYMBOL_NOT_DEFINED);
-		delete e;
-	}
-
-	delete type;
+	type = table.find("@bilbo");
+	BOOST_CHECK(!type);
 }
 
 BOOST_AUTO_TEST_CASE( TestSymbolTableAddTwiceThrowsSemanticError ) {
@@ -75,18 +68,14 @@ BOOST_AUTO_TEST_CASE( TestSymbolTableAddInNewScopeStillThrowsSemanticError ) {
 
 BOOST_AUTO_TEST_CASE( TestSymbolTableAddInNewScopeNotSetOncePopped ) {
 	ScopeSymbolTable table;
+	boost::optional<Type*> optionaltype;
 	Type* type = new Type;
 
 	table.pushScope();
 	table.add("@bilbo", type);
 	table.popScope();
-	try {
-		table.find("@bilbo");
-		BOOST_CHECK_MESSAGE(false, "No exception thrown");
-	} catch(SemanticError* e) {
-		BOOST_CHECK(e->code == SYMBOL_NOT_DEFINED);
-		delete e;
-	}
+	optionaltype = table.find("@bilbo");
+	BOOST_CHECK(!optionaltype);
 
 	delete type;
 }

@@ -82,8 +82,8 @@ void ClassParseTreeTraverser::secondPass(Node* tree) {
 			{
 				scopesymtable->pushScope();
 				loadCtorArgs(tree);
-				loadProperties(tree);
 				typechecker->setThisContext(classname);
+				loadProperties(tree);
 				typeCheckMethods(tree);
 				scopesymtable->popScope();
 			}

@@ -29,7 +29,7 @@ syn match	blockcomment	"##"
 syn keyword	inheritancekeyword	a an contained
 syn keyword	interfacekeyword	capable
 syn keyword	mytype	Int Truth Text Char
-syn match	alias	"@\<[a-zA-Z]\+\>"
+syn match	alias	"\<[a-z][a-zA-Z]*\>"
 syn match	shadow	"\$"
 syn match	returntype	"\(\<[a-zA-Z]\+\>\s\+\)\?--"
 syn match	functioncall	")\?\<[a-zA-Z]\+\>(" contained

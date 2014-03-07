@@ -44,10 +44,11 @@ int wakewrap()
 }
 
 /* identifiers & values */
-%token <string> IDENTIFIER
-%token <string> ALIAS
+%token <string> UIDENTIFIER
+%token <string> LIDENTIFIER
 %token <string> SPECIALTY
 %token <string> STRING
+%type <string> identifier
 %token <number> NUMBER
 %token <number> TRUTH
 %token <number> SYM_SHADOW
@@ -70,12 +71,12 @@ imports:
 	;
 
 import:
-	IMPORT importtarget IDENTIFIER ';'												{ $$ = MakeTwoBranchNode(NT_IMPORT, $2, MakeNodeFromString(NT_IMPORTPATH, $3)); }
+	IMPORT importtarget identifier ';'												{ $$ = MakeTwoBranchNode(NT_IMPORT, $2, MakeNodeFromString(NT_IMPORTPATH, $3)); }
 	;
 
 importtarget:
 	/* empty */																	{ $$ = MakeEmptyNode(NT_EMPTY); }
-	| '(' IDENTIFIER ')'														{ $$ = MakeNodeFromString(NT_IMPORTTARGET, $2); }
+	| '(' identifier ')'														{ $$ = MakeNodeFromString(NT_IMPORTTARGET, $2); }
 	;
 
 classes:
@@ -84,8 +85,8 @@ classes:
 	;
 
 class:
-	EVERY IDENTIFIER parentage IS ':'											{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromString(NT_CLASSNAME, $2), $3); }
-	| EVERY IDENTIFIER parentage IS ':' classbody								{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromString(NT_CLASSNAME, $2), $3); AddSubNode($$, $6); }
+	EVERY UIDENTIFIER parentage IS ':'											{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromString(NT_CLASSNAME, $2), $3); }
+	| EVERY UIDENTIFIER parentage IS ':' classbody								{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromString(NT_CLASSNAME, $2), $3); AddSubNode($$, $6); }
 	;
 
 parentage:
@@ -99,8 +100,8 @@ inheritances:
 	;
 
 inheritance:
-	CAPABLE IDENTIFIER															{ $$ = MakeNodeFromString(NT_INTERFACE, $2); }
-	| A_OR_AN IDENTIFIER														{ $$ = MakeNodeFromString(NT_SUBCLASS, $2); }
+	CAPABLE UIDENTIFIER															{ $$ = MakeNodeFromString(NT_INTERFACE, $2); }
+	| A_OR_AN UIDENTIFIER														{ $$ = MakeNodeFromString(NT_SUBCLASS, $2); }
 	;
 
 classbody:
@@ -150,7 +151,7 @@ injection_providable:
 injectionblockargs:
 
 injection:
-	IDENTIFIER '(' injection_args ')'											{ $$ = MakeTwoBranchNode(NT_INJECTION, MakeNodeFromString(NT_CLASSNAME, $1), $3); }
+	UIDENTIFIER '(' injection_args ')'											{ $$ = MakeTwoBranchNode(NT_INJECTION, MakeNodeFromString(NT_CLASSNAME, $1), $3); }
 	;
 
 injection_args:
@@ -202,7 +203,7 @@ type_pure_arrayable:
 	;
 
 type_pure_arrayable_nonoptional:
-	IDENTIFIER																	{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; }
+	UIDENTIFIER																	{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; }
 	| FN '(' ')'																{ $$ = MakeType(TYPE_LAMBDA); }
 	| FN '(' commonorlambdatypes ')'											{ $$ = MakeType(TYPE_LAMBDA); $$->typedata.lambda.arguments = $3; }
 	| type_pure SYM_RETURN_DECREMENT FN '(' commonorlambdatypes ')'				{ $$ = MakeType(TYPE_LAMBDA); $$->typedata.lambda.returntype = $1; $$->typedata.lambda.arguments = $5; }
@@ -215,15 +216,21 @@ methodbody:
 	;
 
 methodnamesegments:
-	IDENTIFIER '(' ')'															{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
-	| IDENTIFIER '(' declarabletypes ')'										{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1), MakeNodeFromTypeArray($3)); }
-	| IDENTIFIER '(' declarabletypes ')' methodnamesegments						{ $$ = $5; PrependSubNode($5, MakeNodeFromTypeArray($3)); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
+	UIDENTIFIER '(' ')'															{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
+	| UIDENTIFIER '(' declarabletypes ')'										{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1), MakeNodeFromTypeArray($3)); }
+	| UIDENTIFIER '(' declarabletypes ')' methodnamesegments					{ $$ = $5; PrependSubNode($5, MakeNodeFromTypeArray($3)); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
+	| LIDENTIFIER '(' ')'															{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
+	| LIDENTIFIER '(' declarabletypes ')'										{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1), MakeNodeFromTypeArray($3)); }
+	| LIDENTIFIER '(' declarabletypes ')' methodnamesegments					{ $$ = $5; PrependSubNode($5, MakeNodeFromTypeArray($3)); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
 	;
 
 methodcallsegments:
-	IDENTIFIER '(' ')'															{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
-	| IDENTIFIER '(' curryableexpressions ')'									{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1), $3); }
-	| IDENTIFIER '(' curryableexpressions ')' methodcallsegments				{ $$ = $5; PrependSubNode($5, $3); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
+	UIDENTIFIER '(' ')'															{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
+	| UIDENTIFIER '(' curryableexpressions ')'									{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1), $3); }
+	| UIDENTIFIER '(' curryableexpressions ')' methodcallsegments				{ $$ = $5; PrependSubNode($5, $3); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
+	| LIDENTIFIER '(' ')'															{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
+	| LIDENTIFIER '(' curryableexpressions ')'									{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1), $3); }
+	| LIDENTIFIER '(' curryableexpressions ')' methodcallsegments				{ $$ = $5; PrependSubNode($5, $3); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
 	;
 
 declarabletypes:
@@ -232,23 +239,23 @@ declarabletypes:
 	;
 
 type_common:
-	IDENTIFIER SYM_ARRAYED														{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; $$->arrayed = $2; }
-	| IDENTIFIER																{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; }
+	UIDENTIFIER SYM_ARRAYED														{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; $$->arrayed = $2; }
+	| UIDENTIFIER																{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; }
 	;
 
 type_valued:
 	type_common																	{ $$ = MakeNodeFromType($1); }
 	| SYM_SHADOW type_common													{ $$ = MakeNodeFromType($2); $2->typedata._class.shadow = $1; }
-	| ALIAS																		{ $$ = MakeNodeFromString(NT_ALIAS, $1); }
+	| LIDENTIFIER																{ $$ = MakeNodeFromString(NT_ALIAS, $1); }
 	;
 
 type_declarable_nonoptional:
 	type_common																	{ $$ = $1; }
 	| SYM_SHADOW type_common													{ $$ = $2; $$->typedata._class.shadow = $1; }
-	| ALIAS type_common															{ $$ = $2; $$->alias = $1; }
-	| type_common ALIAS															{ $$ = $1; $$->alias = $2; }
-	| ALIAS type_lambda															{ $$ = $2; $$->alias = $1; }
-	| type_lambda ALIAS															{ $$ = $1; $$->alias = $2; }
+	| LIDENTIFIER type_common													{ $$ = $2; $$->alias = $1; }
+	| type_common LIDENTIFIER													{ $$ = $1; $$->alias = $2; }
+	| LIDENTIFIER type_lambda													{ $$ = $2; $$->alias = $1; }
+	| type_lambda LIDENTIFIER													{ $$ = $1; $$->alias = $2; }
 	;
 
 type_declarable:
@@ -283,10 +290,10 @@ type_retrievabledeclarable:
 	type_declarable																{ $$ = $1; }
 	| type_common SPECIALTY														{ $$ = $1; $$->specialty = $2; }
 	| SYM_SHADOW type_common SPECIALTY											{ $$ = $2; $$->typedata._class.shadow = $1; $$->specialty = $3;}
-	| ALIAS type_common SPECIALTY												{ $$ = $2; $$->alias = $1; $$->specialty = $3; }
-	| type_common SPECIALTY ALIAS												{ $$ = $1; $$->alias = $3; $$->specialty = $2; }
-	| ALIAS type_lambda SPECIALTY												{ $$ = $2; $$->alias = $1; $$->specialty = $3; }
-	| type_lambda SPECIALTY ALIAS												{ $$ = $1; $$->alias = $3; $$->specialty = $2; }
+	| LIDENTIFIER type_common SPECIALTY											{ $$ = $2; $$->alias = $1; $$->specialty = $3; }
+	| type_common SPECIALTY LIDENTIFIER											{ $$ = $1; $$->alias = $3; $$->specialty = $2; }
+	| LIDENTIFIER type_lambda SPECIALTY											{ $$ = $2; $$->alias = $1; $$->specialty = $3; }
+	| type_lambda SPECIALTY LIDENTIFIER											{ $$ = $1; $$->alias = $3; $$->specialty = $2; }
 	;
 
 curryableexpressions:
@@ -303,8 +310,8 @@ value:
 	| value '[' expression ']'													{ $$ = MakeTwoBranchNode(NT_ARRAY_ACCESS, $1, $3); }
 	| objectable '.' type_valued												{ $$ = MakeTwoBranchNode(NT_MEMBER_ACCESS, $1, $3); }
 	| objectable '.' methodcallsegments											{ $$ = MakeTwoBranchNode(NT_METHOD_INVOCATION, $1, $3); }
-	| value '(' ')'																{ $$ = MakeOneBranchNode(NT_LAMBDA_INVOCATION, $1); }
-	| value '(' curryableexpressions ')'										{ $$ = MakeTwoBranchNode(NT_LAMBDA_INVOCATION, $1, $3); }
+	/*| value '(' ')'																{ $$ = MakeOneBranchNode(NT_LAMBDA_INVOCATION, $1); }
+	| value '(' curryableexpressions ')'										{ $$ = MakeTwoBranchNode(NT_LAMBDA_INVOCATION, $1, $3); }*/
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
 	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
 	| TRUTH																		{ $$ = MakeNodeFromNumber(NT_TRUTHLIT, $1); }
@@ -476,6 +483,11 @@ retrieval:
 expressions:
 	expression																	{ $$ = MakeOneBranchNode(NT_EXPRESSIONS, $1); }
 	| expression ',' expressions												{ $$ = $3; AddSubNode($$, $1); }
+	;
+
+identifier:
+	UIDENTIFIER																	{ $$ = $1; }
+	| LIDENTIFIER																	{ $$ = $1; }
 	;
 
 %%

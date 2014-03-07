@@ -450,8 +450,20 @@ Type* TypeChecker::typeCheck(Node* tree) {
 
 			case NT_METHOD_INVOCATION:
 				{
-					Type* subject = typeCheck(tree->node_data.nodes[0]);
 					Node* methodname = tree->node_data.nodes[1];
+
+					if(tree->node_data.nodes[0]->node_type == NT_THIS && methodname->subnodes == 2) {
+						string name = methodname->node_data.nodes[0]->node_data.string;
+						boost::optional<Type*> variable = scopesymtable->find(string("@") + name);
+						if(variable) {
+							methodname->node_type = NT_LAMBDA_INVOCATION;
+							methodname->node_data.nodes[0]->node_type = NT_ALIAS;
+							ret = typeCheck(methodname);
+							break;
+						}
+					}
+
+					Type* subject = typeCheck(tree->node_data.nodes[0]);
 					vector<pair<string, TypeArray*> > method_segments;
 
 					int i = 0;

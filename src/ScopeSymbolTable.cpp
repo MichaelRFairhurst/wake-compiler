@@ -27,7 +27,8 @@ void ScopeSymbolTable::addOverwriting(Type* type) {
 boost::optional<Type*> ScopeSymbolTable::find(string name) {
 	if(!table.count(name)) {
 		string temp = "Symbol " + name + " not defined in this scope.";
-		throw new SemanticError(SYMBOL_NOT_DEFINED, temp);
+		//throw new SemanticError(SYMBOL_NOT_DEFINED, temp);
+		return boost::optional<Type*>();
 	}
 
 	map<string, pair<Type*, string> >::iterator it = table.find(name);
@@ -38,6 +39,7 @@ boost::optional<Type*> ScopeSymbolTable::find(Type* type) {
 	string name = getNameForType(type);
 	if(!table.count(name)) {
 		string temp = "Symbol " + name + " not defined in this scope.";
+		return boost::optional<Type*>();
 		throw new SemanticError(SYMBOL_NOT_DEFINED, temp);
 	}
 

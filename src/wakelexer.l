@@ -104,8 +104,8 @@ True					count(); wakelval.number = 1; return TRUTH;
 False					count(); wakelval.number = 0; return TRUTH;
 [0-9]+(\.[0-9]+)?		count(); wakelval.number = atof(waketext); return NUMBER;
 \{[a-zA-Z0-9]+\}		count(); wakelval.string = keepInner(waketext); return SPECIALTY;
-[a-zA-Z0-9]+			count(); wakelval.string = strdup(waketext); return IDENTIFIER;
-@[a-zA-Z0-9]+			count(); wakelval.string = strdup(&waketext[1]); return ALIAS;
+[a-z][a-zA-Z0-9]*		count(); wakelval.string = strdup(waketext); return LIDENTIFIER;
+[A-Z][a-zA-Z0-9]*		count(); wakelval.string = strdup(waketext); return UIDENTIFIER;
 \"(\\.|[^\\"])*\"		count(); wakelval.string = unEscapeStringLiteral(keepInner(waketext), '"'); return(STRING);
 '(\\.|[^\'])*\'			count(); wakelval.string = unEscapeStringLiteral(keepInner(waketext), '\''); return(STRING);
 

@@ -98,7 +98,7 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	ProvideBindToClassConstructorArgumentTwoNotExists,
-	"every ClassB is: needs ClassA, ClassA @also; every ClassA is: provides ClassA, ClassB <- ClassB(ClassA, NonExistClass);",
+	"every ClassB is: needs ClassA, ClassA also; every ClassA is: provides ClassA, ClassB <- ClassB(ClassA, NonExistClass);",
 	PTT_EXPECT(CLASSNAME_NOT_FOUND)
 )
 
@@ -113,24 +113,24 @@ PTT_TEST_CASE(
 	"every ClassA is:										\n\
 		getName(											\n\
 			ClassA,											\n\
-			ClassA @b,										\n\
+			ClassA b,										\n\
 			ClassA -- fn(									\n\
 				ClassA,										\n\
 				ClassA -- fn()								\n\
-			) @alias1										\n\
+			) alias1										\n\
 		)FromEmptyFunc(										\n\
-			ClassA -- fn() @alias2							\n\
+			ClassA -- fn() alias2							\n\
 		) {}												\n\
 															\n\
 		getName(											\n\
 			ClassA,											\n\
-			ClassA @c,										\n\
+			ClassA c,										\n\
 			ClassA -- fn(									\n\
 				ClassA,										\n\
 				ClassA -- fn()								\n\
-			) @alias3										\n\
+			) alias3										\n\
 		)FromEmptyFunc(										\n\
-			ClassA -- fn() @alias4							\n\
+			ClassA -- fn() alias4							\n\
 		) {}												\n\
 		",
 	PTT_EXPECT(MULTIPLE_METHOD_DEFINITION)
@@ -162,32 +162,32 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	MethodWithLambdaArgumentWithInvalidReturn,
-	"every MyClass is: badMethod( NonExist -- fn() @aliased ) {}",
+	"every MyClass is: badMethod( NonExist -- fn() aliased ) {}",
 	PTT_EXPECT(CLASSNAME_NOT_FOUND)
 )
 
 PTT_TEST_CASE(
 	MethodWithLambdaArgumentWithInvalidArgument,
-	"every MyClass is: badMethod( MyClass -- fn( NonExist ) @aliased ) {}",
+	"every MyClass is: badMethod( MyClass -- fn( NonExist ) aliased ) {}",
 	PTT_EXPECT(CLASSNAME_NOT_FOUND)
 )
 
 PTT_TEST_CASE(
 	ValidFile,
-	"every Parent is:																				\n\
-																									\n\
-	every Child (a Parent) is:																		\n\
-		provides																					\n\
-			Child,																					\n\
-			Parent <- Child;																		\n\
-																									\n\
-		Parent -- My(Parent)Function(Child, Parent @b, Parent -- fn(Child) @aliased) {				\n\
-			Child; @b; return @aliased(Child);														\n\
-		}																							\n\
-																									\n\
-		Parent -- fn(Child) -- MyFunction(Child, Parent, Parent -- fn(Child) @aliased) {			\n\
-			return @aliased;																		\n\
-		}																							\n\
+	"every Parent is:																	\n\
+																						\n\
+	every Child (a Parent) is:															\n\
+		provides																		\n\
+			Child,																		\n\
+			Parent <- Child;															\n\
+																						\n\
+		Parent -- My(Parent)Function(Child, Parent b, Parent -- fn(Child) aliased) {	\n\
+			Child; b; return aliased(Child);											\n\
+		}																				\n\
+																						\n\
+		Parent -- fn(Child) -- MyFunction(Child, Parent, Parent -- fn(Child) aliased) {	\n\
+			return aliased;																\n\
+		}																				\n\
 	",
 	PTT_VALID
 )
@@ -206,7 +206,7 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	MethodDefinedWithVariablesSameAlias,
-	"every MyClass is: methodWithDualArgs( MyClass @a, MyClass @a ) {}",
+	"every MyClass is: methodWithDualArgs( MyClass b, MyClass b ) {}",
 	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)
 )
 
@@ -218,7 +218,7 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	MethodUsesNonexistAlias,
-	"every MyClass is: methodWithEmptyScope() { @a; }",
+	"every MyClass is: methodWithEmptyScope() { b; }",
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 )
 
@@ -236,7 +236,7 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	MethodUsesClassnameForAliasBoundClass,
-	"every MyClass is: methodWithEmptyScope(MyClass @a) { MyClass; }",
+	"every MyClass is: methodWithEmptyScope(MyClass b) { MyClass; }",
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 )
 
@@ -247,7 +247,7 @@ PTT_TEST_CASE(
 		multiplyStringByInt() { 'test' * 5; }									\n\
 		multiplyIntByObject(MyClass) { 5 * MyClass; }							\n\
 		multiplyObjectByInt(MyClass) { MyClass * 5; }							\n\
-		multiplyLambdaByInt(MyClass --fn(MyClass) @lambda) { @lambda * 5; }		\n\
+		multiplyLambdaByInt(MyClass --fn(MyClass) lambda) { lambda * 5; }		\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -263,7 +263,7 @@ PTT_TEST_CASE(
 		divideStringByInt() { 'test' / 5; }						\n\
 		divideIntByObject(MyClass) { 5 / MyClass; }				\n\
 		divideObjectByInt(MyClass) { MyClass / 5; }				\n\
-		divideLambdaByInt(fn() @lambda) { @lambda / 5; }		\n\
+		divideLambdaByInt(fn() lambda) { lambda / 5; }		\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -279,7 +279,7 @@ PTT_TEST_CASE(
 		addStringByInt() { 'test' + 5; }						\n\
 		addIntByObject(MyClass) { 5 + MyClass; }				\n\
 		addObjectByInt(MyClass) { MyClass + 5; }				\n\
-		addLambdaByInt(fn() @lambda) { @lambda + 5; }			\n\
+		addLambdaByInt(fn() lambda) { lambda + 5; }			\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -295,7 +295,7 @@ PTT_TEST_CASE(
 		subtractStringByInt() { 'test' - 5; }					\n\
 		subtractIntByObject(MyClass) { 5 - MyClass; }			\n\
 		subtractObjectByInt(MyClass) { MyClass - 5; }			\n\
-		subtractLambdaByInt(fn() @lambda) { @lambda - 5; }		\n\
+		subtractLambdaByInt(fn() lambda) { lambda - 5; }		\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -465,10 +465,10 @@ PTT_TEST_CASE(
 	"every MyClass is:											\n\
 		truthLiterals() { if(True) 5; if(False) 5; }			\n\
 		truthVariable(Truth) { if(Truth) 5; }					\n\
-		truthAlias(Truth @a) { if(@a) 5; }						\n\
+		truthAlias(Truth b) { if(b) 5; }						\n\
 		truthLiteralsWhile() { while(True) 5; while(False) 5; }	\n\
 		truthVariableWhile(Truth) { while(Truth) 5; }			\n\
-		truthAliasWhile(Truth @a) { while(@a) 5; }				\n\
+		truthAliasWhile(Truth b) { while(b) 5; }				\n\
 	",
 	PTT_VALID
 )
@@ -571,7 +571,7 @@ PTT_TEST_CASE(
 		assignTruthTo(Truth) { Truth = True; }						\n\
 		assignTextTo(Text) { Text = 'text'; }						\n\
 		assignIntTo(Int) { Int = 5; }								\n\
-		assign(MyClass @a)To(MyClass @b) { @a = @b; }				\n\
+		assign(MyClass c)To(MyClass b) { c = b; }				\n\
 		assignA(MyClass)To(ParentClass) { ParentClass = MyClass; }	\n\
 	",
 	PTT_VALID
@@ -581,18 +581,18 @@ PTT_TEST_CASE(
 	InvalidLambdaInvocations,
 	"every UnrelatedClass is: every ParentClass is:							\n\
 	every MyClass (a ParentClass) is:										\n\
-		call(fn(Text) @fn)WithInt() { @fn(4); }								\n\
-		call(fn(Text) @fn)WithTruth() { @fn(True); }						\n\
-		call(fn(Text) @fn)With(MyClass) { @fn(MyClass); }					\n\
-		call(fn(Truth) @fn)With(MyClass) { @fn(MyClass); }					\n\
-		call(fn(Truth) @fn)WithInt() { @fn(4); }							\n\
-		call(fn(Truth) @fn)WithText() { @fn('test'); }						\n\
-		call(fn(Int) @fn)WithText() { @fn('test'); }						\n\
-		call(fn(Int) @fn)WithTruth() { @fn(True); }							\n\
-		call(fn(Int) @fn)With(MyClass) { @fn(MyClass); }					\n\
-		call(fn(Int, Text) @fn)WithTextInt() { @fn('abc', 4); }				\n\
-		call(fn(MyClass) @fn)With(UnrelatedClass) { @fn(UnrelatedClass); }	\n\
-		call(fn(MyClass) @fn)With(ParentClass) { @fn(ParentClass); }		\n\
+		call(fn(Text) lambda)WithInt() { lambda(4); }								\n\
+		call(fn(Text) lambda)WithTruth() { lambda(True); }						\n\
+		call(fn(Text) lambda)With(MyClass) { lambda(MyClass); }					\n\
+		call(fn(Truth) lambda)With(MyClass) { lambda(MyClass); }					\n\
+		call(fn(Truth) lambda)WithInt() { lambda(4); }							\n\
+		call(fn(Truth) lambda)WithText() { lambda('test'); }						\n\
+		call(fn(Int) lambda)WithText() { lambda('test'); }						\n\
+		call(fn(Int) lambda)WithTruth() { lambda(True); }							\n\
+		call(fn(Int) lambda)With(MyClass) { lambda(MyClass); }					\n\
+		call(fn(Int, Text) lambda)WithTextInt() { lambda('abc', 4); }				\n\
+		call(fn(MyClass) lambda)With(UnrelatedClass) { lambda(UnrelatedClass); }	\n\
+		call(fn(MyClass) lambda)With(ParentClass) { lambda(ParentClass); }		\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -613,28 +613,28 @@ PTT_TEST_CASE(
 	"every ParentClass is:																								\n\
 	every MyClass (a ParentClass) is:																					\n\
 																														\n\
-		call(fn(Text) @fn)WithText() { @fn('test'); }																	\n\
+		call(fn(Text) lambda)WithText() { lambda('test'); }																	\n\
 																														\n\
-		call(fn(Truth) @fn)WithTruth() { @fn(True); }																	\n\
+		call(fn(Truth) lambda)WithTruth() { lambda(True); }																	\n\
 																														\n\
-		call(fn(Int) @fn)WithInt() { @fn(4); }																			\n\
+		call(fn(Int) lambda)WithInt() { lambda(4); }																			\n\
 																														\n\
-		call(fn(ParentClass) @fn)With(MyClass) { @fn(MyClass); }														\n\
+		call(fn(ParentClass) lambda)With(MyClass) { lambda(MyClass); }														\n\
 																														\n\
-		Text -- call(Text -- fn(Text, Int, Truth, ParentClass) @fn)WithProperArgsAnd(MyClass) {							\n\
-			return @fn('text', 4, True, MyClass);																		\n\
+		Text -- call(Text -- fn(Text, Int, Truth, ParentClass) lambda)WithProperArgsAnd(MyClass) {							\n\
+			return lambda('text', 4, True, MyClass);																		\n\
 		}																												\n\
 																														\n\
-		Int -- call(Int -- fn(Int, Truth, ParentClass, Text) @fn)WithProperArgsAnd(MyClass) {							\n\
-			return @fn(4, True, MyClass, 'text');																		\n\
+		Int -- call(Int -- fn(Int, Truth, ParentClass, Text) lambda)WithProperArgsAnd(MyClass) {							\n\
+			return lambda(4, True, MyClass, 'text');																		\n\
 		}																												\n\
 																														\n\
-		Truth -- call(Truth -- fn(Truth, ParentClass, Text, Int) @fn)WitProperArgsAnd(MyClass) {						\n\
-			return @fn(True, MyClass, 'text', 4);																		\n\
+		Truth -- call(Truth -- fn(Truth, ParentClass, Text, Int) lambda)WitProperArgsAnd(MyClass) {						\n\
+			return lambda(True, MyClass, 'text', 4);																		\n\
 		}																												\n\
 																														\n\
-		MyClass -- call(MyClass -- fn(ParentClass, Truth, Text, Int) @fn)WithProperArgsAnd(MyClass) {					\n\
-			return @fn(MyClass, True, 'text', 4);																		\n\
+		MyClass -- call(MyClass -- fn(ParentClass, Truth, Text, Int) lambda)WithProperArgsAnd(MyClass) {					\n\
+			return lambda(MyClass, True, 'text', 4);																		\n\
 		}																												\n\
 	",
 	PTT_VALID
@@ -673,7 +673,7 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	AssignPropertyFromCtorIsOK,
-	"every MyClass is: with Int @too = Int; needs Int;",
+	"every MyClass is: with Int too = Int; needs Int;",
 	PTT_VALID
 )
 
@@ -693,11 +693,11 @@ PTT_TEST_CASE(
 	CtorAndPropertiesUsableInMethods,
 	"every MyClass is:									\n\
 	every OtherClass is:								\n\
-		needs MyClass @a;								\n\
-		with MyClass @b;								\n\
-		with MyClass @c = @b;							\n\
-		MyClass -- testScope(MyClass @d) {				\n\
-			return @a; return @b; return @c; return @d;	\n\
+		needs MyClass c;								\n\
+		with MyClass b;								\n\
+		with MyClass e = b;							\n\
+		MyClass -- testScope(MyClass d) {				\n\
+			return e; return b; return c; return d;	\n\
 		}",
 	PTT_VALID
 )
@@ -725,23 +725,23 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	MethodInvocationOfClassNotThisComplex,
-	"every MyClass is: MyClass -- method(MyClass @a)Here(MyClass@b)Yeah() { return @a.method(@a)Here(@b)Yeah(); }",
+	"every MyClass is: MyClass -- method(MyClass c)Here(MyClass b)Yeah() { return c.method(c)Here(b)Yeah(); }",
 	PTT_VALID
 )
 
 PTT_TEST_CASE(
 	MethodInvocationOfClassNotThisSimple,
-	"every MyClass is: MyClass -- method(MyClass @a) { return @a.method(@a); }",
+	"every MyClass is: MyClass -- method(MyClass c) { return c.method(c); }",
 	PTT_VALID
 )
 
 PTT_TEST_CASE(
 	MethodInvocationOfClassNotThisArgumentsAreTypeChecked,
 	"every MyClass is:																								\n\
-		MyClass -- argIsInvalidType(MyClass @a, Int) { return @a.argIsInvalidType(@a, 'test'); }					\n\
-		MyClass -- argIsInvalidExpression(MyClass @a, Int) { return @a.argIsInvalidExpression(@a, 5 + 'test'); }	\n\
-		Text -- argIsInvalidReturn(MyClass @a, Int) { return @a.argIsInvalidType(@a, 5); }							\n\
-		MyClass -- argIsInvalidArgumentCount(MyClass @a, Int) { return @a.argIsInvalidType(@a); }					\n\
+		MyClass -- argIsInvalidType(MyClass c, Int) { return c.argIsInvalidType(c, 'test'); }					\n\
+		MyClass -- argIsInvalidExpression(MyClass c, Int) { return c.argIsInvalidExpression(c, 5 + 'test'); }	\n\
+		Text -- argIsInvalidReturn(MyClass c, Int) { return c.argIsInvalidType(c, 5); }							\n\
+		MyClass -- argIsInvalidArgumentCount(MyClass c, Int) { return c.argIsInvalidType(c); }					\n\
 	",
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 	PTT_EXPECT(TYPE_ERROR)
@@ -751,23 +751,23 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	MethodInvocationOfClassUsingThisComplex,
-	"every MyClass is: MyClass -- method(MyClass @a)Here(MyClass@b)Yeah() { return method(@a)Here(@b)Yeah(); }",
+	"every MyClass is: MyClass -- method(MyClass c)Here(MyClass b)Yeah() { return method(c)Here(b)Yeah(); }",
 	PTT_VALID
 )
 
 PTT_TEST_CASE(
 	MethodInvocationOfClassUsingThisSimple,
-	"every MyClass is: MyClass -- method(MyClass @a) { return method(@a); }",
+	"every MyClass is: MyClass -- method(MyClass c) { return method(c); }",
 	PTT_VALID
 )
 
 PTT_TEST_CASE(
 	MethodInvocationOfClassUsingThisArgumentsAreTypeChecked,
 	"every MyClass is:																							\n\
-		MyClass -- argIsInvalidType(MyClass @a, Int) { return argIsInvalidType(@a, 'test'); }					\n\
-		MyClass -- argIsInvalidExpression(MyClass @a, Int) { return argIsInvalidExpression(@a, 5 + 'test'); }	\n\
-		Text -- argIsInvalidReturn(MyClass @a, Int) { return argIsInvalidType(@a, 5); }							\n\
-		MyClass -- argIsInvalidArgumentCount(MyClass @a, Int) { return argIsInvalidType(@a); }					\n\
+		MyClass -- argIsInvalidType(MyClass c, Int) { return argIsInvalidType(c, 'test'); }					\n\
+		MyClass -- argIsInvalidExpression(MyClass c, Int) { return argIsInvalidExpression(c, 5 + 'test'); }	\n\
+		Text -- argIsInvalidReturn(MyClass c, Int) { return argIsInvalidType(c, 5); }							\n\
+		MyClass -- argIsInvalidArgumentCount(MyClass c, Int) { return argIsInvalidType(c); }					\n\
 	",
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 	PTT_EXPECT(TYPE_ERROR)
@@ -777,23 +777,23 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	MethodInvocationOfClassUsingThisExplicitComplex,
-	"every MyClass is: MyClass -- method(MyClass @a)Here(MyClass@b)Yeah() { return this.method(@a)Here(@b)Yeah(); }",
+	"every MyClass is: MyClass -- method(MyClass c)Here(MyClass b)Yeah() { return this.method(c)Here(b)Yeah(); }",
 	PTT_VALID
 )
 
 PTT_TEST_CASE(
 	MethodInvocationOfClassUsingThisExplicitSimple,
-	"every MyClass is: MyClass -- method(MyClass @a) { return this.method(@a); }",
+	"every MyClass is: MyClass -- method(MyClass c) { return this.method(c); }",
 	PTT_VALID
 )
 
 PTT_TEST_CASE(
 	MethodInvocationOfClassUsingThisExplicitArgumentsAreTypeChecked,
 	"every MyClass is:																								\n\
-		MyClass -- argIsInvalidType(MyClass @a, Int) { return this.argIsInvalidType(@a, 'test'); }					\n\
-		MyClass -- argIsInvalidExpression(MyClass @a, Int) { return this.argIsInvalidExpression(@a, 5 + 'test'); }	\n\
-		Text -- argIsInvalidReturn(MyClass @a, Int) { return this.argIsInvalidType(@a, 5); }							\n\
-		MyClass -- argIsInvalidArgumentCount(MyClass @a, Int) { return this.argIsInvalidType(@a); }					\n\
+		MyClass -- argIsInvalidType(MyClass c, Int) { return this.argIsInvalidType(c, 'test'); }					\n\
+		MyClass -- argIsInvalidExpression(MyClass c, Int) { return this.argIsInvalidExpression(c, 5 + 'test'); }	\n\
+		Text -- argIsInvalidReturn(MyClass c, Int) { return this.argIsInvalidType(c, 5); }							\n\
+		MyClass -- argIsInvalidArgumentCount(MyClass c, Int) { return this.argIsInvalidType(c); }					\n\
 	",
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 	PTT_EXPECT(TYPE_ERROR)
