@@ -26,7 +26,7 @@ every AssertsTest is:
 		Asserts.that("George Bush")Equals("Barack Obama");
 
 		if(Asserts.haveFailed()) {
-			if(Asserts.getLastText() == "Failed asserting that Barack Obama is equal to @actual George Bush") return True;
+			if(Asserts.getLastText() == "Failed asserting that Barack Obama is equal to actual George Bush") return True;
 
 			Printer.printLine("Incorrect failure text!");
 			Printer.printLine("Real text is " + Asserts.getLastText());
@@ -68,7 +68,7 @@ every AssertsTest is:
 		Asserts.that(True)Equals(False);
 
 		if(Asserts.haveFailed()) {
-			if(Asserts.getLastText() == "Failed asserting that False is equal to @actual True") return True;
+			if(Asserts.getLastText() == "Failed asserting that False is equal to actual True") return True;
 
 			Printer.printLine("Incorrect failure text!");
 			Printer.printLine("Real text is " + Asserts.getLastText());
@@ -92,7 +92,7 @@ every AssertsTest is:
 		Asserts.that(False)Equals(True);
 
 		if(Asserts.haveFailed()) {
-			if(Asserts.getLastText() == "Failed asserting that True is equal to @actual False") return True;
+			if(Asserts.getLastText() == "Failed asserting that True is equal to actual False") return True;
 
 			Printer.printLine("Incorrect failure text!");
 			Printer.printLine("Real text is " + Asserts.getLastText());
@@ -116,7 +116,7 @@ every AssertsTest is:
 		Asserts.isTrue(False);
 
 		if(Asserts.haveFailed()) {
-			if(Asserts.getLastText() == "Failed asserting that True is equal to @actual False") return True;
+			if(Asserts.getLastText() == "Failed asserting that True is equal to actual False") return True;
 
 			Printer.printLine("Incorrect failure text!");
 			Printer.printLine("Real text is " + Asserts.getLastText());
@@ -140,7 +140,7 @@ every AssertsTest is:
 		Asserts.isFalse(True);
 
 		if(Asserts.haveFailed()) {
-			if(Asserts.getLastText() == "Failed asserting that False is equal to @actual True") return True;
+			if(Asserts.getLastText() == "Failed asserting that False is equal to actual True") return True;
 
 			Printer.printLine("Incorrect failure text!");
 			Printer.printLine("Real text is " + Asserts.getLastText());
