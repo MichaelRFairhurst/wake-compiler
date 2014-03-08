@@ -32,13 +32,13 @@ every InheritanceTest is:
 	}
 
 	Truth -- testOverrideChildFromProviderGetsChildClassName(Asserts) {
-		var InheritanceTestParent = :(InheritanceTestParent{Override} <- this);
+		var InheritanceTestParent = InheritanceTestParent{Override} <- this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestOverride");
 		return Asserts.allPassed();
 	}
 
 	Truth -- testOverrideChildAfterCastGetsChildClassName(Asserts) {
-		var InheritanceTestParent = :(InheritanceTestOverride <- this);
+		var InheritanceTestParent = InheritanceTestOverride <- this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestOverride");
 		return Asserts.allPassed();
 	}
@@ -50,13 +50,13 @@ every InheritanceTest is:
 	}
 
 	Truth -- testFallthroughChildFromProviderGetsChildClassName(Asserts) {
-		var InheritanceTestParent = :(InheritanceTestParent{Fallthrough} <- this);
+		var InheritanceTestParent = InheritanceTestParent{Fallthrough} <- this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestParent");
 		return Asserts.allPassed();
 	}
 
 	Truth -- testFallthroughChildAfterCastGetsChildClassName(Asserts) {
-		var InheritanceTestParent = :(InheritanceTestFallthrough <- this);
+		var InheritanceTestParent = InheritanceTestFallthrough <- this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestParent");
 		return Asserts.allPassed();
 	}
@@ -68,13 +68,13 @@ every InheritanceTest is:
 	}
 
 	Truth -- testImplementingChildFromProviderGetsChildClassName(Asserts) {
-		var InheritanceTestParent = :(InheritanceTestParent{Interface} <- this);
+		var InheritanceTestParent = InheritanceTestParent{Interface} <- this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestInterface");
 		return Asserts.allPassed();
 	}
 
 	Truth -- testImplementingChildAfterCastGetsChildClassName(Asserts) {
-		var InheritanceTestParent = :(InheritanceTestInterface <- this);
+		var InheritanceTestParent = InheritanceTestInterface <- this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestInterface");
 		return Asserts.allPassed();
 	}

@@ -477,7 +477,7 @@ expression:
 	;
 
 retrieval:
-	':' '(' type_retrievable retrievalargs value ')'							{ $$ = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($3), $4); AddSubNode($$, $5); }
+	type_retrievable retrievalargs value							{ $$ = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1), $2); AddSubNode($$, $3); }
 	;
 
 expressions:
