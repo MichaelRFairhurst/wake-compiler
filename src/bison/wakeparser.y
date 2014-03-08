@@ -50,7 +50,7 @@ int wakewrap()
 %token <string> STRING
 %type <string> identifier
 %token <number> NUMBER
-%token <number> TRUTH
+%token <number> BOOL
 %token <number> SYM_SHADOW
 %token <number> SYM_ARRAYED
 %type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection injection_args provision provisions injection_arg ctor retrievabledeclarableargs value method block methodreturn methodnamesegments methodbody methodaccess methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional type_valued property property_value retrievalargs retrieval objectable expression_cast
@@ -145,7 +145,7 @@ injection_providable:
 	| block																		{ $$ = $1; }
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
 	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
-	| TRUTH																		{ $$ = MakeNodeFromNumber(NT_TRUTHLIT, $1); }
+	| BOOL																		{ $$ = MakeNodeFromNumber(NT_BOOLLIT, $1); }
 	;
 
 injectionblockargs:
@@ -163,7 +163,7 @@ injection_arg:
 	type_retrievable															{ $$ = MakeNodeFromType($1); }
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
 	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
-	| TRUTH																		{ $$ = MakeNodeFromNumber(NT_TRUTHLIT, $1); }
+	| BOOL																		{ $$ = MakeNodeFromNumber(NT_BOOLLIT, $1); }
 	| SYM_CURRIER																{ $$ = MakeEmptyNode(NT_CURRIED); }
 	;
 
@@ -314,7 +314,7 @@ value:
 	| value '(' curryableexpressions ')'										{ $$ = MakeTwoBranchNode(NT_LAMBDA_INVOCATION, $1, $3); }*/
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
 	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
-	| TRUTH																		{ $$ = MakeNodeFromNumber(NT_TRUTHLIT, $1); }
+	| BOOL																		{ $$ = MakeNodeFromNumber(NT_BOOLLIT, $1); }
 	| retrieval																	{ $$ = $1; }
 	| '(' expression ')'														{ $$ = $2; }
 	| '[' expressions ']'														{ $$ = MakeOneBranchNode(NT_ARRAY_DECLARATION, $2); }

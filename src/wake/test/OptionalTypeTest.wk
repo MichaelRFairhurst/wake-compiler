@@ -1,33 +1,33 @@
 every OptionalTypeTest is:
 
-	Truth -- testOptionalIntNeverSet() {
+	Bool -- testOptionalIntNeverSet() {
 		var Int? = nothing;
 		if Int exists {
-			return False;
+			return false;
 		}
-		return True;
+		return true;
 	}
 
-	Truth -- testOptionalIntSet() {
+	Bool -- testOptionalIntSet() {
 		var Int? = 5;
 		if Int exists {
 			return Int == 5;
 		}
-		return False;
+		return false;
 	}
 
-	Truth -- testOptionalIntNotSetWillHitElse() {
+	Bool -- testOptionalIntNotSetWillHitElse() {
 		var Int? = nothing;
 		if Int exists {} else {
-			return True;
+			return true;
 		}
-		return False;
+		return false;
 	}
 
-	Truth -- testOptionalIntSetWontHitElse() {
+	Bool -- testOptionalIntSetWontHitElse() {
 		var Int? = 5;
 		if Int exists {} else {
-			return False;
+			return false;
 		}
-		return True;
+		return true;
 	}

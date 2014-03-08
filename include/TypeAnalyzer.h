@@ -24,7 +24,7 @@ class TypeAnalyzer {
 		Type* getCommonSubtypeOf(Type* a, Type* b);
 		bool isPrimitiveTypeInt(Type* theint);
 		bool isPrimitiveTypeText(Type* theint);
-		bool isPrimitiveTypeTruth(Type* theint);
+		bool isPrimitiveTypeBool(Type* theint);
 		string getNameForType(Type* type);
 
 };

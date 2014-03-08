@@ -49,7 +49,7 @@
 #define NT_CURRIED 33
 #define NT_STRINGLIT 34
 #define NT_NUMBERLIT 35
-#define NT_TRUTHLIT 36
+#define NT_BOOLLIT 36
 #define NT_ALIAS 37
 
 #define NT_ARRAY_ACCESS 38

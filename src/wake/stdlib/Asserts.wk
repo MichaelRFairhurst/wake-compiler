@@ -9,25 +9,25 @@ every Asserts is:
 
 	needs Printer;
 
-	with Truth hasfailed = False;
+	with Bool hasfailed = false;
 	with Text lasttext = "";
 
-	that(actual Truth)Equals(Truth) {
-		if(Truth != actual) {
+	that(actual Bool)Equals(Bool) {
+		if(Bool != actual) {
 			lasttext = "Failed asserting that ";
-			if(Truth) lasttext = lasttext + "True is equal to actual False";
-			else lasttext = lasttext + "False is equal to actual True";
+			if(Bool) lasttext = lasttext + "true is equal to actual false";
+			else lasttext = lasttext + "false is equal to actual true";
 			Printer.printLine(lasttext);
-			hasfailed = True;
+			hasfailed = true;
 		}
 	}
 
-	isFalse(Truth) {
-		that(Truth)Equals(False);
+	isFalse(Bool) {
+		that(Bool)Equals(false);
 	}
 
-	isTrue(Truth) {
-		that(Truth)Equals(True);
+	isTrue(Bool) {
+		that(Bool)Equals(true);
 	}
 
 	that(actual Int)Equals(Int) {
@@ -36,7 +36,7 @@ every Asserts is:
 			Printer.printLine(lasttext);
 			Printer.printLine(Int);
 			Printer.printLine(actual);
-			hasfailed = True;
+			hasfailed = true;
 		}
 	}
 
@@ -44,7 +44,7 @@ every Asserts is:
 		if(Text != actual) {
 			lasttext = "Failed asserting that " + Text + " is equal to actual " + actual;
 			Printer.printLine(lasttext);
-			hasfailed = True;
+			hasfailed = true;
 		}
 	}
 
@@ -52,7 +52,7 @@ every Asserts is:
 	# This is only for until we can provide and then
 	# watch an ErrorCounter instance.
 	##
-	Truth -- haveFailed() {
+	Bool -- haveFailed() {
 		return hasfailed;
 	}
 
@@ -60,7 +60,7 @@ every Asserts is:
 	# This is only for until we can provide and then
 	# watch an ErrorCounter instance.
 	##
-	Truth -- allPassed() {
+	Bool -- allPassed() {
 		return !hasfailed;
 	}
 

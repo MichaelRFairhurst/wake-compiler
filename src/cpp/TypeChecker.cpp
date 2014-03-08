@@ -116,9 +116,9 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				ret->typedata._class.classname = strdup("Int");
 				break;
 
-			case NT_TRUTHLIT:
+			case NT_BOOLLIT:
 				ret = MakeType(TYPE_CLASS);
-				ret->typedata._class.classname = strdup("Truth");
+				ret->typedata._class.classname = strdup("Bool");
 				break;
 
 			case NT_ALIAS:
@@ -236,7 +236,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 			case NT_GREATERTHANEQUAL:
 				{
 					ret = MakeType(TYPE_CLASS);
-					ret->typedata._class.classname = strdup("Truth");
+					ret->typedata._class.classname = strdup("Bool");
 
 					Type* a = typeCheck(tree->node_data.nodes[0]);
 					Type* b = typeCheck(tree->node_data.nodes[1]);
@@ -266,7 +266,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					Type* a = typeCheck(tree->node_data.nodes[0]);
 					Type* b = typeCheck(tree->node_data.nodes[1]);
 					ret = MakeType(TYPE_CLASS);
-					ret->typedata._class.classname = strdup("Truth");
+					ret->typedata._class.classname = strdup("Bool");
 
 					if(!analyzer->isASubtypeOfB(a, b) && !analyzer->isASubtypeOfB(b, a)) {
 						expectedstring = analyzer->getNameForType(a);
@@ -285,19 +285,19 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					ret = typeCheck(tree->node_data.nodes[0]);
 					Type* cmp = typeCheck(tree->node_data.nodes[1]);
 
-					if(!analyzer->isPrimitiveTypeTruth(ret) || !analyzer->isPrimitiveTypeTruth(cmp)) {
-						if(analyzer->isPrimitiveTypeTruth(ret)) {
+					if(!analyzer->isPrimitiveTypeBool(ret) || !analyzer->isPrimitiveTypeBool(cmp)) {
+						if(analyzer->isPrimitiveTypeBool(ret)) {
 							erroneousstring = analyzer->getNameForType(cmp);
 						} else {
 							erroneousstring = analyzer->getNameForType(ret); freeType(ret);
 							ret = MakeType(TYPE_CLASS);
-							ret->typedata._class.classname = strdup("Truth");
+							ret->typedata._class.classname = strdup("Bool");
 						}
 						freeType(cmp);
 
-						expectedstring = "Truth";
+						expectedstring = "Bool";
 
-						throw string("AND or OR comparison on non-Truth types");
+						throw string("AND or OR comparison on non-Bool types");
 					}
 
 					freeType(cmp);
@@ -307,14 +307,14 @@ Type* TypeChecker::typeCheck(Node* tree) {
 			case NT_INVERT:
 				ret = typeCheck(tree->node_data.nodes[0]);
 
-				if(!analyzer->isPrimitiveTypeTruth(ret)) {
-					expectedstring = "Truth";
+				if(!analyzer->isPrimitiveTypeBool(ret)) {
+					expectedstring = "Bool";
 					erroneousstring = analyzer->getNameForType(ret);
 					freeType(ret);
 					ret = MakeType(TYPE_CLASS);
-					ret->typedata._class.classname = strdup("Truth");
+					ret->typedata._class.classname = strdup("Bool");
 					ret->arrayed = 0;
-					throw string("If conditions must be Truths");
+					throw string("If conditions must be Bool");
 				}
 				break;
 
@@ -347,11 +347,11 @@ Type* TypeChecker::typeCheck(Node* tree) {
 						freeType(typeCheck(tree->node_data.nodes[2]));
 					}
 
-					if(!analyzer->isPrimitiveTypeTruth(ret)) {
-						expectedstring = "Truth"; freeType(ret);
+					if(!analyzer->isPrimitiveTypeBool(ret)) {
+						expectedstring = "Bool"; freeType(ret);
 						ret = MakeType(TYPE_CLASS);
-						ret->typedata._class.classname = strdup("Truth");
-						throw string("If/While conditions must be Truths");
+						ret->typedata._class.classname = strdup("Bool");
+						throw string("If/While conditions must be Bool");
 					}
 				}
 				break;
@@ -363,11 +363,11 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					freeType(typeCheck(tree->node_data.nodes[2]));
 					freeType(typeCheck(tree->node_data.nodes[3]));
 
-					if(!analyzer->isPrimitiveTypeTruth(ret)) {
-						expectedstring = "Truth"; freeType(ret);
+					if(!analyzer->isPrimitiveTypeBool(ret)) {
+						expectedstring = "Bool"; freeType(ret);
 						ret = MakeType(TYPE_CLASS);
-						ret->typedata._class.classname = strdup("Truth");
-						throw string("For conditions must be Truths");
+						ret->typedata._class.classname = strdup("Bool");
+						throw string("For conditions must be Bool");
 					}
 				}
 				break;

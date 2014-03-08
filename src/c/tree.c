@@ -28,7 +28,7 @@ void initTreeTypes() {
 	nodenames[NT_SUBCLASS] = "NT_SUBCLASS";
 	nodenames[NT_IMPORTTARGET] = "NT_IMPORTTARGET";
 	nodenames[NT_BLOCK] = "NT_BLOCK";
-	nodenames[NT_TRUTHLIT] = "NT_TRUTHLIT";
+	nodenames[NT_BOOLLIT] = "NT_BOOLLIT";
 	nodenames[NT_STRINGLIT] = "NT_STRINGLIT";
 	nodenames[NT_NUMBERLIT] = "NT_NUMBERLIT";
 	nodenames[NT_CLASSNAME] = "NT_CLASSNAME";

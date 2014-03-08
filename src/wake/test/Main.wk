@@ -18,18 +18,18 @@ every Main is:
 
 	provides Printer, Asserts;
 
-	with Truth passed = True;
+	with Bool passed = true;
 	with Int totalcount = 0;
 	with Int failedcount = 0;
 	with Int passedcount = 0;
 	with Text[] failed = [];
 
-	Run(Truth result, test Text) {
+	Run(Bool result, test Text) {
 		totalcount = totalcount + 1;
 		if(!result) {
 			failed[failedcount] = test;
 			failedcount = failedcount + 1;
-			passed = False;
+			passed = false;
 			Printer.print("F");
 		} else {
 			Printer.print(".");
@@ -105,11 +105,11 @@ every Main is:
 #>
 every TernaryOperatorTest is:
 
-	Truth -- testTrue(Asserts) {
-		return True ? True : False;
+	Bool -- testTrue(Asserts) {
+		return true ? true : false;
 	}
 
-	Truth -- testFalse(Asserts) {
-		return False ? False : True;
+	Bool -- testFalse(Asserts) {
+		return false ? false : true;
 	}
 ##

@@ -101,8 +101,8 @@ var						count(); return VAR;
 \$+						count(); wakelval.number = strlen(waketext); return SYM_SHADOW;
 (\[\])+					count(); wakelval.number = strlen(waketext)>>1; return SYM_ARRAYED;
 
-True					count(); wakelval.number = 1; return TRUTH;
-False					count(); wakelval.number = 0; return TRUTH;
+true					count(); wakelval.number = 1; return BOOL;
+false					count(); wakelval.number = 0; return BOOL;
 [0-9]+(\.[0-9]+)?		count(); wakelval.number = atof(waketext); return NUMBER;
 \{[a-zA-Z0-9]+\}		count(); wakelval.string = keepInner(waketext); return SPECIALTY;
 [a-z][a-zA-Z0-9]*		count(); wakelval.string = strdup(waketext); return LIDENTIFIER;

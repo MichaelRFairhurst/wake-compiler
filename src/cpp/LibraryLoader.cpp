@@ -18,7 +18,7 @@ void LibraryLoader::loadStdLibToTable(ObjectSymbolTable* table) {
 	table->importClass(ptable);
 
 	ptable = table->getEmptyPropertySymbolTable();
-	ptable->classname = "Truth";
+	ptable->classname = "Bool";
 	table->importClass(ptable);
 
 	ptable = table->getEmptyPropertySymbolTable();

@@ -313,14 +313,14 @@ PTT_TEST_CASE(
 			5 + 5 + 5;					// done thrice to ensure int returned		\n\
 			5 - 5 - 5;					// done thrice to ensure int returned		\n\
 			'test' + 'test' + 'test';	// done thrice to ensure string returned	\n\
-			'test' == 'test' == True;	// test returns truth						\n\
-			'test' != 'test' == True;	// test returns truth						\n\
-			5 == 5 == True;				// test returns truth						\n\
-			5 != 5 == True;				// test returns truth						\n\
-			5 < 5 == True;				// test returns truth						\n\
-			5 > 5 == True;				// test returns truth						\n\
-			5 <= 5 == True;				// test returns truth						\n\
-			5 >= 5 == True;				// test returns truth						\n\
+			'test' == 'test' == true;	// test returns truth						\n\
+			'test' != 'test' == true;	// test returns truth						\n\
+			5 == 5 == true;				// test returns truth						\n\
+			5 != 5 == true;				// test returns truth						\n\
+			5 < 5 == true;				// test returns truth						\n\
+			5 > 5 == true;				// test returns truth						\n\
+			5 <= 5 == true;				// test returns truth						\n\
+			5 >= 5 == true;				// test returns truth						\n\
 		}																			\n\
 	",
 	PTT_VALID
@@ -365,10 +365,10 @@ PTT_TEST_CASE(
 )
 
 PTT_TEST_CASE(
-	AndOperatorAndOrOperatorReturnTruths,
+	AndOperatorAndOrOperatorReturnBools,
 	"every MyClass is:									\n\
-		andTruths() { True && True && True; }			\n\
-		orTruths() { True || True || True; }			\n\
+		andBools() { true && true && true; }			\n\
+		orBools() { true || true || true; }			\n\
 	",
 	PTT_VALID
 )
@@ -401,7 +401,7 @@ PTT_TEST_CASE(
 )
 
 PTT_TEST_CASE(
-	CannotIfCondOrInvertWithAnythingButTruths,
+	CannotIfCondOrInvertWithAnythingButBools,
 	"every MyClass is:											\n\
 		ifConditionWithInt() { if(5) 5; }						\n\
 		ifConditionWith( MyClass ) { if(MyClass) 5; }			\n\
@@ -433,18 +433,18 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	CatchesTypeErrorsWithinIfElseAndInvertWorks,
 	"every MyClass is:													\n\
-		failInIf() { if(True) 5 + 'illegal'; }							\n\
-		failInElse() { if(True) 5; else 5 + 'illegal'; }				\n\
-		failInIfInverted() { if(!True) 5 + 'illegal'; }					\n\
-		failInElseInverted() { if(!True) 5; else 5 + 'illegal'; }		\n\
-		failInWhile() { while(!True) 5 + 'illegal'; }					\n\
-		failInWhileInverted() { while(!True) 5 + 'illegal'; }			\n\
-		failInFor() { for(5; !True; 5) 5 + 'illegal'; }					\n\
-		failInForInverted() { for(5; !True; 5) 5 + 'illegal'; }			\n\
-		failInForInit() { for(5 + 'illegal'; !True; 5) 5; }				\n\
-		failInForInitInverted() { for( 5 + 'illegal'; !True; 5) 5; }	\n\
-		failInForIncr() { for(5; !True; 5 + 'illegal') 5; }				\n\
-		failInForIncrInverted() { for(5; !True; 5 + 'illegal') 5; }		\n\
+		failInIf() { if(true) 5 + 'illegal'; }							\n\
+		failInElse() { if(true) 5; else 5 + 'illegal'; }				\n\
+		failInIfInverted() { if(!true) 5 + 'illegal'; }					\n\
+		failInElseInverted() { if(!true) 5; else 5 + 'illegal'; }		\n\
+		failInWhile() { while(!true) 5 + 'illegal'; }					\n\
+		failInWhileInverted() { while(!true) 5 + 'illegal'; }			\n\
+		failInFor() { for(5; !true; 5) 5 + 'illegal'; }					\n\
+		failInForInverted() { for(5; !true; 5) 5 + 'illegal'; }			\n\
+		failInForInit() { for(5 + 'illegal'; !true; 5) 5; }				\n\
+		failInForInitInverted() { for( 5 + 'illegal'; !true; 5) 5; }	\n\
+		failInForIncr() { for(5; !true; 5 + 'illegal') 5; }				\n\
+		failInForIncrInverted() { for(5; !true; 5 + 'illegal') 5; }		\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -463,12 +463,12 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ValidIfConditions,
 	"every MyClass is:											\n\
-		truthLiterals() { if(True) 5; if(False) 5; }			\n\
-		truthVariable(Truth) { if(Truth) 5; }					\n\
-		truthAlias(Truth b) { if(b) 5; }						\n\
-		truthLiteralsWhile() { while(True) 5; while(False) 5; }	\n\
-		truthVariableWhile(Truth) { while(Truth) 5; }			\n\
-		truthAliasWhile(Truth b) { while(b) 5; }				\n\
+		truthLiterals() { if(true) 5; if(false) 5; }			\n\
+		truthVariable(Bool) { if(Bool) 5; }					\n\
+		truthAlias(Bool b) { if(b) 5; }						\n\
+		truthLiteralsWhile() { while(true) 5; while(false) 5; }	\n\
+		truthVariableWhile(Bool) { while(Bool) 5; }			\n\
+		truthAliasWhile(Bool b) { while(b) 5; }				\n\
 	",
 	PTT_VALID
 )
@@ -478,19 +478,19 @@ PTT_TEST_CASE(
 	"every UnrelatedClass is:																\n\
 	every ParentClass is:																	\n\
 	every MyClass (a ParentClass) is:														\n\
-		Truth -- returnTextLiteralAsTruth() { return 'text'; }								\n\
-		Truth -- returnNumberLiteralAsTruth() { return 1; }									\n\
-		Truth -- returnClassAsTruth(MyClass) { return MyClass; }							\n\
-		Truth -- returnNothingAsTruth() { return; }											\n\
-		Text -- returnTruthLiteralAsText() { return True; }									\n\
+		Bool -- returnTextLiteralAsBool() { return 'text'; }								\n\
+		Bool -- returnNumberLiteralAsBool() { return 1; }									\n\
+		Bool -- returnClassAsBool(MyClass) { return MyClass; }							\n\
+		Bool -- returnNothingAsBool() { return; }											\n\
+		Text -- returnBoolLiteralAsText() { return true; }									\n\
 		Text -- returnNumberLiteralAsText() { return 1; }									\n\
 		Text -- returnClassAsText(MyClass) { return MyClass; }								\n\
 		Text -- returnNothingAsText() { return; }											\n\
-		Int -- returnTruthLiteralAsInt() { return True; }									\n\
+		Int -- returnBoolLiteralAsInt() { return true; }									\n\
 		Int -- returnTextLiteralAsInt() { return 'text'; }									\n\
 		Int -- returnClassAsInt(MyClass) { return MyClass; }								\n\
 		Int -- returnNothingAsInt() { return; }												\n\
-		MyClass -- returnTruthLiteralAsClass() { return True; }								\n\
+		MyClass -- returnBoolLiteralAsClass() { return true; }								\n\
 		MyClass -- returnTextLiteralAsClass() { return 'test'; }							\n\
 		MyClass -- returnIntLiteralAsClass() { return 1; }									\n\
 		MyClass -- returnUnrelatedClassAsClass(UnrelatedClass) { return UnrelatedClass; }	\n\
@@ -499,7 +499,7 @@ PTT_TEST_CASE(
 		returnTextLiteralInVoidMethod() { return 'text'; }									\n\
 		returnNumberLiteralInVoidMethod() { return 1; }										\n\
 		returnClassInVoidMethod(MyClass) { return MyClass; }								\n\
-		returnTruthLiteralInVoidMethod() { return True; }									\n\
+		returnBoolLiteralInVoidMethod() { return true; }									\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -529,7 +529,7 @@ PTT_TEST_CASE(
 	ValidReturnValues,
 	"every RelatedClass (a MyClass) is:												\n\
 	every MyClass is:																\n\
-		Truth -- returnTruth() { return True; }										\n\
+		Bool -- returnBool() { return true; }										\n\
 		Text -- returnText() { return 'text'; }										\n\
 		Int -- returnInt() { return 5; }											\n\
 		MyClass -- returnAMyClass(MyClass) { return MyClass; }						\n\
@@ -545,10 +545,10 @@ PTT_TEST_CASE(
 	"every UnrelatedClass is:												\n\
 	every ParentClass is:													\n\
 	every MyClass (a ParentClass) is:										\n\
-		assignTruthTo(Int) { Int = True; }									\n\
+		assignBoolTo(Int) { Int = true; }									\n\
 		assignTextTo(Int) { Int = 'text'; }									\n\
 		assignA(MyClass)To(Int) { Int = MyClass; }							\n\
-		assignTruthTo(Text) { Text = True; }								\n\
+		assignBoolTo(Text) { Text = true; }								\n\
 		assignIntTo(Text) { Text = 5; }										\n\
 		assignA(MyClass)To(Text) { Text = MyClass; }						\n\
 		assignAn(UnrelatedClass)To(MyClass) { MyClass = UnrelatedClass; }	\n\
@@ -568,7 +568,7 @@ PTT_TEST_CASE(
 	ValidAssignments,
 	"every ParentClass is:											\n\
 	every MyClass (a ParentClass) is:								\n\
-		assignTruthTo(Truth) { Truth = True; }						\n\
+		assignBoolTo(Bool) { Bool = true; }						\n\
 		assignTextTo(Text) { Text = 'text'; }						\n\
 		assignIntTo(Int) { Int = 5; }								\n\
 		assign(MyClass c)To(MyClass b) { c = b; }				\n\
@@ -582,13 +582,13 @@ PTT_TEST_CASE(
 	"every UnrelatedClass is: every ParentClass is:							\n\
 	every MyClass (a ParentClass) is:										\n\
 		call(fn(Text) lambda)WithInt() { lambda(4); }								\n\
-		call(fn(Text) lambda)WithTruth() { lambda(True); }						\n\
+		call(fn(Text) lambda)WithBool() { lambda(true); }						\n\
 		call(fn(Text) lambda)With(MyClass) { lambda(MyClass); }					\n\
-		call(fn(Truth) lambda)With(MyClass) { lambda(MyClass); }					\n\
-		call(fn(Truth) lambda)WithInt() { lambda(4); }							\n\
-		call(fn(Truth) lambda)WithText() { lambda('test'); }						\n\
+		call(fn(Bool) lambda)With(MyClass) { lambda(MyClass); }					\n\
+		call(fn(Bool) lambda)WithInt() { lambda(4); }							\n\
+		call(fn(Bool) lambda)WithText() { lambda('test'); }						\n\
 		call(fn(Int) lambda)WithText() { lambda('test'); }						\n\
-		call(fn(Int) lambda)WithTruth() { lambda(True); }							\n\
+		call(fn(Int) lambda)WithBool() { lambda(true); }							\n\
 		call(fn(Int) lambda)With(MyClass) { lambda(MyClass); }					\n\
 		call(fn(Int, Text) lambda)WithTextInt() { lambda('abc', 4); }				\n\
 		call(fn(MyClass) lambda)With(UnrelatedClass) { lambda(UnrelatedClass); }	\n\
@@ -615,26 +615,26 @@ PTT_TEST_CASE(
 																														\n\
 		call(fn(Text) lambda)WithText() { lambda('test'); }																	\n\
 																														\n\
-		call(fn(Truth) lambda)WithTruth() { lambda(True); }																	\n\
+		call(fn(Bool) lambda)WithBool() { lambda(true); }																	\n\
 																														\n\
 		call(fn(Int) lambda)WithInt() { lambda(4); }																			\n\
 																														\n\
 		call(fn(ParentClass) lambda)With(MyClass) { lambda(MyClass); }														\n\
 																														\n\
-		Text -- call(Text -- fn(Text, Int, Truth, ParentClass) lambda)WithProperArgsAnd(MyClass) {							\n\
-			return lambda('text', 4, True, MyClass);																		\n\
+		Text -- call(Text -- fn(Text, Int, Bool, ParentClass) lambda)WithProperArgsAnd(MyClass) {							\n\
+			return lambda('text', 4, true, MyClass);																		\n\
 		}																												\n\
 																														\n\
-		Int -- call(Int -- fn(Int, Truth, ParentClass, Text) lambda)WithProperArgsAnd(MyClass) {							\n\
-			return lambda(4, True, MyClass, 'text');																		\n\
+		Int -- call(Int -- fn(Int, Bool, ParentClass, Text) lambda)WithProperArgsAnd(MyClass) {							\n\
+			return lambda(4, true, MyClass, 'text');																		\n\
 		}																												\n\
 																														\n\
-		Truth -- call(Truth -- fn(Truth, ParentClass, Text, Int) lambda)WitProperArgsAnd(MyClass) {						\n\
-			return lambda(True, MyClass, 'text', 4);																		\n\
+		Bool -- call(Bool -- fn(Bool, ParentClass, Text, Int) lambda)WitProperArgsAnd(MyClass) {						\n\
+			return lambda(true, MyClass, 'text', 4);																		\n\
 		}																												\n\
 																														\n\
-		MyClass -- call(MyClass -- fn(ParentClass, Truth, Text, Int) lambda)WithProperArgsAnd(MyClass) {					\n\
-			return lambda(MyClass, True, 'text', 4);																		\n\
+		MyClass -- call(MyClass -- fn(ParentClass, Bool, Text, Int) lambda)WithProperArgsAnd(MyClass) {					\n\
+			return lambda(MyClass, true, 'text', 4);																		\n\
 		}																												\n\
 	",
 	PTT_VALID
@@ -706,7 +706,7 @@ PTT_TEST_CASE(
 	CtorBodyIsTypeChecked,
 	"every MyClass is:			\n\
 		needs nothing then {	\n\
-			5 + True;			\n\
+			5 + true;			\n\
 		}",
 	PTT_EXPECT(TYPE_ERROR)
 )
@@ -847,55 +847,55 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	BreakAndContinueWithinForOrWhileIsOK,
-	"every MyClass is: afn() { while(True) { while(True) { break; continue; } for(5; True; 5) { break; continue; }; break; continue; } }",
+	"every MyClass is: afn() { while(true) { while(true) { break; continue; } for(5; true; 5) { break; continue; }; break; continue; } }",
 	PTT_VALID
 )
 
 PTT_TEST_CASE(
 	InexhaustiveReturnFromIfsWithoutElses,
-	"every MyClass is: Truth -- afn() { if(True) return True; if(True) return True; if(True) return True; }",
+	"every MyClass is: Bool -- afn() { if(true) return true; if(true) return true; if(true) return true; }",
 	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
 )
 
 PTT_TEST_CASE(
 	InexhaustiveReturnFromIfsWithoutReturns,
-	"every MyClass is: Truth -- afn() { if(True) 5; else return True; if(True) 5; else return True; }",
+	"every MyClass is: Bool -- afn() { if(true) 5; else return true; if(true) 5; else return true; }",
 	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
 )
 
 PTT_TEST_CASE(
 	InexhaustiveReturnFromElsesWithoutReturns,
-	"every MyClass is: Truth -- afn() { if(True) return True; else 5; if(True) return True; else 5; }",
+	"every MyClass is: Bool -- afn() { if(true) return true; else 5; if(true) return true; else 5; }",
 	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
 )
 
 PTT_TEST_CASE(
 	InexhaustiveReturnFromReturningWithinLoopsOnly,
-	"every MyClass is: Truth -- afn() { while(True) return True; for(1; True; 1) return True; }",
+	"every MyClass is: Bool -- afn() { while(true) return true; for(1; true; 1) return true; }",
 	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
 )
 
 PTT_TEST_CASE(
 	InexhaustiveReturnFromNoReturn,
-	"every MyClass is: Truth -- afn() { 5 + 5; 6 + 6; 8 + 9 + 7; }",
+	"every MyClass is: Bool -- afn() { 5 + 5; 6 + 6; 8 + 9 + 7; }",
 	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
 )
 
 PTT_TEST_CASE(
 	InexhaustiveReturnComplicated,
 	"every MyClass is:				\n\
-		Truth -- afn() {			\n\
-			if(True) {				\n\
-				if(True) {			\n\
+		Bool -- afn() {			\n\
+			if(true) {				\n\
+				if(true) {			\n\
 					5 + 5;			\n\
 					6 + 6;			\n\
-					return True;	\n\
+					return true;	\n\
 				}					\n\
 			} else {				\n\
 				5 + 6;				\n\
 				7 == 10;			\n\
-				while(True) {		\n\
-					return True;	\n\
+				while(true) {		\n\
+					return true;	\n\
 				}					\n\
 			}						\n\
 			6 + 7;					\n\
@@ -906,20 +906,20 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ExhaustiveReturnComplicated,
 	"every MyClass is:				\n\
-		Truth -- afn() {			\n\
-			if(True) {				\n\
-				if(True) {			\n\
+		Bool -- afn() {			\n\
+			if(true) {				\n\
+				if(true) {			\n\
 					5 + 5;			\n\
 					6 + 6;			\n\
-					return True;	\n\
+					return true;	\n\
 				} else {			\n\
 					7 / 16;			\n\
 				}					\n\
-				return True;		\n\
+				return true;		\n\
 			} else {				\n\
 				5 + 6;				\n\
 				7 == 10;			\n\
-				return True;		\n\
+				return true;		\n\
 			}						\n\
 			6 + 7;					\n\
 	}",
@@ -952,7 +952,7 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	TestDeclareAnIntIsScoped,
-	"every MyClass is: Int -- myfn() { if(True) { var Int = 5; } return Int; }",
+	"every MyClass is: Int -- myfn() { if(true) { var Int = 5; } return Int; }",
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 )
 
@@ -1265,19 +1265,19 @@ PTT_TEST_CASE(
 		with MyClass[] = [];								\n\
 		with Int[] = [];									\n\
 		with Text[] = [];									\n\
-		with Truth[] = [];									\n\
+		with Bool[] = [];									\n\
 		assignIntToMyClasses() { MyClass[1] = 5; }			\n\
 		assignTextToMyClasses() { MyClass[1] = 'test'; }	\n\
-		assignTruthToMyClasses() { MyClass[1] = True; }		\n\
+		assignBoolToMyClasses() { MyClass[1] = true; }		\n\
 		assignMyClassToInts() { Int[1] = this; }			\n\
 		assignTextToInts() { Int[1] = 'test'; }				\n\
-		assignTruthToInts() { Int[1] = True; }				\n\
+		assignBoolToInts() { Int[1] = true; }				\n\
 		assignMyClassToTexts() { Text[1] = this; }			\n\
 		assignIntToTexts() { Text[1] = 4; }					\n\
-		assignTruthToTexts() { Text[1] = True; }			\n\
-		assignMyClassToTruths() { Truth[1] = this; }		\n\
-		assignIntToTruths() { Truth[1] = 4; }				\n\
-		assignTextToTruths() { Truth[1] = 'test'; }			\n\
+		assignBoolToTexts() { Text[1] = true; }			\n\
+		assignMyClassToBools() { Bool[1] = this; }		\n\
+		assignIntToBools() { Bool[1] = 4; }				\n\
+		assignTextToBools() { Bool[1] = 'test'; }			\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -1299,15 +1299,15 @@ PTT_TEST_CASE(
 		with MyClass[][] = [];								\n\
 		with Int[][] = [];									\n\
 		with Text[][] = [];									\n\
-		with Truth[][] = [];								\n\
+		with Bool[][] = [];								\n\
 		assignToMyClasses() { MyClass[][] = []; }			\n\
 		assignToMyClassesIndex() { MyClass[1] = []; }		\n\
 		assignToInts() { Int[][] = []; }					\n\
 		assignToIntsIndex() { Int[1] = []; }				\n\
 		assignToTexts() { Text[][] = []; }					\n\
 		assignToTextsIndex() { Text[1] = []; }				\n\
-		assignToTruths() { Truth[][] = []; }				\n\
-		assignToTruthsIndex() { Truth[1] = []; }			\n\
+		assignToBools() { Bool[][] = []; }				\n\
+		assignToBoolsIndex() { Bool[1] = []; }			\n\
 	",
 	PTT_VALID
 );
@@ -1318,14 +1318,14 @@ PTT_TEST_CASE(
 		with $Int = [];										\n\
 		with $Text = [];									\n\
 		with $MyClass = [];									\n\
-		with $Truth = [];									\n\
+		with $Bool = [];									\n\
 		with Int[] = []; //valid							\n\
 		with Text[] = []; //valid							\n\
-		with Truth[] = []; //valid							\n\
+		with Bool[] = []; //valid							\n\
 		with MyClass[] = []; //valid						\n\
 		assignToIntsIndex() { Int[1] = []; }				\n\
 		assignToTextsIndex() { Text[1] = []; }				\n\
-		assignToTruthsIndex() { Truth[1] = []; }			\n\
+		assignToBoolsIndex() { Bool[1] = []; }			\n\
 		assignToMyClassesIndex() { MyClass[1] = []; }		\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
@@ -1605,16 +1605,16 @@ PTT_TEST_CASE(
 );
 
 PTT_TEST_CASE(
-	OptionalIntsTruthsAndTextsCantBeUsed,
+	OptionalIntsBoolsAndTextsCantBeUsed,
 	"every MyClass is:											\n\
 		addOptionalInts(Int?, $Int?) { Int + $Int; }			\n\
 		subtractOptionalInts(Int?, $Int?) { Int - $Int; }		\n\
 		divideOptionalInts(Int?, $Int?) { Int / $Int; }			\n\
 		multiplyOptionalInts(Int?, $Int?) { Int * $Int; }		\n\
 		concatOptionalTexts(Text?, $Text?) { Text * Text; }		\n\
-		notOptionalTruth(Truth?) { !Truth; }					\n\
-		andOptionalTruths(Truth?, $Truth?) { Truth && $Truth; }	\n\
-		orOptionalTruths(Truth?, $Truth?) { Truth || $Truth; }	\n\
+		notOptionalBool(Bool?) { !Bool; }					\n\
+		andOptionalBools(Bool?, $Bool?) { Bool && $Bool; }	\n\
+		orOptionalBools(Bool?, $Bool?) { Bool || $Bool; }	\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -1641,9 +1641,9 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ReturningWithinExistsIsNotExhaustive,
 	"every MyClass is:				\n\
-		Truth -- myMethod(Int?) {	\n\
+		Bool -- myMethod(Int?) {	\n\
 			if Int exists {			\n\
-				return True;		\n\
+				return true;		\n\
 			}						\n\
 		}",
 	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
@@ -1652,10 +1652,10 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ReturningWithinExistsElseIsNotExhaustive,
 	"every MyClass is:				\n\
-		Truth -- myMethod(Int?) {	\n\
+		Bool -- myMethod(Int?) {	\n\
 			if Int exists {			\n\
 			} else {				\n\
-				return True;		\n\
+				return true;		\n\
 			}						\n\
 		}",
 	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
@@ -1664,9 +1664,9 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ReturningWithinExistsWithAnElseIsNotExhaustive,
 	"every MyClass is:				\n\
-		Truth -- myMethod(Int?) {	\n\
+		Bool -- myMethod(Int?) {	\n\
 			if Int exists {			\n\
-				return True;		\n\
+				return true;		\n\
 			} else {				\n\
 			}						\n\
 		}",
@@ -1676,11 +1676,11 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ReturningWithinExistsAndElseIsExhaustive,
 	"every MyClass is:				\n\
-		Truth -- myMethod(Int?) {	\n\
+		Bool -- myMethod(Int?) {	\n\
 			if Int exists {			\n\
-				return True;		\n\
+				return true;		\n\
 			} else {				\n\
-				return False;		\n\
+				return false;		\n\
 			}						\n\
 		}",
 	PTT_VALID

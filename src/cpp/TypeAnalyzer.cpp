@@ -33,8 +33,8 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 		if(a->typedata.lambda.arguments->typecount != b->typedata.lambda.arguments->typecount)
 			return false;
 
-		// Truth -- fn() is a subtype of void -- fn(), since the subtype will simply ignore the returnval
-		// however, void --fn() is not a subtype of Truth -- fn() as you probably guessed
+		// Bool -- fn() is a subtype of void -- fn(), since the subtype will simply ignore the returnval
+		// however, void --fn() is not a subtype of Bool -- fn() as you probably guessed
 		if(a->typedata.lambda.returntype == NULL && b->typedata.lambda.returntype != NULL)
 			return false;
 		else if(b->typedata.lambda.returntype != NULL && !isASubtypeOfB(a->typedata.lambda.returntype, b->typedata.lambda.returntype))
@@ -123,9 +123,9 @@ bool TypeAnalyzer::isPrimitiveTypeText(Type* type) {
 	return type->type != TYPE_LAMBDA && type->typedata._class.classname == string("Text") && type->arrayed == 0 && type->optional == 0;
 }
 
-bool TypeAnalyzer::isPrimitiveTypeTruth(Type* type) {
+bool TypeAnalyzer::isPrimitiveTypeBool(Type* type) {
 	if(type->type == TYPE_MATCHALL) return true;
-	return type->type != TYPE_LAMBDA && type->typedata._class.classname == string("Truth") && type->arrayed == 0 && type->optional == 0;
+	return type->type != TYPE_LAMBDA && type->typedata._class.classname == string("Bool") && type->arrayed == 0 && type->optional == 0;
 }
 
 string TypeAnalyzer::getNameForType(Type* type) {

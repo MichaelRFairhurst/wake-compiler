@@ -2,60 +2,60 @@ import Asserts;
 
 every BooleanLogicTest is:
 
-	Truth -- testNot(Asserts) {
-		Asserts.that(!True)Equals(False);
-		Asserts.that(!False)Equals(True);
+	Bool -- testNot(Asserts) {
+		Asserts.that(!true)Equals(false);
+		Asserts.that(!false)Equals(true);
 		return Asserts.allPassed();
 	}
 
-	Truth -- testOr(Asserts) {
-		Asserts.that(True  || True)Equals(True);
-		Asserts.that(False || True)Equals(True);
-		Asserts.that(True  || False)Equals(True);
-		Asserts.that(False || False)Equals(False);
+	Bool -- testOr(Asserts) {
+		Asserts.that(true  || true)Equals(true);
+		Asserts.that(false || true)Equals(true);
+		Asserts.that(true  || false)Equals(true);
+		Asserts.that(false || false)Equals(false);
 		return Asserts.allPassed();
 	}
 
-	Truth -- testAnd(Asserts) {
-		Asserts.that(True  && True)Equals(True);
-		Asserts.that(False && True)Equals(False);
-		Asserts.that(True  && False)Equals(False);
-		Asserts.that(False && False)Equals(False);
+	Bool -- testAnd(Asserts) {
+		Asserts.that(true  && true)Equals(true);
+		Asserts.that(false && true)Equals(false);
+		Asserts.that(true  && false)Equals(false);
+		Asserts.that(false && false)Equals(false);
 		return Asserts.allPassed();
 	}
 
-	Truth -- testOrderOfOperations(Asserts) {
-		Asserts.that(True  && True  || False)Equals(True);
-		Asserts.that(True  && False || False)Equals(False);
-		Asserts.that(False && True  || False)Equals(False);
-		Asserts.that(False && False || False)Equals(False);
-		Asserts.that(True  && True  || True)Equals(True);
-		Asserts.that(True  && False || True)Equals(True);
-		Asserts.that(False && True  || True)Equals(True);
-		Asserts.that(False && False || True)Equals(True);
-		Asserts.that(True  || True  && False)Equals(True);
-		Asserts.that(True  || False && False)Equals(True);
-		Asserts.that(False || True  && False)Equals(False);
-		Asserts.that(False || False && False)Equals(False);
-		Asserts.that(True  || True  && True)Equals(True);
-		Asserts.that(True  || False && True)Equals(True);
-		Asserts.that(False || True  && True)Equals(True);
-		Asserts.that(False || False && True)Equals(False);
-		Asserts.that(!True  && True  )Equals(False);
-		Asserts.that(True   && !True )Equals(False);
-		Asserts.that(!True  && False )Equals(False);
-		Asserts.that(True   && !False)Equals(True);
-		Asserts.that(!False && True  )Equals(True);
-		Asserts.that(False  && !True )Equals(False);
-		Asserts.that(!False && False )Equals(False);
-		Asserts.that(False  && !False)Equals(False);
-		Asserts.that(!True  || True  )Equals(True);
-		Asserts.that(True   || !True )Equals(True);
-		Asserts.that(!True  || False )Equals(False);
-		Asserts.that(True   || !False)Equals(True);
-		Asserts.that(!False || True  )Equals(True);
-		Asserts.that(False  || !True )Equals(False);
-		Asserts.that(!False || False )Equals(True);
-		Asserts.that(False  || !False)Equals(True);
+	Bool -- testOrderOfOperations(Asserts) {
+		Asserts.that(true  && true  || false)Equals(true);
+		Asserts.that(true  && false || false)Equals(false);
+		Asserts.that(false && true  || false)Equals(false);
+		Asserts.that(false && false || false)Equals(false);
+		Asserts.that(true  && true  || true)Equals(true);
+		Asserts.that(true  && false || true)Equals(true);
+		Asserts.that(false && true  || true)Equals(true);
+		Asserts.that(false && false || true)Equals(true);
+		Asserts.that(true  || true  && false)Equals(true);
+		Asserts.that(true  || false && false)Equals(true);
+		Asserts.that(false || true  && false)Equals(false);
+		Asserts.that(false || false && false)Equals(false);
+		Asserts.that(true  || true  && true)Equals(true);
+		Asserts.that(true  || false && true)Equals(true);
+		Asserts.that(false || true  && true)Equals(true);
+		Asserts.that(false || false && true)Equals(false);
+		Asserts.that(!true  && true  )Equals(false);
+		Asserts.that(true   && !true )Equals(false);
+		Asserts.that(!true  && false )Equals(false);
+		Asserts.that(true   && !false)Equals(true);
+		Asserts.that(!false && true  )Equals(true);
+		Asserts.that(false  && !true )Equals(false);
+		Asserts.that(!false && false )Equals(false);
+		Asserts.that(false  && !false)Equals(false);
+		Asserts.that(!true  || true  )Equals(true);
+		Asserts.that(true   || !true )Equals(true);
+		Asserts.that(!true  || false )Equals(false);
+		Asserts.that(true   || !false)Equals(true);
+		Asserts.that(!false || true  )Equals(true);
+		Asserts.that(false  || !true )Equals(false);
+		Asserts.that(!false || false )Equals(true);
+		Asserts.that(false  || !false)Equals(true);
 		return Asserts.allPassed();
 	}

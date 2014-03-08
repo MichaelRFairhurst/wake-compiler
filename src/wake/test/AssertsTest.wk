@@ -13,140 +13,140 @@ every AssertsTest is:
 
 	needs Printer;
 
-	Truth -- testAssertTextMatches() {
+	Bool -- testAssertTextMatches() {
 		var Asserts <- this;
 		Asserts.that("abcdefg aha!")Equals("abcdefg aha!");
-		if(!Asserts.haveFailed()) return True;
+		if(!Asserts.haveFailed()) return true;
 		Printer.printLine("Failed asserting that text is equal to itself");
-		return False;
+		return false;
 	}
 
-	Truth -- testAssertTextNotMatches() {
+	Bool -- testAssertTextNotMatches() {
 		var Asserts <- this;
 		Asserts.that("George Bush")Equals("Barack Obama");
 
 		if(Asserts.haveFailed()) {
-			if(Asserts.getLastText() == "Failed asserting that Barack Obama is equal to actual George Bush") return True;
+			if(Asserts.getLastText() == "Failed asserting that Barack Obama is equal to actual George Bush") return true;
 
 			Printer.printLine("Incorrect failure text!");
 			Printer.printLine("Real text is " + Asserts.getLastText());
-			return False;
+			return false;
 		}
 
 		Printer.printLine("Failed asserting that different text is different");
-		return False;
+		return false;
 	}
 
-	Truth -- testAssertIntMatches() {
+	Bool -- testAssertIntMatches() {
 		var Asserts <- this;
 		Asserts.that(10)Equals(10);
-		if(!Asserts.haveFailed()) return True;
+		if(!Asserts.haveFailed()) return true;
 		Printer.printLine("Failed asserting that ints are equal to themselves");
-		return False;
+		return false;
 	}
 
-	Truth -- testAssertIntNotMatches() {
+	Bool -- testAssertIntNotMatches() {
 		var Asserts <- this;
 		Asserts.that(45)Equals(54);
 
-		if(Asserts.haveFailed()) return True;
+		if(Asserts.haveFailed()) return true;
 
 		Printer.printLine("Failed asserting that different 54 and 45 are different");
-		return False;
+		return false;
 	}
 
-	Truth -- testAssertTrueMatches() {
+	Bool -- testAssertTrueMatches() {
 		var Asserts <- this;
-		Asserts.that(True)Equals(True);
-		if(!Asserts.haveFailed()) return True;
-		Printer.printLine("Failed asserting that True that True");
-		return False;
+		Asserts.that(true)Equals(true);
+		if(!Asserts.haveFailed()) return true;
+		Printer.printLine("Failed asserting that true that true");
+		return false;
 	}
 
-	Truth -- testAssertTrueNotMatches() {
+	Bool -- testAssertTrueNotMatches() {
 		var Asserts <- this;
-		Asserts.that(True)Equals(False);
+		Asserts.that(true)Equals(false);
 
 		if(Asserts.haveFailed()) {
-			if(Asserts.getLastText() == "Failed asserting that False is equal to actual True") return True;
+			if(Asserts.getLastText() == "Failed asserting that false is equal to actual true") return true;
 
 			Printer.printLine("Incorrect failure text!");
 			Printer.printLine("Real text is " + Asserts.getLastText());
-			return False;
+			return false;
 		}
 
-		Printer.printLine("Failed asserting that False is not equal to True");
-		return False;
+		Printer.printLine("Failed asserting that false is not equal to true");
+		return false;
 	}
 
-	Truth -- testAssertFalseMatches() {
+	Bool -- testAssertFalseMatches() {
 		var Asserts <- this;
-		Asserts.that(False)Equals(False);
-		if(!Asserts.haveFailed()) return True;
-		Printer.printLine("Failed asserting that False that False");
-		return False;
+		Asserts.that(false)Equals(false);
+		if(!Asserts.haveFailed()) return true;
+		Printer.printLine("Failed asserting that false that false");
+		return false;
 	}
 
-	Truth -- testAssertFalseNotMatches() {
+	Bool -- testAssertFalseNotMatches() {
 		var Asserts <- this;
-		Asserts.that(False)Equals(True);
+		Asserts.that(false)Equals(true);
 
 		if(Asserts.haveFailed()) {
-			if(Asserts.getLastText() == "Failed asserting that True is equal to actual False") return True;
+			if(Asserts.getLastText() == "Failed asserting that true is equal to actual false") return true;
 
 			Printer.printLine("Incorrect failure text!");
 			Printer.printLine("Real text is " + Asserts.getLastText());
-			return False;
+			return false;
 		}
 
-		Printer.printLine("Failed asserting that True is not equal to False");
-		return False;
+		Printer.printLine("Failed asserting that true is not equal to false");
+		return false;
 	}
 
-	Truth -- testAssertTrue() {
+	Bool -- testAssertTrue() {
 		var Asserts <- this;
-		Asserts.isTrue(True);
-		if(!Asserts.haveFailed()) return True;
-		Printer.printLine("Failed asserting that True is True");
-		return False;
+		Asserts.isTrue(true);
+		if(!Asserts.haveFailed()) return true;
+		Printer.printLine("Failed asserting that true is true");
+		return false;
 	}
 
-	Truth -- testAssertNotTrue() {
+	Bool -- testAssertNotTrue() {
 		var Asserts <- this;
-		Asserts.isTrue(False);
+		Asserts.isTrue(false);
 
 		if(Asserts.haveFailed()) {
-			if(Asserts.getLastText() == "Failed asserting that True is equal to actual False") return True;
+			if(Asserts.getLastText() == "Failed asserting that true is equal to actual false") return true;
 
 			Printer.printLine("Incorrect failure text!");
 			Printer.printLine("Real text is " + Asserts.getLastText());
-			return False;
+			return false;
 		}
 
-		Printer.printLine("Failed asserting that False is not True");
-		return False;
+		Printer.printLine("Failed asserting that false is not true");
+		return false;
 	}
 
-	Truth -- testAssertFalse() {
+	Bool -- testAssertFalse() {
 		var Asserts <- this;
-		Asserts.isFalse(False);
-		if(!Asserts.haveFailed()) return True;
-		Printer.printLine("Failed asserting that False is False");
-		return False;
+		Asserts.isFalse(false);
+		if(!Asserts.haveFailed()) return true;
+		Printer.printLine("Failed asserting that false is false");
+		return false;
 	}
 
-	Truth -- testAssertNotFalse() {
+	Bool -- testAssertNotFalse() {
 		var Asserts <- this;
-		Asserts.isFalse(True);
+		Asserts.isFalse(true);
 
 		if(Asserts.haveFailed()) {
-			if(Asserts.getLastText() == "Failed asserting that False is equal to actual True") return True;
+			if(Asserts.getLastText() == "Failed asserting that false is equal to actual true") return true;
 
 			Printer.printLine("Incorrect failure text!");
 			Printer.printLine("Real text is " + Asserts.getLastText());
-			return False;
+			return false;
 		}
 
-		Printer.printLine("Failed asserting that True is not False");
-		return False;
+		Printer.printLine("Failed asserting that true is not false");
+		return false;
 	}
