@@ -21,7 +21,7 @@ endif
 setlocal iskeyword+=:
 syn keyword	basickeyword	with public new return if else while foreach in import provides needs then nothing var exists true false
 syn region	classdecl	start="every" end="is:" contains=inheritancekeyword,interfacekeyword,ancestrysymbols,withinregionkeyword transparent keepend
-syn region	comment	start="\/\/" end="$"
+syn match	fulltextident	"\~\[[^\]]\+\]\~"
 syn match	hashcomment	"#\<[a-zA-Z]\+\>\?"
 syn region	blockcomment	start="#>" end="##"
 syn match	blockcomment	"##"
@@ -41,6 +41,7 @@ syn match	currysymbols "???"
 syn region	mystring start=/"/ skip=/\\\\\|\\"/ end=/"/
 syn region	mystring2 start=/'/ skip=/\\\\\|\\'/ end=/'/
 syn match	injectionlabel	"\({\)\@<=[a-zA-Z0-9]\+\(}\)\@="
+syn region	comment	start="\/\/" end="$"
 
 hi link comment		Comment
 hi link hashcomment	Comment
@@ -53,6 +54,7 @@ hi link interfacekeyword	Function
 
 hi link mytype		Type
 hi link returntype	String
+hi link fulltextident	Special
 hi link alias		Function
 hi link shadow		Function
 

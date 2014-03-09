@@ -26,31 +26,31 @@ every Main is:
 	with Text[] failed = [];
 
 	Run(Bool result, test Text) {
-		totalcount = totalcount + 1;
+		totalcount += 1;
 		if(!result) {
 			failed[failedcount] = test;
-			failedcount = failedcount + 1;
+			failedcount += 1;
 			passed = false;
 			Printer.print("F");
 		} else {
 			Printer.print(".");
-			passedcount = passedcount + 1;
+			passedcount += 1;
 		}
 	}
 
 	Main() {
-		Run(AssertsTest.testAssertTextMatches(), "testAssertTextMatches");
-		Run(AssertsTest.testAssertTextNotMatches(), "testAssertTextNotMatches");
-		Run(AssertsTest.testAssertIntMatches(), "testAssertIntMatches");
-		Run(AssertsTest.testAssertIntNotMatches(), "testAssertIntNotMatches");
-		Run(AssertsTest.testAssertTrueMatches(), "testAssertTrueMatches");
-		Run(AssertsTest.testAssertTrueNotMatches(), "testAssertTrueNotMatches");
-		Run(AssertsTest.testAssertFalseMatches(), "testAssertFalseMatches");
-		Run(AssertsTest.testAssertFalseNotMatches(), "testAssertFalseNotMatches");
-		Run(AssertsTest.testAssertTrue(), "testAssertTrue");
-		Run(AssertsTest.testAssertNotTrue(), "testAssertNotTrue");
-		Run(AssertsTest.testAssertFalse(), "testAssertFalse");
-		Run(AssertsTest.testAssertNotFalse(), "testAssertNotFalse");
+		Run(AssertsTest.~[test assert text matches]~(), "test assert text matches");
+		Run(AssertsTest.~[test assert text not matches]~(), "test assert text not matches");
+		Run(AssertsTest.~[test assert int matches]~(), "test assert int matches");
+		Run(AssertsTest.~[test assert int not matches]~(), "test assert int not matches");
+		Run(AssertsTest.~[test assert true matches]~(), "test assert true matches");
+		Run(AssertsTest.~[test assert true not matches]~(), "test assert true not matches");
+		Run(AssertsTest.~[test assert false matches]~(), "test assert false matches");
+		Run(AssertsTest.~[test assert false not matches]~(), "test assert false not matches");
+		Run(AssertsTest.~[test assert true]~(), "test assert true");
+		Run(AssertsTest.~[test assert not true]~(), "test assert not true");
+		Run(AssertsTest.~[test assert false]~(), "test assert false");
+		Run(AssertsTest.~[test assert not false]~(), "test assert not false");
 		Run(MathTest.testAddition(Asserts <- this), "testAddition");
 		Run(MathTest.testSubtraction(Asserts <- this), "testSubtraction");
 		Run(MathTest.testDivision(Asserts <- this), "testDivision");
@@ -61,26 +61,26 @@ every Main is:
 		Run(BooleanLogicTest.testOrderOfOperations(Asserts <- this), "testOrderOfOperations");
 		//Run(TernaryOperatorTest.testTrue(Asserts <- this));
 		//Run(TernaryOperatorTest.testFalse(Asserts <- this));
-		Run(InheritanceTest.testParentGetsParentClassName(Asserts <- this), "testParentgetsParentClassname");
-		Run(InheritanceTest.testOverrideChildGetsChildClassName(Asserts <- this), "testOverrideChildGetsChildClassname");
-		Run(InheritanceTest.testOverrideChildFromProviderGetsChildClassName(Asserts <- this), "testOvverideChildFromProviderGetsChildClassName");
-		Run(InheritanceTest.testOverrideChildAfterCastGetsChildClassName(Asserts <- this), "testOverrideChildAfterCastGetsChildClassname");
-		Run(InheritanceTest.testFallthroughChildGetsChildClassName(Asserts <- this ), "testFallthroughChildGetsChildClassname");
-		Run(InheritanceTest.testFallthroughChildFromProviderGetsChildClassName(Asserts <- this ), "testFallthroughChildFromProviderGetsChildClassName");
-		Run(InheritanceTest.testFallthroughChildAfterCastGetsChildClassName(Asserts <- this ), "testFallthroughChildAfterCastGetsChildClassname");
-		Run(InheritanceTest.testImplementingChildGetsChildClassName(Asserts <- this ), "testImplementingChildGetsChildClassName");
-		Run(InheritanceTest.testImplementingChildFromProviderGetsChildClassName(Asserts <- this ), "testImplementingChildFromProiderGetsChildClassName");
-		Run(InheritanceTest.testImplementingChildAfterCastGetsChildClassName(Asserts <- this ), "testImplementingChildAfterCastGetsChildClassName");
-		Run(ArrayTest.testSetArrayIndex(Asserts <- this), "testSetArrayIndex");
-		Run(ArrayTest.testResetArrayIndex(Asserts <- this), "testResetArrayIndex");
-		Run(ArrayTest.testSetArrayArrayIndexIndex(Asserts <- this), "testSetArrayArrayIndexIndex");
-		Run(ArrayTest.testResetArrayArrayIndexIndex(Asserts <- this), "tsetResetArrayArrayIndexIndex");
-		Run(ArrayTest.testSetMultipleArrayIndices(Asserts <- this), "testSetMultipleArrayIndices");
-		Run(ArrayTest.testSetMultipleArrayArrayIndicesIndices(Asserts <- this), "testSetMultipleArrayArrayIndicesIndices");
-		Run(OptionalTypeTest.testOptionalIntNeverSet(), "testOptionalIntNeverSet");
-		Run(OptionalTypeTest.testOptionalIntSet(), "teestOptionalIntSet");
-		Run(OptionalTypeTest.testOptionalIntNotSetWillHitElse(), "testOptionalIntNotSetWillHitElse");
-		Run(OptionalTypeTest.testOptionalIntSetWontHitElse(), "testOptionalIntSetWontHitElse");
+		Run(InheritanceTest.~[test parent gets parent class name]~(Asserts <- this), "test parentgets parent classname");
+		Run(InheritanceTest.~[test override child gets child class name]~(Asserts <- this), "test override child gets child classname");
+		Run(InheritanceTest.~[test override child from provider gets child class name]~(Asserts <- this), "test ovveride child from provider gets child class name");
+		Run(InheritanceTest.~[test override child after cast gets child class name]~(Asserts <- this), "test override child after cast gets child classname");
+		Run(InheritanceTest.~[test fallthrough child gets child class name]~(Asserts <- this ), "test fallthrough child gets child classname");
+		Run(InheritanceTest.~[test fallthrough child from provider gets child class name]~(Asserts <- this ), "test fallthrough child from provider gets child class name");
+		Run(InheritanceTest.~[test fallthrough child after cast gets child class name]~(Asserts <- this ), "test fallthrough child after cast gets child classname");
+		Run(InheritanceTest.~[test implementing child gets child class name]~(Asserts <- this ), "test implementing child gets child class name");
+		Run(InheritanceTest.~[test implementing child from provider gets child class name]~(Asserts <- this ), "test implementing child from proider gets child class name");
+		Run(InheritanceTest.~[test implementing child after cast gets child class name]~(Asserts <- this ), "test implementing child after cast gets child class name");
+		Run(ArrayTest.~[test set array index]~(Asserts <- this), "test set array index");
+		Run(ArrayTest.~[test reset array index]~(Asserts <- this), "test reset array index");
+		Run(ArrayTest.~[test set array array index index]~(Asserts <- this), "test set array array index index");
+		Run(ArrayTest.~[test reset array array index index]~(Asserts <- this), "tset reset array array index index");
+		Run(ArrayTest.~[test set multiple array indices]~(Asserts <- this), "test set multiple array indices");
+		Run(ArrayTest.~[test set multiple array array indices indices]~(Asserts <- this), "test set multiple array array indices indices");
+		Run(OptionalTypeTest.~[test optional int never set]~(), "test optional int never set");
+		Run(OptionalTypeTest.~[test optional int set]~(), "teest optional int set");
+		Run(OptionalTypeTest.~[test optional int not set will hit else]~(), "test optional int not set will hit else");
+		Run(OptionalTypeTest.~[test optional int set wont hit else]~(), "test optional int set wont hit else");
 		Run(AssignmentsTest.testPlusEquals(Asserts <- this), "testPlusEquals");
 		Run(AssignmentsTest.testMinusEquals(Asserts <- this), "testMinusEquals");
 		Run(AssignmentsTest.testTimesEquals(Asserts <- this), "testTimesEquals");
@@ -102,7 +102,7 @@ every Main is:
 		var Int = 0;
 		while(Int < failedcount) {
 			Printer.printLine(failed[Int]);
-			Int = Int + 1;
+			Int += 1;
 		}
 
 		System.exit(1);

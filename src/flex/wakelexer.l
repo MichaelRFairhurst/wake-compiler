@@ -112,6 +112,7 @@ false					count(); wakelval.number = 0; return BOOL;
 \{[a-zA-Z0-9]+\}		count(); wakelval.string = keepInner(waketext); return SPECIALTY;
 [a-z][a-zA-Z0-9]*		count(); wakelval.string = strdup(waketext); return LIDENTIFIER;
 [A-Z][a-zA-Z0-9]*		count(); wakelval.string = strdup(waketext); return UIDENTIFIER;
+\~\[[^\]]+\]\~		count(); wakelval.string = strdup(waketext); return UIDENTIFIER;
 \"(\\.|[^\\"])*\"		count(); wakelval.string = unEscapeStringLiteral(keepInner(waketext), '"'); return(STRING);
 '(\\.|[^\'])*\'			count(); wakelval.string = unEscapeStringLiteral(keepInner(waketext), '\''); return(STRING);
 

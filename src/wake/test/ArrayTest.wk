@@ -2,14 +2,14 @@ import Asserts;
 
 every ArrayTest is:
 
-	Bool -- testSetArrayIndex(Asserts) {
+	Bool -- ~[test set array index]~(Asserts) {
 		var Int[] = [];
 		Int[0] = 5;
 		Asserts.that(Int[0])Equals(5);
 		return Asserts.allPassed();
 	}
 
-	Bool -- testResetArrayIndex(Asserts) {
+	Bool -- ~[test reset array index]~(Asserts) {
 		var Int[] = [];
 		Int[0] = 5;
 		Int[0] = 3;
@@ -17,7 +17,7 @@ every ArrayTest is:
 		return Asserts.allPassed();
 	}
 
-	Bool -- testSetArrayArrayIndexIndex(Asserts) {
+	Bool -- ~[test set array array index index]~(Asserts) {
 		var Int[][] = [];
 		Int[0] = [];
 		Int[0][0] = 3;
@@ -25,7 +25,7 @@ every ArrayTest is:
 		return Asserts.allPassed();
 	}
 
-	Bool -- testResetArrayArrayIndexIndex(Asserts) {
+	Bool -- ~[test reset array array index index]~(Asserts) {
 		var Int[][] = [];
 		Int[0] = [];
 		Int[0][0] = 3;
@@ -34,7 +34,7 @@ every ArrayTest is:
 		return Asserts.allPassed();
 	}
 
-	Bool -- testSetMultipleArrayIndices(Asserts) {
+	Bool -- ~[test set multiple array indices]~(Asserts) {
 		var Int[] = [];
 		Int[0] = 5;
 		Int[1] = 6;
@@ -47,7 +47,7 @@ every ArrayTest is:
 		return Asserts.allPassed();
 	}
 
-	Bool -- testSetMultipleArrayArrayIndicesIndices(Asserts) {
+	Bool -- ~[test set multiple array array indices indices]~(Asserts) {
 		var Int[][] = [];
 		Int[0] = [];
 		Int[1] = [];

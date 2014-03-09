@@ -1,6 +1,6 @@
 every OptionalTypeTest is:
 
-	Bool -- testOptionalIntNeverSet() {
+	Bool -- ~[test optional int never set]~() {
 		var Int? = nothing;
 		if Int exists {
 			return false;
@@ -8,7 +8,7 @@ every OptionalTypeTest is:
 		return true;
 	}
 
-	Bool -- testOptionalIntSet() {
+	Bool -- ~[test optional int set]~() {
 		var Int? = 5;
 		if Int exists {
 			return Int == 5;
@@ -16,7 +16,7 @@ every OptionalTypeTest is:
 		return false;
 	}
 
-	Bool -- testOptionalIntNotSetWillHitElse() {
+	Bool -- ~[test optional int not set will hit else]~() {
 		var Int? = nothing;
 		if Int exists {} else {
 			return true;
@@ -24,7 +24,7 @@ every OptionalTypeTest is:
 		return false;
 	}
 
-	Bool -- testOptionalIntSetWontHitElse() {
+	Bool -- ~[test optional int set wont hit else]~() {
 		var Int? = 5;
 		if Int exists {} else {
 			return false;
