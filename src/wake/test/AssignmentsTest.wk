@@ -45,3 +45,13 @@ every AssignmentsTest is:
 		Asserts.that(Int)Equals(1);
 		return Asserts.allPassed();
 	}
+
+	Bool -- testUsingAssigmentReturnValues(Asserts) {
+		var Int = 5;
+		if((Int := 1) != 1) {
+			return false;
+		}
+
+		Asserts.that(Int := 4)Equals(4);
+		return Asserts.allPassed();
+	}

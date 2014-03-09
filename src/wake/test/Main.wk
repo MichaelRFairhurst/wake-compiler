@@ -85,6 +85,7 @@ every Main is:
 		Run(AssignmentsTest.testMinusEquals(Asserts <- this), "testMinusEquals");
 		Run(AssignmentsTest.testTimesEquals(Asserts <- this), "testTimesEquals");
 		Run(AssignmentsTest.testDivideEquals(Asserts <- this), "testDivideEquals");
+		Run(AssignmentsTest.testUsingAssigmentReturnValues(Asserts <- this), "testUsingAssigmentReturnValues");
 
 		Printer.printLine("");
 		Printer.printLine("");

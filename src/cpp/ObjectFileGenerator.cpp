@@ -224,6 +224,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 			file << "var ";
 			// FALL THROUGH
 		case NT_ASSIGNMENT:
+		case NT_VALUED_ASSIGNMENT:
 			generate(tree->node_data.nodes[0]);
 			file << "=";
 			generate(tree->node_data.nodes[1]);
