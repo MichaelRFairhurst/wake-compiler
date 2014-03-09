@@ -171,6 +171,12 @@ Type* TypeChecker::typeCheck(Node* tree) {
 			 * Backtracking from the above endpoints
 			 *
 			 */
+			case NT_ADD_ASSIGNMENT:
+				if(!isValidLValue(tree->node_data.nodes[0])) {
+					errors->addError(new SemanticError(INVALID_ASSIGNMENT, "", tree));
+						break;
+				}
+				// FALLTHROUGH
 			case NT_ADD:
 				{
 					ret = typeCheck(tree->node_data.nodes[0]);
@@ -203,6 +209,14 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				}
 				break;
 
+			case NT_MULT_ASSIGNMENT:
+			case NT_DIV_ASSIGNMENT:
+			case NT_SUB_ASSIGNMENT:
+				if(!isValidLValue(tree->node_data.nodes[0])) {
+					errors->addError(new SemanticError(INVALID_ASSIGNMENT, "", tree));
+						break;
+				}
+				// FALLTHROUGH
 			case NT_MULTIPLY:
 			case NT_DIVIDE:
 			case NT_SUBTRACT:

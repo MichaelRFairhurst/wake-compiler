@@ -30,7 +30,7 @@ int wakewrap()
 /* keywords */
 %token EVERY CAPABLE A_OR_AN IS RETURN FOREACH WITH PUBLIC IF ELSE WHILE IN IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE EXISTS VAR
 /* symbols */
-%token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT
+%token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT SYM_PLUSEQ SYM_VALEQ SYM_MULTEQ SYM_SUBEQ SYM_DIVEQ
 /* this too */
 %token ERRORTOKEN
 
@@ -53,7 +53,7 @@ int wakewrap()
 %token <number> BOOL
 %token <number> SYM_SHADOW
 %token <number> SYM_ARRAYED
-%type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection injection_args provision provisions injection_arg ctor retrievabledeclarableargs value method block methodreturn methodnamesegments methodbody methodaccess methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional type_valued property property_value retrievalargs retrieval objectable expression_cast
+%type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection injection_args provision provisions injection_arg ctor retrievabledeclarableargs value method block methodreturn methodnamesegments methodbody methodaccess methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional type_valued property property_value retrievalargs retrieval objectable expression_cast assignment
 %type <type>  type_pure type_pure_arrayable type_pure_arrayable_nonoptional type_declarable_nonoptional type_declarable type_common type_lambda type_commonorlambda type_retrievable type_retrievabledeclarable
 %type <type_array> declarabletypes commonorlambdatypes
 %start file
@@ -471,13 +471,22 @@ expression_conditional:
 	| expression_conditionalor '?' expression ':' expression_conditional		{ $$ = MakeTwoBranchNode(NT_IF_THEN_ELSE, $1, $3); AddSubNode($$, $5); }
 	;
 
+assignment:
+	value '=' expression														{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, $1, $3); }
+	| value SYM_VALEQ expression												{ $$ = MakeTwoBranchNode(NT_VALUED_ASSIGNMENT, $1, $3); }
+	| value SYM_PLUSEQ expression												{ $$ = MakeTwoBranchNode(NT_ADD_ASSIGNMENT, $1, $3); }
+	| value SYM_SUBEQ expression												{ $$ = MakeTwoBranchNode(NT_SUB_ASSIGNMENT, $1, $3); }
+	| value SYM_MULTEQ expression												{ $$ = MakeTwoBranchNode(NT_MULT_ASSIGNMENT, $1, $3); }
+	| value SYM_DIVEQ expression												{ $$ = MakeTwoBranchNode(NT_DIV_ASSIGNMENT, $1, $3); }
+	;
+
 expression:
 	expression_conditional														{ $$ = $1; }
-	| value '=' expression														{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, $1, $3); }
+	| assignment																{ $$ = $1; }
 	;
 
 retrieval:
-	type_retrievable retrievalargs value							{ $$ = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1), $2); AddSubNode($$, $3); }
+	type_retrievable retrievalargs value										{ $$ = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1), $2); AddSubNode($$, $3); }
 	;
 
 expressions:

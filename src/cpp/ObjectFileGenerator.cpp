@@ -224,18 +224,33 @@ void ObjectFileGenerator::generate(Node* tree) {
 			file << "var ";
 			// FALL THROUGH
 		case NT_ASSIGNMENT:
-			{
-				Node* assignednode = tree->node_data.nodes[0];
-				//if(assignednode->node_type == NT_ALIAS) {
-					//file << table.getAddress(string("@") + assignednode->node_data.string) << "=";
-				//} else {
-					//file << table.getAddress(assignednode->node_data.type) << "=";
-				//}
-				generate(assignednode);
-				file << "=";
-			}
+			generate(tree->node_data.nodes[0]);
+			file << "=";
 			generate(tree->node_data.nodes[1]);
-			//if(tree->node_type == NT_DECLARATION) file << ";";
+			break;
+
+		case NT_ADD_ASSIGNMENT:
+			generate(tree->node_data.nodes[0]);
+			file << "+=";
+			generate(tree->node_data.nodes[1]);
+			break;
+
+		case NT_SUB_ASSIGNMENT:
+			generate(tree->node_data.nodes[0]);
+			file << "-=";
+			generate(tree->node_data.nodes[1]);
+			break;
+
+		case NT_MULT_ASSIGNMENT:
+			generate(tree->node_data.nodes[0]);
+			file << "*=";
+			generate(tree->node_data.nodes[1]);
+			break;
+
+		case NT_DIV_ASSIGNMENT:
+			generate(tree->node_data.nodes[0]);
+			file << "/=";
+			generate(tree->node_data.nodes[1]);
 			break;
 
 		case NT_ARRAY_DECLARATION:

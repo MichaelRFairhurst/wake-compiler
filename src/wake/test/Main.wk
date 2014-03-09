@@ -8,13 +8,14 @@ import BooleanLogicTest;
 import InheritanceTest;
 import ArrayTest;
 import OptionalTypeTest;
+import AssignmentsTest;
 
 #>
 # Test suite entry point
 ##
 every Main is:
 
-	needs System, AssertsTest, Printer, MathTest, BooleanLogicTest, InheritanceTest, ArrayTest, OptionalTypeTest;
+	needs System, AssertsTest, Printer, MathTest, BooleanLogicTest, InheritanceTest, ArrayTest, OptionalTypeTest, AssignmentsTest;
 
 	provides Printer, Asserts;
 
@@ -80,6 +81,10 @@ every Main is:
 		Run(OptionalTypeTest.testOptionalIntSet(), "teestOptionalIntSet");
 		Run(OptionalTypeTest.testOptionalIntNotSetWillHitElse(), "testOptionalIntNotSetWillHitElse");
 		Run(OptionalTypeTest.testOptionalIntSetWontHitElse(), "testOptionalIntSetWontHitElse");
+		Run(AssignmentsTest.testPlusEquals(Asserts <- this), "testPlusEquals");
+		Run(AssignmentsTest.testMinusEquals(Asserts <- this), "testMinusEquals");
+		Run(AssignmentsTest.testTimesEquals(Asserts <- this), "testTimesEquals");
+		Run(AssignmentsTest.testDivideEquals(Asserts <- this), "testDivideEquals");
 
 		Printer.printLine("");
 		Printer.printLine("");
