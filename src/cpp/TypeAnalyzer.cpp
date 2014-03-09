@@ -136,6 +136,10 @@ string TypeAnalyzer::getNameForType(Type* type) {
 		return name;
 	}
 
+	if(type->type == TYPE_MATCHALL) {
+		return "{inferencing failed}";
+	}
+
 	if(type->type == TYPE_NOTHING) {
 		return "[NOTHING]";
 	}

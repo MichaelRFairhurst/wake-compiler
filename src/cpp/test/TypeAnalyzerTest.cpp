@@ -54,4 +54,10 @@ BOOST_AUTO_TEST_CASE(NothingIsNotSubtypeOfRealType) {
 	BOOST_REQUIRE(!analyzer.isASubtypeOfB(&nothing, &realtype));
 }
 
+BOOST_AUTO_TEST_CASE(MatchallNameIsErroneousType) {
+	TypeAnalyzer analyzer;
+	Type matchall = *MakeType(TYPE_MATCHALL);
+	BOOST_REQUIRE(analyzer.getNameForType(&matchall) == "{inferencing failed}");
+}
+
 BOOST_AUTO_TEST_SUITE_END();

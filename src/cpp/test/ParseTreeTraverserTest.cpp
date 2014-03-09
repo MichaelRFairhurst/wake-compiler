@@ -1686,4 +1686,32 @@ PTT_TEST_CASE(
 	PTT_VALID
 );
 
+PTT_TEST_CASE(
+	MethodCallOnAnUnknownClassIsUnknownVariableError,
+	"every MyClass is:				\n\
+		myMethod() {				\n\
+			Whatever.whatever();	\n\
+		}",
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
+);
+
+PTT_TEST_CASE(
+	ReturnMethodCallOnAnUnknownClassIsUnknownVariableError,
+	"every MyClass is:					\n\
+		Int --  myMethod() {			\n\
+			return Whatever.whatever();	\n\
+		}",
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
+);
+
+PTT_TEST_CASE(
+	ReturnVoidMethodCallOnAnUnknownClassIsUnknownVariableError,
+	"every MyClass is:					\n\
+		myMethod() {					\n\
+			return Whatever.whatever();	\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR) // invalid return
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
+);
+
 BOOST_AUTO_TEST_SUITE_END()

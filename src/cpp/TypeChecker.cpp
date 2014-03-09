@@ -478,6 +478,12 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					}
 
 					Type* subject = typeCheck(tree->node_data.nodes[0]);
+
+					if(subject->type == TYPE_MATCHALL) {
+						ret = subject;
+						break;
+					}
+
 					vector<pair<string, TypeArray*> > method_segments;
 
 					int i = 0;
