@@ -33,6 +33,7 @@ enum SemanticErrorCode {
 	ABSTRACT_PROVISION,				// Providing a class directly that doesn't implement all of its methods
 	DIRECT_USE_OF_OPTIONAL_TYPE,	// :Printer = nothing;
 	EXISTS_ON_NONOPTIONAL_TYPE,		// needs Printer; Printer exists { }
+	USE_OF_ASSIGNMENT_VALUE,		// needs Printer; Printer exists { }
 };
 
 class SemanticError {

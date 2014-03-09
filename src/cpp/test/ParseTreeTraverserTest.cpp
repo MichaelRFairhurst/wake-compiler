@@ -1714,4 +1714,63 @@ PTT_TEST_CASE(
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 );
 
+PTT_TEST_CASE(
+	UsingNormalAssignmentAsValueIsNotAllowed,
+	"every MyClass is:												\n\
+		with Int = 0;												\n\
+		with Bool = false;											\n\
+		with MyClass = this;										\n\
+		inAddition() { (Int = 3) + 2; }								\n\
+		inSubtraction() { (Int = 3) - 2; }							\n\
+		inDivision() { (Int = 3) / 2; }								\n\
+		inMultiplication() { (Int = 3) * 2; }						\n\
+		inAssignment() { Int = (Int = 3); }							\n\
+		Int -- inReturn() { return Int = 3; }						\n\
+		inMethodSubject() { (MyClass = this).inMethodSubject(); }	\n\
+		inEquivalence() { (Int = 5) == 5; }							\n\
+		inLT() { (Int = 5) <= 5; }									\n\
+		inGT() { (Int = 5) >= 5; }									\n\
+		inIfStmt() { if(Bool = true) {} }							\n\
+		inWhileStmt() { while(Bool = true) {} }						\n\
+		inMethodArg($Int) { inMethodArg(Int = 5); }					\n\
+	",
+	PTT_EXPECT(USE_OF_ASSIGNMENT_VALUE)
+	PTT_EXPECT(USE_OF_ASSIGNMENT_VALUE)
+	PTT_EXPECT(USE_OF_ASSIGNMENT_VALUE)
+	PTT_EXPECT(USE_OF_ASSIGNMENT_VALUE)
+	PTT_EXPECT(USE_OF_ASSIGNMENT_VALUE)
+	PTT_EXPECT(USE_OF_ASSIGNMENT_VALUE)
+	PTT_EXPECT(USE_OF_ASSIGNMENT_VALUE)
+	PTT_EXPECT(USE_OF_ASSIGNMENT_VALUE)
+	PTT_EXPECT(USE_OF_ASSIGNMENT_VALUE)
+	PTT_EXPECT(USE_OF_ASSIGNMENT_VALUE)
+	PTT_EXPECT(USE_OF_ASSIGNMENT_VALUE)
+	PTT_EXPECT(USE_OF_ASSIGNMENT_VALUE)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND) // the  uninferencable type
+	PTT_EXPECT(USE_OF_ASSIGNMENT_VALUE)
+);
+
+PTT_TEST_CASE(
+	UsingValuedAssignmentAsValueIsOK,
+	"every MyClass is:												\n\
+		with Int = 0;												\n\
+		with Bool = false;											\n\
+		with MyClass = this;										\n\
+		inAddition() { (Int := 3) + 2; }							\n\
+		inSubtraction() { (Int := 3) - 2; }							\n\
+		inDivision() { (Int := 3) / 2; }							\n\
+		inMultiplication() { (Int := 3) * 2; }						\n\
+		inAssignment() { Int = (Int := 3); }						\n\
+		Int -- inReturn() { return Int := 3; }						\n\
+		inMethodSubject() { (MyClass := this).inMethodSubject(); }	\n\
+		inMethodArg($Int) { inMethodArg(Int := 5); }				\n\
+		inEquivalence() { (Int := 5) == 5; }						\n\
+		inLT() { (Int := 5) <= 5; }									\n\
+		inGT() { (Int := 5) >= 5; }									\n\
+		inIfStmt() { if(Bool := true) {} }							\n\
+		inWhileStmt() { while(Bool := true) {} }					\n\
+	",
+	PTT_VALID
+);
+
 BOOST_AUTO_TEST_SUITE_END()

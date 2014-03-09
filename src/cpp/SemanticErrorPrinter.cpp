@@ -78,6 +78,9 @@ void SemanticErrorPrinter::print(SemanticError* e) {
 		case EXISTS_ON_NONOPTIONAL_TYPE:
 			cout << "Calling T exists { } on a nonoptional type, statement does nothing";
 			break;
+		case USE_OF_ASSIGNMENT_VALUE:
+			cout << "Using the result of an assignment as a value. Use ':=' if you didn't intend to compare with ==.";
+			break;
 		default:
 			cout << "bad error code provided";
 	}

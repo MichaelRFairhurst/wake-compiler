@@ -5,6 +5,7 @@
 #define TYPE_CLASS 2
 #define TYPE_MATCHALL 3
 #define TYPE_NOTHING 4
+#define TYPE_UNUSABLE 5
 
 struct TypeArray;
 

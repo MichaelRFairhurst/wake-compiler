@@ -179,8 +179,9 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				// FALLTHROUGH
 			case NT_ADD:
 				{
-					ret = typeCheck(tree->node_data.nodes[0]);
-					Type* additive = typeCheck(tree->node_data.nodes[1]);
+					ret = typeCheckUsable(tree->node_data.nodes[0]);
+					Type* additive = typeCheckUsable(tree->node_data.nodes[1]);
+					//if(ret->type == TYPE_UNUSABLE || additive->type == TYPE_UNUSABLE
 
 					if(analyzer->isPrimitiveTypeInt(ret)) {
 						if(!analyzer->isPrimitiveTypeInt(additive)) {
@@ -221,8 +222,8 @@ Type* TypeChecker::typeCheck(Node* tree) {
 			case NT_DIVIDE:
 			case NT_SUBTRACT:
 				{
-					ret = typeCheck(tree->node_data.nodes[0]);
-					Type* factor = typeCheck(tree->node_data.nodes[1]);
+					ret = typeCheckUsable(tree->node_data.nodes[0]);
+					Type* factor = typeCheckUsable(tree->node_data.nodes[1]);
 
 					if(!analyzer->isPrimitiveTypeInt(ret) || !analyzer->isPrimitiveTypeInt(factor)) {
 						expectedstring = "Int";
@@ -252,8 +253,8 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					ret = MakeType(TYPE_CLASS);
 					ret->typedata._class.classname = strdup("Bool");
 
-					Type* a = typeCheck(tree->node_data.nodes[0]);
-					Type* b = typeCheck(tree->node_data.nodes[1]);
+					Type* a = typeCheckUsable(tree->node_data.nodes[0]);
+					Type* b = typeCheckUsable(tree->node_data.nodes[1]);
 
 					if(!analyzer->isPrimitiveTypeInt(a) || !analyzer->isPrimitiveTypeInt(b)) {
 						expectedstring = "Int";
@@ -277,8 +278,8 @@ Type* TypeChecker::typeCheck(Node* tree) {
 			case NT_EQUALITY:
 			case NT_INEQUALITY:
 				{
-					Type* a = typeCheck(tree->node_data.nodes[0]);
-					Type* b = typeCheck(tree->node_data.nodes[1]);
+					Type* a = typeCheckUsable(tree->node_data.nodes[0]);
+					Type* b = typeCheckUsable(tree->node_data.nodes[1]);
 					ret = MakeType(TYPE_CLASS);
 					ret->typedata._class.classname = strdup("Bool");
 
@@ -296,8 +297,8 @@ Type* TypeChecker::typeCheck(Node* tree) {
 			case NT_AND:
 			case NT_OR:
 				{
-					ret = typeCheck(tree->node_data.nodes[0]);
-					Type* cmp = typeCheck(tree->node_data.nodes[1]);
+					ret = typeCheckUsable(tree->node_data.nodes[0]);
+					Type* cmp = typeCheckUsable(tree->node_data.nodes[1]);
 
 					if(!analyzer->isPrimitiveTypeBool(ret) || !analyzer->isPrimitiveTypeBool(cmp)) {
 						if(analyzer->isPrimitiveTypeBool(ret)) {
@@ -319,7 +320,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				break;
 
 			case NT_INVERT:
-				ret = typeCheck(tree->node_data.nodes[0]);
+				ret = typeCheckUsable(tree->node_data.nodes[0]);
 
 				if(!analyzer->isPrimitiveTypeBool(ret)) {
 					expectedstring = "Bool";
@@ -334,8 +335,8 @@ Type* TypeChecker::typeCheck(Node* tree) {
 
 			case NT_ARRAY_ACCESS:
 				{
-					ret = typeCheck(tree->node_data.nodes[0]);
-					Type* index = typeCheck(tree->node_data.nodes[1]);
+					ret = typeCheckUsable(tree->node_data.nodes[0]);
+					Type* index = typeCheckUsable(tree->node_data.nodes[1]);
 					--ret->arrayed;
 
 					if(!analyzer->isPrimitiveTypeInt(index)) {
@@ -354,7 +355,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 			case NT_IF_ELSE:
 			case NT_WHILE:
 				{
-					ret = typeCheck(tree->node_data.nodes[0]);
+					ret = typeCheckUsable(tree->node_data.nodes[0]);
 					freeType(typeCheck(tree->node_data.nodes[1]));
 
 					if(tree->subnodes > 2) {
@@ -373,7 +374,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 			case NT_FOR:
 				{
 					freeType(typeCheck(tree->node_data.nodes[0]));
-					ret = typeCheck(tree->node_data.nodes[1]);
+					ret = typeCheckUsable(tree->node_data.nodes[1]);
 					freeType(typeCheck(tree->node_data.nodes[2]));
 					freeType(typeCheck(tree->node_data.nodes[3]));
 
@@ -390,7 +391,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				if(returntype == NULL) {
 					if(tree->subnodes == 0) break;
 
-					ret = typeCheck(tree->node_data.nodes[0]);
+					ret = typeCheckUsable(tree->node_data.nodes[0]);
 					expectedstring = "VOID";
 					erroneousstring = analyzer->getNameForType(ret);
 					throw string("Method is not allowed to return anything");
@@ -402,7 +403,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					throw string("Method is not allowed to return without a value");
 				}
 
-				ret = typeCheck(tree->node_data.nodes[0]);
+				ret = typeCheckUsable(tree->node_data.nodes[0]);
 				if(!analyzer->isASubtypeOfB(ret, returntype)) {
 					expectedstring = analyzer->getNameForType(returntype);
 					erroneousstring = analyzer->getNameForType(ret);
@@ -410,27 +411,33 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				}
 				break;
 
+			case NT_VALUED_ASSIGNMENT:
 			case NT_ASSIGNMENT:
 				{
 					if(!isValidLValue(tree->node_data.nodes[0])) {
 						errors->addError(new SemanticError(INVALID_ASSIGNMENT, "", tree));
+						ret = MakeType(tree->node_type == NT_ASSIGNMENT ? TYPE_UNUSABLE : TYPE_MATCHALL);
 					} else {
-						ret = typeCheck(tree->node_data.nodes[0]);
+						Type* subject = typeCheck(tree->node_data.nodes[0]);
+						ret = tree->node_type == NT_ASSIGNMENT ? MakeType(TYPE_UNUSABLE) : subject;
 						if(tree->node_data.nodes[1]->node_type == NT_ARRAY_DECLARATION && tree->node_data.nodes[1]->subnodes == 0) {
-							if(!ret->arrayed) {
-								expectedstring = analyzer->getNameForType(ret);
+							if(!subject->arrayed) {
+								expectedstring = analyzer->getNameForType(subject);
 								erroneousstring = "[]";
+								if(tree->node_type == NT_ASSIGNMENT) freeType(subject);
 								throw string("Invalid type in assignment");
 							}
 						} else {
-							Type* assignment = typeCheck(tree->node_data.nodes[1]);
+							Type* assignment = typeCheckUsable(tree->node_data.nodes[1]);
 							//TODO This leaks for invalid property names since analyzer throws a SymbolNotFoundException
-							if(!analyzer->isASubtypeOfB(assignment, ret)) {
-								expectedstring = analyzer->getNameForType(ret);
+							if(!analyzer->isASubtypeOfB(assignment, subject)) {
+								expectedstring = analyzer->getNameForType(subject);
 								erroneousstring = analyzer->getNameForType(assignment);
+								if(tree->node_type == NT_ASSIGNMENT) freeType(subject);
 								freeType(assignment);
 								throw string("Invalid type in assignment");
 							}
+							if(tree->node_type == NT_ASSIGNMENT) freeType(subject);
 							freeType(assignment);
 						}
 					}
@@ -439,7 +446,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 
 			case NT_LAMBDA_INVOCATION:
 				{
-					Type* lambda = typeCheck(tree->node_data.nodes[0]);
+					Type* lambda = typeCheckUsable(tree->node_data.nodes[0]);
 					Type* actual = MakeType(TYPE_LAMBDA);
 					actual->typedata.lambda.arguments = MakeTypeArray();
 					ret = copyType(actual->typedata.lambda.returntype = copyType(lambda->typedata.lambda.returntype));
@@ -447,7 +454,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					if(tree->subnodes == 2) {
 						int i;
 						for(i = 0; i < tree->node_data.nodes[1]->subnodes; i++) {
-							AddTypeToTypeArray(typeCheck(tree->node_data.nodes[1]->node_data.nodes[i]), actual->typedata.lambda.arguments);
+							AddTypeToTypeArray(typeCheckUsable(tree->node_data.nodes[1]->node_data.nodes[i]), actual->typedata.lambda.arguments);
 						}
 					}
 
@@ -472,12 +479,12 @@ Type* TypeChecker::typeCheck(Node* tree) {
 						if(variable) {
 							methodname->node_type = NT_LAMBDA_INVOCATION;
 							methodname->node_data.nodes[0]->node_type = NT_ALIAS;
-							ret = typeCheck(methodname);
+							ret = typeCheckUsable(methodname);
 							break;
 						}
 					}
 
-					Type* subject = typeCheck(tree->node_data.nodes[0]);
+					Type* subject = typeCheckUsable(tree->node_data.nodes[0]);
 
 					if(subject->type == TYPE_MATCHALL) {
 						ret = subject;
@@ -495,7 +502,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 						if(methodname->subnodes > i) {
 							int a;
 							for(a = 0; a < methodname->node_data.nodes[i]->subnodes; a++)
-								AddTypeToTypeArray(typeCheck(methodname->node_data.nodes[i]->node_data.nodes[a]), args);
+								AddTypeToTypeArray(typeCheckUsable(methodname->node_data.nodes[i]->node_data.nodes[a]), args);
 						}
 
 						method_segments.push_back(pair<string, TypeArray*>(name, args));
@@ -553,7 +560,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				try {
 					ret = copyType(tree->node_data.nodes[0]->node_data.type);
 					objectsymtable->assertTypeIsValid(ret);
-					Type* casted = typeCheck(tree->node_data.nodes[1]);
+					Type* casted = typeCheckUsable(tree->node_data.nodes[1]);
 					if(!analyzer->isASubtypeOfB(casted, ret)) {
 						expectedstring = analyzer->getNameForType(ret);
 						erroneousstring = analyzer->getNameForType(casted);
@@ -571,7 +578,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				{
 					Type* provider;
 					try {
-						provider = typeCheck(tree->node_data.nodes[2]);
+						provider = typeCheckUsable(tree->node_data.nodes[2]);
 						ret = copyType(tree->node_data.nodes[0]->node_data.type);
 						//TODO index 1 is the arguments
 						objectsymtable->assertTypeIsValid(ret);
@@ -602,14 +609,12 @@ Type* TypeChecker::typeCheck(Node* tree) {
 
 			case NT_EXISTS:
 				try {
-					Type* ret = typeCheck(tree->node_data.nodes[0]);
+					Type* ret = typeCheckUsable(tree->node_data.nodes[0]);
 
 					if(!ret->optional) {
 						errors->addError(new SemanticError(EXISTS_ON_NONOPTIONAL_TYPE, "exists { } statement uses a nonoptional type", tree)); // @todo better error message!
 						break;
 					}
-
-					objectsymtable->assertTypeIsValid(ret);
 
 					Type* real = copyType(ret);
 					real->optional = 0;
@@ -688,4 +693,18 @@ bool TypeChecker::isValidLValue(Node* n) {
 		default:
 			return false;
 	}
+}
+
+Type* TypeChecker::typeCheckUsable(Node* n) {
+	Type* t = typeCheck(n);
+	if(t == NULL) {
+		return MakeType(TYPE_NOTHING);
+	}
+
+	if(t->type == TYPE_UNUSABLE) {
+		errors->addError(new SemanticError(USE_OF_ASSIGNMENT_VALUE, "", n));
+		t->type = TYPE_MATCHALL;
+	}
+
+	return t;
 }

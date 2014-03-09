@@ -26,6 +26,7 @@ class TypeChecker {
 
 	private:
 		Type* typeCheck(Node* n);
+		Type* typeCheckUsable(Node* n);
 		bool exhaustiveReturns(Node* n);
 		void flowAnalysis(Node* n, bool breakable, bool caseable, bool continuable);
 		bool isValidLValue(Node* N);
