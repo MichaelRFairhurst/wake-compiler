@@ -1,0 +1,47 @@
+import Asserts;
+
+every AssignmentsTest is:
+
+	Bool -- testPlusEquals(Asserts) {
+		var Int = 5;
+		Int += 0;
+		Asserts.that(Int)Equals(5);
+		Int += 1;
+		Asserts.that(Int)Equals(6);
+		Int += 5;
+		Asserts.that(Int)Equals(11);
+		return Asserts.allPassed();
+	}
+
+	Bool -- testMinusEquals(Asserts) {
+		var Int = 5;
+		Int -= 0;
+		Asserts.that(Int)Equals(5);
+		Int -= 1;
+		Asserts.that(Int)Equals(4);
+		Int -= 4;
+		Asserts.that(Int)Equals(0);
+		return Asserts.allPassed();
+	}
+
+	Bool -- testTimesEquals(Asserts) {
+		var Int = 5;
+		Int *= 1;
+		Asserts.that(Int)Equals(5);
+		Int *= 5;
+		Asserts.that(Int)Equals(25);
+		Int *= 0;
+		Asserts.that(Int)Equals(0);
+		return Asserts.allPassed();
+	}
+
+	Bool -- testDivideEquals(Asserts) {
+		var Int = 25;
+		Int /= 5;
+		Asserts.that(Int)Equals(5);
+		Int /= 1;
+		Asserts.that(Int)Equals(5);
+		Int /= 5;
+		Asserts.that(Int)Equals(1);
+		return Asserts.allPassed();
+	}
