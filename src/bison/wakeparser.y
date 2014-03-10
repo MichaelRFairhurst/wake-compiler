@@ -53,7 +53,7 @@ int wakewrap()
 %token <number> BOOL
 %token <number> SYM_SHADOW
 %token <number> SYM_ARRAYED
-%type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection injection_args provision provisions injection_arg ctor retrievabledeclarableargs value method block methodreturn methodnamesegments methodbody methodaccess methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional type_valued property property_value retrievalargs retrieval objectable expression_cast assignment
+%type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection injection_args provision provisions injection_arg ctor retrievabledeclarableargs value method block methodreturn methodnamesegments methodbody methodaccess methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional type_valued property property_value retrievalargs retrieval objectable expression_cast assignment publicorprivatectorneed
 %type <type>  type_pure type_pure_arrayable type_pure_arrayable_nonoptional type_declarable_nonoptional type_declarable type_common type_lambda type_commonorlambda type_retrievable type_retrievabledeclarable
 %type <type_array> declarabletypes commonorlambdatypes
 %start file
@@ -174,8 +174,13 @@ ctor:
 	;
 
 retrievabledeclarableargs:
-	retrievabledeclarableargs ',' type_retrievabledeclarable					{ $$ = $1; AddSubNode($$, MakeNodeFromType($3)); }
-	| type_retrievabledeclarable												{ $$ = MakeOneBranchNode(NT_CTOR_ARGS, MakeNodeFromType($1)); }
+	retrievabledeclarableargs ',' publicorprivatectorneed						{ $$ = $1; AddSubNode($$, $3); }
+	| publicorprivatectorneed													{ $$ = MakeOneBranchNode(NT_CTOR_ARGS, $1); }
+	;
+
+publicorprivatectorneed:
+	type_retrievabledeclarable													{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, MakeNodeFromType($1), MakeEmptyNode(NT_PRIVATE)); }
+	| PUBLIC type_retrievabledeclarable											{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, MakeNodeFromType($2), MakeEmptyNode(NT_PUBLIC)); }
 	;
 
 method:

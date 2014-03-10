@@ -23,7 +23,7 @@ every Main is:
 	with Int totalcount = 0;
 	with Int failedcount = 0;
 	with Int passedcount = 0;
-	with Text[] failed = [];
+	with Text[] failed `tests by name` = [];
 
 	Run(Bool result, test Text) {
 		totalcount += 1;
@@ -111,11 +111,11 @@ every Main is:
 #>
 every TernaryOperatorTest is:
 
-	Bool -- testTrue(Asserts) {
+	Bool -- testTrue() {
 		return true ? true : false;
 	}
 
-	Bool -- testFalse(Asserts) {
+	Bool -- testFalse() {
 		return false ? false : true;
 	}
 ##

@@ -33,6 +33,7 @@
 
 #define NT_CTOR 20
 #define NT_CTOR_ARGS 21
+#define NT_CTOR_ARG 86
 
 #define NT_METHOD_DECLARATION 22
 #define NT_METHOD_RETURN_TYPE 23

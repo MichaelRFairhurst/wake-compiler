@@ -28,6 +28,7 @@ void count();
 <ST_LINECOMMENT>.		count();
 
 #[a-zA-Z0-9]+			count();
+`[^`]*`					count();
 
 every					count(); return EVERY;
 capable					count(); return CAPABLE;

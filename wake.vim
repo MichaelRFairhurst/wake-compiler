@@ -42,6 +42,7 @@ syn region	mystring start=/"/ skip=/\\\\\|\\"/ end=/"/
 syn region	mystring2 start=/'/ skip=/\\\\\|\\'/ end=/'/
 syn match	injectionlabel	"\({\)\@<=[a-zA-Z0-9]\+\(}\)\@="
 syn region	comment	start="\/\/" end="$"
+syn match	comment	"`[^`]*`"
 
 hi link comment		Comment
 hi link hashcomment	Comment

@@ -109,9 +109,10 @@ void ClassParseTreeTraverser::checkCtorArgs(Node* tree) {
 		case NT_CTOR_ARGS:
 			try {
 				for(int i = 0; i < tree->subnodes; i++) {
-					objectsymtable->assertTypeIsValid(tree->node_data.nodes[i]->node_data.type);
-					objectsymtable->getAnalyzer()->assertNeedIsNotCircular(classname, tree->node_data.nodes[i]->node_data.type);
-					propertysymtable->addNeed(tree->node_data.nodes[i]->node_data.type);
+					Type* needtype = tree->node_data.nodes[i]->node_data.nodes[0]->node_data.type;
+					objectsymtable->assertTypeIsValid(needtype);
+					objectsymtable->getAnalyzer()->assertNeedIsNotCircular(classname, needtype);
+					propertysymtable->addNeed(needtype);
 				}
 			} catch(SymbolNotFoundException* e) {
 				errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
@@ -138,7 +139,7 @@ void ClassParseTreeTraverser::loadCtorArgs(Node* tree) {
 		case NT_CTOR_ARGS:
 			try {
 				for(int i = 0; i < tree->subnodes; i++) {
-					Type* need = tree->node_data.nodes[i]->node_data.type;
+					Type* need = tree->node_data.nodes[i]->node_data.nodes[0]->node_data.type;
 					scopesymtable->add(need);
 				}
 			} catch(SymbolNotFoundException* e) {
