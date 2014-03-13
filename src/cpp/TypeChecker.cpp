@@ -150,15 +150,15 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					if(!variable && thiscontext != "") {
 						PropertySymbolTable* proptable = objectsymtable->find(thiscontext);
 						variable = proptable->find(scopesymtable->getNameForType(tree->node_data.type));
-					}
-					if(!variable) {
-						ret = MakeType(TYPE_MATCHALL);
-						errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Symbol by name of " + scopesymtable->getNameForType(tree->node_data.type) + " not found", tree));
 						if(variable) {
 							tree->node_type = NT_MEMBER_ACCESS;
 							AddSubNode(tree, MakeEmptyNode(NT_THIS));
 							AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(tree->node_data.type->typedata._class.classname)));
 						}
+					}
+					if(!variable) {
+						ret = MakeType(TYPE_MATCHALL);
+						errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Symbol by name of " + scopesymtable->getNameForType(tree->node_data.type) + " not found", tree));
 					} else {
 						ret = copyType(*variable);
 					}
@@ -650,7 +650,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					PropertySymbolTable* proptable = objectsymtable->find(subject->typedata._class.classname);
 					string name = tree->node_data.nodes[1]->node_type == NT_ALIAS
 						? tree->node_data.nodes[1]->node_data.string
-						: tree->node_data.nodes[1]->node_data.type->typedata._class.classname;
+						: scopesymtable->getNameForType(tree->node_data.nodes[1]->node_data.type);
 					boost::optional<Type*> variable = proptable->find(name);
 					if(!variable) {
 						ret = MakeType(TYPE_MATCHALL);

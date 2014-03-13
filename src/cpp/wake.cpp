@@ -55,7 +55,7 @@ void compileFile(Options* options) {
 
 	// Parse the shit out of this
 	if(parser.parse(myfile)) exit(3);
-	//parser.print();
+	//parser.print();exit(0);
 
 	ObjectSymbolTable table;
 	LibraryLoader loader;

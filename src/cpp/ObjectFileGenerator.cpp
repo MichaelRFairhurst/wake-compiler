@@ -222,10 +222,14 @@ void ObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_PROPERTY:
-			//table.add(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type);
-			//file << "var ";
-			generate(tree->node_data.nodes[0]);
-			file << ";";
+			{
+				file << "this.";
+				string propname = table.getNameForType(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type);
+				header->addPropertyUsage(file.tellp(), propname);
+				file << "=";
+				generate(tree->node_data.nodes[0]->node_data.nodes[1]);
+				file << ";";
+			}
 			break;
 
 		case NT_DECLARATION:
