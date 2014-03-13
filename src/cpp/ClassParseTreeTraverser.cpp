@@ -72,6 +72,22 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 				e->token = tree;
 				errors->addError(e);
 			}
+			break;
+
+		case NT_PROPERTY:
+			try {
+				Type* prop = copyType(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type);
+				objectsymtable->assertTypeIsValid(prop);
+				boost::optional<SemanticError*> error = propertysymtable->addProperty(prop, tree->subnodes == 2 ? PROPERTY_PUBLIC : 0);
+				if(error) {
+					(*error)->token = tree;
+					errors->addError(*error);
+				}
+			} catch(SemanticError* e) {
+				e->token = tree;
+				errors->addError(e);
+			}
+			break;
 
 	}
 }
@@ -82,8 +98,8 @@ void ClassParseTreeTraverser::secondPass(Node* tree) {
 			{
 				scopesymtable->pushScope();
 				loadCtorArgs(tree);
+				typeCheckProperties(tree);
 				typechecker->setThisContext(classname);
-				loadProperties(tree);
 				typeCheckMethods(tree);
 				scopesymtable->popScope();
 			}
@@ -150,19 +166,20 @@ void ClassParseTreeTraverser::loadCtorArgs(Node* tree) {
 	}
 }
 
-void ClassParseTreeTraverser::loadProperties(Node* tree) {
+void ClassParseTreeTraverser::typeCheckProperties(Node* tree) {
 	switch(tree->node_type) {
 		case NT_CLASSBODY:
 			{
 				int i = tree->subnodes;
 				while(i > 0) {
 					i--;
-					loadProperties(tree->node_data.nodes[i]);
+					typeCheckProperties(tree->node_data.nodes[i]);
 				}
 			}
 			break;
 
 		case NT_PROPERTY:
+			scopesymtable->pushScope();
 			try {
 				if(tree->node_data.nodes[0]->node_type == NT_ASSIGNMENT) {
 					scopesymtable->add(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type);
@@ -179,6 +196,7 @@ void ClassParseTreeTraverser::loadProperties(Node* tree) {
 				e->token = tree;
 				errors->addError(e);
 			}
+			scopesymtable->popScope();
 			break;
 	}
 }

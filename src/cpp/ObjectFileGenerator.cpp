@@ -58,7 +58,6 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_CTOR:
 		case NT_PARENT:
 		case NT_CLASSNAME:
-		case NT_MEMBER_ACCESS:
 		case NT_LAMBDA_INVOCATION:
 		case NT_CAST:
 			{
@@ -201,6 +200,16 @@ void ObjectFileGenerator::generate(Node* tree) {
 			}
 			break;
 
+		case NT_MEMBER_ACCESS:
+			{
+				generate(tree->node_data.nodes[0]);
+				string name = tree->node_data.nodes[tree->subnodes - 1]->node_data.string;
+
+				file << ".";
+				header->addPropertyUsage(file.tellp(), name);
+			}
+			break;
+
 		case NT_RETRIEVAL:
 			{
 				generate(tree->node_data.nodes[2]);
@@ -270,8 +279,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 		case NT_ALIAS:
 			{
-				string name = "@";
-				name += tree->node_data.string;
+				string name = tree->node_data.string;
 				file << table.getAddress(name);
 			}
 			break;

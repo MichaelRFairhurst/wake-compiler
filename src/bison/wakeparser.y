@@ -117,14 +117,13 @@ classprop:
 	;
 
 property:
-	WITH PUBLIC property_value ';'												{ $$ = MakeOneBranchNode(NT_PROPERTY, $3); }
+	WITH PUBLIC property_value ';'												{ $$ = MakeTwoBranchNode(NT_PROPERTY, $3, MakeEmptyNode(NT_PUBLIC)); }
 	| WITH property_value ';'													{ $$ = MakeOneBranchNode(NT_PROPERTY, $2); }
 	;
 
 property_value:
-	type_declarable													{ $$ = MakeNodeFromType($1); }
-	| type_declarable '=' value										{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1), $3); }
-	| type_declarable retrievalargs value								{	Node* retrieval = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1), $2);
+	type_declarable '=' value													{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1), $3); }
+	| type_declarable retrievalargs value										{	Node* retrieval = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1), $2);
 																					AddSubNode(retrieval, $3);
 																					$$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType(copyType($1)), retrieval);		}
 	;

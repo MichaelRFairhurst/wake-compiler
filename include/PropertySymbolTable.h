@@ -31,6 +31,7 @@ class PropertySymbolTable {
 		string getAddress(string name);
 		string getProvisionSymbol(Type* provided);
 		boost::optional<SemanticError*> addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, int flags);
+		boost::optional<SemanticError*> addProperty(Type* property, int flags);
 		boost::optional<SemanticError*> addProvision(Type* provision);
 		void addNeed(Type* returntype);
 		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);

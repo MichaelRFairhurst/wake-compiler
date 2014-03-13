@@ -5,7 +5,7 @@
 #include "ParseTreeTraverser.h"
 #include "LibraryLoader.h"
 
-BOOST_AUTO_TEST_SUITE( ObjectSymbolTableTest )
+BOOST_AUTO_TEST_SUITE( ParseTreeTraverserTest )
 
 #define PTT_PRINT_TREE 0
 
@@ -642,13 +642,13 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	InvalidPropertyClassIsNotFoundError,
-	"every MyClass is: with NonExist;",
+	"every MyClass is: with NonExist = 4;\n",
 	PTT_EXPECT(CLASSNAME_NOT_FOUND)
 )
 
 PTT_TEST_CASE(
 	assignNonExistClassToPropertyIsNotFoundError,
-	"every MyClass is: with MyClass = NonExist;",
+	"every MyClass is: with MyClass = NonExist;\n",
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 )
 
@@ -659,13 +659,14 @@ PTT_TEST_CASE(
 )
 
 PTT_TEST_CASE(
-	AssignMultiplePropertiesRightOrderIsOK,
+	AssignMultiplePropertiesRightOrderIsntOK,
 	"every MyClass is: with Int = 5; with $Int = Int; with $$Int = $Int;",
-	PTT_VALID
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 )
 
 PTT_TEST_CASE(
-	AssignMultiplePropertiesWrongOrderIsntOK,
+	AssignMultiplePropertiesLeftOrderIsntOK,
 	"every MyClass is: with Int = $Int; with $Int = $$Int; with $$Int = 5;",
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
@@ -694,8 +695,8 @@ PTT_TEST_CASE(
 	"every MyClass is:									\n\
 	every OtherClass is:								\n\
 		needs MyClass c;								\n\
-		with MyClass b;								\n\
-		with MyClass e = b;							\n\
+		with MyClass b = c;								\n\
+		with MyClass e = c;							\n\
 		MyClass -- testScope(MyClass d) {				\n\
 			return e; return b; return c; return d;	\n\
 		}",
@@ -1719,7 +1720,7 @@ PTT_TEST_CASE(
 	"every MyClass is:												\n\
 		with Int = 0;												\n\
 		with Bool = false;											\n\
-		with MyClass = this;										\n\
+		with MyClass? = nothing;									\n\
 		inAddition() { (Int = 3) + 2; }								\n\
 		inSubtraction() { (Int = 3) - 2; }							\n\
 		inDivision() { (Int = 3) / 2; }								\n\
@@ -1752,24 +1753,34 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	UsingValuedAssignmentAsValueIsOK,
-	"every MyClass is:												\n\
-		with Int = 0;												\n\
-		with Bool = false;											\n\
-		with MyClass = this;										\n\
-		inAddition() { (Int := 3) + 2; }							\n\
-		inSubtraction() { (Int := 3) - 2; }							\n\
-		inDivision() { (Int := 3) / 2; }							\n\
-		inMultiplication() { (Int := 3) * 2; }						\n\
-		inAssignment() { Int = (Int := 3); }						\n\
-		Int -- inReturn() { return Int := 3; }						\n\
-		inMethodSubject() { (MyClass := this).inMethodSubject(); }	\n\
-		inMethodArg($Int) { inMethodArg(Int := 5); }				\n\
-		inEquivalence() { (Int := 5) == 5; }						\n\
-		inLT() { (Int := 5) <= 5; }									\n\
-		inGT() { (Int := 5) >= 5; }									\n\
-		inIfStmt() { if(Bool := true) {} }							\n\
-		inWhileStmt() { while(Bool := true) {} }					\n\
+	"every MyClass is:															\n\
+		with Int = 0;															\n\
+		with Bool = false;														\n\
+		inAddition() { (Int := 3) + 2; }										\n\
+		inSubtraction() { (Int := 3) - 2; }										\n\
+		inDivision() { (Int := 3) / 2; }										\n\
+		inMultiplication() { (Int := 3) * 2; }									\n\
+		inAssignment() { Int = (Int := 3); }									\n\
+		Int -- inReturn() { return Int := 3; }									\n\
+		inMethodSubject(MyClass) { (MyClass := this).inMethodSubject(this); }	\n\
+		inMethodArg($Int) { inMethodArg(Int := 5); }							\n\
+		inEquivalence() { (Int := 5) == 5; }									\n\
+		inLT() { (Int := 5) <= 5; }												\n\
+		inGT() { (Int := 5) >= 5; }												\n\
+		inIfStmt() { if(Bool := true) {} }										\n\
+		inWhileStmt() { while(Bool := true) {} }								\n\
 	",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestUsePublicPropertiesOnOtherObject,
+	"every MyClass is:						\n\
+		with public Int = 3;				\n\
+		with public Int aliased = 3;		\n\
+		myMethod(MyClass) {					\n\
+			MyClass.Int + MyClass.aliased;	\n\
+		}",
 	PTT_VALID
 );
 

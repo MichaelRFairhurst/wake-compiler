@@ -62,8 +62,7 @@ string ScopeSymbolTable::getNameForType(Type* type) {
 	string name;
 
 	if(type->alias != NULL) {
-		name = "@";
-		name += type->alias;
+		name = type->alias;
 	} else {
 		name = string(type->typedata._class.shadow, '$') + type->typedata._class.classname;
 	}

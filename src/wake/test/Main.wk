@@ -9,13 +9,14 @@ import InheritanceTest;
 import ArrayTest;
 import OptionalTypeTest;
 import AssignmentsTest;
+import PropertyTest;
 
 #>
 # Test suite entry point
 ##
 every Main is:
 
-	needs System, AssertsTest, Printer, MathTest, BooleanLogicTest, InheritanceTest, ArrayTest, OptionalTypeTest, AssignmentsTest;
+	needs System, AssertsTest, Printer, MathTest, BooleanLogicTest, InheritanceTest, ArrayTest, OptionalTypeTest, AssignmentsTest, PropertyTest;
 
 	provides Printer, Asserts;
 
@@ -86,6 +87,8 @@ every Main is:
 		Run(AssignmentsTest.testTimesEquals(Asserts <- this), "testTimesEquals");
 		Run(AssignmentsTest.testDivideEquals(Asserts <- this), "testDivideEquals");
 		Run(AssignmentsTest.testUsingAssigmentReturnValues(Asserts <- this), "testUsingAssigmentReturnValues");
+		Run(PropertyTest.~[test own properties]~(Asserts <- this), "test own properties");
+		Run(PropertyTest.~[test others properties]~(Asserts <- this), "test others properties");
 
 		Printer.printLine("");
 		Printer.printLine("");

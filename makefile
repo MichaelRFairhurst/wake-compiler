@@ -1,7 +1,7 @@
 SHELL=/bin/bash
 
-OPT=-O3
-#OPT=-O0 -g
+#OPT=-O3
+OPT=-O0 -g
 FLAGS=-Iinclude -Igen
 CC=cc $(FLAGS)
 CPP=g++ $(FLAGS) -std=c++11
@@ -49,7 +49,8 @@ WAKENAMES=ArrayTest.wk \
 			BooleanLogicTest.wk \
 			InheritanceTestParent.wk \
 			MockPrinter.wk \
-			AssignmentsTest.wk
+			AssignmentsTest.wk \
+			PropertyTest.wk
 
 WAKEOBJS=$(addprefix bin/wakeobj/, $(WAKENAMES:.wk=.o))
 
@@ -110,10 +111,13 @@ bin/wake: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o chivvy
 bin/finaltest.js: $(WAKEOBJS) src/wake/stdlib/myobj/std.o
 	time ./bin/wake -d bin/waketable -l src/wake/stdlib/myobj/std.o $(WAKEOBJS) -o bin/finaltest.js
 
-bin/wakeobj/Main.o: src/wake/test/Main.wk bin/wake bin/wakeobj/Asserts.o bin/wakeobj/ArrayTest.o bin/wakeobj/MathTest.o bin/wakeobj/AssertsTest.o bin/wakeobj/BooleanLogicTest.o bin/wakeobj/OptionalTypeTest.o bin/wakeobj/InheritanceTest.o bin/wakeobj/AssignmentsTest.o $(WAKETABLEOBJS)
+bin/wakeobj/Main.o: src/wake/test/Main.wk bin/wake bin/wakeobj/PropertyTest.o bin/wakeobj/Asserts.o bin/wakeobj/ArrayTest.o bin/wakeobj/MathTest.o bin/wakeobj/AssertsTest.o bin/wakeobj/BooleanLogicTest.o bin/wakeobj/OptionalTypeTest.o bin/wakeobj/InheritanceTest.o bin/wakeobj/AssignmentsTest.o $(WAKETABLEOBJS)
 	time ./bin/wake -d bin/waketable $< -o $@
 
 bin/wakeobj/MockPrinter.o: src/wake/test/MockPrinter.wk bin/wake bin/waketable/Printer.table
+	time ./bin/wake -d bin/waketable $< -o $@
+
+bin/wakeobj/PropertyTest.o: src/wake/test/PropertyTest.wk bin/wake bin/wakeobj/Asserts.o
 	time ./bin/wake -d bin/waketable $< -o $@
 
 bin/wakeobj/AssignmentsTest.o: src/wake/test/AssignmentsTest.wk bin/wake bin/wakeobj/Asserts.o

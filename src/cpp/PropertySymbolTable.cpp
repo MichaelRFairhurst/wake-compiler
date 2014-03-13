@@ -39,12 +39,28 @@ boost::optional<SemanticError*> PropertySymbolTable::addMethod(Type* returntype,
 	return boost::optional<SemanticError*>();
 }
 
+boost::optional<SemanticError*> PropertySymbolTable::addProperty(Type* property, int flags) {
+	string name = analyzer->getNameForTypeAsProperty(property);
+
+	if(properties.count(name)) {
+		string temp = "duplicate property name is " + name;
+		return boost::optional<SemanticError*>(new SemanticError(MULTIPLE_PROVISION_DEFINITION, temp));
+	}
+
+	ObjectProperty* prop = new ObjectProperty;
+	prop->flags = flags;
+	prop->type = property;
+
+	properties[name] = prop;
+	return boost::optional<SemanticError*>();
+}
+
 boost::optional<SemanticError*> PropertySymbolTable::addProvision(Type* provided) {
 	string name = analyzer->getNameForType(provided) + "<-";
 	if(provided->specialty != NULL) name += provided->specialty;
 
 	if(properties.count(name)) {
-		string temp = "duplicate method signature is " + name;
+		string temp = "duplicate provisoning is " + name;
 		return boost::optional<SemanticError*>(new SemanticError(MULTIPLE_PROVISION_DEFINITION, temp));
 	}
 

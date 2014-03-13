@@ -26,6 +26,7 @@ class TypeAnalyzer {
 		bool isPrimitiveTypeText(Type* theint);
 		bool isPrimitiveTypeBool(Type* theint);
 		string getNameForType(Type* type);
+		string getNameForTypeAsProperty(Type* type);
 
 };
 

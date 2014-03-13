@@ -1,0 +1,21 @@
+import Asserts;
+
+every PropertyTest is:
+
+	provides PropertyTest;
+
+	with public Int = 5;
+	with public Int six = 6;
+
+	Bool -- ~[test own properties]~(Asserts) {
+		Asserts.that(Int)Equals(5);
+		Asserts.that(six)Equals(6);
+		return Asserts.allPassed();
+	}
+
+	Bool -- ~[test others properties]~(Asserts) {
+		var PropertyTest <- this;
+		Asserts.that(PropertyTest.Int)Equals(5);
+		Asserts.that(PropertyTest.six)Equals(6);
+		return Asserts.allPassed();
+	}
