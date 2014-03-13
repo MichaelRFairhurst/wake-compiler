@@ -222,8 +222,8 @@ void ObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_PROPERTY:
-			table.add(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type);
-			file << "var ";
+			//table.add(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type);
+			//file << "var ";
 			generate(tree->node_data.nodes[0]);
 			file << ";";
 			break;
