@@ -1774,14 +1774,66 @@ PTT_TEST_CASE(
 );
 
 PTT_TEST_CASE(
-	TestUsePublicPropertiesOnOtherObject,
+	TestUsePublicPropertiesOnOtherObjectAndThis,
 	"every MyClass is:						\n\
 		with public Int = 3;				\n\
 		with public Int aliased = 3;		\n\
 		myMethod(MyClass) {					\n\
 			MyClass.Int + MyClass.aliased;	\n\
+			MyClass.Int = 3;				\n\
+			MyClass.aliased = 3;			\n\
+			this.Int + this.aliased;		\n\
+			this.Int = 3;					\n\
+			this.aliased = 3;				\n\
 		}",
 	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	AccessPropertyOnTypeErrorIsntSegfault,
+	"every MyClass is: myMethod() { Stou.lalala; }",
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
+)
+
+PTT_TEST_CASE(
+	TestUsePublicPropertiesOnOtherObjectAndThisInvalid,
+	"every MyClass is:							\n\
+		with public Int = 3;					\n\
+		with public Int aliased = 3;			\n\
+		myMethod(MyClass) {						\n\
+			MyClass.Int == this;				\n\
+			MyClass.Int.nonExistMethod();		\n\
+			MyClass.aliased == this;			\n\
+			MyClass.aliased.nonExistMethod();	\n\
+			MyClass.Int = this;					\n\
+			MyClass.Int = true;					\n\
+			MyClass.aliased = this;				\n\
+			MyClass.aliased = true;				\n\
+			this.Int == this;					\n\
+			this.Int.nonExistMethod();			\n\
+			this.aliased == this;				\n\
+			this.aliased.nonExistMethod();		\n\
+			this.Int = this;					\n\
+			this.Int = true;					\n\
+			this.aliased = this;				\n\
+			this.aliased = true;				\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(TYPE_ERROR)
 );
 
 BOOST_AUTO_TEST_SUITE_END()

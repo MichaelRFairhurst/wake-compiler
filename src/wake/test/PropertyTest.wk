@@ -10,6 +10,20 @@ every PropertyTest is:
 	Bool -- ~[test own properties]~(Asserts) {
 		Asserts.that(Int)Equals(5);
 		Asserts.that(six)Equals(6);
+		Asserts.that(this.Int)Equals(5);
+		Asserts.that(this.six)Equals(6);
+		Int = 2;
+		six = 3;
+		Asserts.that(Int)Equals(2);
+		Asserts.that(six)Equals(3);
+		Asserts.that(this.Int)Equals(2);
+		Asserts.that(this.six)Equals(3);
+		this.Int = 3;
+		this.six = 4;
+		Asserts.that(Int)Equals(3);
+		Asserts.that(six)Equals(4);
+		Asserts.that(this.Int)Equals(3);
+		Asserts.that(this.six)Equals(4);
 		return Asserts.allPassed();
 	}
 
@@ -17,5 +31,17 @@ every PropertyTest is:
 		var PropertyTest <- this;
 		Asserts.that(PropertyTest.Int)Equals(5);
 		Asserts.that(PropertyTest.six)Equals(6);
+		PropertyTest.Int = 2;
+		PropertyTest.six = 3;
+		Asserts.that(PropertyTest.Int)Equals(2);
+		Asserts.that(PropertyTest.six)Equals(3);
+
+		var $PropertyTest <- this;
+		Asserts.that($PropertyTest.Int)Equals(5);
+		Asserts.that($PropertyTest.six)Equals(6);
+		$PropertyTest.Int = 2;
+		$PropertyTest.six = 3;
+		Asserts.that($PropertyTest.Int)Equals(2);
+		Asserts.that($PropertyTest.six)Equals(3);
 		return Asserts.allPassed();
 	}

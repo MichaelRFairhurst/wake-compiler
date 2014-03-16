@@ -646,7 +646,11 @@ Type* TypeChecker::typeCheck(Node* tree) {
 
 			case NT_MEMBER_ACCESS:
 				{
-					Type* subject = typeCheck(tree->node_data.nodes[0]);
+					Type* subject = typeCheckUsable(tree->node_data.nodes[0]);
+					if(subject->type == TYPE_MATCHALL) {
+						ret = subject;
+						break;
+					}
 					PropertySymbolTable* proptable = objectsymtable->find(subject->typedata._class.classname);
 					string name = tree->node_data.nodes[1]->node_type == NT_ALIAS
 						? tree->node_data.nodes[1]->node_data.string
@@ -717,6 +721,7 @@ bool TypeChecker::isValidLValue(Node* n) {
 	switch(n->node_type) {
 		case NT_ALIAS: return true;
 		case NT_TYPEDATA: return true;
+		case NT_MEMBER_ACCESS: return true;
 		case NT_ARRAY_ACCESS:
 			return isValidLValue(n->node_data.nodes[0]);
 		default:
