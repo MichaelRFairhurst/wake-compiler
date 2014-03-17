@@ -67,6 +67,12 @@ void ObjectFileGenerator::generate(Node* tree) {
 			}
 			break;
 
+		case NT_AUTOBOX:
+			file << "(";
+			generate(tree->node_data.nodes[0]);
+			file << ")";
+			break;
+
 		case NT_CLASS:
 			{
 				table.pushScope();

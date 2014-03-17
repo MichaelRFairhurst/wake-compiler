@@ -1,1 +1,12 @@
 every Int is:
+
+	Int -- squared() { return 0; }
+	Int -- absoluteValue() { return 0; } // ABS FAILS
+
+	Int -- orMaxOf(Int) { return 0; }
+	Int -- orMaxOf(Int[]) { return 0; }
+
+	Int -- orMinOf(Int) { return 0; }
+	Int -- orMinOf(Int[]) { return 0; }
+
+	Int -- numberOfDigits() { return 0; }

@@ -1802,17 +1802,17 @@ PTT_TEST_CASE(
 		with public Int aliased = 3;			\n\
 		myMethod(MyClass) {						\n\
 			MyClass.Int == this;				\n\
-			//MyClass.Int.nonExistMethod();		\n\
+			MyClass.Int.nonExistMethod();		\n\
 			MyClass.aliased == this;			\n\
-			//MyClass.aliased.nonExistMethod();	\n\
+			MyClass.aliased.nonExistMethod();	\n\
 			MyClass.Int = this;					\n\
 			MyClass.Int = true;					\n\
 			MyClass.aliased = this;				\n\
 			MyClass.aliased = true;				\n\
 			this.Int == this;					\n\
-			//this.Int.nonExistMethod();			\n\
+			this.Int.nonExistMethod();			\n\
 			this.aliased == this;				\n\
-			//this.aliased.nonExistMethod();		\n\
+			this.aliased.nonExistMethod();		\n\
 			this.Int = this;					\n\
 			this.Int = true;					\n\
 			this.aliased = this;				\n\
@@ -1822,17 +1822,17 @@ PTT_TEST_CASE(
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
-	//PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 	PTT_EXPECT(TYPE_ERROR)
-	//PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
-	PTT_EXPECT(TYPE_ERROR)
-	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
-	//PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 	PTT_EXPECT(TYPE_ERROR)
-	//PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 	PTT_EXPECT(TYPE_ERROR)
 );
 

@@ -10,13 +10,14 @@ import ArrayTest;
 import OptionalTypeTest;
 import AssignmentsTest;
 import PropertyTest;
+import AutoboxingTest;
 
 #>
 # Test suite entry point
 ##
 every Main is:
 
-	needs System, AssertsTest, Printer, MathTest, BooleanLogicTest, InheritanceTest, ArrayTest, OptionalTypeTest, AssignmentsTest, PropertyTest;
+	needs System, AssertsTest, Printer, MathTest, BooleanLogicTest, InheritanceTest, ArrayTest, OptionalTypeTest, AssignmentsTest, PropertyTest, AutoboxingTest;
 
 	provides Printer, Asserts;
 
@@ -89,6 +90,13 @@ every Main is:
 		Run(AssignmentsTest.testUsingAssigmentReturnValues(Asserts <- this), "testUsingAssigmentReturnValues");
 		Run(PropertyTest.~[test own properties]~(Asserts <- this), "test own properties");
 		Run(PropertyTest.~[test others properties]~(Asserts <- this), "test others properties");
+		Run(AutoboxingTest.testIntSquared(Asserts <- this), "testIntSquared");
+		Run(AutoboxingTest.testAbsoluteValue(Asserts <- this), "testAbsoluteValue");
+		Run(AutoboxingTest.testMaxOfInt(Asserts <- this), "testMaxOfInt");
+		Run(AutoboxingTest.testMaxOfInts(Asserts <- this), "testMaxOfInts");
+		Run(AutoboxingTest.testMinOfInt(Asserts <- this), "testMinOfInt");
+		Run(AutoboxingTest.testMinOfInts(Asserts <- this), "testMinOfInts");
+		Run(AutoboxingTest.testNumberOfDigits(Asserts <- this), "testNumberOfDigits");
 
 		Printer.printLine("");
 		Printer.printLine("");

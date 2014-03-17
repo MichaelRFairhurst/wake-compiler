@@ -128,11 +128,11 @@ bool TypeAnalyzer::isPrimitiveTypeBool(Type* type) {
 	return type->type != TYPE_LAMBDA && type->typedata._class.classname == string("Bool") && type->arrayed == 0 && type->optional == 0;
 }
 
-bool TypeAnalyzer::isAutoboxedType(Type* type, string* boxed) {
+bool TypeAnalyzer::isAutoboxedType(Type* type, string** boxed) {
 	if(type->type == TYPE_MATCHALL) return false;
 
 	// need to return a generic autoboxed type according to arguments/return
-	if(type->type == TYPE_LAMBDA) { boxed = new string("lambda"); return true; }
+	if(type->type == TYPE_LAMBDA) { *boxed = new string("lambda"); return true; }
 
 	// shouldn't be here...throw exception?
 	if(type->type == TYPE_UNUSABLE) return false;
@@ -141,11 +141,11 @@ bool TypeAnalyzer::isAutoboxedType(Type* type, string* boxed) {
 	if(type->optional) return false;
 
 	// need to return a Array<T>
-	if(type->arrayed) { boxed = new string("Array"); return true; }
+	if(type->arrayed) { *boxed = new string("Array"); return true; }
 
-	if(isPrimitiveTypeBool(type)) { boxed = new string("Bool"); return true; }
-	if(isPrimitiveTypeText(type)) { boxed = new string("Text"); return true; }
-	if(isPrimitiveTypeInt(type)) { boxed = new string("Int"); return true; }
+	if(isPrimitiveTypeBool(type)) { *boxed = new string("Bool"); return true; }
+	if(isPrimitiveTypeText(type)) { *boxed = new string("Text"); return true; }
+	if(isPrimitiveTypeInt(type)) { *boxed = new string("Int"); return true; }
 
 	return false;
 }
