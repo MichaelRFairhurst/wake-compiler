@@ -13,6 +13,7 @@ void LibraryLoader::loadImport(string importname, string importpath, ObjectSymbo
 }
 
 void LibraryLoader::loadStdLibToTable(ObjectSymbolTable* table) {
+#ifdef STDLIB_ONLY_DEFINE_PRIMITIVES
 	PropertySymbolTable* ptable = table->getEmptyPropertySymbolTable();
 	ptable->classname = "Text";
 	table->importClass(ptable);
@@ -24,5 +25,12 @@ void LibraryLoader::loadStdLibToTable(ObjectSymbolTable* table) {
 	ptable = table->getEmptyPropertySymbolTable();
 	ptable->classname = "Int";
 	table->importClass(ptable);
+#else
+	sstream importbin;
+	TableFileReader reader;
+
+#include "gen/waketables.c"
+	PropertySymbolTable* ptable = table.getEmptyPropertySymbolTable();reader.read(ptable, importbin);table.importClass(ptable);
+#endif
 
 }

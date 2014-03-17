@@ -498,6 +498,13 @@ Type* TypeChecker::typeCheck(Node* tree) {
 
 					Type* subject = typeCheckUsable(tree->node_data.nodes[0]);
 
+					string* boxedtype;
+					if(analyzer->isAutoboxedType(subject, boxedtype)) {
+						Node* node = tree->node_data.nodes[0];
+						tree->node_data.nodes[0] = MakeTwoBranchNode(NT_AUTOBOX, node, MakeNodeFromString(NT_COMPILER_HINT, strdup(boxedtype->c_str())));
+						delete boxedtype;
+					}
+
 					if(subject->type == TYPE_MATCHALL) {
 						ret = subject;
 						break;
@@ -650,6 +657,12 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					if(subject->type == TYPE_MATCHALL) {
 						ret = subject;
 						break;
+					}
+					string* boxedtype;
+					if(analyzer->isAutoboxedType(subject, boxedtype)) {
+						Node* node = tree->node_data.nodes[0];
+						tree->node_data.nodes[0] = MakeTwoBranchNode(NT_AUTOBOX, node, MakeNodeFromString(NT_COMPILER_HINT, strdup(boxedtype->c_str())));
+						delete boxedtype;
 					}
 					PropertySymbolTable* proptable = objectsymtable->find(subject->typedata._class.classname);
 					string name = tree->node_data.nodes[1]->node_type == NT_ALIAS

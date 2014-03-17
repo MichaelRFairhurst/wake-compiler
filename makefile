@@ -21,7 +21,6 @@ CPPNAMES= \
 	TypeChecker.cpp \
 	ClassParseTreeTraverser.cpp \
 	MethodSignatureParseTreeTraverser.cpp \
-	LibraryLoader.cpp \
 	ObjectFileGenerator.cpp \
 	ObjectFileHeaderData.cpp \
 	ObjectFileHeaderRenderer.cpp \
@@ -98,12 +97,18 @@ chivvy: bin/test
 	@echo -- NOW CHIVVY ALONG
 	@echo
 
-bin/test: $(CPPOBJS) $(GENOBJS) $(COBJS) $(TESTOBJS)
+bin/test: $(CPPOBJS) $(GENOBJS) $(COBJS) $(TESTOBJS) bin/cpp/LibraryLoader-nolib.o
 	@echo add TEST=false to skip
-	if $(TEST); then $(CPP) $(TESTOBJS) $(CPPOBJS) $(GENOBJS) $(COBJS) -o bin/test -lfl -lboost_unit_test_framework -lboost_filesystem -lboost_system ; fi
+	if $(TEST); then $(CPP) $(TESTOBJS) $(CPPOBJS) bin/cpp/LibraryLoader-nolib.o $(GENOBJS) $(COBJS) -o bin/test -lfl -lboost_unit_test_framework -lboost_filesystem -lboost_system ; fi
 
-bin/wake: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o chivvy
-	$(CPP) $(OPT) $(CPPOBJS) bin/cpp/wake.o $(GENOBJS) $(COBJS) -o bin/wake -lfl -lboost_filesystem -lboost_system
+bin/wake-nolib: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o chivvy
+	$(CPP) $(OPT) $(CPPOBJS) bin/cpp/LibraryLoader-nolib.o bin/cpp/wake.o $(GENOBJS) $(COBJS) -o bin/wake-nolib -lfl -lboost_filesystem -lboost_system -DSTDLIB_ONLY_DEFINE_PRIMITIVES
+	@echo
+	@echo -- CHEERIO
+	@echo
+
+bin/wake: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o bin/cpp/LibraryLoader.o chivvy bin/wake-nolib $(WAKETABLEOBJS)
+	$(CPP) $(OPT) $(CPPOBJS) bin/cpp/LibraryLoader.o bin/cpp/wake.o $(GENOBJS) $(COBJS) -o bin/wake-nolib -lfl -lboost_filesystem -lboost_system
 	@echo
 	@echo -- CHEERIO
 	@echo
@@ -159,17 +164,26 @@ bin/gen/%.o: gen/%.c gen/wake.tab.c
 bin/tests/%.o: src/cpp/test/%.cpp
 	$(CPP) -g -c $< -o $@
 
-bin/waketable/%.table: src/wake/stdlib/tables/%.wk bin/wake
-	./bin/wake -t $< -d bin/waketable
+bin/waketable/%.table: src/wake/stdlib/tables/%.wk bin/wake-nolib
+	./bin/wake-nolib -t $< -d bin/waketable
 
 bin/cpp/%.o: src/cpp/%.cpp gen/wake.tab.c gen/objectfile.tab.c
 	$(CPP) $(OPT) -c $< -o $@
+
+bin/cpp/LibraryLoader.o: src/cpp/LibraryLoader.cpp gen/wake.tab.c gen/objectfile.tab.c gen/waketables.c
+
+bin/cpp/LibraryLoader-nolib.o: src/cpp/LibraryLoader.cpp gen/wake.tab.c gen/objectfile.tab.c
+	$(CPP) $(OPT) -c $< -o $@ -DSTDLIB_ONLY_DEFINE_PRIMITIVES
 
 bin/c/%.o: src/c/%.c gen/wake.tab.c gen/objectfile.tab.c
 	$(CC) $(OPT) -c $< -o $@
 
 gen/%.tab.c: src/bison/%parser.y
 	bison -p $* -dg -o $@ $<
+
+gen/waketables.c: bin/wake-nolib $(WAKETABLEOBJS)
+	rm gen/waketables.c || :
+	for i in bin/waketables/* do; echo 'importbin.str(' >> gen/waketables.c xxd $$i -c >> gen/waketables.c echo '); PropertySymbolTable* ptable = table.getEmptyPropertySymbolTable();reader.read(ptable, importbin);table.importClass(ptable);' done
 
 gen/lex.%.c: src/flex/%lexer.l gen/wake.tab.c gen/objectfile.tab.c
 	flex -P $* -o $@ $<
@@ -187,6 +201,7 @@ loo:
 	rm bin/gen/* || :
 	rm bin/c/* || :
 	rm bin/wake || :
+	rm bin/wake-nolib || :
 	rm bin/wakeobj/* || :
 	rm bin/waketable/* || :
 	rm bin/finaltest.js || :
