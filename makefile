@@ -53,8 +53,9 @@ WAKENAMES=ArrayTest.wk \
 
 WAKEOBJS=$(addprefix bin/wakeobj/, $(WAKENAMES:.wk=.o))
 
-WAKETABLENAMES=Printer.wk System.wk
+WAKETABLENAMES=Printer.wk System.wk Int.wk Text.wk Bool.wk
 WAKETABLEOBJS=$(addprefix bin/waketable/, $(WAKETABLENAMES:.wk=.table))
+WAKETABLEINCLUDES=$(addprefix gen/, $(WAKETABLENAMES:.wk=.table.h))
 
 CNAMES=tree.c type.c parseUtil.c
 COBJS=$(addprefix bin/c/, $(CNAMES:.c=.o))
@@ -101,14 +102,14 @@ bin/test: $(CPPOBJS) $(GENOBJS) $(COBJS) $(TESTOBJS) bin/cpp/LibraryLoader-nolib
 	@echo add TEST=false to skip
 	if $(TEST); then $(CPP) $(TESTOBJS) $(CPPOBJS) bin/cpp/LibraryLoader-nolib.o $(GENOBJS) $(COBJS) -o bin/test -lfl -lboost_unit_test_framework -lboost_filesystem -lboost_system ; fi
 
-bin/wake-nolib: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o chivvy
+bin/wake-nolib: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o chivvy bin/cpp/LibraryLoader-nolib.o
 	$(CPP) $(OPT) $(CPPOBJS) bin/cpp/LibraryLoader-nolib.o bin/cpp/wake.o $(GENOBJS) $(COBJS) -o bin/wake-nolib -lfl -lboost_filesystem -lboost_system -DSTDLIB_ONLY_DEFINE_PRIMITIVES
 	@echo
 	@echo -- CHEERIO
 	@echo
 
-bin/wake: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o bin/cpp/LibraryLoader.o chivvy bin/wake-nolib $(WAKETABLEOBJS)
-	$(CPP) $(OPT) $(CPPOBJS) bin/cpp/LibraryLoader.o bin/cpp/wake.o $(GENOBJS) $(COBJS) -o bin/wake-nolib -lfl -lboost_filesystem -lboost_system
+bin/wake: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o bin/cpp/LibraryLoader-withlib.o chivvy bin/wake-nolib $(WAKETABLEOBJS)
+	$(CPP) $(OPT) $(CPPOBJS) bin/cpp/LibraryLoader-withlib.o bin/cpp/wake.o $(GENOBJS) $(COBJS) -o bin/wake -lfl -lboost_filesystem -lboost_system
 	@echo
 	@echo -- CHEERIO
 	@echo
@@ -158,22 +159,26 @@ bin/wakeobj/Asserts.o: src/wake/stdlib/Asserts.wk bin/wake $(WAKETABLEOBJS)
 bin/wakeobj/%.o: src/wake/test/%.wk bin/wake $(WAKETABLEOBJS)
 	time ./bin/wake -d bin/waketable $< -o $@
 
+bin/waketable/%.table: src/wake/stdlib/tables/%.wk bin/wake-nolib
+	./bin/wake-nolib -d bin/waketable -t $< -d bin/waketable
+
+bin/waketable/Printer.table: bin/waketable/Int.table bin/waketable/Text.table bin/wake-nolib src/wake/stdlib/tables/Printer.wk
+bin/waketable/System.table: bin/waketable/Int.table bin/wake-nolib src/wake/stdlib/tables/System.wk
+
 bin/gen/%.o: gen/%.c gen/wake.tab.c
 	$(CC) $(OPT) -c $< -o $@
 
 bin/tests/%.o: src/cpp/test/%.cpp
 	$(CPP) -g -c $< -o $@
 
-bin/waketable/%.table: src/wake/stdlib/tables/%.wk bin/wake-nolib
-	./bin/wake-nolib -t $< -d bin/waketable
-
 bin/cpp/%.o: src/cpp/%.cpp gen/wake.tab.c gen/objectfile.tab.c
 	$(CPP) $(OPT) -c $< -o $@
 
-bin/cpp/LibraryLoader.o: src/cpp/LibraryLoader.cpp gen/wake.tab.c gen/objectfile.tab.c gen/waketables.c
+bin/cpp/LibraryLoader-withlib.o: src/cpp/LibraryLoader.cpp $(WAKETABLEINCLUDES)
+	$(CPP) $(OPT) -c $< -o $@ -DCOMPILE_IN_PRIMITIVE_TYPES
 
-bin/cpp/LibraryLoader-nolib.o: src/cpp/LibraryLoader.cpp gen/wake.tab.c gen/objectfile.tab.c
-	$(CPP) $(OPT) -c $< -o $@ -DSTDLIB_ONLY_DEFINE_PRIMITIVES
+bin/cpp/LibraryLoader-nolib.o: src/cpp/LibraryLoader.cpp
+	$(CPP) $(OPT) -c $< -o $@
 
 bin/c/%.o: src/c/%.c gen/wake.tab.c gen/objectfile.tab.c
 	$(CC) $(OPT) -c $< -o $@
@@ -181,9 +186,8 @@ bin/c/%.o: src/c/%.c gen/wake.tab.c gen/objectfile.tab.c
 gen/%.tab.c: src/bison/%parser.y
 	bison -p $* -dg -o $@ $<
 
-gen/waketables.c: bin/wake-nolib $(WAKETABLEOBJS)
-	rm gen/waketables.c || :
-	for i in bin/waketables/* do; echo 'importbin.str(' >> gen/waketables.c xxd $$i -c >> gen/waketables.c echo '); PropertySymbolTable* ptable = table.getEmptyPropertySymbolTable();reader.read(ptable, importbin);table.importClass(ptable);' done
+gen/%.table.h: bin/waketable/%.table bin/wake-nolib
+	xxd -i $< $@
 
 gen/lex.%.c: src/flex/%lexer.l gen/wake.tab.c gen/objectfile.tab.c
 	flex -P $* -o $@ $<

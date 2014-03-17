@@ -1,3 +1,5 @@
+import Int;
+
 #>
 # This only defines the signatures, and will be used to
 # generate an importable .table file

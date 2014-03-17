@@ -141,8 +141,7 @@ bool TypeAnalyzer::isAutoboxedType(Type* type, string* boxed) {
 	if(type->optional) return false;
 
 	// need to return a Array<T>
-	//if(type->arrayed) { boxed = new string("array"); return true; }
-	if(type->arrayed) return false; // autoboxing arrays is a biiit more work
+	if(type->arrayed) { boxed = new string("Array"); return true; }
 
 	if(isPrimitiveTypeBool(type)) { boxed = new string("Bool"); return true; }
 	if(isPrimitiveTypeText(type)) { boxed = new string("Text"); return true; }

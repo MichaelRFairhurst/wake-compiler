@@ -21,7 +21,7 @@ BOOST_AUTO_TEST_SUITE( ParseTreeTraverserTest )
 		loader.loadStdLibToTable(&table); \
 		ParseTreeTraverser t(&table); \
 		MockSemanticErrorPrinter e; \
-		p.parse( CODE ); \
+		p.parse( "every Int is: every Bool is: every Text is: " CODE ); \
 		if(PTT_PRINT_TREE) p.print(); \
 		{ EXPECTATIONS } \
 		t.traverse(p.getParseTree()); \

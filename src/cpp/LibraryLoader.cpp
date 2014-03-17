@@ -1,6 +1,8 @@
 #include "LibraryLoader.h"
 #include <fstream>
+#include <sstream>
 #include "TableFileReader.h"
+
 
 void LibraryLoader::loadImport(string importname, string importpath, ObjectSymbolTable& objtable) {
 	fstream importfile;
@@ -13,24 +15,24 @@ void LibraryLoader::loadImport(string importname, string importpath, ObjectSymbo
 }
 
 void LibraryLoader::loadStdLibToTable(ObjectSymbolTable* table) {
-#ifdef STDLIB_ONLY_DEFINE_PRIMITIVES
-	PropertySymbolTable* ptable = table->getEmptyPropertySymbolTable();
-	ptable->classname = "Text";
-	table->importClass(ptable);
+	#ifdef COMPILE_IN_PRIMITIVE_TYPES
+		#include "Int.table.h"
+		#include "Text.table.h"
+		#include "Bool.table.h"
 
-	ptable = table->getEmptyPropertySymbolTable();
-	ptable->classname = "Bool";
-	table->importClass(ptable);
+		#define LOAD_MEMORY_TABLE_FILE(tname) \
+			stringstream importbin ## tname; \
+			importbin ## tname.write((const char*)bin_waketable_ ## tname ## _table, bin_waketable_ ## tname ## _table_len); \
+			ptable = table->getEmptyPropertySymbolTable(); \
+			reader.read(ptable, importbin ## tname); \
+			table->importClass(ptable);
 
-	ptable = table->getEmptyPropertySymbolTable();
-	ptable->classname = "Int";
-	table->importClass(ptable);
-#else
-	sstream importbin;
-	TableFileReader reader;
+		TableFileReader reader;
+		PropertySymbolTable* ptable;
 
-#include "gen/waketables.c"
-	PropertySymbolTable* ptable = table.getEmptyPropertySymbolTable();reader.read(ptable, importbin);table.importClass(ptable);
-#endif
+		LOAD_MEMORY_TABLE_FILE(Int);
+		LOAD_MEMORY_TABLE_FILE(Text);
+		LOAD_MEMORY_TABLE_FILE(Bool);
 
+	#endif
 }
