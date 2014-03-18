@@ -68,6 +68,8 @@ void ObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_AUTOBOX:
+			file << "new ";
+			header->addClassUsage(file.tellp(), tree->node_data.nodes[1]->node_data.string);
 			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << ")";

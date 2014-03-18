@@ -1,30 +1,61 @@
-%-CLASSES-%
-	11 {Printer}
-	400 {System}
+var $ b='';
 
-%-PROPERTIES-%
-	30 {print(Text)}
-	36 {print(Int)}
-	215 {printLine(Text)}
-	221 {printLine(Int)}
-	358 {print(Int)}
-	419 {exit(Int)}
+~Printer~ = function(){
+	this.`print(Text)` =
+	this.`print(Int)` = function(a) {
+		if(typeof $ process != 'undefined'
+				&& typeof $ process.stdout != 'undefined'
+				&& typeof $ process.stdout.write != 'undefined')
+			process.stdout.write(''+a);
 
-%-END-%
-
-var b='';
-=function(){
-	this.=this.=function(a){
-		if(typeof process!='undefined'&&typeof process.stdout!='undefined'&&typeof process.stdout.write!='undefined')process.stdout.write(''+a);
-		else b+=''+a;
+		else $ b += '' + a;
 	};
-	this.=this.=function(a){
-		if(typeof process!='undefined'&&typeof process.stdout!='undefined'&&typeof process.stdout.write!='undefined')return this.(a+'\n');
-		console.log(b+a);b='';
+
+	this.`printLine(Text)` =
+	this.`printLine(Int)` = function(a) {
+		if(typeof $ process != 'undefined'
+				&& typeof $ process.stdout != 'undefined'
+				&& typeof $ process.stdout.write != 'undefined') return $ this.`print(Text)`(a + '\n');
+		console.log(b + a);
+		b = '';
 	};
 };
-=function(){
-	this.=function(a){
-		if(typeof process!='undefined'&&typeof process.exit!='undefined')process.exit(a);
+
+~System~ = function() {
+	this.`exit(Int)` = function(a) {
+		if(typeof $ process!='undefined' && typeof $ process.exit!='undefined')
+			process.exit(a);
 	};
 };
+
+~Int~ = function(a) {
+	this.`squared()` = function() {
+		return $ a * a;
+	};
+
+	this.`absoluteValue()` = function() {
+		return $ a < 0 ? a * -1 : a;
+	};
+
+	this.`orMaxOf(Int)` = function(b) {
+		return $ a < b ? b : a;
+	};
+
+	this.`orMaxOf(Int[])` = function(b) { return $ 0; };
+
+	this.`orMinOf(Int)` = function(b) { return $ 0; };
+
+	this.`orMinOf(Int[])` = function(b) { return $ 0; };
+
+	this.`numberOfDigits()` = function() { return $ 0; };
+
+};
+
+~Text~ = function(a) {
+
+	this.`toUpper()` = function() { return $ "stub"; };
+	this.`toLower()` = function() { return $ "stub"; };
+	this.`switchCase()` = function() { return $ "stub"; };
+	this.`trim()` = function() { return $ "stub"; };
+
+}
