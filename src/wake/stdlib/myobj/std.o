@@ -1,21 +1,21 @@
-var $ b='';
+var$ b='';
 
 ~Printer~ = function(){
 	this.`print(Text)` =
 	this.`print(Int)` = function(a) {
-		if(typeof $ process != 'undefined'
-				&& typeof $ process.stdout != 'undefined'
-				&& typeof $ process.stdout.write != 'undefined')
+		if(typeof$ process != 'undefined'
+				&& typeof$ process.stdout != 'undefined'
+				&& typeof$ process.stdout.write != 'undefined')
 			process.stdout.write(''+a);
 
-		else $ b += '' + a;
+		else$ b += '' + a;
 	};
 
 	this.`printLine(Text)` =
 	this.`printLine(Int)` = function(a) {
-		if(typeof $ process != 'undefined'
-				&& typeof $ process.stdout != 'undefined'
-				&& typeof $ process.stdout.write != 'undefined') return $ this.`print(Text)`(a + '\n');
+		if(typeof$ process != 'undefined'
+				&& typeof$ process.stdout != 'undefined'
+				&& typeof$ process.stdout.write != 'undefined') return$ this.`print(Text)`(a + '\n');
 		console.log(b + a);
 		b = '';
 	};
@@ -23,39 +23,72 @@ var $ b='';
 
 ~System~ = function() {
 	this.`exit(Int)` = function(a) {
-		if(typeof $ process!='undefined' && typeof $ process.exit!='undefined')
+		if(typeof$ process!='undefined' && typeof$ process.exit!='undefined')
 			process.exit(a);
 	};
 };
 
 ~Int~ = function(a) {
 	this.`squared()` = function() {
-		return $ a * a;
+		return$ a * a;
 	};
 
 	this.`absoluteValue()` = function() {
-		return $ a < 0 ? a * -1 : a;
+		return$ a < 0 ? a * -1 : a;
 	};
 
 	this.`orMaxOf(Int)` = function(b) {
-		return $ a < b ? b : a;
+		return$ a < b ? b : a;
 	};
 
-	this.`orMaxOf(Int[])` = function(b) { return $ 0; };
+	this.`orMaxOf(Int[])` = function(b) {
+		var$ c = 0, d;
+		for(d = a; c < b.length; c++) {
+			if(a < b[c]) d = b[c];
+		}
+		return$ d;
+	};
 
-	this.`orMinOf(Int)` = function(b) { return $ 0; };
+	this.`orMinOf(Int)` = function(b) {
+		return$ a > b ? b : a;
+	};
 
-	this.`orMinOf(Int[])` = function(b) { return $ 0; };
+	this.`orMinOf(Int[])` = function(b) {
+		var$ c = 0, d;
+		for(d = a; c < b.length; c++) {
+			if(a > b[c]) d = b[c];
+		}
+		return$ d;
+	};
 
-	this.`numberOfDigits()` = function() { return $ 0; };
+	this.`numberOfDigits()` = function(b) {
+		var$ b = 1, c = this.`absoluteValue()`();
+		while((c /= 10) > 1) b++;
+		return$ b;
+	};
 
 };
 
 ~Text~ = function(a) {
 
-	this.`toUpper()` = function() { return $ "stub"; };
-	this.`toLower()` = function() { return $ "stub"; };
-	this.`switchCase()` = function() { return $ "stub"; };
-	this.`trim()` = function() { return $ "stub"; };
+	this.`toUpper()` = function() {
+		return$ a.toUpperCase();
+	};
 
-}
+	this.`toLower()` = function() {
+		return$ a.toLowerCase();
+	};
+
+	this.`switchCase()` = function() {
+		return$ a.replace(/([a-z])|([A-Z])/g,
+			function(b,c){
+					return (c) ? b.toUpperCase() : b.toLowerCase()
+			}
+		);
+	};
+
+	this.`trim()` = function() {
+		return$ a.trim();
+	};
+
+};

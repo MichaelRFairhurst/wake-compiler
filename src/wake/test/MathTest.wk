@@ -6,14 +6,14 @@ every MathTest is:
 		Asserts.that(2 + 2)Equals(4);
 		Asserts.that(6 + 2)Equals(8);
 		Asserts.that(60000 + 20000)Equals(80000);
-		Asserts.that(0-20 + 14)Equals(0-6);
+		Asserts.that(0 - 20 + 14)Equals(0 - 6);
 		return Asserts.allPassed();
 	}
 
 	Bool -- testSubtraction(Asserts) {
 		Asserts.that(6 - 2)Equals(4);
 		Asserts.that(42 - 2)Equals(40);
-		Asserts.that(40 - 80)Equals(0-40);
+		Asserts.that(40 - 80)Equals(0 - 40);
 		return Asserts.allPassed();
 	}
 
@@ -34,12 +34,12 @@ every MathTest is:
 
 	Bool -- testOrderOfOperations(Asserts) {
 		Asserts.that(5 + 6 * 2)Equals(17);
-		Asserts.that(5 - 6 * 2)Equals(0-7);
+		Asserts.that(5 - 6 * 2)Equals(0 - 7);
 		Asserts.that(5 + 6 / 2)Equals(8);
 		Asserts.that(5 - 6 / 2)Equals(2);
 		Asserts.that(6 * 2 + 5)Equals(17);
 		Asserts.that(6 * 2 - 5)Equals(7);
 		Asserts.that(6 / 2 + 5)Equals(8);
-		Asserts.that(6 / 2 - 5)Equals(0-2);
+		Asserts.that(6 / 2 - 5)Equals(0 - 2);
 		return Asserts.allPassed();
 	}

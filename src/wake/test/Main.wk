@@ -97,6 +97,10 @@ every Main is:
 		Run(AutoboxingTest.testMinOfInt(Asserts <- this), "testMinOfInt");
 		Run(AutoboxingTest.testMinOfInts(Asserts <- this), "testMinOfInts");
 		Run(AutoboxingTest.testNumberOfDigits(Asserts <- this), "testNumberOfDigits");
+		Run(AutoboxingTest.testToUpper(Asserts <- this), "testToUpper");
+		Run(AutoboxingTest.testToLower(Asserts <- this), "testToLower");
+		Run(AutoboxingTest.testSwitchCase(Asserts <- this), "testSwitchCase");
+		Run(AutoboxingTest.testTrim(Asserts <- this), "testSwitchCase");
 
 		Printer.printLine("");
 		Printer.printLine("");

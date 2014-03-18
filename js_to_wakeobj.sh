@@ -52,4 +52,4 @@ do
 done
 
 echo "%-CLASSES-% $CLASSESOUT %-PROPERTIES-% $PROPERTIESOUT %-END-%"
-echo "$JSOUT"
+echo -n "$JSOUT"

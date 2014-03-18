@@ -118,8 +118,8 @@ bin/wake: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o bin/cpp/LibraryLoader-wi
 bin/finaltest.js: $(WAKEOBJS) bin/wakeobj/std.o
 	time ./bin/wake -d bin/waketable -l bin/wakeobj/std.o $(WAKEOBJS) -o bin/finaltest.js
 
-bin/wakeobj/std.o: src/wake/stdlib/myobj/std.o character_reader.sh
-	cat $< | ./character_reader.sh > $@
+bin/wakeobj/std.o: src/wake/stdlib/myobj/std.o js_to_wakeobj.sh
+	cat $< | ./js_to_wakeobj.sh > $@
 
 bin/wakeobj/Main.o: src/wake/test/Main.wk bin/wake bin/wakeobj/PropertyTest.o bin/wakeobj/AutoboxingTest.o bin/wakeobj/Asserts.o bin/wakeobj/ArrayTest.o bin/wakeobj/MathTest.o bin/wakeobj/AssertsTest.o bin/wakeobj/BooleanLogicTest.o bin/wakeobj/OptionalTypeTest.o bin/wakeobj/InheritanceTest.o bin/wakeobj/AssignmentsTest.o $(WAKETABLEOBJS)
 	time ./bin/wake -d bin/waketable $< -o $@

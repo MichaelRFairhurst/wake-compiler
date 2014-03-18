@@ -9,6 +9,8 @@ every AutoboxingTest is:
 
 	Bool -- testAbsoluteValue(Asserts) {
 		Asserts.that(5.absoluteValue())Equals(5);
+		Asserts.that(0.absoluteValue())Equals(0);
+		Asserts.that(-3.absoluteValue())Equals(3);
 		// TODO...NEGATIVES
 		return Asserts.allPassed();
 	}
@@ -55,5 +57,33 @@ every AutoboxingTest is:
 		Asserts.that(12.numberOfDigits())Equals(2);
 		Asserts.that(1.numberOfDigits())Equals(1);
 		Asserts.that(0.numberOfDigits())Equals(1);
+		return Asserts.allPassed();
+	}
+
+	Bool -- testToUpper(Asserts) {
+		Asserts.that("blah".toUpper())Equals("BLAH");
+		return Asserts.allPassed();
+	}
+
+	Bool -- testToLower(Asserts) {
+		Asserts.that("BLAH".toLower())Equals("blah");
+		return Asserts.allPassed();
+	}
+
+	Bool -- testSwitchCase(Asserts) {
+		Asserts.that("BlAh".switchCase())Equals("bLaH");
+		return Asserts.allPassed();
+	}
+
+	Bool -- testTrim(Asserts) {
+		Asserts.that("    	 blah".trim())Equals("blah");
+		Asserts.that(" blah".trim())Equals("blah");
+		Asserts.that("blah ".trim())Equals("blah");
+		Asserts.that("blah 		".trim())Equals("blah");
+		Asserts.that(" blah ".trim())Equals("blah");
+		Asserts.that("  	 blah 		 ".trim())Equals("blah");
+		Asserts.that("blah".trim())Equals("blah");
+		Asserts.that(" blah blah ".trim())Equals("blah blah");
+		Asserts.that("blah blah".trim())Equals("blah blah");
 		return Asserts.allPassed();
 	}
