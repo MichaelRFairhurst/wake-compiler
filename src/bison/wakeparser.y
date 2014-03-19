@@ -54,8 +54,8 @@ int wakewrap()
 %token <number> SYM_SHADOW
 %token <number> SYM_ARRAYED
 %type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection injection_args provision provisions injection_arg ctor retrievabledeclarableargs value method block methodreturn methodnamesegments methodbody methodaccess methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional type_valued property property_value retrievalargs retrieval objectable expression_cast assignment publicorprivatectorneed
-%type <type>  type_pure type_pure_arrayable type_pure_arrayable_nonoptional type_declarable_nonoptional type_declarable type_common type_lambda type_commonorlambda type_retrievable type_retrievabledeclarable
-%type <type_array> declarabletypes commonorlambdatypes
+%type <type>  type_pure type_pure_arrayable type_pure_arrayable_nonoptional type_declarable_nonoptional type_declarable type_common type_lambda type_commonorlambda type_retrievable type_retrievabledeclarable type specializabletype shadowabletype puretype classtype fntype
+%type <type_array> declarabletypes commonorlambdatypes puretypes
 %start file
 %%
 
@@ -122,8 +122,8 @@ property:
 	;
 
 property_value:
-	type_declarable '=' value													{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1), $3); }
-	| type_declarable retrievalargs value										{	Node* retrieval = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1), $2);
+	type '=' value													{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1), $3); }
+	| type retrievalargs value										{	Node* retrieval = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1), $2);
 																					AddSubNode(retrieval, $3);
 																					$$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType(copyType($1)), retrieval);		}
 	;
@@ -134,12 +134,12 @@ provisions:
 	;
 
 provision:
-	type_retrievable															{ $$ = MakeOneBranchNode(NT_PROVISION, MakeNodeFromType($1)); }
-	| type_retrievable SYM_PROVIDE injection_providable							{ $$ = MakeTwoBranchNode(NT_PROVISION, MakeNodeFromType($1), $3); }
+	type															{ $$ = MakeOneBranchNode(NT_PROVISION, MakeNodeFromType($1)); }
+	| type SYM_PROVIDE injection_providable							{ $$ = MakeTwoBranchNode(NT_PROVISION, MakeNodeFromType($1), $3); }
 	;
 
 injection_providable:
-	type_retrievable															{ $$ = MakeNodeFromType($1); }
+	type															{ $$ = MakeNodeFromType($1); }
 	| injection																	{ $$ = $1; }
 	| block																		{ $$ = $1; }
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
@@ -159,7 +159,7 @@ injection_args:
 	;
 
 injection_arg:
-	type_retrievable															{ $$ = MakeNodeFromType($1); }
+	type															{ $$ = MakeNodeFromType($1); }
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
 	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
 	| BOOL																		{ $$ = MakeNodeFromNumber(NT_BOOLLIT, $1); }
@@ -178,8 +178,8 @@ retrievabledeclarableargs:
 	;
 
 publicorprivatectorneed:
-	type_retrievabledeclarable													{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, MakeNodeFromType($1), MakeEmptyNode(NT_PRIVATE)); }
-	| PUBLIC type_retrievabledeclarable											{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, MakeNodeFromType($2), MakeEmptyNode(NT_PUBLIC)); }
+	type													{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, MakeNodeFromType($1), MakeEmptyNode(NT_PRIVATE)); }
+	| PUBLIC type											{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, MakeNodeFromType($2), MakeEmptyNode(NT_PUBLIC)); }
 	;
 
 method:
@@ -193,7 +193,7 @@ methodaccess:
 	| PUBLIC																	{ $$ = MakeEmptyNode(NT_PUBLIC); }
 
 methodreturn:
-	type_pure SYM_RETURN_DECREMENT												{ $$ = MakeOneBranchNode(NT_METHOD_RETURN_TYPE, MakeNodeFromType($1)); }
+	puretype SYM_RETURN_DECREMENT												{ $$ = MakeOneBranchNode(NT_METHOD_RETURN_TYPE, MakeNodeFromType($1)); }
 	;
 
 type_pure:
@@ -500,7 +500,49 @@ expressions:
 
 identifier:
 	UIDENTIFIER																	{ $$ = $1; }
-	| LIDENTIFIER																	{ $$ = $1; }
+	| LIDENTIFIER																{ $$ = $1; }
 	;
+
+type:
+	LIDENTIFIER specializabletype												{ $$ = $2; $$->alias = $1; }
+	| specializabletype LIDENTIFIER												{ $$ = $1; $$->alias = $2; }
+	| specializabletype															{ $$ = $1; }
+	;
+
+specializabletype:
+	shadowabletype																{ $$ = $1; }
+	| shadowabletype SPECIALTY													{ $$ = $1; $$->specialty = $2; }
+	;
+
+shadowabletype:
+	puretype																	{ $$ = $1; }
+	| SYM_SHADOW classtype														{ $$ = $2; $$->typedata._class.shadow = $1; }
+	;
+
+puretype:
+	classtype																	{ $$ = $1; }
+	| fntype																	{ $$ = $1; }
+	;
+
+puretypes:
+	puretype																	{ $$ = MakeTypeArray($1); }
+	| puretypes puretype														{ $$ = $1; AddTypeToTypeArray($2, $$); }
+
+classtype:
+	UIDENTIFIER																	{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; }
+	| UIDENTIFIER '<' puretypes '>'												{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; }
+	| classtype '?'																{ $$ = $1; $$->optional++; }
+	| classtype SYM_ARRAYED														{ $$ = $1; $$->arrayed += SYM_ARRAYED; }
+	;
+
+fntype:
+	puretype SYM_RETURN_DECREMENT FN '(' puretypes ')'							{ $$ = MakeType(TYPE_LAMBDA); $$->typedata.lambda.returntype = $1; $$->typedata.lambda.arguments = $5; }
+	| puretype SYM_RETURN_DECREMENT FN '(' ')'									{ $$ = MakeType(TYPE_LAMBDA); $$->typedata.lambda.returntype = $1; }
+	| FN '(' puretypes ')'														{ $$ = MakeType(TYPE_LAMBDA); $$->typedata.lambda.arguments = $3; }
+	| FN '(' ')'																{ $$ = MakeType(TYPE_LAMBDA); }
+	| fntype '?'																{ $$ = $1; $$->optional++; }
+	| fntype SYM_ARRAYED														{ $$ = $1; $$->arrayed += SYM_ARRAYED; }
+	;
+
 
 %%
