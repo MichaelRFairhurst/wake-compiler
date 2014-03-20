@@ -345,6 +345,9 @@ Chainable
 	var List<Map<String,from Employee to Architect>>;
 	var List<Map<String,anything>>;
 
+// TERNARY
+	return true if isOpen() else checkCanOpen();
+
 //PRIVATE METHODS
 //CALL PARENT METHODS
 //XLANG

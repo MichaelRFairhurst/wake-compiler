@@ -17,9 +17,9 @@ import AutoboxingTest;
 ##
 every Main is:
 
-	needs System, AssertsTest, Printer, MathTest, BooleanLogicTest, InheritanceTest, ArrayTest, OptionalTypeTest, AssignmentsTest, PropertyTest, AutoboxingTest, $AutoboxingTest[];
+	needs System, AssertsTest, Printer, MathTest, BooleanLogicTest, InheritanceTest, ArrayTest, OptionalTypeTest, AssignmentsTest, PropertyTest, AutoboxingTest;
 
-	provides Printer, Asserts, Printer?;
+	provides Printer, Asserts;
 
 	with Bool passed = true;
 	with Int totalcount = 0;

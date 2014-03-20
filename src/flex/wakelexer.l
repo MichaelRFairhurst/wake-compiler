@@ -62,6 +62,7 @@ cast					count(); return CAST;
 exists					count(); return EXISTS;
 var						count(); return VAR;
 
+\<\(					count(); return SYM_PROVIDE_ARGS_OPEN;
 \+\+					count(); return SYM_INCREMENT;
 !=						count(); return SYM_NE;
 ==						count(); return SYM_EQ;

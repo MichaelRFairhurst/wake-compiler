@@ -30,9 +30,10 @@ int wakewrap()
 /* keywords */
 %token EVERY CAPABLE A_OR_AN IS RETURN FOREACH WITH PUBLIC IF ELSE WHILE IN IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE EXISTS VAR
 /* symbols */
-%token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT SYM_PLUSEQ SYM_VALEQ SYM_MULTEQ SYM_SUBEQ SYM_DIVEQ
+%token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT SYM_PLUSEQ SYM_VALEQ SYM_MULTEQ SYM_SUBEQ SYM_DIVEQ SYM_PROVIDE_ARGS_OPEN
 /* this too */
 %token ERRORTOKEN
+
 
 %union
 {
@@ -53,10 +54,13 @@ int wakewrap()
 %token <number> BOOL
 %token <number> SYM_SHADOW
 %token <number> SYM_ARRAYED
-%type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection injection_args provision provisions injection_arg ctor retrievabledeclarableargs value method block methodreturn methodnamesegments methodbody methodaccess methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional type_valued property property_value retrievalargs retrieval objectable expression_cast assignment publicorprivatectorneed
+%type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection injection_args provision provisions injection_arg ctor retrievabledeclarableargs value method block methodreturn methodnamesegments methodbody methodaccess methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional type_valued property property_value retrievalargs objectable expression_cast assignment publicorprivatectorneed expression_retrieval
 %type <type>  type_pure type_pure_arrayable type_pure_arrayable_nonoptional type_declarable_nonoptional type_declarable type_common type_lambda type_commonorlambda type_retrievable type_retrievabledeclarable type specializabletype shadowabletype puretype classtype fntype
 %type <type_array> declarabletypes commonorlambdatypes puretypes
 %start file
+
+%expect 2
+%expect-rr 0
 %%
 
 file:
@@ -122,8 +126,8 @@ property:
 	;
 
 property_value:
-	type '=' value													{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1), $3); }
-	| type retrievalargs value										{	Node* retrieval = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1), $2);
+	type_declarable '=' expression													{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1), $3); }
+	| type_declarable retrievalargs expression										{	Node* retrieval = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1), $2);
 																					AddSubNode(retrieval, $3);
 																					$$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType(copyType($1)), retrieval);		}
 	;
@@ -134,12 +138,12 @@ provisions:
 	;
 
 provision:
-	type															{ $$ = MakeOneBranchNode(NT_PROVISION, MakeNodeFromType($1)); }
-	| type SYM_PROVIDE injection_providable							{ $$ = MakeTwoBranchNode(NT_PROVISION, MakeNodeFromType($1), $3); }
+	type_retrievable															{ $$ = MakeOneBranchNode(NT_PROVISION, MakeNodeFromType($1)); }
+	| type_retrievable SYM_PROVIDE injection_providable							{ $$ = MakeTwoBranchNode(NT_PROVISION, MakeNodeFromType($1), $3); }
 	;
 
 injection_providable:
-	type															{ $$ = MakeNodeFromType($1); }
+	type_retrievable															{ $$ = MakeNodeFromType($1); }
 	| injection																	{ $$ = $1; }
 	| block																		{ $$ = $1; }
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
@@ -159,7 +163,7 @@ injection_args:
 	;
 
 injection_arg:
-	type															{ $$ = MakeNodeFromType($1); }
+	type_retrievable															{ $$ = MakeNodeFromType($1); }
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
 	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
 	| BOOL																		{ $$ = MakeNodeFromNumber(NT_BOOLLIT, $1); }
@@ -178,8 +182,8 @@ retrievabledeclarableargs:
 	;
 
 publicorprivatectorneed:
-	type													{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, MakeNodeFromType($1), MakeEmptyNode(NT_PRIVATE)); }
-	| PUBLIC type											{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, MakeNodeFromType($2), MakeEmptyNode(NT_PUBLIC)); }
+	type_retrievabledeclarable													{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, MakeNodeFromType($1), MakeEmptyNode(NT_PRIVATE)); }
+	| PUBLIC type_retrievabledeclarable											{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, MakeNodeFromType($2), MakeEmptyNode(NT_PUBLIC)); }
 	;
 
 method:
@@ -193,7 +197,7 @@ methodaccess:
 	| PUBLIC																	{ $$ = MakeEmptyNode(NT_PUBLIC); }
 
 methodreturn:
-	puretype SYM_RETURN_DECREMENT												{ $$ = MakeOneBranchNode(NT_METHOD_RETURN_TYPE, MakeNodeFromType($1)); }
+	type_pure SYM_RETURN_DECREMENT												{ $$ = MakeOneBranchNode(NT_METHOD_RETURN_TYPE, MakeNodeFromType($1)); }
 	;
 
 type_pure:
@@ -319,7 +323,6 @@ value:
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
 	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
 	| BOOL																		{ $$ = MakeNodeFromNumber(NT_BOOLLIT, $1); }
-	| retrieval																	{ $$ = $1; }
 	| '(' expression ')'														{ $$ = $2; }
 	| '[' expressions ']'														{ $$ = MakeOneBranchNode(NT_ARRAY_DECLARATION, $2); }
 	| SYM_ARRAYED																{ $$ = MakeEmptyNode(NT_ARRAY_DECLARATION); }
@@ -346,15 +349,15 @@ declarationorstatement:
 	;
 
 declaration:
-	VAR type_declarable '=' value ';'											{ $$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType($2), $4); }
-	| VAR type_declarable retrievalargs value ';'								{	Node* retrieval = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($2), $3);
+	VAR type_declarable '=' expression ';'											{ $$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType($2), $4); }
+	| VAR type_declarable retrievalargs expression ';'								{	Node* retrieval = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($2), $3);
 																					AddSubNode(retrieval, $4);
 																					$$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType(copyType($2)), retrieval);		}
 	;
 
 retrievalargs:
 	SYM_PROVIDE																	{ $$ = MakeEmptyNode(NT_EMPTY); }
-	| '<' '(' expressions ')'													{ $$ = $3; }
+	| SYM_PROVIDE_ARGS_OPEN expressions ')'										{ $$ = $2; }
 
 statement:
 	emptystatement																{ $$ = MakeEmptyNode(NT_EMPTY); }
@@ -472,7 +475,12 @@ expression_conditionalor:
 
 expression_conditional:
 	expression_conditionalor													{ $$ = $1; }
-	| expression_conditionalor '?' expression ':' expression_conditional		{ $$ = MakeTwoBranchNode(NT_IF_THEN_ELSE, $1, $3); AddSubNode($$, $5); }
+	| expression_conditionalor IF expression_conditional ELSE expression		{ $$ = MakeTwoBranchNode(NT_IF_THEN_ELSE, $1, $3); AddSubNode($$, $5); }
+	;
+
+expression_retrieval:
+	expression_conditional														{ $$ = $1; }
+	| type_retrievabledeclarable retrievalargs expression_conditional						{ $$ = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1), $2); AddSubNode($$, $3); }
 	;
 
 assignment:
@@ -485,12 +493,8 @@ assignment:
 	;
 
 expression:
-	expression_conditional														{ $$ = $1; }
+	expression_retrieval														{ $$ = $1; }
 	| assignment																{ $$ = $1; }
-	;
-
-retrieval:
-	type_retrievable retrievalargs value										{ $$ = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1), $2); AddSubNode($$, $3); }
 	;
 
 expressions:
@@ -500,7 +504,7 @@ expressions:
 
 identifier:
 	UIDENTIFIER																	{ $$ = $1; }
-	| LIDENTIFIER																{ $$ = $1; }
+	| LIDENTIFIER																	{ $$ = $1; }
 	;
 
 type:
@@ -530,7 +534,7 @@ puretypes:
 
 classtype:
 	UIDENTIFIER																	{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; }
-	| UIDENTIFIER '<' puretypes '>'												{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; }
+	| UIDENTIFIER '(' puretypes ')'												{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; }
 	| classtype '?'																{ $$ = $1; $$->optional++; }
 	| classtype SYM_ARRAYED														{ $$ = $1; $$->arrayed += SYM_ARRAYED; }
 	;
@@ -543,6 +547,5 @@ fntype:
 	| fntype '?'																{ $$ = $1; $$->optional++; }
 	| fntype SYM_ARRAYED														{ $$ = $1; $$->arrayed += SYM_ARRAYED; }
 	;
-
 
 %%
