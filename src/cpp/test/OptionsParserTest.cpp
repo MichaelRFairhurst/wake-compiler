@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE(TestDefaults) {
 	BOOST_CHECK(options->compileFilename == "");
 	BOOST_CHECK(options->outFilename == "a.out");
 	BOOST_CHECK(options->mainclass == "Main");
-	BOOST_CHECK(options->mainmethod == "Main()");
+	BOOST_CHECK(options->mainmethod == "main()");
 	delete options;
 }
 

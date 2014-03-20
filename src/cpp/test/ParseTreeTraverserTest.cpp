@@ -181,11 +181,11 @@ PTT_TEST_CASE(
 			Child,																		\n\
 			Parent <- Child;															\n\
 																						\n\
-		Parent -- My(Parent)Function(Child, Parent b, Parent -- fn(Child) aliased) {	\n\
+		Parent -- my(Parent)Function(Child, Parent b, Parent -- fn(Child) aliased) {	\n\
 			Child; b; return aliased(Child);											\n\
 		}																				\n\
 																						\n\
-		Parent -- fn(Child) -- MyFunction(Child, Parent, Parent -- fn(Child) aliased) {	\n\
+		Parent -- fn(Child) -- myFunction(Child, Parent, Parent -- fn(Child) aliased) {	\n\
 			return aliased;																\n\
 		}																				\n\
 	",

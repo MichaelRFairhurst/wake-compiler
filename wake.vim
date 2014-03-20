@@ -32,8 +32,9 @@ syn match	alias	"\<[a-z][a-zA-Z]*\>"
 syn match	withinregionkeyword	"\(every\|is:\)"
 syn match	shadow	"\$"
 syn match	returntype	"\(\<[a-zA-Z]\+\>\s\+\)\?--"
-syn match	functioncall	")\?\<[a-zA-Z]\+\>(" contained
-syn match	methodnameseg	")\?\<[a-zA-Z]\+\>("
+syn match	functioncall	"\<[a-zA-Z]\+\>(" contained
+syn match	methodstart	"\<[a-z][a-zA-Z]*\>("
+syn match	methodseg	"\<)[a-zA-Z]*\>("
 syn match	symbols	"\((\|)\|;\||\|=\|+\|{\|}\|,\|\.\|<\|>\|\-\|\*\|\/\|:\)"
 syn match	ancestrysymbols "\((\|)\|,\)" contained
 syn match	typesymbols "\(\[\|\]\)"
@@ -64,7 +65,8 @@ hi link ancestrysymbols	Keyword
 hi link currysymbols		Function
 hi link typesymbols		Type
 
-hi link methodnameseg		Special
+hi link methodseg		Special
+hi link methodstart		Special
 hi link functioncall		String
 hi link mystring2		String
 hi link mystring		String
