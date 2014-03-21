@@ -355,6 +355,15 @@ Chainable
 	var List(Map(String,from Employee to Architect));
 	var List(Map(String,anything));
 
+	var List{Architect};
+	var List{List{Architect}};
+	var Map{String,Architect};
+	var List{Map{String,Architect}};
+	var List{Map{String,from Architect}};
+	var List{Map{String,to Architect}};
+	var List{Map{String,from Employee to Architect}};
+	var List{Map{String,anything}};
+
 // TERNARY
 	return true if isOpen() else checkCanOpen();
 
