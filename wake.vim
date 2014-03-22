@@ -41,7 +41,7 @@ syn match	typesymbols "\(\[\|\]\)"
 syn match	currysymbols "???"
 syn region	mystring start=/"/ skip=/\\\\\|\\"/ end=/"/
 syn region	mystring2 start=/'/ skip=/\\\\\|\\'/ end=/'/
-syn match	injectionlabel	"\({\)\@<=[a-zA-Z0-9]\+\(}\)\@="
+syn match	specialty	":[a-zA-Z0-9]\+"
 syn region	comment	start="\/\/" end="$"
 syn match	comment	"`[^`]*`"
 
@@ -70,6 +70,6 @@ hi link methodstart		Special
 hi link functioncall		String
 hi link mystring2		String
 hi link mystring		String
-hi link injectionlabel		Function
+hi link specialty		Special
 
 let b:current_syntax = "wake"

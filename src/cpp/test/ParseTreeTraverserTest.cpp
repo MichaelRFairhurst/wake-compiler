@@ -1061,7 +1061,7 @@ PTT_TEST_CASE(
 	InjectCtorSpecializationWarning,
 	"every ClassA is:								\n\
 	every ClassB is:								\n\
-		needs ClassA{Specified};					\n\
+		needs ClassA:Specified;					\n\
 		provides ClassA, ClassB <- ClassB(ClassA);	\n\
 	",
 	PTT_EXPECT(WARNING)
@@ -1071,10 +1071,10 @@ PTT_TEST_CASE(
 	InjectCtorSpecializationMatchedNotWarning,
 	"every ClassA is:											\n\
 	every ClassB is:											\n\
-		needs ClassA{Specified};								\n\
+		needs ClassA:Specified;								\n\
 		provides												\n\
-			ClassA{Specified},									\n\
-			ClassB <- ClassB(ClassA{Specified});				\n\
+			ClassA:Specified,									\n\
+			ClassB <- ClassB(ClassA:Specified);				\n\
 	",
 	PTT_VALID
 )
@@ -1120,7 +1120,7 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	DuplicateProvisionWithSpecialtyIsError,
 	"every ClassA is:							\n\
-		provides ClassA{Poop}, ClassA{Poop};	\n\
+		provides ClassA:Poop, ClassA:Poop;	\n\
 	",
 	PTT_EXPECT(MULTIPLE_PROVISION_DEFINITION)
 )
@@ -1128,7 +1128,7 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	DuplicateProvisionWithDifferentSpecialtyIsOk,
 	"every ClassA is:							\n\
-		provides ClassA{Poop}, ClassA{NotPoop};	\n\
+		provides ClassA:Poop, ClassA:NotPoop;	\n\
 	",
 	PTT_VALID
 )
@@ -1155,12 +1155,12 @@ PTT_TEST_CASE(
 	RetrieveFromClassCtordSpecialtiedValid,
 	"every MyDB is:										\n\
 														\n\
-		needs Int{Port}, Text{Username};				\n\
+		needs Int:Port, Text:Username;				\n\
 														\n\
 		provides										\n\
-			Int{Port} <- 55,							\n\
-			Text{Username} <- 'Bilbo',					\n\
-			MyDB <- MyDB(Int{Port}, Text{Username});	\n\
+			Int:Port <- 55,							\n\
+			Text:Username <- 'Bilbo',					\n\
+			MyDB <- MyDB(Int:Port, Text:Username);	\n\
 														\n\
 		MyDB -- cloneMe() {								\n\
 			return MyDB <- this;						\n\
@@ -1172,17 +1172,17 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	InjectionsAndProvisionsRequireTransitiveProvidability,
 	"every ClassA is:							\n\
-		needs Int{Port};						\n\
+		needs Int:Port;						\n\
 	every ClassB is:							\n\
-		needs ClassA, Text{Stuff};				\n\
+		needs ClassA, Text:Stuff;				\n\
 	every ClassC is:							\n\
-		needs ClassB, Int{ID};					\n\
+		needs ClassB, Int:ID;					\n\
 	every Provider is:							\n\
 		provides								\n\
 			ClassB,								\n\
 			ClassC,								\n\
-			Int{ID},							\n\
-			Text{Stuff};						\n\
+			Int:ID,							\n\
+			Text:Stuff;						\n\
 	",
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
@@ -1191,20 +1191,20 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	InjectionsAndProvisionsRequireTransitiveProvidabilityOK,
 	"every ClassA is:					\n\
-		needs Int{Port};				\n\
+		needs Int:Port;				\n\
 										\n\
 	every ClassB is:					\n\
-		needs ClassA, Text{Stuff};		\n\
+		needs ClassA, Text:Stuff;		\n\
 										\n\
 	every ClassC is:					\n\
-		needs ClassB, Int{ID};			\n\
+		needs ClassB, Int:ID;			\n\
 										\n\
 	every Provider is:					\n\
 		provides						\n\
 			ClassC,						\n\
-			Int{ID},					\n\
-			Text{Stuff},				\n\
-			Int{Port},					\n\
+			Int:ID,					\n\
+			Text:Stuff,				\n\
+			Int:Port,					\n\
 			ClassB,						\n\
 			ClassA;						\n\
 	",
