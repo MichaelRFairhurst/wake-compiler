@@ -55,7 +55,7 @@ int wakewrap()
 %token <number> SYM_SHADOW
 %token <number> SYM_ARRAYED
 %type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection injection_args provision provisions injection_arg ctor ctorargs value method block methodreturn methodnamesegments methodbody methodaccess methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval
-%type <type> type specializabletype shadowabletype puretype classtype fntype
+%type <type> type specializabletype shadowabletype puretype classtype fntype parameterizedtype
 %type <type_array> puretypes types
 %start file
 
@@ -89,8 +89,8 @@ classes:
 	;
 
 class:
-	EVERY UIDENTIFIER parentage IS ':'											{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromString(NT_CLASSNAME, $2), $3); }
-	| EVERY UIDENTIFIER parentage IS ':' classbody								{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromString(NT_CLASSNAME, $2), $3); AddSubNode($$, $6); }
+	EVERY parameterizedtype parentage IS ':'									{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromType($2), $3); }
+	| EVERY parameterizedtype parentage IS ':' classbody						{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromType($2), $3); AddSubNode($$, $6); }
 	;
 
 parentage:
@@ -104,8 +104,8 @@ inheritances:
 	;
 
 inheritance:
-	CAPABLE UIDENTIFIER															{ $$ = MakeNodeFromString(NT_INTERFACE, $2); }
-	| A_OR_AN UIDENTIFIER														{ $$ = MakeNodeFromString(NT_SUBCLASS, $2); }
+	CAPABLE parameterizedtype													{ $$ = MakeOneBranchNode(NT_INTERFACE, MakeNodeFromType($2)); }
+	| A_OR_AN parameterizedtype													{ $$ = MakeOneBranchNode(NT_SUBCLASS, MakeNodeFromType($2)); }
 	;
 
 classbody:
@@ -456,10 +456,14 @@ types:
 	;
 
 classtype:
+	parameterizedtype															{ $$ = $1; }
+	| parameterizedtype '?'														{ $$ = $1; $$->optional = 1; }
+	| parameterizedtype SYM_ARRAYED												{ $$ = $1; $$->arrayed += $2; }
+	;
+
+parameterizedtype:
 	UIDENTIFIER																	{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; }
 	| UIDENTIFIER '{' puretypes '}'												{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; }
-	| classtype '?'																{ $$ = $1; $$->optional = 1; }
-	| classtype SYM_ARRAYED														{ $$ = $1; $$->arrayed += $2; }
 	;
 
 fntype:

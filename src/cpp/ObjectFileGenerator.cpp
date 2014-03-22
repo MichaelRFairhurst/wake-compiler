@@ -57,7 +57,6 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_INJECTION_ARG:
 		case NT_CTOR:
 		case NT_PARENT:
-		case NT_CLASSNAME:
 		case NT_LAMBDA_INVOCATION:
 		case NT_CAST:
 			{
@@ -78,7 +77,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_CLASS:
 			{
 				table.pushScope();
-				classname = tree->node_data.nodes[0]->node_data.string;
+				classname = tree->node_data.nodes[0]->node_data.type->typedata._class.classname;
 				header->addClassUsage(file.tellp(), classname);
 				file << "=function(";
 
@@ -297,7 +296,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_SUBCLASS:
-			header->addClassUsage(file.tellp(), tree->node_data.string);
+			header->addClassUsage(file.tellp(), tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
 			file << ".call(this);";
 			break;
 

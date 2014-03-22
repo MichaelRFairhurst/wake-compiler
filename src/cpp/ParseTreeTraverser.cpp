@@ -32,25 +32,22 @@ void ParseTreeTraverser::traverse(Node* tree) {
 			break;
 
 		case NT_CLASS:
-			traverse(tree->node_data.nodes[0]);
-			traverse(tree->node_data.nodes[1]);
-			break;
-
-		case NT_CLASSNAME:
 			{
-				errors.pushContext("In declaration of 'every " + string(tree->node_data.string) + "'");
-				boost::optional<SemanticError*> error = objectsymtable->addClass(tree->node_data.string);
+				errors.pushContext("In declaration of 'every " + string(tree->node_data.nodes[0]->node_data.type->typedata._class.classname) + "'");
+				boost::optional<SemanticError*> error = objectsymtable->addClass(tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
 				if(error) {
 					(*error)->token = tree;
 					errors.addError(*error);
 				}
+
+				traverse(tree->node_data.nodes[1]);
 			}
 			break;
 
 		case NT_INTERFACE:
 		case NT_SUBCLASS:
 			{
-				boost::optional<SemanticError*> error = objectsymtable->addInheritance(tree->node_data.string, tree->node_type == NT_SUBCLASS);
+				boost::optional<SemanticError*> error = objectsymtable->addInheritance(tree->node_data.nodes[0]->node_data.type->typedata._class.classname, tree->node_type == NT_SUBCLASS);
 				if(error) {
 					(*error)->token = tree;
 					errors.addError((*error));
@@ -74,7 +71,7 @@ void ParseTreeTraverser::secondPass(Node* tree) {
 
 		case NT_CLASS:
 			{
-				string classname = tree->node_data.nodes[0]->node_data.string;
+				string classname = tree->node_data.nodes[0]->node_data.type->typedata._class.classname;
 				errors.pushContext("In declaration of 'every " + classname + "'");
 				ClassParseTreeTraverser classtraverser(&errors, objectsymtable, &scopesymtable, classname, &typechecker, &methodanalyzer);
 
@@ -88,7 +85,7 @@ void ParseTreeTraverser::secondPass(Node* tree) {
 		case NT_INTERFACE:
 		case NT_SUBCLASS:
 			try {
-				objectsymtable->find(tree->node_data.string);
+				objectsymtable->find(tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
 			} catch(SymbolNotFoundException* e) {
 				errors.addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
 				delete e;
@@ -112,7 +109,7 @@ void ParseTreeTraverser::thirdPass(Node* tree) {
 
 		case NT_CLASS:
 			{
-				string classname = tree->node_data.nodes[0]->node_data.string;
+				string classname = tree->node_data.nodes[0]->node_data.type->typedata._class.classname;
 				errors.pushContext("In declaration of 'every " + classname + "'");
 				ClassParseTreeTraverser classtraverser(&errors, objectsymtable, &scopesymtable, classname, &typechecker, &methodanalyzer);
 
