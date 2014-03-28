@@ -346,6 +346,19 @@ Chainable
 	var List{Map{String,from Employee to Architect}};
 	var List{Map{String,anything}};
 
+// PROVIDING GENERICS
+	// You can provide generics without parameters
+	provides List;
+	// However, not generics that parameterized needs
+	provides Container;
+	// unless you resolves the generic and meet its needs
+	provides Container{MyClass}, MyClass;
+	// or if you 'auto provide'
+	provides auto Container;
+	// Which results in runtime DI that provides defaults for everything except specialties
+	// disabled when reflection is turned off
+	provides T; // type error, because T can have any sort of transitive dependencies
+	provides auto T; // Doable!
 // TERNARY
 	return true if isOpen() else checkCanOpen();
 

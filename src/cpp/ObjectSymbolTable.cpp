@@ -114,6 +114,8 @@ PropertySymbolTable* ObjectSymbolTable::find(string name) {
 }
 
 void ObjectSymbolTable::assertTypeIsValid(Type* type) {
+	if(type->type == TYPE_PARAMETERIZED) return;
+
 	if(type->type == TYPE_CLASS) {
 		if(classes.count(type->typedata._class.classname)) return;
 

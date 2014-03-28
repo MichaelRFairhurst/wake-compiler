@@ -97,6 +97,10 @@ void TypeChecker::setThisContext(string name) {
 	thiscontext = name;
 }
 
+void TypeChecker::setParameterizedTypes(vector<Type*> types) {
+	parameterizedtypes = types;
+}
+
 Type* TypeChecker::typeCheck(Node* tree) {
 	TypeAnalyzer* analyzer = objectsymtable->getAnalyzer();
 	Type* ret = NULL;

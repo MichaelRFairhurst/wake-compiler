@@ -23,6 +23,7 @@ class TypeChecker {
 		void setReturnType(Type* returntype);
 		void setThisContext(string classname);
 		void check(Node* n);
+		void setParameterizedTypes(vector<Type*> types);
 
 	private:
 		Type* typeCheck(Node* n);
@@ -37,6 +38,7 @@ class TypeChecker {
 		ScopeSymbolTable* scopesymtable;
 		Type* returntype;
 		string thiscontext;
+		vector<Type*> parameterizedtypes;
 
 };
 

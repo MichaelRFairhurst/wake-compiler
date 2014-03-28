@@ -9,11 +9,12 @@
  * Then it type checks the methods, provisions, and ctor body
  */
 
-ClassParseTreeTraverser::ClassParseTreeTraverser(ErrorTracker* errors, ObjectSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, string classname, TypeChecker* typechecker, MethodSignatureParseTreeTraverser* methodanalyzer) {
+ClassParseTreeTraverser::ClassParseTreeTraverser(ErrorTracker* errors, ObjectSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, string classname, vector<Type*> parameterizedtypes, TypeChecker* typechecker, MethodSignatureParseTreeTraverser* methodanalyzer) {
 	this->errors = errors;
 	this->scopesymtable = scopesymtable;
 	this->objectsymtable = objectsymtable;
 	this->classname = classname;
+	this->parameterizedtypes = parameterizedtypes;
 	this->typechecker = typechecker;
 	this->methodanalyzer = methodanalyzer;
 	propertysymtable = objectsymtable->find(classname);
@@ -59,6 +60,7 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 
 		case NT_METHOD_DECLARATION:
 			try {
+				methodanalyzer->convertParameterizedTypes(tree, parameterizedtypes);
 				vector<pair<string, TypeArray*> >* methodname = methodanalyzer->getName(tree);
 
 				boost::optional<SemanticError*> error = propertysymtable->addMethod(methodanalyzer->getReturn(tree), methodname, methodanalyzer->getFlags(tree));

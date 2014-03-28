@@ -55,8 +55,8 @@ int wakewrap()
 %token <number> SYM_SHADOW
 %token <number> SYM_ARRAYED
 %type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection injection_args provision provisions injection_arg ctor ctorargs value method block methodreturn methodnamesegments methodbody methodaccess methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval
-%type <type> type specializabletype shadowabletype puretype classtype fntype parameterizedtype
-%type <type_array> puretypes types
+%type <type> type specializabletype shadowabletype puretype classtype fntype parameterizedtype unboundtypespecification classdeclarationtype
+%type <type_array> puretypes types unboundtypespecifications
 %start file
 
 %expect 2
@@ -89,8 +89,8 @@ classes:
 	;
 
 class:
-	EVERY parameterizedtype parentage IS ':'									{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromType($2), $3); }
-	| EVERY parameterizedtype parentage IS ':' classbody						{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromType($2), $3); AddSubNode($$, $6); }
+	EVERY classdeclarationtype parentage IS ':'									{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromType($2), $3); }
+	| EVERY classdeclarationtype parentage IS ':' classbody						{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromType($2), $3); AddSubNode($$, $6); }
 	;
 
 parentage:
@@ -473,6 +473,23 @@ fntype:
 	| FN '(' ')'																{ $$ = MakeType(TYPE_LAMBDA); }
 	| fntype '?'																{ $$ = $1; $$->optional = 1; }
 	| fntype SYM_ARRAYED														{ $$ = $1; $$->arrayed += $2; }
+	;
+
+unboundtypespecifications:
+	unboundtypespecification													{ $$ = MakeTypeArray(); AddTypeToTypeArray($1, $$); }
+	| unboundtypespecifications unboundtypespecification						{ $$ = $1; AddTypeToTypeArray($2, $1); }
+	;
+
+unboundtypespecification:
+	UIDENTIFIER																	{ $$ = MakeType(TYPE_PARAMETERIZED); $$->typedata.parameterized.label = $1; }
+	/* | UIDENTIFIER from puretype
+	   | UIDENTIFIER to puretype
+	   | UIDENTIFIER from puretype to puretype */
+	;
+
+classdeclarationtype:
+	UIDENTIFIER																	{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; }
+	| UIDENTIFIER '{' unboundtypespecifications '}'								{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; $$->typedata._class.parameters = $3; }
 	;
 
 %%

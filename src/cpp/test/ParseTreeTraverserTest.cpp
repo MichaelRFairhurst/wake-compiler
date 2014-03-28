@@ -36,6 +36,8 @@ BOOST_AUTO_TEST_SUITE( ParseTreeTraverserTest )
 /**
  * Now use them
  */
+
+/*
 PTT_TEST_CASE(
 	MultipleClassDefinition,
 	"every MyClass is: every MyClass is:",
@@ -832,7 +834,6 @@ PTT_TEST_CASE(
 	"every MyClass is: afn() { switch(5) { case 1: break; switch (8) { case 6: break; } case 2: break; default: } }",
 	PTT_VALID
 )
-*/
 
 PTT_TEST_CASE(
 	BreakNotWithinSwitchForOrWhileIsError,
@@ -1834,6 +1835,16 @@ PTT_TEST_CASE(
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 	PTT_EXPECT(TYPE_ERROR)
+);
+*/
+
+PTT_TEST_CASE(
+	TestParameterizedClassReturningType,
+	"every MyClass{T} is:	\n\
+		T -- myMethod(T) {	\n\
+			return T;		\n\
+	}",
+	PTT_VALID
 );
 
 BOOST_AUTO_TEST_SUITE_END()
