@@ -1,17 +1,15 @@
 #include "MethodSignatureParseTreeTraverser.h"
 #include "SemanticError.h"
+#include "TypeParameterizer.h"
 
 void MethodSignatureParseTreeTraverser::convertParameterizedTypes(Node* methoddef, vector<Type*> parameterizedtypes) {
 	int i;
 	Node* methodname;
+	TypeParameterizer parameterizer;
 
 	if(methoddef->node_data.nodes[1]->node_type == NT_METHOD_RETURN_TYPE) {
 		methodname = methoddef->node_data.nodes[2];
-		Type* returntype  = methoddef->node_data.nodes[1]->node_data.nodes[0]->node_data.type;
-		if(returntype->type == TYPE_CLASS  && returntype->typedata._class.classname == string("T")) {//parameterizedtypes[0]->typedata.parameterized.label)) {
-			freeType(returntype);
-			methoddef->node_data.nodes[1]->node_data.nodes[0]->node_data.type = copyType(parameterizedtypes[0]);
-		}
+		parameterizer.applyParameterizations(&methoddef->node_data.nodes[1]->node_data.nodes[0]->node_data.type, parameterizedtypes);
 	} else {
 		methodname = methoddef->node_data.nodes[1];
 	}
@@ -23,11 +21,7 @@ void MethodSignatureParseTreeTraverser::convertParameterizedTypes(Node* methodde
 		if(i < methodname->subnodes) {
 			args = methodname->node_data.nodes[i]->node_data.typearray;
 			for(int b = 0; b < args->typecount; b++) {
-				Type* arg  = args->types[b];
-				if(arg->type == TYPE_CLASS  && arg->typedata._class.classname == string("T")) { //parameterizedtypes[0]->typedata.parameterized.label)) {
-					freeType(arg);
-					args->types[b] = copyType(parameterizedtypes[0]);
-				}
+				parameterizer.applyParameterizations(&args->types[b], parameterizedtypes);
 			}
 		}
 	}

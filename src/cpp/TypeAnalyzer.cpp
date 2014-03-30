@@ -21,11 +21,11 @@ bool TypeAnalyzer::isASubtypeOfB(string a, string b) {
 }
 
 bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
+	//if(a == NULL || b == NULL) return false;
 	if(a->type == TYPE_MATCHALL || b->type == TYPE_MATCHALL) return true;
-	if(a == NULL || b == NULL) return false;
 	if(a->type == TYPE_NOTHING) return b->optional;
 	if(a->arrayed != b->arrayed) return false;
-	if(a->type != b->type) return false;
+	if(a->type != b->type) return false; // TODO: parameterized types don't always follow this logic!
 
 	if(a->type == TYPE_LAMBDA) {
 
@@ -47,7 +47,7 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 
 		return true;
 
-	} else {
+	} else if(a->type == TYPE_CLASS) {
 		if(string(a->typedata._class.classname) == b->typedata._class.classname) {
 			return a->optional <= b->optional;
 		}
@@ -64,6 +64,10 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 			delete e;
 		}
 
+		return false;
+	} else if(a->type == TYPE_PARAMETERIZED) {
+		if(a->typedata.parameterized.label == string(b->typedata.parameterized.label)) return true;
+		// TODO: lower/upper bounds comparison
 		return false;
 	}
 
@@ -159,7 +163,7 @@ string TypeAnalyzer::getNameForType(Type* type) {
 	}
 
 	if(type->type == TYPE_PARAMETERIZED) {
-		return "?";
+		return type->typedata.parameterized.label;
 	}
 
 	if(type->type == TYPE_MATCHALL) {

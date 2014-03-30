@@ -31,7 +31,8 @@ CPPNAMES= \
 	SimpleAddressTable.cpp \
 	TableFileWriter.cpp \
 	TableFileReader.cpp \
-	ImportParseTreeTraverser.cpp
+	ImportParseTreeTraverser.cpp \
+	TypeParameterizer.cpp
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
 
