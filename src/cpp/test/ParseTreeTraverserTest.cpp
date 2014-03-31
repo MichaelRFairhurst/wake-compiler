@@ -1840,11 +1840,50 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	TestParameterizedClassReturningType,
-	"every MyClass{T} is:	\n\
-		T -- myMethod(T) {	\n\
-			return T;		\n\
-	}",
+	"every MyClass{T, E} is:	\n\
+		T -- myMethod(T) {		\n\
+			return T;			\n\
+		}						\n\
+								\n\
+		E -- myMethod(E) {		\n\
+			return E;			\n\
+		}",
 	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestParameterizedClassReturningWrongType,
+	"every MyClass{T, E} is:	\n\
+		E -- returnClass() {	\n\
+			return this;		\n\
+		}						\n\
+								\n\
+		E -- returnBool() {		\n\
+			return true;		\n\
+		}						\n\
+								\n\
+		E -- returnText() {		\n\
+			return 'Test';		\n\
+		}						\n\
+								\n\
+		E -- returnInt() {		\n\
+			return 5;			\n\
+		}						\n\
+								\n\
+		E -- myMethod(T) {		\n\
+			return T;			\n\
+		}						\n\
+								\n\
+		T -- myMethod(E) {		\n\
+			return E;			\n\
+		}",
+
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
 );
 
 BOOST_AUTO_TEST_SUITE_END()

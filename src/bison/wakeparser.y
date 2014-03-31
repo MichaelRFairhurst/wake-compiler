@@ -477,7 +477,7 @@ fntype:
 
 unboundtypespecifications:
 	unboundtypespecification													{ $$ = MakeTypeArray(); AddTypeToTypeArray($1, $$); }
-	| unboundtypespecifications unboundtypespecification						{ $$ = $1; AddTypeToTypeArray($2, $1); }
+	| unboundtypespecifications ',' unboundtypespecification						{ $$ = $1; AddTypeToTypeArray($3, $1); }
 	;
 
 unboundtypespecification:
