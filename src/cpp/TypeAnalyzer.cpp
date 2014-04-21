@@ -176,7 +176,15 @@ string TypeAnalyzer::getNameForType(Type* type) {
 
 	if(type->type == TYPE_CLASS) {
 		name = type->typedata._class.classname;
-		if(type->optional) name += "?";
+		if(type->typedata._class.parameters != NULL) {
+			name += "{";
+			int i;
+			for(i = 0; i < type->typedata._class.parameters->typecount; i++) {
+				if(i) name += ",";
+				name += getNameForType(type->typedata._class.parameters->types[i]);
+			}
+			name += "}";
+		}
 	} else {
 		name = getNameForType(type->typedata.lambda.returntype);
 		name += "--(";
@@ -194,6 +202,7 @@ string TypeAnalyzer::getNameForType(Type* type) {
 	int i;
 	for(i = 0; i < type->arrayed; i++)
 		name += "[]";
+	if(type->optional) name += "?";
 
 	return name;
 }

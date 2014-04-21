@@ -37,7 +37,6 @@ BOOST_AUTO_TEST_SUITE( ParseTreeTraverserTest )
  * Now use them
  */
 
-/*
 PTT_TEST_CASE(
 	MultipleClassDefinition,
 	"every MyClass is: every MyClass is:",
@@ -833,7 +832,7 @@ PTT_TEST_CASE(
 	BreakWithinSwitchAfterClosingPriorSwitchIsOk,
 	"every MyClass is: afn() { switch(5) { case 1: break; switch (8) { case 6: break; } case 2: break; default: } }",
 	PTT_VALID
-)
+)*/
 
 PTT_TEST_CASE(
 	BreakNotWithinSwitchForOrWhileIsError,
@@ -1836,7 +1835,6 @@ PTT_TEST_CASE(
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 	PTT_EXPECT(TYPE_ERROR)
 );
-*/
 
 PTT_TEST_CASE(
 	TestParameterizedClassReturningType,
@@ -1880,6 +1878,42 @@ PTT_TEST_CASE(
 
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	TestUseConcreteParameterizedClasses,
+	"every MyClass{T} is:								\n\
+		MyClass{Int} -- takeWithInt(MyClass{Int}) {		\n\
+			return MyClass;								\n\
+		}												\n\
+		MyClass{Text} -- takeWithText(MyClass{Text}) {	\n\
+			return MyClass;								\n\
+		}												\n\
+		MyClass{T} -- takeWithT(MyClass{T}) {			\n\
+			return MyClass;								\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestUseConcreteParameterizedClassesIncorrectly,
+	"every MyClass{T} is:									\n\
+		MyClass{Text} -- returnIntAsText(MyClass{Int}) {	\n\
+			return MyClass;									\n\
+		}													\n\
+		MyClass{Text} -- returnTAsText(MyClass{T}) {		\n\
+			return MyClass;									\n\
+		}													\n\
+		MyClass{T} -- returnIntAsT(MyClass{Int}) {			\n\
+			return MyClass;									\n\
+		}													\n\
+		MyClass{T} -- returnTextAsT(MyClass{Text}) {		\n\
+			return MyClass;									\n\
+		}",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)

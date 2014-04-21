@@ -463,7 +463,7 @@ classtype:
 
 parameterizedtype:
 	UIDENTIFIER																	{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; }
-	| UIDENTIFIER '{' puretypes '}'												{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; }
+	| UIDENTIFIER '{' puretypes '}'												{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; $$->typedata._class.parameters = $3; }
 	;
 
 fntype:
