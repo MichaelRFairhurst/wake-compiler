@@ -532,7 +532,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 						i++;
 					}
 
-					PropertySymbolTable* methodtable = objectsymtable->find(subject->typedata._class.classname);
+					PropertySymbolTable* methodtable = objectsymtable->find(subject);
 					boost::optional<Type*> lambdatype = methodtable->find(methodtable->getSymbolNameOf(&method_segments));
 
 					if(subject->optional) {

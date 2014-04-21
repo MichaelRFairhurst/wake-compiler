@@ -28,6 +28,7 @@ class ObjectSymbolTable {
 
 		void propagateInheritance();
 		void propagateInheritanceToParent(string childname);
+		PropertySymbolTable* find(Type* type);
 		PropertySymbolTable* find(string name);
 		void assertTypeIsValid(Type* type);
 		TypeAnalyzer* getAnalyzer();

@@ -18,6 +18,7 @@ void TypeParameterizer::applyParameterizations(Type** typeaddr, std::vector<Type
 					(*typeaddr)->optional = type->optional;
 					(*typeaddr)->alias = type->alias;
 					freeType(type);
+					break; // We've found it, move along
 				}
 			}
 		}

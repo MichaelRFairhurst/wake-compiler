@@ -19,6 +19,7 @@ Type* MakeType(int type) {
 			thetype->typedata.lambda.arguments = NULL;//MakeTypeArray();
 			break;
 		case TYPE_PARAMETERIZED:
+			thetype->typedata.parameterized.shadow = 0;
 			thetype->typedata.parameterized.upperbound = NULL;
 			thetype->typedata.parameterized.lowerbound = NULL;
 			break;
@@ -91,6 +92,7 @@ Type* copyType(Type* t) {
 		copy->typedata._class.parameters = copyTypeArray(t->typedata._class.parameters);			// Xxx{T from Yyy}
 	} else if(t->type == TYPE_PARAMETERIZED) {
 		copy->typedata.parameterized.label = t->typedata.parameterized.label == NULL ? NULL : strdup(t->typedata.parameterized.label);
+		copy->typedata.parameterized.shadow = t->typedata.parameterized.shadow;					// number of $s
 		copy->typedata.parameterized.lowerbound = copyType(t->typedata.parameterized.lowerbound);
 		copy->typedata.parameterized.upperbound = copyType(t->typedata.parameterized.upperbound);
 	}

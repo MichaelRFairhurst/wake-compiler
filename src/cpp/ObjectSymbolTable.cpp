@@ -100,6 +100,10 @@ void ObjectSymbolTable::propagateInheritanceToParent(string childname) {
 	current->second = true;
 }
 
+PropertySymbolTable* ObjectSymbolTable::find(Type* type) {
+	return find(type->typedata._class.classname);
+}
+
 PropertySymbolTable* ObjectSymbolTable::find(string name) {
 	std::map<string, pair<PropertySymbolTable*, bool> >::iterator searcher = classes.find(name);
 	if(!classes.count(name)) {
