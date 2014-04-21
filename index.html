@@ -676,7 +676,6 @@ span.goodcode {
 			<h3 id="dependencies">Dependencies <span class="label label-inverse">concise</span> <span class="label label-inverse">testable</span></h3>
 			<p>When an object is constructed, first the dependencies are all resolved by means of provisions. This means that you can simply say your object <code>needs Printer</code>, and you will always have one.</p>
 			<h3 id="properties">Properties <span class="label label-inverse">flexible</span></h3>
-			<div class="alert alert-error">Calling a method which uses an uninitialized property during this property initialization process currently results in undefined behavior. In the future the compiler will prevent you from doing so, or local methods might be disallowed entirely.</div>
 			<p>At this point the object has its dependencies met, and each property is evaluated in order. Each assigned value can be a full expression referencing needs or already-evaluated properties. Then the constructor is called.</p>
 			<span class="label label-info">Wake</span>
 			<pre><code class="wake"
@@ -759,7 +758,7 @@ every SubClass (<span class="goodcode" title="Subclass extends BaseClass, meanin
 
     needs <span class="goodcode" title="This dependency will be provided by whatever provision made our UsesProvider object.">Provider</span>, <span class="goodcode" title="We can mark provisions with labels matched at compile time.">DependentClass:Special</span> then {
         <span class="goodcode" title="This is just syntactic sugar, it takes a Printer from our provider and assigns it to the variable Printer.">var Printer &lt;- Provider;</span>
-        <span class="goodcode" title="Here a printer is fetched from our Provider object, but not assigned to a variable.">:(Printer &lt;- Provider)</span>.print(Text);
+        <span class="goodcode" title="Here a printer is fetched from our Provider object, but not assigned to a variable.">(Printer &lt;- Provider)</span>.print(Text);
     }</code></pre>
 		<h3 id="plainprovisions">Defining Plain Provisions <span class="label label-inverse">concise</span> <span class="label label-inverse">typesafe</span></h3>
 		<p>A plain provision simply marks that your class can provide a type. The compiler will ensure that you can provide all of that type's dependencies as well.</p>
@@ -810,7 +809,7 @@ every User is:
 >every Provider is:
 
     needs <span class="goodcode" title="Require an unconfigured session.">Session</span> then {
-        Session.<span class="goodcode" title="Configure our Session so it is provided properly">loadFile</span>(<span class="goodcode" title="Retrieve our own SessionFile path">:(Text:SessionFile &lt; this)</span>);
+        Session.<span class="goodcode" title="Configure our Session so it is provided properly">loadFile</span>(<span class="goodcode" title="Retrieve our own SessionFile path">Text:SessionFile &lt; this</span>);
     }
 
     provides
