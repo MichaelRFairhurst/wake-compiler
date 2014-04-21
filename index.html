@@ -19,7 +19,7 @@ hljs.LANGUAGES.wake = {
   c: [
     {
       cN: 'decorator',
-      b: '{[a-zA-Z]+}'
+      b: ':[a-zA-Z]+'
     },
     {
       cN: 'decorator',
@@ -317,7 +317,7 @@ span.goodcode {
     }
 
     Int -- <span class="goodcode" title="A uniquely clear method naming system">sumFrom( Int )To( $Int )</span> {
-        :Int @sum = generate(Int);
+        var Int @sum = generate(Int);
         if(Int &gt; $Int)
             return @sum + sumFrom(Int - 1)To($Int);
         else return @sum;
@@ -618,10 +618,10 @@ span.goodcode {
     <span class="goodcode" title="Here we define dependencies.">needs @another Int, $$Int, Int @again;</span>
 
     declareThem() {
-        <span class="goodcode" title="Here we define variables within a method.">:Int @local = 4;</span>
+        <span class="goodcode" title="Here we define variables within a method.">var Int @local = 4;</span>
         :@second Int = 4;
         :$$$Int = 5;
-        <span class="badcode" title="Compiler error! In Wake you cannot redefine variables.">:Int = 3</span>;
+        <span class="badcode" title="Compiler error! In Wake you cannot redefine variables.">var Int = 3</span>;
     }</code></pre>
 
 			<h3 id="optionals">Optional Types <span class="label label-inverse">typesafe</span></h3>
@@ -668,7 +668,7 @@ span.goodcode {
         <span class="goodcode" title="You can declare 'needs nothing then {...} to have a constructor with no dependencies.">// constructor body</span>
     }
 
-    <span class="goodcode" title="Provisions; the details are in their own section.">provides Text{URL} &lt;- 'http://www.wakelang.com';</span>
+    <span class="goodcode" title="Provisions; the details are in their own section.">provides Text:URL &lt;- 'http://www.wakelang.com';</span>
 
     <span class="goodcode" title="A method declaration.">Text -- getSSNLastFour() {</span>
         // ...
@@ -757,8 +757,8 @@ every SubClass (<span class="goodcode" title="Subclass extends BaseClass, meanin
 		<pre><code class="wake"
 >every UsesProvider is:
 
-    needs <span class="goodcode" title="This dependency will be provided by whatever provision made our UsesProvider object.">Provider</span>, <span class="goodcode" title="We can mark provisions with labels matched at compile time.">DependentClass{Special}</span> then {
-        <span class="goodcode" title="This is just syntactic sugar, it takes a Printer from our provider and assigns it to the variable Printer.">:Printer &lt;- Provider;</span>
+    needs <span class="goodcode" title="This dependency will be provided by whatever provision made our UsesProvider object.">Provider</span>, <span class="goodcode" title="We can mark provisions with labels matched at compile time.">DependentClass:Special</span> then {
+        <span class="goodcode" title="This is just syntactic sugar, it takes a Printer from our provider and assigns it to the variable Printer.">var Printer &lt;- Provider;</span>
         <span class="goodcode" title="Here a printer is fetched from our Provider object, but not assigned to a variable.">:(Printer &lt;- Provider)</span>.print(Text);
     }</code></pre>
 		<h3 id="plainprovisions">Defining Plain Provisions <span class="label label-inverse">concise</span> <span class="label label-inverse">typesafe</span></h3>
@@ -782,27 +782,27 @@ every SubClass (<span class="goodcode" title="Subclass extends BaseClass, meanin
 
     provides
         <span class="goodcode" title="This is just a plain provision.">User</span>,
-        <span class="goodcode" title="Here we provide a connection by name Default. Note that this is still a plain provision. This is required since we provide User.">DBConnection{Default}</span>;
+        <span class="goodcode" title="Here we provide a connection by name Default. Note that this is still a plain provision. This is required since we provide User.">DBConnection:Default</span>;
 
 every User is:
 
-    needs <span class="goodcode" title="Here we require the Default DBConnection.">DBConnection{Default}</span>;</code></pre>
+    needs <span class="goodcode" title="Here we require the Default DBConnection.">DBConnection:Default</span>;</code></pre>
 		<h3 id="primitiveprovisions">Primitive Provisions <span class="label label-inverse">typesafe</span></h3>
 		<p>Primitive provisions cannot be plain, since the compiler can't tell you what Int to provide. Additionally, they must be specified, to ensure you get the right value. These are the equivalent of constants in Wake, and bind directly to a primitive value.</p>
 		<pre><code class="wake"
 >every PrimitiveProvider is:
 
-    provides Text{Username} &lt;- "MyUser", Int{Port} &lt;- 3306;</code></pre>
+    provides Text:Username &lt;- "MyUser", Int:Port &lt;- 3306;</code></pre>
 
 		<h3 id="ctorprovisions">Constructor Provisions <span class="label label-inverse">flexible</span></h3>
 		<p>We call this constructor provision since it most closely resembles constructors in languages like Java. However, it is merely a way of matching provisions to specific dependencies.</p>
 		<pre><code class="wake"
 >every Provider is:
     provides
-        Int{Port} &lt;- 3307,
-        Text{Username} &lt;- "Test",
-        DBConnection{Test} &lt;- DBConnection(<span class="goodcode" title="If a DBConnection accepts any Text username, we can create specialized connections by letting the provider find the right Username and Port.">Text{Username}, Int{Port}</span>),
-        <span class="goodcode" title="Constructor provisions do not require specialization.">User</span> &lt;- <span class="goodcode" title="Constructor provisions can be used with subtype provision simultaneously.">TestUser</span>(DBConnection{Test});</code></pre>
+        Int:Port &lt;- 3307,
+        Text:Username &lt;- "Test",
+        DBConnection:Test &lt;- DBConnection(<span class="goodcode" title="If a DBConnection accepts any Text username, we can create specialized connections by letting the provider find the right Username and Port.">Text:Username, Int:Port</span>),
+        <span class="goodcode" title="Constructor provisions do not require specialization.">User</span> &lt;- <span class="goodcode" title="Constructor provisions can be used with subtype provision simultaneously.">TestUser</span>(DBConnection:Test);</code></pre>
 		<h3 id="behavioralprovisions">Behavioral Provisions <span class="label label-inverse">flexible</span></h3>
 		<div class="alert alert-error">These are not supported quite just yet.</div>
 		<p>Provisions can be treated as a code body with a return type where necessary. Note that the end result must be a provision; however it can be used to configure objects or provide different objects conditionally, or create a singleton.</p>
@@ -810,11 +810,11 @@ every User is:
 >every Provider is:
 
     needs <span class="goodcode" title="Require an unconfigured session.">Session</span> then {
-        Session.<span class="goodcode" title="Configure our Session so it is provided properly">loadFile</span>(<span class="goodcode" title="Retrieve our own SessionFile path">:(Text{SessionFile} &lt; this)</span>);
+        Session.<span class="goodcode" title="Configure our Session so it is provided properly">loadFile</span>(<span class="goodcode" title="Retrieve our own SessionFile path">:(Text:SessionFile &lt; this)</span>);
     }
 
     provides
-        Text{SessionFile},
+        Text:SessionFile,
         Session &lt;- <span class="goodcode" title="This, together with our constructor, guarantees that we only distribute one session, and that its been properly loaded.">{ return Session; }</span>;</code></pre>
 		</div>
 		<script src="bootstrap/js/bootstrap.min.js"></script>
