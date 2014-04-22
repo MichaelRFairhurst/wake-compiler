@@ -48,6 +48,22 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 		return true;
 
 	} else if(a->type == TYPE_CLASS) {
+		// check if one pointer exists and the other is null: !ptr == 0 and !NULL == 1
+		if(!a->typedata._class.parameters != !b->typedata._class.parameters) {
+			return false;
+		}
+
+		if(a->typedata._class.parameters) { // Here if A is not null, neither is B
+			int len = a->typedata._class.parameters->typecount;
+			if(b->typedata._class.parameters->typecount != len) {
+				return false;
+			}
+
+			for(int i = 0; i < len; i++)
+			if(!isASubtypeOfB(a->typedata._class.parameters->types[i], b->typedata._class.parameters->types[i]))
+				return false; // @TODO this makes generics covariant!!
+		}
+
 		if(string(a->typedata._class.classname) == b->typedata._class.classname) {
 			return a->optional <= b->optional;
 		}
