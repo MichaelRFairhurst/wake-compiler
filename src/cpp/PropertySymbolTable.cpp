@@ -6,6 +6,10 @@ PropertySymbolTable::PropertySymbolTable(TypeAnalyzer* analyzer) {
 	abstract = false;
 }
 
+const map<string, bool>& PropertySymbolTable::getParentage() {
+	return parentage;
+}
+
 boost::optional<SemanticError*> PropertySymbolTable::addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, int flags) {
 	string name = getSymbolNameOf(segments_arguments);
 

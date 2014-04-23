@@ -1,15 +1,15 @@
 #include "TypeAnalyzer.h"
 #include "ClassSpaceSymbolTable.h"
-#include "PropertySymbolTable.h"
+#include "ReadOnlyPropertySymbolTable.h"
 #include "CompilationExceptions.h"
 
 bool TypeAnalyzer::isASubtypeOfB(string a, string b) {
 	try {
 		if(a == b) return true;
 
-		PropertySymbolTable* a_data = reference->find(a);
+		ReadOnlyPropertySymbolTable* a_data = reference->find(a);
 
-		for(map<string, bool>::iterator it = a_data->parentage.begin(); it != a_data->parentage.end(); ++it) {
+		for(auto it = a_data->getParentage().begin(); it != a_data->getParentage().end(); ++it) {
 			if(isASubtypeOfB(it->first, b)) return true;
 		}
 
@@ -70,9 +70,9 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 
 		try {
 
-			PropertySymbolTable* a_data = reference->find(a->typedata._class.classname);
+			ReadOnlyPropertySymbolTable* a_data = reference->find(a->typedata._class.classname);
 
-			for(map<string, bool>::iterator it = a_data->parentage.begin(); it != a_data->parentage.end(); ++it) {
+			for(auto it = a_data->getParentage().begin(); it != a_data->getParentage().end(); ++it) {
 				if(isASubtypeOfB(it->first, b->typedata._class.classname)) return true;
 			}
 
@@ -138,7 +138,7 @@ void TypeAnalyzer::assertNeedIsNotCircular(string classname, Type* need) {
 }
 
 void TypeAnalyzer::assertClassCanBeBound(Type* binding) {
-	PropertySymbolTable* bound = reference->find(binding->typedata._class.classname);
+	ReadOnlyPropertySymbolTable* bound = reference->find(binding->typedata._class.classname);
 	if(bound->isAbstract())
 		throw new SemanticError(ABSTRACT_PROVISION);
 }

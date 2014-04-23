@@ -130,7 +130,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					char* name = tree->node_data.string;
 					boost::optional<Type*> variable = scopesymtable->find(name);
 					if(!variable && thiscontext != "") {
-						PropertySymbolTable* proptable = classestable->find(thiscontext);
+						ReadOnlyPropertySymbolTable* proptable = classestable->find(thiscontext);
 						variable = proptable->find(name);
 						if(variable) {
 							name = strdup(name);
@@ -152,7 +152,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				{
 					boost::optional<Type*> variable = scopesymtable->find(tree->node_data.type);
 					if(!variable && thiscontext != "") {
-						PropertySymbolTable* proptable = classestable->find(thiscontext);
+						ReadOnlyPropertySymbolTable* proptable = classestable->find(thiscontext);
 						variable = proptable->find(scopesymtable->getNameForType(tree->node_data.type));
 						if(variable) {
 							char* propname = strdup(tree->node_data.type->typedata._class.classname);
@@ -533,7 +533,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 						i++;
 					}
 
-					PropertySymbolTable* methodtable = classestable->find(subject);
+					ReadOnlyPropertySymbolTable* methodtable = classestable->find(subject);
 					boost::optional<Type*> lambdatype = methodtable->find(methodtable->getSymbolNameOf(&method_segments));
 
 					if(subject->optional) {
@@ -669,7 +669,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 						tree->node_data.nodes[0] = MakeTwoBranchNode(NT_AUTOBOX, node, MakeNodeFromString(NT_COMPILER_HINT, strdup(boxedtype->c_str())));
 						delete boxedtype;
 					}
-					PropertySymbolTable* proptable = classestable->find(subject->typedata._class.classname);
+					ReadOnlyPropertySymbolTable* proptable = classestable->find(subject->typedata._class.classname);
 					string name = tree->node_data.nodes[1]->node_type == NT_ALIAS
 						? tree->node_data.nodes[1]->node_data.string
 						: scopesymtable->getNameForType(tree->node_data.nodes[1]->node_data.type);

@@ -28,13 +28,16 @@ class ClassSpaceSymbolTable {
 
 		void propagateInheritance();
 		void propagateInheritanceToParent(string childname);
-		PropertySymbolTable* find(Type* type);
-		PropertySymbolTable* find(string name);
+		ReadOnlyPropertySymbolTable* find(Type* type);
+		ReadOnlyPropertySymbolTable* find(string name);
 		void assertTypeIsValid(Type* type);
 		TypeAnalyzer* getAnalyzer();
 		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);
 
+		PropertySymbolTable* findModifiable(string name);
+
 	private:
+		PropertySymbolTable* findModifiable(Type* type);
 
 		// TRUE means defined, FALSE means imported
 		map<string, pair<PropertySymbolTable*, bool> > classes;

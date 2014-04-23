@@ -9,7 +9,7 @@
  * Then it type checks the methods, provisions, and ctor body
  */
 
-ClassParseTreeTraverser::ClassParseTreeTraverser(ErrorTracker* errors, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, string classname, vector<Type*> parameterizedtypes, TypeChecker* typechecker, MethodSignatureParseTreeTraverser* methodanalyzer) {
+ClassParseTreeTraverser::ClassParseTreeTraverser(ErrorTracker* errors, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, string classname, vector<Type*> parameterizedtypes, TypeChecker* typechecker, MethodSignatureParseTreeTraverser* methodanalyzer, PropertySymbolTable* propertysymtable) {
 	this->errors = errors;
 	this->scopesymtable = scopesymtable;
 	this->classestable = classestable;
@@ -17,7 +17,7 @@ ClassParseTreeTraverser::ClassParseTreeTraverser(ErrorTracker* errors, ClassSpac
 	this->parameterizedtypes = parameterizedtypes;
 	this->typechecker = typechecker;
 	this->methodanalyzer = methodanalyzer;
-	propertysymtable = classestable->find(classname);
+	this->propertysymtable = propertysymtable;
 }
 
 void ClassParseTreeTraverser::firstPass(Node* tree) {

@@ -94,17 +94,24 @@ void ClassSpaceSymbolTable::propagateInheritanceToParent(string childname) {
 
 	for(map<string, bool>::iterator it = current->first->parentage.begin(); it != current->first->parentage.end(); ++it) {
 		propagateInheritanceToParent(it->first);
-		propagateInheritanceTables(current->first, find(it->first), it->second);
+		propagateInheritanceTables(current->first, findModifiable(it->first), it->second);
 	}
 
 	current->second = true;
 }
 
-PropertySymbolTable* ClassSpaceSymbolTable::find(Type* type) {
-	return find(type->typedata._class.classname);
+ReadOnlyPropertySymbolTable* ClassSpaceSymbolTable::find(Type* type) {
+	return findModifiable(type);
+}
+ReadOnlyPropertySymbolTable* ClassSpaceSymbolTable::find(string name) {
+	return findModifiable(name);
 }
 
-PropertySymbolTable* ClassSpaceSymbolTable::find(string name) {
+PropertySymbolTable* ClassSpaceSymbolTable::findModifiable(Type* type) {
+	return findModifiable(type->typedata._class.classname);
+}
+
+PropertySymbolTable* ClassSpaceSymbolTable::findModifiable(string name) {
 	std::map<string, pair<PropertySymbolTable*, bool> >::iterator searcher = classes.find(name);
 	if(!classes.count(name)) {
 		SymbolNotFoundException* error = new SymbolNotFoundException();
