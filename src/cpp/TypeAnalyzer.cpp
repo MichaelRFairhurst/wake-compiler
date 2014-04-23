@@ -60,8 +60,8 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 			}
 
 			for(int i = 0; i < len; i++)
-			if(!isASubtypeOfB(a->typedata._class.parameters->types[i], b->typedata._class.parameters->types[i]))
-				return false; // @TODO this makes generics covariant!!
+			if(!isAExactlyB(a->typedata._class.parameters->types[i], b->typedata._class.parameters->types[i]))
+				return false;
 		}
 
 		if(string(a->typedata._class.classname) == b->typedata._class.classname) {
