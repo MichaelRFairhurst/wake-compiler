@@ -14,10 +14,10 @@
 
 using namespace std;
 
-class ObjectSymbolTable {
+class ClassSpaceSymbolTable {
 	public:
-		ObjectSymbolTable();
-		~ObjectSymbolTable();
+		ClassSpaceSymbolTable();
+		~ClassSpaceSymbolTable();
 
 		boost::optional<SemanticError*> addClass(string name);
 		boost::optional<SemanticError*> addInheritance(string child, bool issubclass);

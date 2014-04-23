@@ -1,11 +1,11 @@
 #include "boost/test/unit_test.hpp"
 
 #include "TypeAnalyzer.h"
-#include "ObjectSymbolTable.h"
+#include "ClassSpaceSymbolTable.h"
 
 /**
- *  NOTE!!! This functionality used to be part of ObjectSymbolTable
- * and therefore many test cases for this class exist in ObjectSymbolTableTest
+ *  NOTE!!! This functionality used to be part of ClassSpaceSymbolTable
+ * and therefore many test cases for this class exist in ClassSpaceSymbolTableTest
  */
 
 BOOST_AUTO_TEST_SUITE(TypeAnalyzerTest);
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(ParameterizedClassTypesUnequalParametersNotSubtypes) {
 
 BOOST_AUTO_TEST_CASE(ParameterizedClassTypesRequireDifferentArgumentsAreSubtypes) {
 	TypeAnalyzer analyzer;
-	ObjectSymbolTable table;
+	ClassSpaceSymbolTable table;
 	analyzer.reference = &table;
 	Type* a = MakeType(TYPE_CLASS);
 	Type* b = MakeType(TYPE_CLASS);
@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE(ParameterizedClassTypesRequireDifferentArgumentsAreSubtypes
 
 BOOST_AUTO_TEST_CASE(ParameterizedClassTypesArentCovariantOrContravariant) {
 	TypeAnalyzer analyzer;
-	ObjectSymbolTable table;
+	ClassSpaceSymbolTable table;
 	analyzer.reference = &table;
 	Type* a = MakeType(TYPE_CLASS);
 	Type* b = MakeType(TYPE_CLASS);

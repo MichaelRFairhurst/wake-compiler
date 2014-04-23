@@ -44,7 +44,7 @@ vector<pair<string, TypeArray*> >* MethodSignatureParseTreeTraverser::getName(No
 			if(i < methodname->subnodes) {
 				argshere = methodname->node_data.nodes[i]->node_data.typearray;
 				for(int b = 0; b < argshere->typecount; b++) {
-					objectsymtable->assertTypeIsValid(argshere->types[b]);
+					classestable->assertTypeIsValid(argshere->types[b]);
 				}
 			} else {
 				argshere = emptytypearray;
@@ -73,7 +73,7 @@ Type* MethodSignatureParseTreeTraverser::getReturn(Node* methoddef) {
 
 	if(methoddef->node_data.nodes[1]->node_type == NT_METHOD_RETURN_TYPE) {
 		returntype = methoddef->node_data.nodes[1]->node_data.nodes[0]->node_data.type;
-		objectsymtable->assertTypeIsValid(returntype);
+		classestable->assertTypeIsValid(returntype);
 	} else {
 		returntype = NULL;
 	}
@@ -93,8 +93,8 @@ int MethodSignatureParseTreeTraverser::getFlags(Node* methoddef) {
 	return flags;
 }
 
-MethodSignatureParseTreeTraverser::MethodSignatureParseTreeTraverser(ObjectSymbolTable* objectsymtable) {
-	this->objectsymtable = objectsymtable;
+MethodSignatureParseTreeTraverser::MethodSignatureParseTreeTraverser(ClassSpaceSymbolTable* classestable) {
+	this->classestable = classestable;
 	emptytypearray = MakeTypeArray();
 }
 

@@ -1,7 +1,7 @@
 #ifndef HEADER_LIBRARY_LOADER
 #define HEADER_LIBRARY_LOADER
 
-#include "ObjectSymbolTable.h"
+#include "ClassSpaceSymbolTable.h"
 #include "PropertySymbolTable.h"
 
 extern "C" {
@@ -11,8 +11,8 @@ extern "C" {
 class LibraryLoader {
 
 	public:
-		void loadImport(string importname, string importpath, ObjectSymbolTable& objtable);
-		void loadStdLibToTable(ObjectSymbolTable* table);
+		void loadImport(string importname, string importpath, ClassSpaceSymbolTable& objtable);
+		void loadStdLibToTable(ClassSpaceSymbolTable* table);
 
 };
 

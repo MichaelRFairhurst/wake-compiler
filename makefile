@@ -9,7 +9,7 @@ CPP=g++ $(FLAGS) -std=c++11
 TEST=true
 
 CPPNAMES= \
-	ObjectSymbolTable.cpp \
+	ClassSpaceSymbolTable.cpp \
 	ParseTreeTraverser.cpp \
 	SemanticError.cpp \
 	PropertySymbolTable.cpp \
@@ -67,7 +67,7 @@ GENNAMES=lex.wake.c wake.tab.c objectfile.tab.c lex.objectfile.c
 GENOBJS=$(addprefix bin/gen/, $(GENNAMES:.c=.o))
 
 TESTNAMES=CompilerTests.cpp \
-	ObjectSymbolTableTest.cpp \
+	ClassSpaceSymbolTableTest.cpp \
 	ParseTreeTraverserTest.cpp \
 	ScopeSymbolTableTest.cpp \
 	TypeAnalyzerTest.cpp \

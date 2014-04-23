@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include "ObjectSymbolTable.h"
+#include "ClassSpaceSymbolTable.h"
 #include "ScopeSymbolTable.h"
 #include "SemanticErrorPrinter.h"
 #include "ErrorTracker.h"
@@ -20,7 +20,7 @@ using namespace std;
 class ParseTreeTraverser {
 
 	public:
-		ParseTreeTraverser(ObjectSymbolTable* table) : methodanalyzer(table), typechecker(&errors, table, &scopesymtable, &methodanalyzer) { objectsymtable = table; }
+		ParseTreeTraverser(ClassSpaceSymbolTable* table) : methodanalyzer(table), typechecker(&errors, table, &scopesymtable, &methodanalyzer) { objectsymtable = table; }
 		void traverse(Node* tree);
 		void printErrors(SemanticErrorPrinter& p);
 		bool passesForCompilation();
@@ -31,7 +31,7 @@ class ParseTreeTraverser {
 		ErrorTracker errors;
 
 		ScopeSymbolTable scopesymtable;
-		ObjectSymbolTable* objectsymtable;
+		ClassSpaceSymbolTable* objectsymtable;
 		MethodSignatureParseTreeTraverser methodanalyzer;
 		TypeChecker typechecker;
 

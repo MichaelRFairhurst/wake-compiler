@@ -1,6 +1,6 @@
 #include "EntryPointAnalyzer.h"
 #include <iostream>
-#include "ObjectSymbolTable.h"
+#include "ClassSpaceSymbolTable.h"
 #include "CompilationExceptions.h"
 
 bool EntryPointAnalyzer::checkClassNeedsCanBeMain(vector<Type*>* needs) {
@@ -20,7 +20,7 @@ bool EntryPointAnalyzer::checkMethodCanBeMain(string methodname, Type* method) {
 	return method->typedata.lambda.arguments->typecount == 0;
 }
 
-bool EntryPointAnalyzer::checkMethodCanBeMain(string classname, string methodname, ObjectSymbolTable* table) {
+bool EntryPointAnalyzer::checkMethodCanBeMain(string classname, string methodname, ClassSpaceSymbolTable* table) {
 	try {
 		boost::optional<Type*> method = table->find(classname)->find(methodname);
 		return method ? checkMethodCanBeMain(methodname, *method) : false;

@@ -9,15 +9,15 @@
  * Then it type checks the methods, provisions, and ctor body
  */
 
-ClassParseTreeTraverser::ClassParseTreeTraverser(ErrorTracker* errors, ObjectSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, string classname, vector<Type*> parameterizedtypes, TypeChecker* typechecker, MethodSignatureParseTreeTraverser* methodanalyzer) {
+ClassParseTreeTraverser::ClassParseTreeTraverser(ErrorTracker* errors, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, string classname, vector<Type*> parameterizedtypes, TypeChecker* typechecker, MethodSignatureParseTreeTraverser* methodanalyzer) {
 	this->errors = errors;
 	this->scopesymtable = scopesymtable;
-	this->objectsymtable = objectsymtable;
+	this->classestable = classestable;
 	this->classname = classname;
 	this->parameterizedtypes = parameterizedtypes;
 	this->typechecker = typechecker;
 	this->methodanalyzer = methodanalyzer;
-	propertysymtable = objectsymtable->find(classname);
+	propertysymtable = classestable->find(classname);
 }
 
 void ClassParseTreeTraverser::firstPass(Node* tree) {
@@ -51,7 +51,7 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 					(*error)->token = tree;
 					errors->addError(*error);
 				}
-				objectsymtable->assertTypeIsValid(tree->node_data.nodes[0]->node_data.type);
+				classestable->assertTypeIsValid(tree->node_data.nodes[0]->node_data.type);
 			} catch(SemanticError* e) {
 				e->token = tree;
 				errors->addError(e);
@@ -79,7 +79,7 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 		case NT_PROPERTY:
 			try {
 				Type* prop = copyType(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type);
-				objectsymtable->assertTypeIsValid(prop);
+				classestable->assertTypeIsValid(prop);
 				boost::optional<SemanticError*> error = propertysymtable->addProperty(prop, tree->subnodes == 2 ? PROPERTY_PUBLIC : 0);
 				if(error) {
 					(*error)->token = tree;
@@ -128,8 +128,8 @@ void ClassParseTreeTraverser::checkCtorArgs(Node* tree) {
 			try {
 				for(int i = 0; i < tree->subnodes; i++) {
 					Type* needtype = tree->node_data.nodes[i]->node_data.nodes[0]->node_data.type;
-					objectsymtable->assertTypeIsValid(needtype);
-					objectsymtable->getAnalyzer()->assertNeedIsNotCircular(classname, needtype);
+					classestable->assertTypeIsValid(needtype);
+					classestable->getAnalyzer()->assertNeedIsNotCircular(classname, needtype);
 					propertysymtable->addNeed(needtype);
 				}
 			} catch(SymbolNotFoundException* e) {
@@ -188,7 +188,7 @@ void ClassParseTreeTraverser::typeCheckProperties(Node* tree) {
 					typechecker->setReturnType(NULL);
 					typechecker->check(tree->node_data.nodes[0]);
 				} else {
-					objectsymtable->assertTypeIsValid(tree->node_data.nodes[0]->node_data.type);
+					classestable->assertTypeIsValid(tree->node_data.nodes[0]->node_data.type);
 					scopesymtable->add(tree->node_data.nodes[0]->node_data.type);
 				}
 			} catch(SymbolNotFoundException* e) {
@@ -226,23 +226,23 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 						return;
 
 					case NT_STRINGLIT:
-						if(!objectsymtable->getAnalyzer()->isPrimitiveTypeText(provision))
+						if(!classestable->getAnalyzer()->isPrimitiveTypeText(provision))
 							errors->addError(new SemanticError(TYPE_ERROR, "Bound a Text value to something that is not a Text", tree));
 						break;
 					case NT_NUMBERLIT:
-						if(!objectsymtable->getAnalyzer()->isPrimitiveTypeInt(provision))
+						if(!classestable->getAnalyzer()->isPrimitiveTypeInt(provision))
 							errors->addError(new SemanticError(TYPE_ERROR, "Bound an Int value to something that is not an Int", tree));
 						break;
 					case NT_TYPEDATA:
 						try {
-							objectsymtable->assertTypeIsValid(served->node_data.type);
+							classestable->assertTypeIsValid(served->node_data.type);
 
-							if(!objectsymtable->getAnalyzer()->isASubtypeOfB(served->node_data.type, provision))
+							if(!classestable->getAnalyzer()->isASubtypeOfB(served->node_data.type, provision))
 								errors->addError(new SemanticError(TYPE_ERROR, "Bound class is not a subtype of provided class", tree));
 
 							else {
-								objectsymtable->getAnalyzer()->assertClassCanBeBound(served->node_data.type); // Test that this class isn't abstract
-								objectsymtable->getAnalyzer()->assertClassCanProvide(classname, served->node_data.type); // Test that this class Ctor is recursively provided
+								classestable->getAnalyzer()->assertClassCanBeBound(served->node_data.type); // Test that this class isn't abstract
+								classestable->getAnalyzer()->assertClassCanProvide(classname, served->node_data.type); // Test that this class Ctor is recursively provided
 							}
 						} catch(SemanticError* e) {
 							e->token = tree;
@@ -254,7 +254,7 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 						try {
 							int i;
 							string otherclassname = served->node_data.nodes[0]->node_data.string;
-							vector<Type*>* needs = objectsymtable->find(otherclassname)->getNeeds();
+							vector<Type*>* needs = classestable->find(otherclassname)->getNeeds();
 							Node* arguments = served->node_data.nodes[1];
 							if(needs->size() == arguments->subnodes)
 							for(i = 0; i < arguments->subnodes; i++) {
@@ -264,7 +264,7 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 									case NT_TYPEDATA:
 										{
 											actual = copyType(arguments->node_data.nodes[i]->node_data.type);
-											objectsymtable->assertTypeIsValid(actual);
+											classestable->assertTypeIsValid(actual);
 										}
 										break;
 									case NT_STRINGLIT:
@@ -280,10 +280,10 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 								if(required->specialty != NULL && (actual->specialty == NULL || string(required->specialty) != actual->specialty))
 									errors->addError(new SemanticError(WARNING, "Injected a class with specialized dependencies...it may not be looking for what you're giving it!", tree));
 
-								if(!objectsymtable->getAnalyzer()->isASubtypeOfB(required, actual)) {
+								if(!classestable->getAnalyzer()->isASubtypeOfB(required, actual)) {
 									errors->addError(new SemanticError(TYPE_ERROR, "Injection is not a proper subtype for class dependencies", tree));
 								} else if(arguments->node_data.nodes[i]->node_type == NT_TYPEDATA) {
-									objectsymtable->getAnalyzer()->assertClassCanProvide(classname, actual);
+									classestable->getAnalyzer()->assertClassCanProvide(classname, actual);
 								}
 							} else {
 								errors->addError(new SemanticError(MISMATCHED_INJECTION, "Too many or too few injectioned depndencies", tree));
@@ -300,8 +300,8 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 			} else {
 				try {
 					// if we merely 'provide SomeClass' we must check we provide all its dependencies
-					objectsymtable->getAnalyzer()->assertClassCanBeBound(tree->node_data.nodes[0]->node_data.type); // Test that this class isn't abstract
-					objectsymtable->getAnalyzer()->assertClassCanProvide(classname, tree->node_data.nodes[0]->node_data.type);
+					classestable->getAnalyzer()->assertClassCanBeBound(tree->node_data.nodes[0]->node_data.type); // Test that this class isn't abstract
+					classestable->getAnalyzer()->assertClassCanProvide(classname, tree->node_data.nodes[0]->node_data.type);
 				} catch(SemanticError *e) {
 					e->token = tree;
 					errors->addError(e);

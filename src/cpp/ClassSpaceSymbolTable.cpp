@@ -1,18 +1,18 @@
-#include "ObjectSymbolTable.h"
+#include "ClassSpaceSymbolTable.h"
 #include <algorithm>
 #include "CompilationExceptions.h"
 
-ObjectSymbolTable::ObjectSymbolTable() {
+ClassSpaceSymbolTable::ClassSpaceSymbolTable() {
 	analyzer.reference = this;
 }
 
-ObjectSymbolTable::~ObjectSymbolTable() {
+ClassSpaceSymbolTable::~ClassSpaceSymbolTable() {
 	for(map<string, pair<PropertySymbolTable*, bool> >::iterator it = classes.begin(); it != classes.end(); ++it) {
 		delete it->second.first;
 	}
 }
 
-boost::optional<SemanticError*> ObjectSymbolTable::addClass(string name) {
+boost::optional<SemanticError*> ClassSpaceSymbolTable::addClass(string name) {
 	addingclass_name = name;
 
 	if(classes.count(addingclass_name)) {
@@ -28,7 +28,7 @@ boost::optional<SemanticError*> ObjectSymbolTable::addClass(string name) {
 	return boost::optional<SemanticError*>();
 }
 
-boost::optional<SemanticError*> ObjectSymbolTable::importClass(PropertySymbolTable* table) {
+boost::optional<SemanticError*> ClassSpaceSymbolTable::importClass(PropertySymbolTable* table) {
 	if(classes.count(addingclass_name)) {
 		return boost::optional<SemanticError*>(new SemanticError(MULTIPLE_CLASS_DEFINITION));
 	}
@@ -37,11 +37,11 @@ boost::optional<SemanticError*> ObjectSymbolTable::importClass(PropertySymbolTab
 	return boost::optional<SemanticError*>();
 }
 
-PropertySymbolTable* ObjectSymbolTable::getEmptyPropertySymbolTable() {
+PropertySymbolTable* ClassSpaceSymbolTable::getEmptyPropertySymbolTable() {
 	return new PropertySymbolTable(&analyzer);
 }
 
-vector<PropertySymbolTable*> ObjectSymbolTable::getDefinedClasses() {
+vector<PropertySymbolTable*> ClassSpaceSymbolTable::getDefinedClasses() {
 	vector<PropertySymbolTable*> response;
 
 	for(map<string, pair<PropertySymbolTable*, bool> >::iterator it = classes.begin(); it != classes.end(); ++it) {
@@ -51,7 +51,7 @@ vector<PropertySymbolTable*> ObjectSymbolTable::getDefinedClasses() {
 	return response;
 }
 
-boost::optional<SemanticError*> ObjectSymbolTable::addInheritance(string childname, bool as_subclass) {
+boost::optional<SemanticError*> ClassSpaceSymbolTable::addInheritance(string childname, bool as_subclass) {
 	if(addingclass_hassubclass && as_subclass) {
 		return boost::optional<SemanticError*>(new SemanticError(MORE_THAN_ONE_SUBCLASS));
 	}
@@ -73,7 +73,7 @@ boost::optional<SemanticError*> ObjectSymbolTable::addInheritance(string childna
 	return boost::optional<SemanticError*>();
 }
 
-void ObjectSymbolTable::propagateInheritance() {
+void ClassSpaceSymbolTable::propagateInheritance() {
 	map<string, pair<PropertySymbolTable*, bool> > passed;
 	for(map<string, pair<PropertySymbolTable*, bool> >::iterator it = classes.begin(); it != classes.end(); ++it) {
 		inheritances_gathered[it->first] = pair<PropertySymbolTable*, bool>(it->second.first, false);
@@ -88,7 +88,7 @@ void ObjectSymbolTable::propagateInheritance() {
 	//}
 }
 
-void ObjectSymbolTable::propagateInheritanceToParent(string childname) {
+void ClassSpaceSymbolTable::propagateInheritanceToParent(string childname) {
 	pair<PropertySymbolTable*, bool>* current = &inheritances_gathered.find(childname)->second;
 	if(current->second) return; // Already propagated
 
@@ -100,11 +100,11 @@ void ObjectSymbolTable::propagateInheritanceToParent(string childname) {
 	current->second = true;
 }
 
-PropertySymbolTable* ObjectSymbolTable::find(Type* type) {
+PropertySymbolTable* ClassSpaceSymbolTable::find(Type* type) {
 	return find(type->typedata._class.classname);
 }
 
-PropertySymbolTable* ObjectSymbolTable::find(string name) {
+PropertySymbolTable* ClassSpaceSymbolTable::find(string name) {
 	std::map<string, pair<PropertySymbolTable*, bool> >::iterator searcher = classes.find(name);
 	if(!classes.count(name)) {
 		SymbolNotFoundException* error = new SymbolNotFoundException();
@@ -117,7 +117,7 @@ PropertySymbolTable* ObjectSymbolTable::find(string name) {
 	return searcher->second.first;
 }
 
-void ObjectSymbolTable::assertTypeIsValid(Type* type) {
+void ClassSpaceSymbolTable::assertTypeIsValid(Type* type) {
 	if(type->type == TYPE_PARAMETERIZED) return;
 
 	if(type->type == TYPE_CLASS) {
@@ -135,7 +135,7 @@ void ObjectSymbolTable::assertTypeIsValid(Type* type) {
 	}
 }
 
-void ObjectSymbolTable::printEntryPoints(EntryPointAnalyzer* entryanalyzer) {
+void ClassSpaceSymbolTable::printEntryPoints(EntryPointAnalyzer* entryanalyzer) {
 	for(map<string, pair<PropertySymbolTable*, bool> >::iterator it = classes.begin(); it != classes.end(); ++it) {
 		if(!entryanalyzer->checkClassNeedsCanBeMain(it->second.first->getNeeds())) continue;
 		entryanalyzer->printClass(it->first);
@@ -143,6 +143,6 @@ void ObjectSymbolTable::printEntryPoints(EntryPointAnalyzer* entryanalyzer) {
 	}
 }
 
-TypeAnalyzer* ObjectSymbolTable::getAnalyzer() {
+TypeAnalyzer* ClassSpaceSymbolTable::getAnalyzer() {
 	return &analyzer;
 }

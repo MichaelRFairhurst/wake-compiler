@@ -28,7 +28,7 @@ extern "C" {
 #include "SimpleAddressTable.h"
 #include "ImportParseTreeTraverser.h"
 
-void writeTableFiles(std::string dirname, ObjectSymbolTable& table) {
+void writeTableFiles(std::string dirname, ClassSpaceSymbolTable& table) {
 	vector<PropertySymbolTable*> tables = table.getDefinedClasses();
 	for(auto it = tables.begin(); it != tables.end(); ++it) {
 		fstream file;
@@ -57,7 +57,7 @@ void compileFile(Options* options) {
 	if(parser.parse(myfile)) exit(3);
 	//parser.print();exit(0);
 
-	ObjectSymbolTable table;
+	ClassSpaceSymbolTable table;
 	LibraryLoader loader;
 	loader.loadStdLibToTable(&table);
 	ImportParseTreeTraverser importer;
@@ -122,7 +122,7 @@ int main(int argc, char** argv) {
 	else {
 		AddressAllocator classAllocator;
 		AddressAllocator propAllocator;
-		ObjectSymbolTable table;
+		ClassSpaceSymbolTable table;
 		SimpleAddressTable classTable(classAllocator);
 		SimpleAddressTable propTable(propAllocator);
 		Linker linker(classTable, propTable);

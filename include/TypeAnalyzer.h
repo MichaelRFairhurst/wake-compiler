@@ -7,14 +7,14 @@ extern "C" {
 
 #include <string>
 
-class ObjectSymbolTable;
+class ClassSpaceSymbolTable;
 
 using namespace std;
 
 class TypeAnalyzer {
 
 	public:
-		ObjectSymbolTable* reference;
+		ClassSpaceSymbolTable* reference;
 		bool isASubtypeOfB(string a, string b);
 		bool isASubtypeOfB(Type* a, Type* b);
 		bool isAExactlyB(Type* a, Type* b);

@@ -10,14 +10,14 @@ extern "C" {
 	#include "tree.h"
 }
 
-#include "ObjectSymbolTable.h"
+#include "ClassSpaceSymbolTable.h"
 
 using namespace std;
 
 class MethodSignatureParseTreeTraverser {
 
 	public:
-		MethodSignatureParseTreeTraverser(ObjectSymbolTable* objectsymtable);
+		MethodSignatureParseTreeTraverser(ClassSpaceSymbolTable* objectsymtable);
 		~MethodSignatureParseTreeTraverser();
 
 		vector<pair<string, TypeArray*> >* getName(Node* methoddef);
@@ -27,7 +27,7 @@ class MethodSignatureParseTreeTraverser {
 		int getFlags(Node* methoddef);
 
 	private:
-		ObjectSymbolTable* objectsymtable;
+		ClassSpaceSymbolTable* classestable;
 		TypeArray* emptytypearray;
 
 };

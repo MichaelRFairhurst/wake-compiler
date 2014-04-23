@@ -10,14 +10,14 @@ extern "C" {
 
 using namespace std;
 
-class ObjectSymbolTable;
+class ClassSpaceSymbolTable;
 
 class EntryPointAnalyzer {
 
 	public:
 		bool checkClassNeedsCanBeMain(vector<Type*>* needs);
 		bool checkMethodCanBeMain(string methodname, Type* method);
-		bool checkMethodCanBeMain(string classname, string methodname, ObjectSymbolTable* table);
+		bool checkMethodCanBeMain(string classname, string methodname, ClassSpaceSymbolTable* table);
 		bool printClass(string classname);
 		bool printMethod(string methodname);
 

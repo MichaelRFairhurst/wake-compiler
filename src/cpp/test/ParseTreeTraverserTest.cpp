@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_SUITE( ParseTreeTraverserTest )
 	BOOST_AUTO_TEST_CASE( NAME ) \
 	{ \
 		Parser p; \
-		ObjectSymbolTable table; \
+		ClassSpaceSymbolTable table; \
 		LibraryLoader loader; \
 		loader.loadStdLibToTable(&table); \
 		ParseTreeTraverser t(&table); \

@@ -1,20 +1,20 @@
 #include <boost/test/unit_test.hpp>
 
-#include "ObjectSymbolTable.h"
+#include "ClassSpaceSymbolTable.h"
 #include "SemanticError.h"
 
-BOOST_AUTO_TEST_SUITE( ObjectSymbolTableTest )
+BOOST_AUTO_TEST_SUITE( ClassSpaceSymbolTableTest )
 
 BOOST_AUTO_TEST_CASE( TestClassesAreOwnSubclasses )
 {
-	ObjectSymbolTable table;
+	ClassSpaceSymbolTable table;
 
 	BOOST_CHECK(table.getAnalyzer()->isASubtypeOfB("MyClass", "MyClass"));
 }
 
 BOOST_AUTO_TEST_CASE( TestClassesAreChildsSubclasses )
 {
-	ObjectSymbolTable table;
+	ClassSpaceSymbolTable table;
 
 	table.addClass("ParentClass");
 	table.addClass("ChildClass");
@@ -25,14 +25,14 @@ BOOST_AUTO_TEST_CASE( TestClassesAreChildsSubclasses )
 
 BOOST_AUTO_TEST_CASE( TestClassesArentSubclasses )
 {
-	ObjectSymbolTable table;
+	ClassSpaceSymbolTable table;
 
 	BOOST_REQUIRE(!table.getAnalyzer()->isASubtypeOfB("ClassA", "ClassB"));
 }
 
 BOOST_AUTO_TEST_CASE( TestParentClassesArentSubclasses )
 {
-	ObjectSymbolTable table;
+	ClassSpaceSymbolTable table;
 
 	table.addClass("ParentClass");
 	table.addClass("ChildClass");
@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE( TestParentClassesArentSubclasses )
 
 BOOST_AUTO_TEST_CASE( TestTransitiveSubclassesAreSubClasses )
 {
-	ObjectSymbolTable table;
+	ClassSpaceSymbolTable table;
 
 	table.addClass("ParentClass");
 	table.addClass("ChildClass");

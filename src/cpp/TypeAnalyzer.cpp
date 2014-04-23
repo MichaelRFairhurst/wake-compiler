@@ -1,5 +1,5 @@
 #include "TypeAnalyzer.h"
-#include "ObjectSymbolTable.h"
+#include "ClassSpaceSymbolTable.h"
 #include "PropertySymbolTable.h"
 #include "CompilationExceptions.h"
 
