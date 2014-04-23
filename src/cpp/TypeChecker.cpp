@@ -155,9 +155,10 @@ Type* TypeChecker::typeCheck(Node* tree) {
 						PropertySymbolTable* proptable = objectsymtable->find(thiscontext);
 						variable = proptable->find(scopesymtable->getNameForType(tree->node_data.type));
 						if(variable) {
+							char* propname = strdup(tree->node_data.type->typedata._class.classname);
 							tree->node_type = NT_MEMBER_ACCESS;
 							AddSubNode(tree, MakeEmptyNode(NT_THIS));
-							AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(tree->node_data.type->typedata._class.classname)));
+							AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, propname));
 						}
 					}
 					if(!variable) {
