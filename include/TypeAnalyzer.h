@@ -17,6 +17,7 @@ class TypeAnalyzer {
 		ObjectSymbolTable* reference;
 		bool isASubtypeOfB(string a, string b);
 		bool isASubtypeOfB(Type* a, Type* b);
+		bool isAExactlyB(Type* a, Type* b);
 		void assertClassCanProvide(Type* provider, Type* binding);
 		void assertClassCanProvide(string provider, Type* binding);
 		void assertClassCanBeBound(Type* binding);

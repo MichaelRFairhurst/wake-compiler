@@ -89,6 +89,10 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 
 }
 
+bool TypeAnalyzer::isAExactlyB(Type* a, Type* b) {
+
+}
+
 void TypeAnalyzer::assertNeedIsNotCircular(string classname, Type* need) {
 	if(need->typedata._class.classname == classname)
 		throw new SemanticError(CIRCULAR_DEPENDENCIES, "Created by the need for class " + getNameForType(need));

@@ -1,6 +1,7 @@
 #include "boost/test/unit_test.hpp"
 
 #include "TypeAnalyzer.h"
+#include "ObjectSymbolTable.h"
 
 /**
  *  NOTE!!! This functionality used to be part of ObjectSymbolTable
@@ -80,6 +81,8 @@ BOOST_AUTO_TEST_CASE(ParameterizedClassTypesUnequalParametersNotSubtypes) {
 
 BOOST_AUTO_TEST_CASE(ParameterizedClassTypesRequireDifferentArgumentsAreSubtypes) {
 	TypeAnalyzer analyzer;
+	ObjectSymbolTable table;
+	analyzer.reference = &table;
 	Type* a = MakeType(TYPE_CLASS);
 	Type* b = MakeType(TYPE_CLASS);
 	Type* asub = MakeType(TYPE_CLASS);
@@ -88,10 +91,10 @@ BOOST_AUTO_TEST_CASE(ParameterizedClassTypesRequireDifferentArgumentsAreSubtypes
 	b->typedata._class.classname = strdup("hello");
 	asub->typedata._class.classname = strdup("hellosub");
 	bsub->typedata._class.classname = strdup("hellosub");
-	return;
 	a->typedata._class.parameters = MakeTypeArray();
-	AddTypeToTypeArray(asub, a->typedata._class.parameters);
 	b->typedata._class.parameters = MakeTypeArray();
+
+	AddTypeToTypeArray(asub, a->typedata._class.parameters);
 	AddTypeToTypeArray(bsub, b->typedata._class.parameters);
 
 	BOOST_REQUIRE(analyzer.isASubtypeOfB(a,b));
@@ -105,7 +108,20 @@ BOOST_AUTO_TEST_CASE(ParameterizedClassTypesRequireDifferentArgumentsAreSubtypes
 	BOOST_REQUIRE(!analyzer.isASubtypeOfB(a,b));
 	BOOST_REQUIRE(!analyzer.isASubtypeOfB(b,a));
 
-	freeType(a); freeType(b); freeType(asub); freeType(bsub);
+	freeType(a); freeType(b);// subs get freed automatically
+}
+
+BOOST_AUTO_TEST_CASE(TwoClassesAreExactTypes) {
+	TypeAnalyzer analyzer;
+	ObjectSymbolTable table;
+	analyzer.reference = &table;
+	Type* a = MakeType(TYPE_CLASS);
+	Type* b = MakeType(TYPE_CLASS);
+
+	a->typedata._class.classname = strdup("hello");
+	b->typedata._class.classname = strdup("hello");
+
+	freeType(a); freeType(b);
 }
 
 BOOST_AUTO_TEST_SUITE_END();
