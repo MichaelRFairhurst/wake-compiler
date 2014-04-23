@@ -90,7 +90,37 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 }
 
 bool TypeAnalyzer::isAExactlyB(Type* a, Type* b) {
+	if(a->type != b->type) return false;
+	if(a->arrayed != b->arrayed) return false;
+	if(a->optional != b->optional) return false;
+	if(a->type == TYPE_CLASS) {
+		if(a->typedata._class.classname != string(b->typedata._class.classname)) return false;
+		if(!a->typedata._class.parameters != !b->typedata._class.parameters) return false; // tests both or neither are null. Tests back this up.
+		if(a->typedata._class.parameters != NULL) {
+			if(a->typedata._class.parameters->typecount != b->typedata._class.parameters->typecount)
+				return false;
 
+			for(int i = 0; i < a->typedata._class.parameters->typecount; i++)
+			if(!isAExactlyB(a->typedata._class.parameters->types[i], b->typedata._class.parameters->types[i]))
+				return false;
+		}
+	} else if(a->type == TYPE_PARAMETERIZED) {
+		// no need to check lower/upper bound, should always be the same for all labels
+		return a->typedata.parameterized.label == string(b->typedata.parameterized.label);
+	} else if(a->type == TYPE_LAMBDA) {
+		if(!a->typedata.lambda.returntype != !b->typedata.lambda.returntype) return false; // tests both or neither are null. Tests back this up
+		if(!a->typedata.lambda.arguments != !b->typedata.lambda.arguments) return false; // tests both or neither are null. Tests back this up
+		if(a->typedata.lambda.returntype != NULL && !isAExactlyB(a->typedata.lambda.returntype, b->typedata.lambda.returntype)) return false;
+		if(a->typedata.lambda.arguments != NULL) {
+			if(a->typedata.lambda.arguments->typecount != b->typedata.lambda.arguments->typecount)
+				return false;
+
+			for(int i = 0; i < a->typedata.lambda.arguments->typecount; i++)
+			if(!isAExactlyB(a->typedata.lambda.arguments->types[i], b->typedata.lambda.arguments->types[i]))
+				return false;
+		}
+	}
+	return true;
 }
 
 void TypeAnalyzer::assertNeedIsNotCircular(string classname, Type* need) {
