@@ -33,7 +33,8 @@ CPPNAMES= \
 	TableFileWriter.cpp \
 	TableFileReader.cpp \
 	ImportParseTreeTraverser.cpp \
-	TypeParameterizer.cpp
+	TypeParameterizer.cpp \
+	DerivedPropertySymbolTable.cpp
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
 
@@ -76,7 +77,8 @@ TESTNAMES=CompilerTests.cpp \
 	OptionsParserTest.cpp \
 	ObjectFileHeaderDataTest.cpp \
 	TableFileWriterTest.cpp \
-	TableFileReaderTest.cpp
+	TableFileReaderTest.cpp \
+	DerivedPropertySymbolTableTest.cpp
 
 TESTOBJS=$(addprefix bin/tests/, $(TESTNAMES:.cpp=.o))
 
