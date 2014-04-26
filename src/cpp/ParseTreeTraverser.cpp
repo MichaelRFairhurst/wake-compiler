@@ -75,15 +75,18 @@ void ParseTreeTraverser::secondPass(Node* tree) {
 				string classname = classtype->typedata._class.classname;
 				errors.pushContext("In declaration of 'every " + classname + "'");
 
-				vector<Type*> parameters;
+				vector<Type*>* parameters = new vector<Type*>();
 				if(classtype->typedata._class.parameters != NULL) {
 					int i;
 					for(i = 0; i < classtype->typedata._class.parameters->typecount; i++) {
-						parameters.push_back(classtype->typedata._class.parameters->types[i]);
+						parameters->push_back(classtype->typedata._class.parameters->types[i]);
 					}
 				}
 
-				ClassParseTreeTraverser classtraverser(&errors, objectsymtable, &scopesymtable, classname, parameters, &typechecker, &methodanalyzer, objectsymtable->findModifiable(classname));
+				PropertySymbolTable* proptable = objectsymtable->findModifiable(classname);
+				proptable->setParameters(parameters);
+
+				ClassParseTreeTraverser classtraverser(&errors, objectsymtable, &scopesymtable, classname, &typechecker, &methodanalyzer, proptable);
 
 				secondPass(tree->node_data.nodes[1]);
 				if(tree->subnodes > 2) classtraverser.firstPass(tree->node_data.nodes[2]);
@@ -123,14 +126,7 @@ void ParseTreeTraverser::thirdPass(Node* tree) {
 				string classname = classtype->typedata._class.classname;
 				errors.pushContext("In declaration of 'every " + classname + "'");
 
-				vector<Type*> parameters;
-				if(classtype->typedata._class.parameters != NULL) {
-					int i;
-					for(i = 0; i < classtype->typedata._class.parameters->typecount; i++)
-						parameters.push_back(classtype->typedata._class.parameters->types[i]);
-				}
-
-				ClassParseTreeTraverser classtraverser(&errors, objectsymtable, &scopesymtable, classname, parameters, &typechecker, &methodanalyzer, objectsymtable->findModifiable(classname));
+				ClassParseTreeTraverser classtraverser(&errors, objectsymtable, &scopesymtable, classname, &typechecker, &methodanalyzer, objectsymtable->findModifiable(classname));
 
 				thirdPass(tree->node_data.nodes[1]);
 				if(tree->subnodes > 2) classtraverser.secondPass(tree->node_data.nodes[2]);

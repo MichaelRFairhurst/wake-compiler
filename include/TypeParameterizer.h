@@ -10,8 +10,8 @@ extern "C" {
 class TypeParameterizer {
 
 	public:
-		void applyParameterizations(Type** typeaddr, std::vector<Type*> parameters);
-		void applyParameterizations(TypeArray* types, std::vector<Type*> parameters);
+		void applyParameterizations(Type** typeaddr, const std::vector<Type*>& parameters);
+		void applyParameterizations(TypeArray* types, const std::vector<Type*>& parameters);
 
 };
 

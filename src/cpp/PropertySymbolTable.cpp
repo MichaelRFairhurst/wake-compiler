@@ -164,3 +164,11 @@ void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable*
 bool PropertySymbolTable::isPublic(string name) {
 	return properties.find(name)->second->flags & PROPERTY_PUBLIC;
 }
+
+void PropertySymbolTable::setParameters(vector<Type*>* parameters) {
+	declaredtypeparameters = parameters;
+}
+
+const vector<Type*>& PropertySymbolTable::getParameters() {
+	return *declaredtypeparameters;
+}

@@ -40,13 +40,15 @@ class PropertySymbolTable : public ReadOnlyPropertySymbolTable {
 		map<string, ObjectProperty*> properties;
 		const map<string, bool>& getParentage();
 		map<string, bool> parentage;
+		void setParameters(vector<Type*>* parameters);
+		const vector<Type*>& getParameters();
 
 		friend void propagateInheritanceTables(PropertySymbolTable* parent, PropertySymbolTable* child, bool extend);
 
 	private:
 		TypeAnalyzer* analyzer;
 		vector<Type*> needs;
-		vector<string> declaredtypeparameters;
+		vector<Type*>* declaredtypeparameters;
 };
 
 #endif

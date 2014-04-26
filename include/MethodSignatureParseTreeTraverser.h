@@ -23,7 +23,7 @@ class MethodSignatureParseTreeTraverser {
 		vector<pair<string, TypeArray*> >* getName(Node* methoddef);
 		Node* getBody(Node* methoddef);
 		Type* getReturn(Node* methoddef);
-		void convertParameterizedTypes(Node* methoddef, vector<Type*> parameterizedtypes);
+		void convertParameterizedTypes(Node* methoddef, const vector<Type*>& parameterizedtypes);
 		int getFlags(Node* methoddef);
 
 	private:

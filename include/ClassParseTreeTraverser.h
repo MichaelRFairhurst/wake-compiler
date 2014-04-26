@@ -21,7 +21,7 @@ using namespace std;
 
 class ClassParseTreeTraverser {
 	public:
-		ClassParseTreeTraverser(ErrorTracker* errors, ClassSpaceSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, string classname, vector<Type*> parameterizedtypes, TypeChecker* typechecker, MethodSignatureParseTreeTraverser* methodanalyzer, PropertySymbolTable* propertysymtable);
+		ClassParseTreeTraverser(ErrorTracker* errors, ClassSpaceSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, string classname, TypeChecker* typechecker, MethodSignatureParseTreeTraverser* methodanalyzer, PropertySymbolTable* propertysymtable);
 		void firstPass(Node* tree);
 		void secondPass(Node* tree);
 
@@ -35,7 +35,6 @@ class ClassParseTreeTraverser {
 		vector<pair<string, TypeArray*> >* getMethodName(Node* methoddef);
 
 		string classname;
-		vector<Type*> parameterizedtypes;
 
 		MethodSignatureParseTreeTraverser* methodanalyzer;
 		TypeChecker* typechecker;

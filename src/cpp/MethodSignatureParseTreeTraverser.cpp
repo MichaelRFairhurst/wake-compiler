@@ -2,7 +2,7 @@
 #include "SemanticError.h"
 #include "TypeParameterizer.h"
 
-void MethodSignatureParseTreeTraverser::convertParameterizedTypes(Node* methoddef, vector<Type*> parameterizedtypes) {
+void MethodSignatureParseTreeTraverser::convertParameterizedTypes(Node* methoddef, const vector<Type*>& parameterizedtypes) {
 	int i;
 	Node* methodname;
 	TypeParameterizer parameterizer;
