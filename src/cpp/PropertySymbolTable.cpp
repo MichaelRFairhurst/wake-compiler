@@ -1,5 +1,7 @@
 #include "PropertySymbolTable.h"
 #include "SemanticError.h"
+#include "DerivedPropertySymbolTable.h"
+#include "TypeParameterizer.h"
 
 PropertySymbolTable::PropertySymbolTable(TypeAnalyzer* analyzer) {
 	this->analyzer = analyzer;
@@ -171,4 +173,18 @@ void PropertySymbolTable::setParameters(vector<Type*>* parameters) {
 
 const vector<Type*>& PropertySymbolTable::getParameters() {
 	return *declaredtypeparameters;
+}
+
+ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<Type*>& parameters) {
+	TypeParameterizer parameterizer;
+	map<string, ObjectProperty*>* newprops = new map<string, ObjectProperty*>();
+	for(map<string, ObjectProperty*>::iterator it = properties.begin(); it != properties.end(); ++it) {
+		ObjectProperty* newprop = new ObjectProperty();
+		newprop->type = it->second->type;
+		newprop->flags = it->second->flags;
+		parameterizer.applyParameterizations(&it->second->type, getParameters(), parameters);
+		(*newprops)[it->first] = newprop;
+	}
+	return new DerivedPropertySymbolTable(*analyzer, needs, *newprops, parentage);
+	return this;
 }

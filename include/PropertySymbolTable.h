@@ -43,6 +43,8 @@ class PropertySymbolTable : public ReadOnlyPropertySymbolTable {
 		void setParameters(vector<Type*>* parameters);
 		const vector<Type*>& getParameters();
 
+		ReadOnlyPropertySymbolTable* resolveParameters(vector<Type*>& parameters);
+
 		friend void propagateInheritanceTables(PropertySymbolTable* parent, PropertySymbolTable* child, bool extend);
 
 	private:
