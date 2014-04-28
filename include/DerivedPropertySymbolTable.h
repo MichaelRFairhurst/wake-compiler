@@ -19,7 +19,7 @@ using namespace std;
 
 class DerivedPropertySymbolTable : public ReadOnlyPropertySymbolTable {
 	public:
-		DerivedPropertySymbolTable(TypeAnalyzer& analyzer, vector<Type*> needs, map<string, ObjectProperty*>& properties, const map<string, bool>& parentage) : analyzer(analyzer), needs(needs), properties(properties), parentage(parentage) {};
+		DerivedPropertySymbolTable(TypeAnalyzer& analyzer, vector<Type*>& needs, map<string, ObjectProperty*>& properties, const map<string, bool>& parentage) : analyzer(analyzer), needs(needs), properties(properties), parentage(parentage) {};
 		boost::optional<Type*> find(string name);
 		bool isPublic(string name);
 		string getAddress(string name);
