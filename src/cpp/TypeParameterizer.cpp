@@ -48,8 +48,8 @@ void TypeParameterizer::applyParameterizations(Type** typeaddr, const std::vecto
 		for(int i = 0; i < parameters.size(); i++) {
 			if(type->typedata.parameterized.label == string(parameters.at(i)->typedata.parameterized.label)) {
 				*typeaddr = copyType(parameterizations.at(i));
-				(*typeaddr)->arrayed = type->arrayed;
-				(*typeaddr)->optional = type->optional;
+				(*typeaddr)->arrayed += type->arrayed;
+				(*typeaddr)->optional += type->optional;
 				(*typeaddr)->alias = type->alias;
 				freeType(type);
 				break; // We've found it, move along

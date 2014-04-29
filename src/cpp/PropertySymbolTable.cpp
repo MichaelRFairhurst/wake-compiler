@@ -180,9 +180,9 @@ ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<Type*
 	map<string, ObjectProperty*>* newprops = new map<string, ObjectProperty*>();
 	for(map<string, ObjectProperty*>::iterator it = properties.begin(); it != properties.end(); ++it) {
 		ObjectProperty* newprop = new ObjectProperty();
-		newprop->type = it->second->type;
+		newprop->type = copyType(it->second->type);
 		newprop->flags = it->second->flags;
-		parameterizer.applyParameterizations(&it->second->type, getParameters(), parameters);
+		parameterizer.applyParameterizations(&newprop->type, getParameters(), parameters);
 		(*newprops)[it->first] = newprop;
 	}
 	return new DerivedPropertySymbolTable(*analyzer, needs, *newprops, parentage);
