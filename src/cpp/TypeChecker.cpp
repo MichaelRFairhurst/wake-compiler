@@ -6,6 +6,7 @@ TypeChecker::TypeChecker(ErrorTracker* errors, ClassSpaceSymbolTable* classestab
 	this->classestable = classestable;
 	this->scopesymtable = scopesymtable;
 	this->methodanalyzer = methodanalyzer;
+	thiscontext = NULL;
 }
 
 void TypeChecker::check(Node* tree) {
@@ -93,8 +94,8 @@ void TypeChecker::setReturnType(Type* returntype) {
 	this->returntype = returntype;
 }
 
-void TypeChecker::setThisContext(string name) {
-	thiscontext = name;
+void TypeChecker::setThisContext(Type* context) {
+	thiscontext = context;
 }
 
 void TypeChecker::setParameterizedTypes(vector<Type*> types) {
@@ -129,7 +130,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				{
 					char* name = tree->node_data.string;
 					boost::optional<Type*> variable = scopesymtable->find(name);
-					if(!variable && thiscontext != "") {
+					if(!variable && thiscontext != NULL) {
 						ReadOnlyPropertySymbolTable* proptable = classestable->find(thiscontext);
 						variable = proptable->find(name);
 						if(variable) {
@@ -151,7 +152,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 			case NT_TYPEDATA:
 				{
 					boost::optional<Type*> variable = scopesymtable->find(tree->node_data.type);
-					if(!variable && thiscontext != "") {
+					if(!variable && thiscontext != NULL) {
 						ReadOnlyPropertySymbolTable* proptable = classestable->find(thiscontext);
 						variable = proptable->find(scopesymtable->getNameForType(tree->node_data.type));
 						if(variable) {
@@ -171,8 +172,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				break;
 
 			case NT_THIS:
-				ret = MakeType(TYPE_CLASS);
-				ret->typedata._class.classname = strdup(thiscontext.c_str());
+				ret = copyType(thiscontext);
 				break;
 
 			case NT_NOTHING:

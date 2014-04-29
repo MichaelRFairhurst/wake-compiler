@@ -188,3 +188,16 @@ ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<Type*
 	return new DerivedPropertySymbolTable(*analyzer, needs, *newprops, parentage);
 	return this;
 }
+
+Type* PropertySymbolTable::getAsType() {
+	Type* ret = MakeType(TYPE_CLASS);
+	ret->typedata._class.classname = strdup(classname.c_str());
+	if(getParameters().size()) {
+		ret->typedata._class.parameters = MakeTypeArray();
+		for(auto it = getParameters().begin(); it != getParameters().end(); ++it) {
+			AddTypeToTypeArray(*it, ret->typedata._class.parameters);
+		}
+	}
+
+	return ret;
+}

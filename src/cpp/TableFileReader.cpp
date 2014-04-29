@@ -3,6 +3,8 @@
 #include <iostream>
 
 void TableFileReader::read(PropertySymbolTable* table, istream& s) {
+	//@TODO work rom tablefile
+	table->setParameters(new vector<Type*>());
 	table->classname = readString(s);
 	table->abstract = readUInt8(s);
 	unsigned char tag;

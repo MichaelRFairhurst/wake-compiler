@@ -1920,4 +1920,41 @@ PTT_TEST_CASE(
 	PTT_EXPECT(TYPE_ERROR)
 );
 
+PTT_TEST_CASE(
+	TestGenericMethodReturnTypesHaveChanged,
+	"every MyClass{T} is:													\n\
+		T -- returnATypeT() {												\n\
+			return returnATypeT();											\n\
+		}																	\n\
+		Int -- returnATypeInt(MyClass{Int}) {								\n\
+			return MyClass.returnATypeT();									\n\
+		}																	\n\
+		Text -- returnAText(MyClass{Text}) {								\n\
+			return MyClass.returnATypeT();									\n\
+		}																	\n\
+		Bool -- returnABool(MyClass{Bool}) {								\n\
+			return MyClass.returnATypeT();									\n\
+		}																	\n\
+		MyClass{T} -- returnAMyClassT(MyClass{MyClass{T}}) {				\n\
+			return MyClass.returnATypeT();									\n\
+		}																	\n\
+		Int? -- returnOptionalIntArray(MyClass{Int?}) {						\n\
+			return MyClass.returnATypeT();									\n\
+		}																	\n\
+		Int[] -- returnIntArray(MyClass{Int[]}) {							\n\
+			return MyClass.returnATypeT();									\n\
+		}																	\n\
+		T[] -- returnTArray(MyClass{T[]}) {									\n\
+			return MyClass.returnATypeT();									\n\
+		}																	\n\
+		T? -- returnOptionalT(MyClass{T?}) {								\n\
+			return MyClass.returnATypeT();									\n\
+		}																	\n\
+		Int? -- returnOptionalInt(MyClass{Int?}) {							\n\
+			return MyClass.returnATypeT();									\n\
+		}",
+	PTT_VALID
+);
+
+
 BOOST_AUTO_TEST_SUITE_END()

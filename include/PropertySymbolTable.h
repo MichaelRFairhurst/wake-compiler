@@ -42,6 +42,7 @@ class PropertySymbolTable : public ReadOnlyPropertySymbolTable {
 		map<string, bool> parentage;
 		void setParameters(vector<Type*>* parameters);
 		const vector<Type*>& getParameters();
+		Type* getAsType();
 
 		ReadOnlyPropertySymbolTable* resolveParameters(vector<Type*>& parameters);
 

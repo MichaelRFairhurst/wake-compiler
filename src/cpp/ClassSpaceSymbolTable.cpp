@@ -101,8 +101,30 @@ void ClassSpaceSymbolTable::propagateInheritanceToParent(string childname) {
 }
 
 ReadOnlyPropertySymbolTable* ClassSpaceSymbolTable::find(Type* type) {
-	return findModifiable(type);
+	PropertySymbolTable* table = findModifiable(type);
+	if(type->typedata._class.parameters == NULL) {
+		if(table->getParameters().size()) {
+			SymbolNotFoundException* error = new SymbolNotFoundException();
+			error->errormsg = "Type " + string(type->typedata._class.classname) + " cannot be used without type parameters";;
+			throw error;
+		}
+		return table;
+	} else {
+		if(table->getParameters().size() != type->typedata._class.parameters->typecount) {
+			SymbolNotFoundException* error = new SymbolNotFoundException();
+			error->errormsg = "Type " + string(type->typedata._class.classname) + " is used with the wrong number of type parameters";;
+			throw error;
+		} else {
+			// TODO check lower and upper bounds on type parameters
+			vector<Type*> temp;
+			for(int i = 0; i < type->typedata._class.parameters->typecount; i++) {
+				temp.push_back(type->typedata._class.parameters->types[i]);
+			}
+			return table->resolveParameters(temp);
+		}
+	}
 }
+
 ReadOnlyPropertySymbolTable* ClassSpaceSymbolTable::find(string name) {
 	return findModifiable(name);
 }

@@ -21,7 +21,7 @@ class TypeChecker {
 	public:
 		TypeChecker(ErrorTracker* errors, ClassSpaceSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, MethodSignatureParseTreeTraverser* methodanalyzer);
 		void setReturnType(Type* returntype);
-		void setThisContext(string classname);
+		void setThisContext(Type* thiscontext);
 		void check(Node* n);
 		void setParameterizedTypes(vector<Type*> types);
 
@@ -37,7 +37,7 @@ class TypeChecker {
 		ClassSpaceSymbolTable* classestable;
 		ScopeSymbolTable* scopesymtable;
 		Type* returntype;
-		string thiscontext;
+		Type* thiscontext;
 		vector<Type*> parameterizedtypes;
 
 };

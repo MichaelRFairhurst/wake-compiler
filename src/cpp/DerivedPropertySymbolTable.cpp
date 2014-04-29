@@ -13,11 +13,11 @@ bool DerivedPropertySymbolTable::isPublic(string name) {
 }
 
 string DerivedPropertySymbolTable::getAddress(string name) {
-	throw new std::runtime_error("NOT IMPLEMENTED YET");
+	//throw new std::runtime_error("NOT IMPLEMENTED YET");
 }
 
 string DerivedPropertySymbolTable::getProvisionSymbol(Type* provided) {
-	throw new std::runtime_error("NOT IMPLEMENTED YET");
+	//throw new std::runtime_error("NOT IMPLEMENTED YET");
 }
 
 vector<Type*>* DerivedPropertySymbolTable::getNeeds() {
@@ -25,7 +25,20 @@ vector<Type*>* DerivedPropertySymbolTable::getNeeds() {
 }
 
 string DerivedPropertySymbolTable::getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments) {
-	throw new std::runtime_error("NOT IMPLEMENTED YET");
+	//@TODO not duplicate code from PropertySymbolTable
+	string name;
+	for(vector<pair<string, TypeArray*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
+		name += it->first;
+		name += "(";
+		int i;
+		for(i = 0; i < it->second->typecount; i++) {
+			if(i) name += ",";
+			name += analyzer.getNameForType(it->second->types[i]);
+		}
+		name += ")";
+	}
+
+	return name;
 }
 
 bool DerivedPropertySymbolTable::isAbstract() {
