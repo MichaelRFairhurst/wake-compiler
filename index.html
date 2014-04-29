@@ -272,6 +272,7 @@ span.goodcode {
 				<li><a href="#methods">Methods</a></li>
 				<li><a href="#invoking">- Invoking Methods</a></li>
 				<li><a href="#overloading">- Overloading Methods</a></li>
+				<li><a href="#generics">Generics</a></li>
 				<li><a href="#provisions">Provisions</a></li>
 				<li><a href="#plainprovisions">- Plain Provisions</a></li>
 				<li><a href="#specializedprovisions">- Specialized Provisions</a></li>
@@ -759,6 +760,30 @@ every SubClass (<span class="goodcode" title="Subclass extends BaseClass, meanin
     needs <span class="goodcode" title="This dependency will be provided by whatever provision made our UsesProvider object.">Provider</span>, <span class="goodcode" title="We can mark provisions with labels matched at compile time.">DependentClass:Special</span> then {
         <span class="goodcode" title="This is just syntactic sugar, it takes a Printer from our provider and assigns it to the variable Printer.">var Printer &lt;- Provider;</span>
         <span class="goodcode" title="Here a printer is fetched from our Provider object, but not assigned to a variable.">(Printer &lt;- Provider)</span>.print(Text);
+    }</code></pre>
+		<h3 id="generics">Generics <span class="label label-inverse">flexible</span> <span class="label label-inverse">typesafe</span></h3>
+		<p>Like Java, C#, and other languages, wake supports generic types.</p>
+		<div class="alert alert-info">Generics are required for a powerful static type system. Unlike wake, Java and C# did not have generics in early versions. As such, the type safety and performance of arrays in these languages was thrown out to accomodate missing flexibility. Wake had generics from version one and does not suffer these drawbacks.</div>
+		<div class="alert alert-info">The wake syntax uses curly braces instead of angle brackets for generics. This simple difference speeds up compilation and makes parsing easier for independent programs, as it is a 100% context-free grammar.</div>
+		<div class="alert alert-error">These examples use function types that are not yet implemented.</div>
+		<pre><code class="wake"
+>every CalculationCache<span class="goodcode" title="A calculation cache holds a value of any type T.">{T}</span> is:
+    with <span class="goodcode" title="This may hold an integer, text, a class, or even yet another calculation cache. Calling code decides.">T?</span> = <span class="goodcode" title="Begin the cache as empty">nothing</span>;
+    needs <span class="goodcode" title="Store the function to calculate the value">T -- fn()</span> calculation;
+    <span class="goodcode" title="Here we provide the calculated value of type T.">T</span> -- getValue() {
+        if(<span class="goodcode" title="Use our type T by its typename since it was not aliased.">T</span> == nothing) {
+            T = calculation();
+        }
+        return T;
+    }</code></pre>
+	<p>The type information of a generic is deffered until the moment where its used. For those unfamiliar with generics, using one would look like this.</p>
+		<pre><code class="wake"
+>every Squarer is:
+    needs Int;
+    provides <span class="goodcode" title="Specific variations of generics can be properties, provisions, needs, and more.">CalculationCache{Int};</span>
+    with CalculationCache{Int} <span class="goodcode" title="Create a calculation cache that squares Int">&lt;(Int -- fn() { return Int * Int; }) this;</span>
+    Int -- get() {
+        return CalculationCache.getValue();
     }</code></pre>
 		<h3 id="plainprovisions">Defining Plain Provisions <span class="label label-inverse">concise</span> <span class="label label-inverse">typesafe</span></h3>
 		<p>A plain provision simply marks that your class can provide a type. The compiler will ensure that you can provide all of that type's dependencies as well.</p>
