@@ -29,8 +29,8 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 
 	if(a->type == TYPE_LAMBDA) {
 
-		// A fn taking 3 arguments is not a subtype of a fn taking 2 or 4
-		if(a->typedata.lambda.arguments->typecount != b->typedata.lambda.arguments->typecount)
+		// if one or the other is a pointer
+		if((a->typedata.lambda.arguments == NULL) != (b->typedata.lambda.arguments == NULL))
 			return false;
 
 		// Bool -- fn() is a subtype of void -- fn(), since the subtype will simply ignore the returnval
@@ -40,10 +40,16 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 		else if(b->typedata.lambda.returntype != NULL && !isASubtypeOfB(a->typedata.lambda.returntype, b->typedata.lambda.returntype))
 			return false;
 
-		int i;
-		for(i = 0; i < a->typedata.lambda.arguments->typecount; i++)
-		if(!isASubtypeOfB(a->typedata.lambda.arguments->types[i], b->typedata.lambda.arguments->types[i]))
-			return false;
+		if(a->typedata.lambda.arguments != NULL) {
+			// A fn taking 3 arguments is not a subtype of a fn taking 2 or 4
+			if(a->typedata.lambda.arguments->typecount != b->typedata.lambda.arguments->typecount)
+				return false;
+
+			int i;
+			for(i = 0; i < a->typedata.lambda.arguments->typecount; i++)
+			if(!isASubtypeOfB(a->typedata.lambda.arguments->types[i], b->typedata.lambda.arguments->types[i]))
+				return false;
+		}
 
 		return true;
 
@@ -124,6 +130,7 @@ bool TypeAnalyzer::isAExactlyB(Type* a, Type* b) {
 }
 
 void TypeAnalyzer::assertNeedIsNotCircular(string classname, Type* need) {
+	if(need->type != TYPE_CLASS) return; // @TODO detect circular generics...wow.
 	if(need->typedata._class.classname == classname)
 		throw new SemanticError(CIRCULAR_DEPENDENCIES, "Created by the need for class " + getNameForType(need));
 

@@ -1956,5 +1956,37 @@ PTT_TEST_CASE(
 	PTT_VALID
 );
 
+PTT_TEST_CASE(
+	TestGenericNeedsAndProperties,
+	"every Generic{T} is:														\n\
+	every MyClass{T} is:														\n\
+		needs T plainneed,														\n\
+			T? optionalneed,													\n\
+			T[] arrayedneed,													\n\
+			Generic{T} containedneed,											\n\
+			T -- fn() returnedneed,												\n\
+			T? -- fn() returnedoptionalneed,									\n\
+			T[] -- fn() returnedarrayedneed,									\n\
+			Generic{T} -- fn() returnedcontainedneed,							\n\
+			fn(T) argumentneed,													\n\
+			fn(T?) argumentoptionalneed,										\n\
+			fn(T[]) argumentarrayedneed,										\n\
+			fn(Generic{T}) argumentcontainedneed;								\n\
+		with T plainprop = plainneed;											\n\
+		with T? optionalprop = optionalneed;									\n\
+		with T[] arrayedprop = arrayedneed;										\n\
+		with Generic{T} containedprop = containedneed;							\n\
+		with T -- fn() returnedprop = returnedneed;								\n\
+		with T? -- fn() returnedoptionalprop = returnedoptionalneed;			\n\
+		with T[] -- fn() returnedarrayedprop = returnedarrayedneed;				\n\
+		with Generic{T} -- fn() returnedcontainedprop = returnedcontainedneed;	\n\
+		with fn(T) argumentprop = argumentneed;									\n\
+		with fn(T?) argumentoptionalprop = argumentoptionalneed;				\n\
+		with fn(T[]) argumentarrayedprop = argumentarrayedneed;					\n\
+		with fn(Generic{T}) argumentcontainedprop = argumentcontainedneed;		\n\
+		",
+		PTT_VALID
+)
+
 
 BOOST_AUTO_TEST_SUITE_END()

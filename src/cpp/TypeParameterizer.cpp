@@ -1,6 +1,7 @@
 #include "TypeParameterizer.h"
 
 #include <string>
+#include <string.h>
 
 using namespace std;
 
@@ -16,7 +17,7 @@ void TypeParameterizer::writeInParameterizations(Type** typeaddr, const std::vec
 					*typeaddr = copyType(*it);
 					(*typeaddr)->arrayed = type->arrayed;
 					(*typeaddr)->optional = type->optional;
-					(*typeaddr)->alias = type->alias;
+					(*typeaddr)->alias = type->alias ? strdup(type->alias) : NULL;
 					freeType(type);
 					break; // We've found it, move along
 				}

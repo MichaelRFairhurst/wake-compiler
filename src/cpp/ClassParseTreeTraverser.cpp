@@ -1,5 +1,6 @@
 #include "ClassParseTreeTraverser.h"
 #include "CompilationExceptions.h"
+#include "TypeParameterizer.h"
 
 /**
  * This class makes several passes to have the proper type info at the proper times.
@@ -77,6 +78,8 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 
 		case NT_PROPERTY:
 			try {
+				TypeParameterizer parameterizer;
+				parameterizer.writeInParameterizations(&tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type, propertysymtable->getParameters());
 				Type* prop = copyType(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type);
 				classestable->assertTypeIsValid(prop);
 				boost::optional<SemanticError*> error = propertysymtable->addProperty(prop, tree->subnodes == 2 ? PROPERTY_PUBLIC : 0);
@@ -125,7 +128,9 @@ void ClassParseTreeTraverser::checkCtorArgs(Node* tree) {
 
 		case NT_CTOR_ARGS:
 			try {
+				TypeParameterizer parameterizer;
 				for(int i = 0; i < tree->subnodes; i++) {
+					parameterizer.writeInParameterizations(&tree->node_data.nodes[i]->node_data.nodes[0]->node_data.type, propertysymtable->getParameters());
 					Type* needtype = tree->node_data.nodes[i]->node_data.nodes[0]->node_data.type;
 					classestable->assertTypeIsValid(needtype);
 					classestable->getAnalyzer()->assertNeedIsNotCircular(classname, needtype);
