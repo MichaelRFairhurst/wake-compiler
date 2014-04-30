@@ -150,7 +150,26 @@ void ClassSpaceSymbolTable::assertTypeIsValid(Type* type) {
 	if(type->type == TYPE_PARAMETERIZED) return;
 
 	if(type->type == TYPE_CLASS) {
-		if(classes.count(type->typedata._class.classname)) return;
+		if(classes.count(type->typedata._class.classname)) {
+			std::map<string, pair<PropertySymbolTable*, bool> >::iterator searcher = classes.find(type->typedata._class.classname);
+			PropertySymbolTable* table = searcher->second.first;
+			vector<Type*> parameterizations;
+
+			if(type->typedata._class.parameters != NULL) {
+				int i;
+				for(i = 0; i < type->typedata._class.parameters->typecount; i++) {
+					assertTypeIsValid(type->typedata._class.parameters->types[i]);
+					parameterizations.push_back(type->typedata._class.parameters->types[i]);
+				}
+			}
+
+			// @TODO check upper and lower bounds against parameterizations
+
+			if(table->getParameters().size() != parameterizations.size()) {
+				throw new SemanticError(INVALID_GENERIC_TYPE, type->typedata._class.classname + string(" requires fewer type parameters, or more, or none."));
+			}
+			return;
+		}
 
 		throw new SemanticError(CLASSNAME_NOT_FOUND, type->typedata._class.classname + string(" is not a valid type"));
 	} else {

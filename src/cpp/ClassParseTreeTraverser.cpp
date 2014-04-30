@@ -127,21 +127,23 @@ void ClassParseTreeTraverser::checkCtorArgs(Node* tree) {
 			break;
 
 		case NT_CTOR_ARGS:
-			try {
+			{
 				TypeParameterizer parameterizer;
 				for(int i = 0; i < tree->subnodes; i++) {
-					parameterizer.writeInParameterizations(&tree->node_data.nodes[i]->node_data.nodes[0]->node_data.type, propertysymtable->getParameters());
-					Type* needtype = tree->node_data.nodes[i]->node_data.nodes[0]->node_data.type;
-					classestable->assertTypeIsValid(needtype);
-					classestable->getAnalyzer()->assertNeedIsNotCircular(classname, needtype);
-					propertysymtable->addNeed(needtype);
+					try {
+						parameterizer.writeInParameterizations(&tree->node_data.nodes[i]->node_data.nodes[0]->node_data.type, propertysymtable->getParameters());
+						Type* needtype = tree->node_data.nodes[i]->node_data.nodes[0]->node_data.type;
+						classestable->assertTypeIsValid(needtype);
+						classestable->getAnalyzer()->assertNeedIsNotCircular(classname, needtype);
+						propertysymtable->addNeed(needtype);
+					} catch(SymbolNotFoundException* e) {
+						errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
+						delete e;
+					} catch(SemanticError* e) {
+						e->token = tree;
+						errors->addError(e);
+					}
 				}
-			} catch(SymbolNotFoundException* e) {
-				errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
-				delete e;
-			} catch(SemanticError* e) {
-				e->token = tree;
-				errors->addError(e);
 			}
 	}
 }

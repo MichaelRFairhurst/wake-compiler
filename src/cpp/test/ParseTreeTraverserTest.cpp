@@ -1986,7 +1986,34 @@ PTT_TEST_CASE(
 		with fn(Generic{T}) argumentcontainedprop = argumentcontainedneed;		\n\
 		",
 		PTT_VALID
-)
+);
+
+PTT_TEST_CASE(
+	TestBadParameterizationsInPropertiesAndNeeds,
+	"every Generic{T} is:										\n\
+	every MyClass is:											\n\
+		needs Generic,											\n\
+			Generic{MyClass, MyClass, MyClass},					\n\
+			Generic{Generic{MyClass, MyClass}},					\n\
+			MyClass{Generic{MyClass}},							\n\
+			MyClass{Generic{MyClass}, Generic{MyClass}};		\n\
+		with Generic = 1;										\n\
+		with Generic{MyClass, MyClass, MyClass} = 1;			\n\
+		with Generic{Generic{MyClass, MyClass}} = 1;			\n\
+		with MyClass{Generic{MyClass}} = 1;						\n\
+		with MyClass{Generic{MyClass}, Generic{MyClass}} = 1;	\n\
+	",
+	PTT_EXPECT(INVALID_GENERIC_TYPE)
+	PTT_EXPECT(INVALID_GENERIC_TYPE)
+	PTT_EXPECT(INVALID_GENERIC_TYPE)
+	PTT_EXPECT(INVALID_GENERIC_TYPE)
+	PTT_EXPECT(INVALID_GENERIC_TYPE)
+	PTT_EXPECT(INVALID_GENERIC_TYPE)
+	PTT_EXPECT(INVALID_GENERIC_TYPE)
+	PTT_EXPECT(INVALID_GENERIC_TYPE)
+	PTT_EXPECT(INVALID_GENERIC_TYPE)
+	PTT_EXPECT(INVALID_GENERIC_TYPE)
+);
 
 
 BOOST_AUTO_TEST_SUITE_END()

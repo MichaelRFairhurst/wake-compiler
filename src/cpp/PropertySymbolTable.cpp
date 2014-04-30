@@ -6,6 +6,7 @@
 PropertySymbolTable::PropertySymbolTable(TypeAnalyzer* analyzer) {
 	this->analyzer = analyzer;
 	abstract = false;
+	declaredtypeparameters = new vector<Type*>(); // @TODO this is a hack
 }
 
 const map<string, bool>& PropertySymbolTable::getParentage() {
