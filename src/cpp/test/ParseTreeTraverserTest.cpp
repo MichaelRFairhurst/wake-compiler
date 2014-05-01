@@ -2095,6 +2095,39 @@ PTT_TEST_CASE(
 	PTT_VALID
 );
 
-
+PTT_TEST_CASE(
+	TestUseGenericThingsInMethods,
+	"every MyClass{A, B, C, D} is:										\n\
+		needs A, B, C, D,												\n\
+			A? optA, B? optB, C? optC, D? optD,							\n\
+			A[] arrA, B[] arrB, C[] arrC, D[] arrD;						\n\
+		with A propA = A;												\n\
+		with B propB = B;												\n\
+		with C propC = C;												\n\
+		with D propD = D;												\n\
+		with A? propoptA = optA;										\n\
+		with B? propoptB = optB;										\n\
+		with C? propoptC = optC;										\n\
+		with D? propoptD = optD;										\n\
+		with A[] proparrA = arrA;										\n\
+		with B[] proparrB = arrB;										\n\
+		with C[] proparrC = arrC;										\n\
+		with D[] proparrD = arrD;										\n\
+		useThem() {														\n\
+			var A varA = A; varA = propA;								\n\
+			var B varB = B; varB = propB;								\n\
+			var C varC = C; varC = propC;								\n\
+			var D varD = D; varD = propD;								\n\
+			var A? varoptA = optA; varA = propoptA;						\n\
+			var B? varoptB = optB; varB = propoptB;						\n\
+			var C? varoptC = optC; varC = propoptC;						\n\
+			var D? varoptD = optD; varD = propoptD;						\n\
+			var A[] vararrA = arrA; varA = proparrA;					\n\
+			var B[] vararrB = arrB; varB = proparrB;					\n\
+			var C[] vararrC = arrC; varC = proparrC;					\n\
+			var D[] vararrD = arrD; varD = proparrD;					\n\
+		}",
+	PTT_VALID
+);
 
 BOOST_AUTO_TEST_SUITE_END()
