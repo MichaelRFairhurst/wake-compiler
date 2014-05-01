@@ -2053,6 +2053,48 @@ PTT_TEST_CASE(
 	PTT_VALID
 );
 
+PTT_TEST_CASE(
+	TestCanProvideAndRetrieveValidGenericImplementations,
+	"every MyClass{T} is:						\n\
+		provides								\n\
+			MyClass{Int},						\n\
+			MyClass{Text},						\n\
+			MyClass{Bool},						\n\
+			MyClass{Int?},						\n\
+			MyClass{Text?},						\n\
+			MyClass{Bool?},						\n\
+			MyClass{Int[]},						\n\
+			MyClass{Text[]},					\n\
+			MyClass{Bool[]},					\n\
+			MyClass{MyClass{Int}},				\n\
+			MyClass{MyClass{Text}},				\n\
+			MyClass{MyClass{Bool}},				\n\
+			MyClass{MyClass{Int?}},				\n\
+			MyClass{MyClass{Text?}},			\n\
+			MyClass{MyClass{Bool?}},			\n\
+			MyClass{MyClass{Int[]}},			\n\
+			MyClass{MyClass{Text[]}},			\n\
+			MyClass{MyClass{Bool[]}};			\n\
+		useProvisions() {						\n\
+			MyClass{Int} <- this;				\n\
+			MyClass{Text} <- this;				\n\
+			MyClass{Bool} <- this;				\n\
+			MyClass{Int?} <- this;				\n\
+			MyClass{Text?} <- this;				\n\
+			MyClass{Bool?} <- this;				\n\
+			MyClass{Int[]} <- this;				\n\
+			MyClass{Text[]} <- this;			\n\
+			MyClass{Bool[]} <- this;			\n\
+			MyClass{MyClass{Int}} <- this;		\n\
+			MyClass{MyClass{Text}} <- this;		\n\
+			MyClass{MyClass{Bool}} <- this;		\n\
+			MyClass{MyClass{Int?}} <- this;		\n\
+			MyClass{MyClass{Text?}} <- this;	\n\
+			MyClass{MyClass{Bool?}} <- this;	\n\
+		}",
+	PTT_VALID
+);
+
 
 
 BOOST_AUTO_TEST_SUITE_END()

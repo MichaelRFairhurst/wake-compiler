@@ -41,6 +41,7 @@ boost::optional<SemanticError*> PropertySymbolTable::addMethod(Type* returntype,
 	prop->flags = flags;
 	prop->type = method;
 	prop->casing = getCasingNameOf(segments_arguments);
+	prop->address = name;
 
 	properties[name] = prop;
 

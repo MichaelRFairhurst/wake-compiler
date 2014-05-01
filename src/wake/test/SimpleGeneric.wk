@@ -1,0 +1,42 @@
+every SimpleGeneric{T1, T2} is:
+
+	with public T1? = nothing;
+	with public T2? = nothing;
+
+	setT1($T1) {
+		T1 = $T1;
+	}
+
+	unsetT1() {
+		T1 = nothing;
+	}
+
+	setT2($T2) {
+		T2 = $T2;
+	}
+
+	unsetT2() {
+		T2 = nothing;
+	}
+
+	T1? -- getT1Optional() {
+		return T1;
+	}
+
+	T1 -- getT1Otherwise($T1) {
+		if T1 exists {
+			return T1;
+		}
+		return $T1;
+	}
+
+	T2? -- getT2Optional() {
+		return T2;
+	}
+
+	T2 -- getT2Otherwise($T2) {
+		if T2 exists {
+			return T2;
+		}
+		return $T2;
+	}

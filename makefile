@@ -52,7 +52,8 @@ WAKENAMES=ArrayTest.wk \
 			MockPrinter.wk \
 			AssignmentsTest.wk \
 			PropertyTest.wk \
-			AutoboxingTest.wk
+			AutoboxingTest.wk \
+			SimpleGeneric.wk
 
 WAKEOBJS=$(addprefix bin/wakeobj/, $(WAKENAMES:.wk=.o))
 
@@ -128,6 +129,9 @@ bin/wakeobj/Main.o: src/wake/test/Main.wk bin/wake bin/wakeobj/PropertyTest.o bi
 	time ./bin/wake -d bin/waketable $< -o $@
 
 bin/wakeobj/MockPrinter.o: src/wake/test/MockPrinter.wk bin/wake bin/waketable/Printer.table
+	time ./bin/wake -d bin/waketable $< -o $@
+
+bin/wakeobj/GenericTest.o: src/wake/test/GenericTest.wk bin/wake bin/wakeobj/Asserts.o bin/wakeobj/SimpleGeneric.o
 	time ./bin/wake -d bin/waketable $< -o $@
 
 bin/wakeobj/AutoboxingTest.o: src/wake/test/AutoboxingTest.wk bin/wake bin/wakeobj/Asserts.o

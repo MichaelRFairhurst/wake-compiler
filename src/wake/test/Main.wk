@@ -11,15 +11,20 @@ import OptionalTypeTest;
 import AssignmentsTest;
 import PropertyTest;
 import AutoboxingTest;
+import GenericTest;
+import SimpleGeneric;
 
 #>
 # Test suite entry point
 ##
 every Main is:
 
-	needs System, AssertsTest, Printer, MathTest, BooleanLogicTest, InheritanceTest, ArrayTest, OptionalTypeTest, AssignmentsTest, PropertyTest, AutoboxingTest;
+	needs System, AssertsTest, Printer, MathTest, BooleanLogicTest, InheritanceTest, ArrayTest, OptionalTypeTest, AssignmentsTest, PropertyTest, AutoboxingTest, GenericTest;
 
-	provides Printer, Asserts;
+	provides Printer, Asserts,
+		SimpleGeneric{Int, Text},
+		SimpleGeneric{Text, Int},
+		SimpleGeneric{SimpleGeneric{Int, Text}, SimpleGeneric{Text, Int}};
 
 	with Bool passed = true;
 	with Int totalcount = 0;
@@ -101,6 +106,10 @@ every Main is:
 		run(AutoboxingTest.testToLower(Asserts <- this), "testToLower");
 		run(AutoboxingTest.testSwitchCase(Asserts <- this), "testSwitchCase");
 		run(AutoboxingTest.testTrim(Asserts <- this), "testSwitchCase");
+		run(GenericTest.~[ test all start out as nothing in methods ]~(Asserts <- this), "test all start out as nothing in methods");
+		run(GenericTest.~[ test get otherwise in methods ]~(Asserts <- this), "test get otherwise in methods");
+		run(GenericTest.~[ test set and then get in methods ]~(Asserts <- this), "test set and then get in methods");
+		run(GenericTest.~[ test unset and then all is nothing ]~(Asserts <- this), "test unset and then all is nothing");
 
 		Printer.printLine("");
 		Printer.printLine("");
