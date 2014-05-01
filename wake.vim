@@ -28,13 +28,13 @@ syn match	blockcomment	"##"
 syn keyword	inheritancekeyword	a an contained
 syn keyword	interfacekeyword	capable
 syn keyword	mytype	Int Bool Text Char
-syn match	alias	"\<[a-z][a-zA-Z]*\>"
+syn match	alias	"\<[a-z][a-zA-Z0-9]*\>"
 syn match	withinregionkeyword	"\(every\|is:\)"
 syn match	shadow	"\$"
-syn match	returntype	"\(\<[a-zA-Z]\+\>\s\+\)\?--"
-syn match	functioncall	"\<[a-zA-Z]\+\>(" contained
-syn match	methodstart	"\<[a-z][a-zA-Z]*\>("
-syn match	methodseg	"\<)[a-zA-Z]*\>("
+syn match	returntype	"\(\<[a-zA-Z][a-zA-Z0-9]*\>\s\+\)\?--"
+syn match	functioncall	"\<[a-zA-Z][a-zA-Z0-0]+\>(" contained
+syn match	methodstart	"\<[a-zA-Z][a-zA-Z0-9]*\>("
+syn match	methodseg	"\<)[a-zA-Z][a-zA-Z0-9]*\>("
 syn match	symbols	"\((\|)\|;\||\|=\|+\|{\|}\|,\|\.\|<\|>\|\-\|\*\|\/\|:\)"
 syn match	ancestrysymbols "\((\|)\|,\)" contained
 syn match	typesymbols "\(\[\|\]\)"
