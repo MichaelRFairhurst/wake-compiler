@@ -34,6 +34,7 @@ class PropertySymbolTable : public ReadOnlyPropertySymbolTable {
 		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);
 		vector<Type*>* getNeeds();
 		string getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments);
+		string getCasingNameOf(vector<pair<string, TypeArray*> >* segments_arguments);
 		bool isAbstract();
 		string classname;
 		bool abstract;

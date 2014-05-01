@@ -40,6 +40,7 @@ boost::optional<SemanticError*> PropertySymbolTable::addMethod(Type* returntype,
 	ObjectProperty* prop = new ObjectProperty;
 	prop->flags = flags;
 	prop->type = method;
+	prop->casing = getCasingNameOf(segments_arguments);
 
 	properties[name] = prop;
 
@@ -98,6 +99,22 @@ string PropertySymbolTable::getAddress(string name) {
 string PropertySymbolTable::getProvisionSymbol(Type* provided) {
 	string name = analyzer->getNameForType(provided) + "<-";
 	if(provided->specialty != NULL) name += provided->specialty;
+	return name;
+}
+
+string PropertySymbolTable::getCasingNameOf(vector<pair<string, TypeArray*> >* segments_arguments) {
+	string name;
+	for(vector<pair<string, TypeArray*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
+		name += it->first;
+		name += "(";
+		int i;
+		for(i = 0; i < it->second->typecount; i++) {
+			if(i) name += ",";
+			name += '#';
+		}
+		name += ")";
+	}
+
 	return name;
 }
 
@@ -180,11 +197,23 @@ ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<Type*
 	TypeParameterizer parameterizer;
 	map<string, ObjectProperty*>* newprops = new map<string, ObjectProperty*>();
 	for(map<string, ObjectProperty*>::iterator it = properties.begin(); it != properties.end(); ++it) {
+		string casing, oldcasing = it->second->casing;
 		ObjectProperty* newprop = new ObjectProperty();
 		newprop->type = copyType(it->second->type);
 		newprop->flags = it->second->flags;
 		parameterizer.applyParameterizations(&newprop->type, getParameters(), parameters);
-		(*newprops)[it->first] = newprop;
+		int i = 0, c = 0;
+		while(c < oldcasing.length()) {
+			if(oldcasing.at(c) == '#') {
+				casing += analyzer->getNameForType(newprop->type->typedata.lambda.arguments->types[i]);
+				i++;
+			} else {
+				casing += oldcasing.at(c);
+			}
+			c++;
+		}
+		newprop->casing = casing;
+		(*newprops)[casing] = newprop;
 	}
 	return new DerivedPropertySymbolTable(*analyzer, needs, *newprops, parentage);
 	return this;

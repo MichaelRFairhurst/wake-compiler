@@ -2015,5 +2015,44 @@ PTT_TEST_CASE(
 	PTT_EXPECT(INVALID_GENERIC_TYPE)
 );
 
+PTT_TEST_CASE(
+	TestUseGenericMethodsCorrectly,
+	"every Generic{T1, T2} is:					\n\
+		type1(T1) {}							\n\
+		optional1(T1?) {}						\n\
+		arrayed1(T1[]) {}						\n\
+		type2(T2) {}							\n\
+		optional2(T2?) {}						\n\
+		arrayed2(T2[]) {}						\n\
+		contained(Generic{T1, T2}) {}			\n\
+	every MyClass is:							\n\
+		needs Int,								\n\
+			Int? optionalInt,					\n\
+			Int[] intArray,						\n\
+			Text,								\n\
+			Text? optionalText,					\n\
+			Text[] textArray;					\n\
+		testIntText(Generic{Int,Text}) {		\n\
+			Generic.type1(Int);					\n\
+			Generic.optional1(optionalInt);		\n\
+			Generic.arrayed1(intArray);			\n\
+			Generic.type2(Text);				\n\
+			Generic.optional2(optionalText);	\n\
+			Generic.arrayed2(textArray);		\n\
+			Generic.contained(Generic);			\n\
+		}										\n\
+		testTextInt(Generic{Text,Int}) {		\n\
+			Generic.type1(Text);				\n\
+			Generic.optional1(optionalText);	\n\
+			Generic.arrayed1(textArray);		\n\
+			Generic.type2(Int);					\n\
+			Generic.optional2(optionalInt);		\n\
+			Generic.arrayed2(intArray);			\n\
+			Generic.contained(Generic);			\n\
+		}",
+	PTT_VALID
+);
+
+
 
 BOOST_AUTO_TEST_SUITE_END()
