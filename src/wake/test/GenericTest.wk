@@ -1,4 +1,5 @@
 import Asserts;
+import SimpleGeneric;
 
 every GenericTest is:
 
