@@ -35,9 +35,9 @@ class ClassSpaceSymbolTable {
 		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);
 
 		PropertySymbolTable* findModifiable(string name);
+		PropertySymbolTable* findModifiable(Type* type);
 
 	private:
-		PropertySymbolTable* findModifiable(Type* type);
 
 		// TRUE means defined, FALSE means imported
 		map<string, pair<PropertySymbolTable*, bool> > classes;

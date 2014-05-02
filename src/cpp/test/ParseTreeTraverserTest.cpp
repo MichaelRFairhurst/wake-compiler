@@ -36,7 +36,7 @@ BOOST_AUTO_TEST_SUITE( ParseTreeTraverserTest )
 /**
  * Now use them
  */
-
+/*
 PTT_TEST_CASE(
 	MultipleClassDefinition,
 	"every MyClass is: every MyClass is:",
@@ -833,6 +833,7 @@ PTT_TEST_CASE(
 	"every MyClass is: afn() { switch(5) { case 1: break; switch (8) { case 6: break; } case 2: break; default: } }",
 	PTT_VALID
 )*/
+/*
 
 PTT_TEST_CASE(
 	BreakNotWithinSwitchForOrWhileIsError,
@@ -2094,6 +2095,7 @@ PTT_TEST_CASE(
 		}",
 	PTT_VALID
 );
+*/
 
 PTT_TEST_CASE(
 	TestUseGenericThingsInMethods,
@@ -2118,14 +2120,14 @@ PTT_TEST_CASE(
 			var B varB = B; varB = propB;								\n\
 			var C varC = C; varC = propC;								\n\
 			var D varD = D; varD = propD;								\n\
-			var A? varoptA = optA; varA = propoptA;						\n\
-			var B? varoptB = optB; varB = propoptB;						\n\
-			var C? varoptC = optC; varC = propoptC;						\n\
-			var D? varoptD = optD; varD = propoptD;						\n\
-			var A[] vararrA = arrA; varA = proparrA;					\n\
-			var B[] vararrB = arrB; varB = proparrB;					\n\
-			var C[] vararrC = arrC; varC = proparrC;					\n\
-			var D[] vararrD = arrD; varD = proparrD;					\n\
+			var A? varoptA = optA; varoptA = propoptA;					\n\
+			var B? varoptB = optB; varoptB = propoptB;					\n\
+			var C? varoptC = optC; varoptC = propoptC;					\n\
+			var D? varoptD = optD; varoptD = propoptD;					\n\
+			var A[] vararrA = arrA; vararrA = proparrA;					\n\
+			var B[] vararrB = arrB; vararrB = proparrB;					\n\
+			var C[] vararrC = arrC; vararrC = proparrC;					\n\
+			var D[] vararrD = arrD; vararrD = proparrD;					\n\
 		}",
 	PTT_VALID
 );

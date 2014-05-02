@@ -23,7 +23,7 @@ class TypeChecker {
 		void setReturnType(Type* returntype);
 		void setThisContext(Type* thiscontext);
 		void check(Node* n);
-		void setParameterizedTypes(vector<Type*> types);
+		void setParameterizedTypes(const vector<Type*>& types);
 
 	private:
 		Type* typeCheck(Node* n);

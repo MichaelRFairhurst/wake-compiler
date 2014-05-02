@@ -1,5 +1,6 @@
 #include "TypeChecker.h"
 #include "CompilationExceptions.h"
+#include "TypeParameterizer.h"
 
 TypeChecker::TypeChecker(ErrorTracker* errors, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, MethodSignatureParseTreeTraverser* methodanalyzer) {
 	this->errors = errors;
@@ -98,7 +99,7 @@ void TypeChecker::setThisContext(Type* context) {
 	thiscontext = context;
 }
 
-void TypeChecker::setParameterizedTypes(vector<Type*> types) {
+void TypeChecker::setParameterizedTypes(const vector<Type*>& types) {
 	parameterizedtypes = types;
 }
 
@@ -131,7 +132,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					char* name = tree->node_data.string;
 					boost::optional<Type*> variable = scopesymtable->find(name);
 					if(!variable && thiscontext != NULL) {
-						ReadOnlyPropertySymbolTable* proptable = classestable->find(thiscontext);
+						PropertySymbolTable* proptable = classestable->findModifiable(thiscontext);
 						variable = proptable->find(name);
 						if(variable) {
 							name = strdup(name);
@@ -151,9 +152,11 @@ Type* TypeChecker::typeCheck(Node* tree) {
 
 			case NT_TYPEDATA:
 				{
+					TypeParameterizer parameterizer;
+					parameterizer.writeInParameterizations(&tree->node_data.type, parameterizedtypes);
 					boost::optional<Type*> variable = scopesymtable->find(tree->node_data.type);
 					if(!variable && thiscontext != NULL) {
-						ReadOnlyPropertySymbolTable* proptable = classestable->find(thiscontext);
+						PropertySymbolTable* proptable = classestable->findModifiable(thiscontext);
 						variable = proptable->find(scopesymtable->getNameForType(tree->node_data.type));
 						if(variable) {
 							char* propname = strdup(tree->node_data.type->typedata._class.classname);
@@ -559,6 +562,8 @@ Type* TypeChecker::typeCheck(Node* tree) {
 
 			case NT_DECLARATION:
 				try {
+					TypeParameterizer parameterizer;
+					parameterizer.writeInParameterizations(&tree->node_data.nodes[0]->node_data.type, parameterizedtypes);
 					Type* assignee = tree->node_data.nodes[0]->node_data.type;
 					classestable->assertTypeIsValid(assignee);
 					if(assignee->arrayed && tree->node_data.nodes[1]->subnodes == 0 && tree->node_data.nodes[1]->node_type == NT_ARRAY_DECLARATION) {
@@ -582,6 +587,8 @@ Type* TypeChecker::typeCheck(Node* tree) {
 
 			case NT_CAST:
 				try {
+					TypeParameterizer parameterizer;
+					parameterizer.writeInParameterizations(&tree->node_data.nodes[0]->node_data.type, parameterizedtypes);
 					ret = copyType(tree->node_data.nodes[0]->node_data.type);
 					classestable->assertTypeIsValid(ret);
 					Type* casted = typeCheckUsable(tree->node_data.nodes[1]);
@@ -601,6 +608,8 @@ Type* TypeChecker::typeCheck(Node* tree) {
 			case NT_RETRIEVAL:
 				{
 					Type* provider;
+					TypeParameterizer parameterizer;
+					parameterizer.writeInParameterizations(&tree->node_data.nodes[0]->node_data.type, parameterizedtypes);
 					try {
 						provider = typeCheckUsable(tree->node_data.nodes[2]);
 						ret = copyType(tree->node_data.nodes[0]->node_data.type);

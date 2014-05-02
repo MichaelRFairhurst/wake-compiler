@@ -220,7 +220,7 @@ string TypeAnalyzer::getNameForType(Type* type) {
 	}
 
 	if(type->type == TYPE_PARAMETERIZED) {
-		return type->typedata.parameterized.label;
+		name = type->typedata.parameterized.label;
 	}
 
 	if(type->type == TYPE_MATCHALL) {
@@ -242,7 +242,7 @@ string TypeAnalyzer::getNameForType(Type* type) {
 			}
 			name += "}";
 		}
-	} else {
+	} else if(type->type == TYPE_LAMBDA) {
 		name = getNameForType(type->typedata.lambda.returntype);
 		name += "--(";
 
