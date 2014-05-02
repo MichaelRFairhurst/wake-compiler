@@ -53,7 +53,8 @@ WAKENAMES=ArrayTest.wk \
 			AssignmentsTest.wk \
 			PropertyTest.wk \
 			AutoboxingTest.wk \
-			SimpleGeneric.wk
+			SimpleGeneric.wk \
+			GenericTest.wk
 
 WAKEOBJS=$(addprefix bin/wakeobj/, $(WAKENAMES:.wk=.o))
 
