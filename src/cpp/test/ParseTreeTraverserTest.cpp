@@ -36,7 +36,6 @@ BOOST_AUTO_TEST_SUITE( ParseTreeTraverserTest )
 /**
  * Now use them
  */
-/*
 PTT_TEST_CASE(
 	MultipleClassDefinition,
 	"every MyClass is: every MyClass is:",
@@ -833,7 +832,6 @@ PTT_TEST_CASE(
 	"every MyClass is: afn() { switch(5) { case 1: break; switch (8) { case 6: break; } case 2: break; default: } }",
 	PTT_VALID
 )*/
-/*
 
 PTT_TEST_CASE(
 	BreakNotWithinSwitchForOrWhileIsError,
@@ -2095,7 +2093,6 @@ PTT_TEST_CASE(
 		}",
 	PTT_VALID
 );
-*/
 
 PTT_TEST_CASE(
 	TestUseGenericThingsInMethods,
@@ -2128,6 +2125,19 @@ PTT_TEST_CASE(
 			var B[] vararrB = arrB; vararrB = proparrB;					\n\
 			var C[] vararrC = arrC; vararrC = proparrC;					\n\
 			var D[] vararrD = arrD; vararrD = proparrD;					\n\
+			// test the types were right								\n\
+			optA = nothing; optB = nothing;								\n\
+			optC = nothing; optD = nothing;								\n\
+			propoptA = nothing; propoptB = nothing;						\n\
+			propoptC = nothing; propoptD = nothing;						\n\
+			varoptA = nothing; varoptB = nothing;						\n\
+			varoptC = nothing; varoptD = nothing;						\n\
+			arrA[0]; arrB[0];											\n\
+			arrC[0]; arrD[0];											\n\
+			proparrA[0]; proparrB[0];									\n\
+			proparrC[0]; proparrD[0];									\n\
+			vararrA[0]; vararrB[0];										\n\
+			vararrC[0]; vararrD[0];										\n\
 		}",
 	PTT_VALID
 );
