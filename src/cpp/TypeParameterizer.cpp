@@ -15,6 +15,7 @@ void TypeParameterizer::writeInParameterizations(Type** typeaddr, const std::vec
 			for(vector<Type*>::const_iterator it = parameters.begin(); it != parameters.end(); ++it) {
 				if(type->typedata._class.classname == string((*it)->typedata.parameterized.label)) {
 					*typeaddr = copyType(*it);
+					(*typeaddr)->typedata.parameterized.shadow = type->typedata._class.shadow;
 					(*typeaddr)->arrayed = type->arrayed;
 					(*typeaddr)->optional = type->optional;
 					(*typeaddr)->alias = type->alias ? strdup(type->alias) : NULL;
@@ -52,6 +53,7 @@ void TypeParameterizer::applyParameterizations(Type** typeaddr, const std::vecto
 				(*typeaddr)->arrayed += type->arrayed;
 				(*typeaddr)->optional += type->optional;
 				(*typeaddr)->alias = type->alias;
+				// Shadows don't matter because applied parameterizations don't have to do with scopes
 				freeType(type);
 				break; // We've found it, move along
 			}
