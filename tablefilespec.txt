@@ -1,34 +1,40 @@
-file = namelength (1 byte) | name | Types | 0x00 | Properties | 0x00 | Inheritances
+file = namelength (1 byte) | name | Types | 0x00 | Properties | 0x00 | Inheritances | 0x00 | Parameters
   where
 	Inheritance = parentnamelength (1 byte) | parentname | Bool extends (1 byte)
 	Properties = propertynamelength (1 byte) | propertyname | flags (1 byte) | Type
 	Types = Type*
-	Type = ClassType or LambdaType
-    ClassType = 0x01 | classnamelength (1 byte) | classname | shadow (1 byte int) | arrayed (1 byte int)
-	LambdaType = 0x02 | ReturnType | Types | 0x04
-	ReturnType = (0x03 | Type) or nothing
-
+	Type = ClassType or LambdaType or ParameterizedType
+    ClassType = 0x01 | classnamelength (1 byte) | classname | shadow (1 byte int) | TypeCommon
+	LambdaType = 0x02 | ReturnType | Types | 0x00 | TypeCommon
+	ParameterizedType = 0x03 | labellength | label | (Type upper OR 0x00) | (Type lower OR 0x00) | shadow | typecommon
+	ReturnType = (0x01 | Type) or (0x00)
+	TypeCommon = arrayed | aliaslength | alias | specialtylength | specialty | optional
 
 Memory Layout
 
-     File          Property                    Type                   ReturnType      Typecommon      Inheritance
- ------------    ------------    ------------        ------------    ------------    ------------    ------------
-| namelength |  | namelength |  |    0x01    |      |    0x02    |  |    0x03    |  |   arrayed  |  | NameLength |
- ------------    ------------    ------------        ------------    ------------    ------------    ------------
-|    name    |  |    name    |  | namelength |      | ReturnType |  |    Type    |  | alias len  |  |    Name    |
-|    ...     |  |    ...     |   ------------       |    ...     |  |     ...    |   ------------   |    ...     |
-|    ...     |  |    ...     |  |    name    |  OR   ------------    ------------   |   alias    |   ------------
- ------------    ------------   |    ....    |      |    Types   |                  |    ...     |  | Bool extend|
-|   Needs    |  |   flags    |  |    ....    |      |     ...    |    Or Nothing     ------------    ------------
-|    ...     |   ------------    ------------        ------------                   | specialtyl |
- ------------   |    Type    |  |   shadow   |      |    0x04    |                   ------------
-|   0x00     |   ------------    ------------        ------------                   | specialty  |
- ------------                   | Typecommon |      | Typecommon |                  |    ...     |
-| Properties |                   ------------        ------------                    ------------
-|    ...     |                                                                      |  optional  |
- ------------                                                                        ------------
+     File          Property       Classtype          Lambda       Parameterized    ReturnType      Typecommon      Inheritance
+ ------------    ------------    ------------     ------------    ------------    ------------    ------------    ------------
+| namelength |  | namelength |  |    0x01    |   |    0x02    |  |    0x03    |  |    0x01    |  |   arrayed  |  | NameLength |
+ ------------    ------------    ------------     ------------    ------------    ------------    ------------    ------------
+|    name    |  |    name    |  | namelength |   | ReturnType |  |  labellen  |  |    Type    |  | alias len  |  |    Name    |
+|    ...     |  |    ...     |   ------------    |    ...     |   ------------   |     ...    |   ------------   |    ...     |
+|    ...     |  |    ...     |  |    name    |    ------------   |    label   |   ------------   |   alias    |   ------------
+ ------------    ------------   |    ....    |   |    Types   |  |     ...    |        OR        |    ...     |  | Bool extend|
+|   Needs    |  |   flags    |  |    ....    |   |     ...    |  |     ...    |   ------------    ------------    ------------
+|    ...     |   ------------    ------------     ------------    ------------   |    0x00    |  | specialtyl |
+ ------------   |    Type    |  | ParamTypes |   |    0x00    |  | Type upper |   ------------    ------------
+|   0x00     |   ------------    ------------     ------------    ------------                   | specialty  |
+ ------------                   |    0x00    |   | Typecommon |  | Type lower |                  |    ...     |
+| Properties |                   ------------     ------------    ------------                    ------------
+|    ...     |                  | Typecommon |                   |   shadow   |                  |  optional  |
+ ------------                    ------------                     ------------                    ------------
+|   0x00     |                                                   | Typecommon |
+ ------------                                                     ------------
+|Inheritances|
+|    ...     |
+ ------------
 |   0x00     |
  ------------
-|Inheritances|
+| Parameters |
 |    ...     |
  ------------

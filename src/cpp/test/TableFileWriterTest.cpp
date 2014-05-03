@@ -17,13 +17,14 @@ BOOST_AUTO_TEST_CASE(TestWritesSimple)
 	PropertySymbolTable table(&tanalyzer);
 	table.classname = "classname";
 	writer.write(out, &table);
-	ASSERTLENGTH(13);
+	ASSERTLENGTH(14);
 
 	ASSERTCHAR(9);
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
 	ASSERTCHAR(0); // methods
-	ASSERTCHAR(5); // inheritance
+	ASSERTCHAR(0); // inheritances
+	ASSERTCHAR(0); // inheritance
 }
 
 BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
@@ -44,7 +45,7 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 
 	writer.write(out, &table);
 
-	ASSERTLENGTH(43);
+	ASSERTLENGTH(46);
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
@@ -53,20 +54,23 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 	ASSERTCHAR('p'); ASSERTCHAR('r'); ASSERTCHAR('i'); ASSERTCHAR('n'); ASSERTCHAR('t'); ASSERTCHAR('('); ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t'); ASSERTCHAR(')');
 	ASSERTCHAR(1); // Flagged public
 	ASSERTCHAR(1); // Lambda
+		ASSERTCHAR(0); // No return
 		ASSERTCHAR(2); // Type
 		ASSERTCHAR(4); // class name ength
 		ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t');
+		ASSERTCHAR(0); // parameters
 		ASSERTCHAR(0); // shadow
 		ASSERTCHAR(0); // arrayed
 		ASSERTCHAR(0); // alias length
 		ASSERTCHAR(0); // specialty length
 		ASSERTCHAR(0); // optionality
-	ASSERTCHAR(4); // end arguments
+	ASSERTCHAR(0); // end arguments
 	ASSERTCHAR(0); // arrayed
 	ASSERTCHAR(0); // alias length
 	ASSERTCHAR(0); // specialty length
 	ASSERTCHAR(0); // optionality
-	ASSERTCHAR(5); // inheritance
+	ASSERTCHAR(0); // inheritances
+	ASSERTCHAR(0); // parameters
 }
 
 BOOST_AUTO_TEST_CASE(TestWritesNeed)
@@ -81,20 +85,22 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 	table.classname = "classname";
 
 	writer.write(out, &table);
-	ASSERTLENGTH(24);
+	ASSERTLENGTH(26);
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
 	ASSERTCHAR(2); // type
 	ASSERTCHAR(4); // classname length
 	ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t');
+	ASSERTCHAR(0); // parameters
 	ASSERTCHAR(0); // shadow
 	ASSERTCHAR(0); // array
 	ASSERTCHAR(0); // alias length
 	ASSERTCHAR(0); // spec length
 	ASSERTCHAR(0); // optional
 	ASSERTCHAR(0); // methods
-	ASSERTCHAR(5); // inheritance
+	ASSERTCHAR(0); // inheritance
+	ASSERTCHAR(0); // parameters
 }
 
 BOOST_AUTO_TEST_CASE(TestWritesNeeds)
@@ -112,13 +118,14 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 
 	writer.write(out, &table);
 
-	ASSERTLENGTH(38);
+	ASSERTLENGTH(41);
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
 	ASSERTCHAR(2); // type
 	ASSERTCHAR(4); // classname length
 	ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t');
+	ASSERTCHAR(0); // parameters
 	ASSERTCHAR(0); // shadow
 	ASSERTCHAR(0); // array
 	ASSERTCHAR(0); // alias length
@@ -127,13 +134,15 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	ASSERTCHAR(2); // type
 	ASSERTCHAR(7); // classname length
 	ASSERTCHAR('P'); ASSERTCHAR('r'); ASSERTCHAR('i'); ASSERTCHAR('n'); ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('r');
+	ASSERTCHAR(0); // parameters
 	ASSERTCHAR(0); // shadow
 	ASSERTCHAR(0); // array
 	ASSERTCHAR(0); // alias length
 	ASSERTCHAR(0); // spec length
 	ASSERTCHAR(0); // optional
 	ASSERTCHAR(0); // methods
-	ASSERTCHAR(5); // inheritance
+	ASSERTCHAR(0); // inheritance
+	ASSERTCHAR(0); // parameters
 }
 
 BOOST_AUTO_TEST_CASE(TestWritesInheritance)
@@ -146,19 +155,83 @@ BOOST_AUTO_TEST_CASE(TestWritesInheritance)
 	table.parentage["myparent"] = true;
 	table.parentage["myinterface"] = false;
 	writer.write(out, &table);
-	ASSERTLENGTH(36);
+	ASSERTLENGTH(37);
 
 	ASSERTCHAR(9);
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
 	ASSERTCHAR(0); // methods
-	ASSERTCHAR(5); // inheritance
+	ASSERTCHAR(0); // inheritance
 	ASSERTCHAR(11); // "myinterface" length
 	ASSERTCHAR('m'); ASSERTCHAR('y'); ASSERTCHAR('i'); ASSERTCHAR('n'); ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('r'); ASSERTCHAR('f'); ASSERTCHAR('a'); ASSERTCHAR('c'); ASSERTCHAR('e');
-	ASSERTCHAR(0);
+	ASSERTCHAR(0); // extends = false
 	ASSERTCHAR(8); // "myparent" length
 	ASSERTCHAR('m'); ASSERTCHAR('y'); ASSERTCHAR('p'); ASSERTCHAR('a'); ASSERTCHAR('r'); ASSERTCHAR('e'); ASSERTCHAR('n'); ASSERTCHAR('t');
-	ASSERTCHAR(1);
+	ASSERTCHAR(1); // extends = true
+	ASSERTCHAR(0); // parameters
+}
+
+BOOST_AUTO_TEST_CASE(TestWritesParameters)
+{
+	std::stringstream out;
+	TableFileWriter writer;
+	TypeAnalyzer tanalyzer;
+	PropertySymbolTable table(&tanalyzer);
+	table.classname = "classname";
+	vector<Type*> parameters;
+	Type* t = MakeType(TYPE_PARAMETERIZED); t->typedata.parameterized.label = strdup("T");
+	Type* b = MakeType(TYPE_PARAMETERIZED); b->typedata.parameterized.label = strdup("B");
+	Type* text = MakeType(TYPE_CLASS);
+	Type* booL = MakeType(TYPE_CLASS);
+	b->typedata.parameterized.upperbound = text;
+	text->typedata._class.classname = strdup("Text");
+	booL->typedata._class.classname = strdup("Bool");
+	b->typedata.parameterized.lowerbound = booL;
+	parameters.push_back(t); parameters.push_back(b);
+	table.setParameters(&parameters);
+	writer.write(out, &table);
+	ASSERTLENGTH(56);
+
+	ASSERTCHAR(9);
+	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
+	ASSERTCHAR(0); // not abstract
+	ASSERTCHAR(0); // methods
+	ASSERTCHAR(0); // inheritance
+	ASSERTCHAR(0); // parameters
+	ASSERTCHAR(3); // parameterized type
+	ASSERTCHAR(1); ASSERTCHAR('T');
+	ASSERTCHAR(0); // no upper bound
+	ASSERTCHAR(0); // no lower bound
+	ASSERTCHAR(0); // shadow
+	ASSERTCHAR(0); // arrayed
+	ASSERTCHAR(0); // alias
+	ASSERTCHAR(0); // specialty
+	ASSERTCHAR(0); // optional
+	ASSERTCHAR(3); // parameterized type
+	ASSERTCHAR(1); ASSERTCHAR('B');
+	ASSERTCHAR(TYPE_CLASS); // type upper bound
+		ASSERTCHAR(4); ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t');
+		ASSERTCHAR(0); // parameters
+		ASSERTCHAR(0); // shadow
+		ASSERTCHAR(0); // arrayed
+		ASSERTCHAR(0); // alias
+		ASSERTCHAR(0); // specialty
+		ASSERTCHAR(0); // optional
+	ASSERTCHAR(TYPE_CLASS); // type lower bound
+		ASSERTCHAR(4); ASSERTCHAR('B'); ASSERTCHAR('o'); ASSERTCHAR('o'); ASSERTCHAR('l');
+		ASSERTCHAR(0); // parameters
+		ASSERTCHAR(0); // shadow
+		ASSERTCHAR(0); // arrayed
+		ASSERTCHAR(0); // alias
+		ASSERTCHAR(0); // specialty
+		ASSERTCHAR(0); // optional
+	ASSERTCHAR(0); // shadow
+	ASSERTCHAR(0); // arrayed
+	ASSERTCHAR(0); // alias
+	ASSERTCHAR(0); // specialty
+	ASSERTCHAR(0); // optional
+
+	freeType(t); freeType(b);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
