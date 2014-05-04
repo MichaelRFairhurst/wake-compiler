@@ -36,6 +36,8 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 					"\000" // method flag
 					"\013" // method name length of 11
 					"print(Text)"
+					"\010" // casing length of 8
+					"print(#)"
 					"\001" // Flagged public
 					"\001" // Lambda
 						"\000" // No return
@@ -57,7 +59,7 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 					"\000"; // begin parameters
 
 	std::stringstream in;
-	in.write(dataptr, 46);
+	in.write(dataptr, 55);
 
 	TableFileReader reader;
 

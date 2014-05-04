@@ -57,6 +57,7 @@ boost::optional<SemanticError*> PropertySymbolTable::addProperty(Type* property,
 	}
 
 	ObjectProperty* prop = new ObjectProperty;
+	prop->casing = name;
 	prop->flags = flags;
 	prop->type = property;
 
@@ -80,6 +81,7 @@ boost::optional<SemanticError*> PropertySymbolTable::addProvision(Type* provided
 
 	ObjectProperty* prop = new ObjectProperty;
 	prop->type = method;
+	prop->casing = name;
 
 	properties[name] = prop;
 	return boost::optional<SemanticError*>();

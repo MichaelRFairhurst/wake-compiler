@@ -159,6 +159,7 @@ void TableFileReader::readMethod(PropertySymbolTable* table, istream& s) {
 	//cout << "reading method" << endl;
 	ObjectProperty* prop = new ObjectProperty();
 	string name = readString(s);
+	prop->casing = readString(s);
 	prop->flags = readUInt8(s);
 	prop->type = readType(s);
 	table->properties[name] = prop;

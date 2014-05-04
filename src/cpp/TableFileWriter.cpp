@@ -143,6 +143,11 @@ void TableFileWriter::writeType(ostream& out, Type* type) {
 
 void TableFileWriter::writeProperty(ostream& out, ObjectProperty* property) {
 	char * dataptr = (char*) malloc(1);
+
+	dataptr[0] = (char) property->casing.size();
+	out.write(dataptr, 1);
+	out.write(property->casing.c_str(), property->casing.size());
+
 	dataptr[0] = (char) property->flags;
 	out.write(dataptr, 1);
 

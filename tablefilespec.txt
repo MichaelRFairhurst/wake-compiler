@@ -1,7 +1,7 @@
 file = namelength (1 byte) | name | Types | 0x00 | Properties | 0x00 | Inheritances | 0x00 | Parameters
   where
 	Inheritance = parentnamelength (1 byte) | parentname | Bool extends (1 byte)
-	Properties = propertynamelength (1 byte) | propertyname | flags (1 byte) | Type
+	Properties = propertynamelength (1 byte) | propertyname | casinglength | casing | flags (1 byte) | Type
 	Types = Type*
 	Type = ClassType or LambdaType or ParameterizedType
     ClassType = 0x01 | classnamelength (1 byte) | classname | shadow (1 byte int) | TypeCommon
@@ -20,14 +20,14 @@ Memory Layout
 |    ...     |  |    ...     |   ------------    |    ...     |   ------------   |     ...    |   ------------   |    ...     |
 |    ...     |  |    ...     |  |    name    |    ------------   |    label   |   ------------   |   alias    |   ------------
  ------------    ------------   |    ....    |   |    Types   |  |     ...    |        OR        |    ...     |  | Bool extend|
-|   Needs    |  |   flags    |  |    ....    |   |     ...    |  |     ...    |   ------------    ------------    ------------
+|   Needs    |  |   casingl  |  |    ....    |   |     ...    |  |     ...    |   ------------    ------------    ------------
 |    ...     |   ------------    ------------     ------------    ------------   |    0x00    |  | specialtyl |
- ------------   |    Type    |  | ParamTypes |   |    0x00    |  | Type upper |   ------------    ------------
+ ------------   |   casing   |  | ParamTypes |   |    0x00    |  | Type upper |   ------------    ------------
 |   0x00     |   ------------    ------------     ------------    ------------                   | specialty  |
- ------------                   |    0x00    |   | Typecommon |  | Type lower |                  |    ...     |
-| Properties |                   ------------     ------------    ------------                    ------------
-|    ...     |                  | Typecommon |                   |   shadow   |                  |  optional  |
- ------------                    ------------                     ------------                    ------------
+ ------------   |   flags    |  |    0x00    |   | Typecommon |  | Type lower |                  |    ...     |
+| Properties |   ------------    ------------     ------------    ------------                    ------------
+|    ...     |  |    Type    |  | Typecommon |                   |   shadow   |                  |  optional  |
+ ------------    ------------    ------------                     ------------                    ------------
 |   0x00     |                                                   | Typecommon |
  ------------                                                     ------------
 |Inheritances|
