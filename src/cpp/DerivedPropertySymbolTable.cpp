@@ -13,7 +13,7 @@ bool DerivedPropertySymbolTable::isPublic(string name) {
 }
 
 string DerivedPropertySymbolTable::getAddress(string name) {
-	//throw new std::runtime_error("NOT IMPLEMENTED YET");
+	return properties.find(name)->second->address;
 }
 
 string DerivedPropertySymbolTable::getProvisionSymbol(Type* provided) {

@@ -60,6 +60,7 @@ boost::optional<SemanticError*> PropertySymbolTable::addProperty(Type* property,
 	prop->casing = name;
 	prop->flags = flags;
 	prop->type = property;
+	prop->address = name;
 
 	properties[name] = prop;
 	return boost::optional<SemanticError*>();
@@ -82,6 +83,7 @@ boost::optional<SemanticError*> PropertySymbolTable::addProvision(Type* provided
 	ObjectProperty* prop = new ObjectProperty;
 	prop->type = method;
 	prop->casing = name;
+	prop->address = name;
 
 	properties[name] = prop;
 	return boost::optional<SemanticError*>();
@@ -205,6 +207,7 @@ ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<Type*
 		ObjectProperty* newprop = new ObjectProperty();
 		newprop->type = copyType(it->second->type);
 		newprop->flags = it->second->flags;
+		newprop->address = it->second->address;
 		parameterizer.applyParameterizations(&newprop->type, getParameters(), parameters);
 		int i = 0, c = 0;
 		while(c < oldcasing.length()) {

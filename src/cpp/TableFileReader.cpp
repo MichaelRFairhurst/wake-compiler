@@ -158,6 +158,7 @@ void TableFileReader::readTypeCommon(Type* type, istream& s) {
 void TableFileReader::readMethod(PropertySymbolTable* table, istream& s) {
 	ObjectProperty* prop = new ObjectProperty();
 	string name = readString(s);
+	prop->address = name; // always true except @TODO when extending generics
 	prop->casing = readString(s);
 	prop->flags = readUInt8(s);
 	prop->type = readType(s);

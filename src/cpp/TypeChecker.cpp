@@ -546,13 +546,13 @@ Type* TypeChecker::typeCheck(Node* tree) {
 
 					if(lambdatype) {
 						ret = copyType((*lambdatype)->typedata.lambda.returntype);
+
+						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(subject->typedata._class.classname)));
+						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(methodtable->getAddress(methodtable->getSymbolNameOf(&method_segments)).c_str())));
 					} else {
 						errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Couldn't find property " + methodtable->getSymbolNameOf(&method_segments) + " on class" + subject->typedata._class.classname, tree));
 						ret = MakeType(TYPE_MATCHALL);
 					}
-
-					AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(subject->typedata._class.classname)));
-					AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(methodtable->getSymbolNameOf(&method_segments).c_str())));
 
 					freeType(subject);
 					for(vector<pair<string, TypeArray*> >::iterator it = method_segments.begin(); it != method_segments.end(); ++it)
