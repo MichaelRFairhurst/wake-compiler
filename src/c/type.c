@@ -12,10 +12,16 @@ Type* MakeType(int type) {
 	switch(type) {
 		case TYPE_CLASS:
 			thetype->typedata._class.shadow = 0;
+			thetype->typedata._class.parameters = NULL;
 			break;
 		case TYPE_LAMBDA:
 			thetype->typedata.lambda.returntype = NULL;
 			thetype->typedata.lambda.arguments = NULL;//MakeTypeArray();
+			break;
+		case TYPE_PARAMETERIZED:
+			thetype->typedata.parameterized.shadow = 0;
+			thetype->typedata.parameterized.upperbound = NULL;
+			thetype->typedata.parameterized.lowerbound = NULL;
 			break;
 	}
 	return thetype;
@@ -46,6 +52,13 @@ void freeType(Type *t) {
 
 		case TYPE_CLASS:
 			free(t->typedata._class.classname);
+			freeTypeArray(t->typedata._class.parameters);
+			break;
+
+		case TYPE_PARAMETERIZED:
+			free(t->typedata.parameterized.label);
+			if(t->typedata.parameterized.upperbound != NULL) free(t->typedata.parameterized.upperbound);
+			if(t->typedata.parameterized.lowerbound != NULL) free(t->typedata.parameterized.lowerbound);
 			break;
 	}
 
@@ -73,9 +86,15 @@ Type* copyType(Type* t) {
 		copy->typedata.lambda.arguments = copyTypeArray(t->typedata.lambda.arguments);
 		copy->typedata.lambda.returntype = copyType(t->typedata.lambda.returntype);
 		copy->typedata.lambda.body = t->typedata.lambda.body;
-	} else {
+	} else if(t->type == TYPE_CLASS) {
 		copy->typedata._class.classname = t->typedata._class.classname == NULL ? NULL : strdup(t->typedata._class.classname);
 		copy->typedata._class.shadow = t->typedata._class.shadow;					// number of $s
+		copy->typedata._class.parameters = copyTypeArray(t->typedata._class.parameters);			// Xxx{T from Yyy}
+	} else if(t->type == TYPE_PARAMETERIZED) {
+		copy->typedata.parameterized.label = t->typedata.parameterized.label == NULL ? NULL : strdup(t->typedata.parameterized.label);
+		copy->typedata.parameterized.shadow = t->typedata.parameterized.shadow;					// number of $s
+		copy->typedata.parameterized.lowerbound = copyType(t->typedata.parameterized.lowerbound);
+		copy->typedata.parameterized.upperbound = copyType(t->typedata.parameterized.upperbound);
 	}
 	copy->arrayed = t->arrayed;
 	copy->alias = t->alias == NULL ? NULL : strdup(t->alias);

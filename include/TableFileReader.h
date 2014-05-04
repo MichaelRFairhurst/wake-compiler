@@ -25,6 +25,7 @@ class TableFileReader {
 		Type* readTypeByTag(int tag, istream& s);
 		Type* readClassType(istream& s);
 		Type* readLambdaType(istream& s);
+		Type* readParameterizedType(istream& s);
 
 };
 

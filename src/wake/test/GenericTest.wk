@@ -1,0 +1,69 @@
+import Asserts;
+import SimpleGeneric;
+
+every GenericTest is:
+
+	needs
+		intText SimpleGeneric{Int, Text},
+		textInt SimpleGeneric{Text, Int},
+		nested SimpleGeneric{SimpleGeneric{Int, Text}, SimpleGeneric{Text, Int}};
+
+	Bool -- ~[ test all start out as nothing in methods ]~ (Asserts) {
+		Asserts.that(intText.getT1Optional() == nothing);
+		Asserts.that(intText.getT2Optional() == nothing);
+		Asserts.that(textInt.getT1Optional() == nothing);
+		Asserts.that(textInt.getT2Optional() == nothing);
+		Asserts.that(nested.getT1Optional() == nothing);
+		Asserts.that(nested.getT2Optional() == nothing);
+		return Asserts.allPassed();
+	}
+
+	Bool -- ~[ test get otherwise in methods ]~ (Asserts) {
+		Asserts.that(intText.getT1Otherwise(5) == 5);
+		Asserts.that(intText.getT2Otherwise("hello") == "hello");
+		Asserts.that(textInt.getT1Otherwise("hello") == "hello");
+		Asserts.that(textInt.getT2Otherwise(5) == 5);
+		Asserts.that(nested.getT1Otherwise(intText) == intText);
+		Asserts.that(nested.getT2Otherwise(textInt) == textInt);
+		return Asserts.allPassed();
+	}
+
+	Bool -- ~[ test set and then get in methods ]~ (Asserts) {
+		intText.setT1(4); intText.setT2("hi");
+		textInt.setT1("hey"); textInt.setT2(6);
+		nested.setT1(intText); nested.setT2(textInt);
+		Asserts.that(intText.getT1Optional() == 4);
+		Asserts.that(intText.getT2Optional() == "hi");
+		Asserts.that(textInt.getT1Optional() == "hey");
+		Asserts.that(textInt.getT2Optional() == 6);
+		Asserts.that(nested.getT1Optional() == intText);
+		Asserts.that(nested.getT2Optional() == textInt);
+		return Asserts.allPassed();
+	}
+
+	Bool -- ~[ test unset and then all is nothing ]~ (Asserts) {
+		intText.unsetT1();
+		Asserts.that(intText.getT1Optional() == nothing);
+		intText.unsetT2();
+		Asserts.that(intText.getT2Optional() == nothing);
+		textInt.unsetT1();
+		Asserts.that(textInt.getT1Optional() == nothing);
+		textInt.unsetT2();
+		Asserts.that(textInt.getT2Optional() == nothing);
+		nested.unsetT1();
+		Asserts.that(nested.getT1Optional() == nothing);
+		nested.unsetT2();
+		Asserts.that(nested.getT2Optional() == nothing);
+		return Asserts.allPassed();
+	}
+
+	#>
+	Bool -- ~[ test all start out as nothing in properties]~ (Asserts) {
+		Asserts.that(intText.getT1Optional() == nothing);
+		Asserts.that(intText.getT2Optional() == nothing);
+		Asserts.that(textInt.getT1Optional() == nothing);
+		Asserts.that(textInt.getT2Optional() == nothing);
+		Asserts.that(nested.getT1Optional() == nothing);
+		Asserts.that(nested.getT2Optional() == nothing);
+	}
+	##

@@ -34,6 +34,7 @@ enum SemanticErrorCode {
 	DIRECT_USE_OF_OPTIONAL_TYPE,	// :Printer = nothing;
 	EXISTS_ON_NONOPTIONAL_TYPE,		// needs Printer; Printer exists { }
 	USE_OF_ASSIGNMENT_VALUE,		// needs Printer; Printer exists { }
+	INVALID_GENERIC_TYPE,			// needs Printer; Printer exists { }
 };
 
 class SemanticError {

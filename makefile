@@ -9,7 +9,7 @@ CPP=g++ $(FLAGS) -std=c++11
 TEST=true
 
 CPPNAMES= \
-	ObjectSymbolTable.cpp \
+	ClassSpaceSymbolTable.cpp \
 	ParseTreeTraverser.cpp \
 	SemanticError.cpp \
 	PropertySymbolTable.cpp \
@@ -32,7 +32,9 @@ CPPNAMES= \
 	SimpleAddressTable.cpp \
 	TableFileWriter.cpp \
 	TableFileReader.cpp \
-	ImportParseTreeTraverser.cpp
+	ImportParseTreeTraverser.cpp \
+	TypeParameterizer.cpp \
+	DerivedPropertySymbolTable.cpp
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
 
@@ -51,7 +53,9 @@ WAKENAMES=ArrayTest.wk \
 			MockPrinter.wk \
 			AssignmentsTest.wk \
 			PropertyTest.wk \
-			AutoboxingTest.wk
+			AutoboxingTest.wk \
+			SimpleGeneric.wk \
+			GenericTest.wk
 
 WAKEOBJS=$(addprefix bin/wakeobj/, $(WAKENAMES:.wk=.o))
 
@@ -66,7 +70,7 @@ GENNAMES=lex.wake.c wake.tab.c objectfile.tab.c lex.objectfile.c
 GENOBJS=$(addprefix bin/gen/, $(GENNAMES:.c=.o))
 
 TESTNAMES=CompilerTests.cpp \
-	ObjectSymbolTableTest.cpp \
+	ClassSpaceSymbolTableTest.cpp \
 	ParseTreeTraverserTest.cpp \
 	ScopeSymbolTableTest.cpp \
 	TypeAnalyzerTest.cpp \
@@ -75,7 +79,8 @@ TESTNAMES=CompilerTests.cpp \
 	OptionsParserTest.cpp \
 	ObjectFileHeaderDataTest.cpp \
 	TableFileWriterTest.cpp \
-	TableFileReaderTest.cpp
+	TableFileReaderTest.cpp \
+	DerivedPropertySymbolTableTest.cpp
 
 TESTOBJS=$(addprefix bin/tests/, $(TESTNAMES:.cpp=.o))
 
@@ -126,6 +131,9 @@ bin/wakeobj/Main.o: src/wake/test/Main.wk bin/wake bin/wakeobj/PropertyTest.o bi
 	time ./bin/wake -d bin/waketable $< -o $@
 
 bin/wakeobj/MockPrinter.o: src/wake/test/MockPrinter.wk bin/wake bin/waketable/Printer.table
+	time ./bin/wake -d bin/waketable $< -o $@
+
+bin/wakeobj/GenericTest.o: src/wake/test/GenericTest.wk bin/wake bin/wakeobj/Asserts.o bin/wakeobj/SimpleGeneric.o
 	time ./bin/wake -d bin/waketable $< -o $@
 
 bin/wakeobj/AutoboxingTest.o: src/wake/test/AutoboxingTest.wk bin/wake bin/wakeobj/Asserts.o
@@ -192,7 +200,7 @@ bin/c/%.o: src/c/%.c gen/wake.tab.c gen/objectfile.tab.c
 	$(CC) $(OPT) -c $< -o $@
 
 gen/%.tab.c: src/bison/%parser.y
-	bison -p $* -dg -o $@ $<
+	bison --report=states -p $* -dg -o $@ $<
 
 gen/%.table.h: bin/waketable/%.table bin/wake-nolib
 	xxd -i $< $@

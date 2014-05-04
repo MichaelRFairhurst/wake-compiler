@@ -8,13 +8,13 @@ void ObjectFileHeaderRenderer::writeOut(std::ostream& out, ObjectFileHeaderData*
 	out << "%-CLASSES-%";
 	std::vector<std::pair<int, std::string> > classusages = data->getClassUsages();
 	for(std::vector<std::pair<int, std::string> >::iterator it = classusages.begin(); it != classusages.end(); ++it) {
-		out << it->first << " {" << it->second << "} ";
+		out << it->first << " %" << it->second << "% ";
 	}
 
 	out << "%-PROPERTIES-%";
 	std::vector<std::pair<int, std::string> > propertyusages = data->getPropertyUsages();
 	for(std::vector<std::pair<int, std::string> >::iterator it = propertyusages.begin(); it != propertyusages.end(); ++it) {
-		out << it->first << " {" << it->second << "} ";
+		out << it->first << " %" << it->second << "% ";
 	}
 
 	out << "%-END-%\n";

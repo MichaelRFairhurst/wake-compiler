@@ -10,7 +10,7 @@ extern "C" {
 }
 
 #include "ErrorTracker.h"
-#include "ObjectSymbolTable.h"
+#include "ClassSpaceSymbolTable.h"
 #include "ScopeSymbolTable.h"
 #include "MethodSignatureParseTreeTraverser.h"
 
@@ -19,10 +19,11 @@ using namespace std;
 class TypeChecker {
 
 	public:
-		TypeChecker(ErrorTracker* errors, ObjectSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, MethodSignatureParseTreeTraverser* methodanalyzer);
+		TypeChecker(ErrorTracker* errors, ClassSpaceSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, MethodSignatureParseTreeTraverser* methodanalyzer);
 		void setReturnType(Type* returntype);
-		void setThisContext(string classname);
+		void setThisContext(Type* thiscontext);
 		void check(Node* n);
+		void setParameterizedTypes(const vector<Type*>& types);
 
 	private:
 		Type* typeCheck(Node* n);
@@ -33,10 +34,11 @@ class TypeChecker {
 
 		MethodSignatureParseTreeTraverser* methodanalyzer;
 		ErrorTracker* errors;
-		ObjectSymbolTable* objectsymtable;
+		ClassSpaceSymbolTable* classestable;
 		ScopeSymbolTable* scopesymtable;
 		Type* returntype;
-		string thiscontext;
+		Type* thiscontext;
+		vector<Type*> parameterizedtypes;
 
 };
 

@@ -28,19 +28,20 @@ syn match	blockcomment	"##"
 syn keyword	inheritancekeyword	a an contained
 syn keyword	interfacekeyword	capable
 syn keyword	mytype	Int Bool Text Char
-syn match	alias	"\<[a-z][a-zA-Z]*\>"
+syn match	alias	"\<[a-z][a-zA-Z0-9]*\>"
 syn match	withinregionkeyword	"\(every\|is:\)"
 syn match	shadow	"\$"
-syn match	returntype	"\(\<[a-zA-Z]\+\>\s\+\)\?--"
-syn match	functioncall	")\?\<[a-zA-Z]\+\>(" contained
-syn match	methodnameseg	")\?\<[a-zA-Z]\+\>("
+syn match	returntype	"\(\<[a-zA-Z][a-zA-Z0-9]*\>\s\+\)\?--"
+syn match	functioncall	"\<[a-zA-Z][a-zA-Z0-0]+\>(" contained
+syn match	methodstart	"\<[a-zA-Z][a-zA-Z0-9]*\>("
+syn match	methodseg	"\<)[a-zA-Z][a-zA-Z0-9]*\>("
 syn match	symbols	"\((\|)\|;\||\|=\|+\|{\|}\|,\|\.\|<\|>\|\-\|\*\|\/\|:\)"
 syn match	ancestrysymbols "\((\|)\|,\)" contained
 syn match	typesymbols "\(\[\|\]\)"
 syn match	currysymbols "???"
 syn region	mystring start=/"/ skip=/\\\\\|\\"/ end=/"/
 syn region	mystring2 start=/'/ skip=/\\\\\|\\'/ end=/'/
-syn match	injectionlabel	"\({\)\@<=[a-zA-Z0-9]\+\(}\)\@="
+syn match	specialty	":[a-zA-Z0-9]\+"
 syn region	comment	start="\/\/" end="$"
 syn match	comment	"`[^`]*`"
 
@@ -64,10 +65,11 @@ hi link ancestrysymbols	Keyword
 hi link currysymbols		Function
 hi link typesymbols		Type
 
-hi link methodnameseg		Special
+hi link methodseg		Special
+hi link methodstart		Special
 hi link functioncall		String
 hi link mystring2		String
 hi link mystring		String
-hi link injectionlabel		Function
+hi link specialty		Special
 
 let b:current_syntax = "wake"

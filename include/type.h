@@ -3,9 +3,10 @@
 
 #define TYPE_LAMBDA 1
 #define TYPE_CLASS 2
-#define TYPE_MATCHALL 3
-#define TYPE_NOTHING 4
-#define TYPE_UNUSABLE 5
+#define TYPE_PARAMETERIZED 3
+#define TYPE_MATCHALL 4
+#define TYPE_NOTHING 5
+#define TYPE_UNUSABLE 6
 
 struct TypeArray;
 
@@ -20,7 +21,14 @@ typedef struct Type {
 		struct {
 			char* classname;			// Bongo
 			int shadow;					// number of $s
+			struct TypeArray* parameters; // For tracking declarations with parameters
 		} _class;
+		struct {
+			char* label;				// T
+			int shadow;					// T and $T
+			struct Type* upperbound;	// Container{T from List}
+			struct Type* lowerbound;	// Container{T to List}
+		} parameterized;
 	} typedata;
 	int arrayed;						// number of []
 	char* alias;						// this should be moved....

@@ -237,8 +237,6 @@ void freeNode(Node* n) {
 		case NT_IMPORTPATH:
 		case NT_IMPORTTARGET:
 		case NT_CLASSNAME:
-		case NT_INTERFACE:
-		case NT_SUBCLASS:
 		case NT_STRINGLIT:
 		case NT_METHOD_NAME_SEGMENT:
 		case NT_ALIAS:

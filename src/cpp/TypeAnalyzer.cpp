@@ -1,15 +1,15 @@
 #include "TypeAnalyzer.h"
-#include "ObjectSymbolTable.h"
-#include "PropertySymbolTable.h"
+#include "ClassSpaceSymbolTable.h"
+#include "ReadOnlyPropertySymbolTable.h"
 #include "CompilationExceptions.h"
 
 bool TypeAnalyzer::isASubtypeOfB(string a, string b) {
 	try {
 		if(a == b) return true;
 
-		PropertySymbolTable* a_data = reference->find(a);
+		ReadOnlyPropertySymbolTable* a_data = reference->find(a);
 
-		for(map<string, bool>::iterator it = a_data->parentage.begin(); it != a_data->parentage.end(); ++it) {
+		for(auto it = a_data->getParentage().begin(); it != a_data->getParentage().end(); ++it) {
 			if(isASubtypeOfB(it->first, b)) return true;
 		}
 
@@ -21,16 +21,16 @@ bool TypeAnalyzer::isASubtypeOfB(string a, string b) {
 }
 
 bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
+	//if(a == NULL || b == NULL) return false;
 	if(a->type == TYPE_MATCHALL || b->type == TYPE_MATCHALL) return true;
-	if(a == NULL || b == NULL) return false;
 	if(a->type == TYPE_NOTHING) return b->optional;
 	if(a->arrayed != b->arrayed) return false;
-	if(a->type != b->type) return false;
+	if(a->type != b->type) return false; // TODO: parameterized types don't always follow this logic!
 
 	if(a->type == TYPE_LAMBDA) {
 
-		// A fn taking 3 arguments is not a subtype of a fn taking 2 or 4
-		if(a->typedata.lambda.arguments->typecount != b->typedata.lambda.arguments->typecount)
+		// if one or the other is a pointer
+		if((a->typedata.lambda.arguments == NULL) != (b->typedata.lambda.arguments == NULL))
 			return false;
 
 		// Bool -- fn() is a subtype of void -- fn(), since the subtype will simply ignore the returnval
@@ -40,23 +40,45 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 		else if(b->typedata.lambda.returntype != NULL && !isASubtypeOfB(a->typedata.lambda.returntype, b->typedata.lambda.returntype))
 			return false;
 
-		int i;
-		for(i = 0; i < a->typedata.lambda.arguments->typecount; i++)
-		if(!isASubtypeOfB(a->typedata.lambda.arguments->types[i], b->typedata.lambda.arguments->types[i]))
-			return false;
+		if(a->typedata.lambda.arguments != NULL) {
+			// A fn taking 3 arguments is not a subtype of a fn taking 2 or 4
+			if(a->typedata.lambda.arguments->typecount != b->typedata.lambda.arguments->typecount)
+				return false;
+
+			int i;
+			for(i = 0; i < a->typedata.lambda.arguments->typecount; i++)
+			if(!isASubtypeOfB(a->typedata.lambda.arguments->types[i], b->typedata.lambda.arguments->types[i]))
+				return false;
+		}
 
 		return true;
 
-	} else {
+	} else if(a->type == TYPE_CLASS) {
+		// check if one pointer exists and the other is null: !ptr == 0 and !NULL == 1
+		if(!a->typedata._class.parameters != !b->typedata._class.parameters) {
+			return false;
+		}
+
+		if(a->typedata._class.parameters) { // Here if A is not null, neither is B
+			int len = a->typedata._class.parameters->typecount;
+			if(b->typedata._class.parameters->typecount != len) {
+				return false;
+			}
+
+			for(int i = 0; i < len; i++)
+			if(!isAExactlyB(a->typedata._class.parameters->types[i], b->typedata._class.parameters->types[i]))
+				return false;
+		}
+
 		if(string(a->typedata._class.classname) == b->typedata._class.classname) {
 			return a->optional <= b->optional;
 		}
 
 		try {
 
-			PropertySymbolTable* a_data = reference->find(a->typedata._class.classname);
+			ReadOnlyPropertySymbolTable* a_data = reference->find(a->typedata._class.classname);
 
-			for(map<string, bool>::iterator it = a_data->parentage.begin(); it != a_data->parentage.end(); ++it) {
+			for(auto it = a_data->getParentage().begin(); it != a_data->getParentage().end(); ++it) {
 				if(isASubtypeOfB(it->first, b->typedata._class.classname)) return true;
 			}
 
@@ -65,11 +87,50 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 		}
 
 		return false;
+	} else if(a->type == TYPE_PARAMETERIZED) {
+		if(a->typedata.parameterized.label == string(b->typedata.parameterized.label)) return true;
+		// TODO: lower/upper bounds comparison
+		return false;
 	}
 
 }
 
+bool TypeAnalyzer::isAExactlyB(Type* a, Type* b) {
+	if(a->type != b->type) return false;
+	if(a->arrayed != b->arrayed) return false;
+	if(a->optional != b->optional) return false;
+	if(a->type == TYPE_CLASS) {
+		if(a->typedata._class.classname != string(b->typedata._class.classname)) return false;
+		if(!a->typedata._class.parameters != !b->typedata._class.parameters) return false; // tests both or neither are null. Tests back this up.
+		if(a->typedata._class.parameters != NULL) {
+			if(a->typedata._class.parameters->typecount != b->typedata._class.parameters->typecount)
+				return false;
+
+			for(int i = 0; i < a->typedata._class.parameters->typecount; i++)
+			if(!isAExactlyB(a->typedata._class.parameters->types[i], b->typedata._class.parameters->types[i]))
+				return false;
+		}
+	} else if(a->type == TYPE_PARAMETERIZED) {
+		// no need to check lower/upper bound, should always be the same for all labels
+		return a->typedata.parameterized.label == string(b->typedata.parameterized.label);
+	} else if(a->type == TYPE_LAMBDA) {
+		if(!a->typedata.lambda.returntype != !b->typedata.lambda.returntype) return false; // tests both or neither are null. Tests back this up
+		if(!a->typedata.lambda.arguments != !b->typedata.lambda.arguments) return false; // tests both or neither are null. Tests back this up
+		if(a->typedata.lambda.returntype != NULL && !isAExactlyB(a->typedata.lambda.returntype, b->typedata.lambda.returntype)) return false;
+		if(a->typedata.lambda.arguments != NULL) {
+			if(a->typedata.lambda.arguments->typecount != b->typedata.lambda.arguments->typecount)
+				return false;
+
+			for(int i = 0; i < a->typedata.lambda.arguments->typecount; i++)
+			if(!isAExactlyB(a->typedata.lambda.arguments->types[i], b->typedata.lambda.arguments->types[i]))
+				return false;
+		}
+	}
+	return true;
+}
+
 void TypeAnalyzer::assertNeedIsNotCircular(string classname, Type* need) {
+	if(need->type != TYPE_CLASS) return; // @TODO detect circular generics...wow.
 	if(need->typedata._class.classname == classname)
 		throw new SemanticError(CIRCULAR_DEPENDENCIES, "Created by the need for class " + getNameForType(need));
 
@@ -84,7 +145,7 @@ void TypeAnalyzer::assertNeedIsNotCircular(string classname, Type* need) {
 }
 
 void TypeAnalyzer::assertClassCanBeBound(Type* binding) {
-	PropertySymbolTable* bound = reference->find(binding->typedata._class.classname);
+	ReadOnlyPropertySymbolTable* bound = reference->find(binding->typedata._class.classname);
 	if(bound->isAbstract())
 		throw new SemanticError(ABSTRACT_PROVISION);
 }
@@ -158,6 +219,10 @@ string TypeAnalyzer::getNameForType(Type* type) {
 		return name;
 	}
 
+	if(type->type == TYPE_PARAMETERIZED) {
+		name = type->typedata.parameterized.label;
+	}
+
 	if(type->type == TYPE_MATCHALL) {
 		return "{inferencing failed}";
 	}
@@ -168,8 +233,16 @@ string TypeAnalyzer::getNameForType(Type* type) {
 
 	if(type->type == TYPE_CLASS) {
 		name = type->typedata._class.classname;
-		if(type->optional) name += "?";
-	} else {
+		if(type->typedata._class.parameters != NULL) {
+			name += "{";
+			int i;
+			for(i = 0; i < type->typedata._class.parameters->typecount; i++) {
+				if(i) name += ",";
+				name += getNameForType(type->typedata._class.parameters->types[i]);
+			}
+			name += "}";
+		}
+	} else if(type->type == TYPE_LAMBDA) {
 		name = getNameForType(type->typedata.lambda.returntype);
 		name += "--(";
 
@@ -186,6 +259,7 @@ string TypeAnalyzer::getNameForType(Type* type) {
 	int i;
 	for(i = 0; i < type->arrayed; i++)
 		name += "[]";
+	if(type->optional) name += "?";
 
 	return name;
 }

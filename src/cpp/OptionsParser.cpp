@@ -17,7 +17,7 @@ Options* OptionsParser::parse(int argc, char** argv) {
 	options->outFilename = "a.out";
 	options->tabledir = ".";
 	options->mainclass = "Main";
-	options->mainmethod = "Main()";
+	options->mainmethod = "main()";
 
 	while(i < argc) {
 		string arg = argv[i]; i++;

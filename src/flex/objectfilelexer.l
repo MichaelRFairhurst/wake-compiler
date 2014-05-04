@@ -14,7 +14,7 @@ extern YYSTYPE objectfilelval;
 "%-END-%"				yyterminate();
 
 [0-9]+(\.[0-9]+)?		objectfilelval.number = atoi(objectfiletext); return NUMBER;
-\{[^}]+\}				objectfilelval.string = keepInner(objectfiletext); return SYMBOL;
+%[^%]+%					objectfilelval.string = keepInner(objectfiletext); return SYMBOL;
 
 [ \n\t\r]				// nothing
 .						return ERRORTOKEN;

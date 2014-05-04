@@ -1,5 +1,31 @@
 #include "MethodSignatureParseTreeTraverser.h"
 #include "SemanticError.h"
+#include "TypeParameterizer.h"
+
+void MethodSignatureParseTreeTraverser::convertParameterizedTypes(Node* methoddef, const vector<Type*>& parameterizedtypes) {
+	int i;
+	Node* methodname;
+	TypeParameterizer parameterizer;
+
+	if(methoddef->node_data.nodes[1]->node_type == NT_METHOD_RETURN_TYPE) {
+		methodname = methoddef->node_data.nodes[2];
+		parameterizer.writeInParameterizations(&methoddef->node_data.nodes[1]->node_data.nodes[0]->node_data.type, parameterizedtypes);
+	} else {
+		methodname = methoddef->node_data.nodes[1];
+	}
+
+	for(i = 0; i < methodname->subnodes; i++) {
+		TypeArray* args;
+		i++;
+
+		if(i < methodname->subnodes) {
+			args = methodname->node_data.nodes[i]->node_data.typearray;
+			for(int b = 0; b < args->typecount; b++) {
+				parameterizer.writeInParameterizations(&args->types[b], parameterizedtypes);
+			}
+		}
+	}
+}
 
 vector<pair<string, TypeArray*> >* MethodSignatureParseTreeTraverser::getName(Node* methoddef) {
 	vector<pair<string, TypeArray*> >* arguments_segments = new vector<pair<string, TypeArray*> >();
@@ -18,7 +44,7 @@ vector<pair<string, TypeArray*> >* MethodSignatureParseTreeTraverser::getName(No
 			if(i < methodname->subnodes) {
 				argshere = methodname->node_data.nodes[i]->node_data.typearray;
 				for(int b = 0; b < argshere->typecount; b++) {
-					objectsymtable->assertTypeIsValid(argshere->types[b]);
+					classestable->assertTypeIsValid(argshere->types[b]);
 				}
 			} else {
 				argshere = emptytypearray;
@@ -47,7 +73,7 @@ Type* MethodSignatureParseTreeTraverser::getReturn(Node* methoddef) {
 
 	if(methoddef->node_data.nodes[1]->node_type == NT_METHOD_RETURN_TYPE) {
 		returntype = methoddef->node_data.nodes[1]->node_data.nodes[0]->node_data.type;
-		objectsymtable->assertTypeIsValid(returntype);
+		classestable->assertTypeIsValid(returntype);
 	} else {
 		returntype = NULL;
 	}
@@ -67,8 +93,8 @@ int MethodSignatureParseTreeTraverser::getFlags(Node* methoddef) {
 	return flags;
 }
 
-MethodSignatureParseTreeTraverser::MethodSignatureParseTreeTraverser(ObjectSymbolTable* objectsymtable) {
-	this->objectsymtable = objectsymtable;
+MethodSignatureParseTreeTraverser::MethodSignatureParseTreeTraverser(ClassSpaceSymbolTable* classestable) {
+	this->classestable = classestable;
 	emptytypearray = MakeTypeArray();
 }
 

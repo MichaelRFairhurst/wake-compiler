@@ -49,6 +49,17 @@ every Asserts is:
 	}
 
 	#>
+	# Assert true
+	##
+	that(Bool) {
+		if(!Bool) {
+			lasttext = "Failed an assertion";
+			Printer.printLine(lasttext);
+			hasfailed = true;
+		}
+	}
+
+	#>
 	# This is only for until we can provide and then
 	# watch an ErrorCounter instance.
 	##

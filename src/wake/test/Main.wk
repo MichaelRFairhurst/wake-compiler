@@ -11,15 +11,20 @@ import OptionalTypeTest;
 import AssignmentsTest;
 import PropertyTest;
 import AutoboxingTest;
+import GenericTest;
+import SimpleGeneric;
 
 #>
 # Test suite entry point
 ##
 every Main is:
 
-	needs System, AssertsTest, Printer, MathTest, BooleanLogicTest, InheritanceTest, ArrayTest, OptionalTypeTest, AssignmentsTest, PropertyTest, AutoboxingTest;
+	needs System, AssertsTest, Printer, MathTest, BooleanLogicTest, InheritanceTest, ArrayTest, OptionalTypeTest, AssignmentsTest, PropertyTest, AutoboxingTest, GenericTest;
 
-	provides Printer, Asserts;
+	provides Printer, Asserts,
+		SimpleGeneric{Int, Text},
+		SimpleGeneric{Text, Int},
+		SimpleGeneric{SimpleGeneric{Int, Text}, SimpleGeneric{Text, Int}};
 
 	with Bool passed = true;
 	with Int totalcount = 0;
@@ -27,7 +32,7 @@ every Main is:
 	with Int passedcount = 0;
 	with Text[] failed `tests by name` = [];
 
-	Run(Bool result, test Text) {
+	run(Bool result, test Text) {
 		totalcount += 1;
 		if(!result) {
 			failed[failedcount] = test;
@@ -40,67 +45,71 @@ every Main is:
 		}
 	}
 
-	Main() {
-		Run(AssertsTest.~[test assert text matches]~(), "test assert text matches");
-		Run(AssertsTest.~[test assert text not matches]~(), "test assert text not matches");
-		Run(AssertsTest.~[test assert int matches]~(), "test assert int matches");
-		Run(AssertsTest.~[test assert int not matches]~(), "test assert int not matches");
-		Run(AssertsTest.~[test assert true matches]~(), "test assert true matches");
-		Run(AssertsTest.~[test assert true not matches]~(), "test assert true not matches");
-		Run(AssertsTest.~[test assert false matches]~(), "test assert false matches");
-		Run(AssertsTest.~[test assert false not matches]~(), "test assert false not matches");
-		Run(AssertsTest.~[test assert true]~(), "test assert true");
-		Run(AssertsTest.~[test assert not true]~(), "test assert not true");
-		Run(AssertsTest.~[test assert false]~(), "test assert false");
-		Run(AssertsTest.~[test assert not false]~(), "test assert not false");
-		Run(MathTest.testAddition(Asserts <- this), "testAddition");
-		Run(MathTest.testSubtraction(Asserts <- this), "testSubtraction");
-		Run(MathTest.testDivision(Asserts <- this), "testDivision");
-		Run(MathTest.testMultiplication(Asserts <- this), "testMultiplication");
-		Run(MathTest.testOrderOfOperations(Asserts <- this), "testOrderOfOperations");
-		Run(BooleanLogicTest.testOr(Asserts <- this), "testOr");
-		Run(BooleanLogicTest.testAnd(Asserts <- this), "testAnd");
-		Run(BooleanLogicTest.testOrderOfOperations(Asserts <- this), "testOrderOfOperations");
+	main() {
+		run(AssertsTest.~[test assert text matches]~(), "test assert text matches");
+		run(AssertsTest.~[test assert text not matches]~(), "test assert text not matches");
+		run(AssertsTest.~[test assert int matches]~(), "test assert int matches");
+		run(AssertsTest.~[test assert int not matches]~(), "test assert int not matches");
+		run(AssertsTest.~[test assert true matches]~(), "test assert true matches");
+		run(AssertsTest.~[test assert true not matches]~(), "test assert true not matches");
+		run(AssertsTest.~[test assert false matches]~(), "test assert false matches");
+		run(AssertsTest.~[test assert false not matches]~(), "test assert false not matches");
+		run(AssertsTest.~[test assert true]~(), "test assert true");
+		run(AssertsTest.~[test assert not true]~(), "test assert not true");
+		run(AssertsTest.~[test assert false]~(), "test assert false");
+		run(AssertsTest.~[test assert not false]~(), "test assert not false");
+		run(MathTest.testAddition(Asserts <- this), "testAddition");
+		run(MathTest.testSubtraction(Asserts <- this), "testSubtraction");
+		run(MathTest.testDivision(Asserts <- this), "testDivision");
+		run(MathTest.testMultiplication(Asserts <- this), "testMultiplication");
+		run(MathTest.testOrderOfOperations(Asserts <- this), "testOrderOfOperations");
+		run(BooleanLogicTest.testOr(Asserts <- this), "testOr");
+		run(BooleanLogicTest.testAnd(Asserts <- this), "testAnd");
+		run(BooleanLogicTest.testOrderOfOperations(Asserts <- this), "testOrderOfOperations");
 		//Run(TernaryOperatorTest.testTrue(Asserts <- this));
 		//Run(TernaryOperatorTest.testFalse(Asserts <- this));
-		Run(InheritanceTest.~[test parent gets parent class name]~(Asserts <- this), "test parentgets parent classname");
-		Run(InheritanceTest.~[test override child gets child class name]~(Asserts <- this), "test override child gets child classname");
-		Run(InheritanceTest.~[test override child from provider gets child class name]~(Asserts <- this), "test ovveride child from provider gets child class name");
-		Run(InheritanceTest.~[test override child after cast gets child class name]~(Asserts <- this), "test override child after cast gets child classname");
-		Run(InheritanceTest.~[test fallthrough child gets child class name]~(Asserts <- this ), "test fallthrough child gets child classname");
-		Run(InheritanceTest.~[test fallthrough child from provider gets child class name]~(Asserts <- this ), "test fallthrough child from provider gets child class name");
-		Run(InheritanceTest.~[test fallthrough child after cast gets child class name]~(Asserts <- this ), "test fallthrough child after cast gets child classname");
-		Run(InheritanceTest.~[test implementing child gets child class name]~(Asserts <- this ), "test implementing child gets child class name");
-		Run(InheritanceTest.~[test implementing child from provider gets child class name]~(Asserts <- this ), "test implementing child from proider gets child class name");
-		Run(InheritanceTest.~[test implementing child after cast gets child class name]~(Asserts <- this ), "test implementing child after cast gets child class name");
-		Run(ArrayTest.~[test set array index]~(Asserts <- this), "test set array index");
-		Run(ArrayTest.~[test reset array index]~(Asserts <- this), "test reset array index");
-		Run(ArrayTest.~[test set array array index index]~(Asserts <- this), "test set array array index index");
-		Run(ArrayTest.~[test reset array array index index]~(Asserts <- this), "tset reset array array index index");
-		Run(ArrayTest.~[test set multiple array indices]~(Asserts <- this), "test set multiple array indices");
-		Run(ArrayTest.~[test set multiple array array indices indices]~(Asserts <- this), "test set multiple array array indices indices");
-		Run(OptionalTypeTest.~[test optional int never set]~(), "test optional int never set");
-		Run(OptionalTypeTest.~[test optional int set]~(), "teest optional int set");
-		Run(OptionalTypeTest.~[test optional int not set will hit else]~(), "test optional int not set will hit else");
-		Run(OptionalTypeTest.~[test optional int set wont hit else]~(), "test optional int set wont hit else");
-		Run(AssignmentsTest.testPlusEquals(Asserts <- this), "testPlusEquals");
-		Run(AssignmentsTest.testMinusEquals(Asserts <- this), "testMinusEquals");
-		Run(AssignmentsTest.testTimesEquals(Asserts <- this), "testTimesEquals");
-		Run(AssignmentsTest.testDivideEquals(Asserts <- this), "testDivideEquals");
-		Run(AssignmentsTest.testUsingAssigmentReturnValues(Asserts <- this), "testUsingAssigmentReturnValues");
-		Run(PropertyTest.~[test own properties]~(Asserts <- this), "test own properties");
-		Run(PropertyTest.~[test others properties]~(Asserts <- this), "test others properties");
-		Run(AutoboxingTest.testIntSquared(Asserts <- this), "testIntSquared");
-		Run(AutoboxingTest.testAbsoluteValue(Asserts <- this), "testAbsoluteValue");
-		Run(AutoboxingTest.testMaxOfInt(Asserts <- this), "testMaxOfInt");
-		Run(AutoboxingTest.testMaxOfInts(Asserts <- this), "testMaxOfInts");
-		Run(AutoboxingTest.testMinOfInt(Asserts <- this), "testMinOfInt");
-		Run(AutoboxingTest.testMinOfInts(Asserts <- this), "testMinOfInts");
-		Run(AutoboxingTest.testNumberOfDigits(Asserts <- this), "testNumberOfDigits");
-		Run(AutoboxingTest.testToUpper(Asserts <- this), "testToUpper");
-		Run(AutoboxingTest.testToLower(Asserts <- this), "testToLower");
-		Run(AutoboxingTest.testSwitchCase(Asserts <- this), "testSwitchCase");
-		Run(AutoboxingTest.testTrim(Asserts <- this), "testSwitchCase");
+		run(InheritanceTest.~[test parent gets parent class name]~(Asserts <- this), "test parentgets parent classname");
+		run(InheritanceTest.~[test override child gets child class name]~(Asserts <- this), "test override child gets child classname");
+		run(InheritanceTest.~[test override child from provider gets child class name]~(Asserts <- this), "test ovveride child from provider gets child class name");
+		run(InheritanceTest.~[test override child after cast gets child class name]~(Asserts <- this), "test override child after cast gets child classname");
+		run(InheritanceTest.~[test fallthrough child gets child class name]~(Asserts <- this ), "test fallthrough child gets child classname");
+		run(InheritanceTest.~[test fallthrough child from provider gets child class name]~(Asserts <- this ), "test fallthrough child from provider gets child class name");
+		run(InheritanceTest.~[test fallthrough child after cast gets child class name]~(Asserts <- this ), "test fallthrough child after cast gets child classname");
+		run(InheritanceTest.~[test implementing child gets child class name]~(Asserts <- this ), "test implementing child gets child class name");
+		run(InheritanceTest.~[test implementing child from provider gets child class name]~(Asserts <- this ), "test implementing child from proider gets child class name");
+		run(InheritanceTest.~[test implementing child after cast gets child class name]~(Asserts <- this ), "test implementing child after cast gets child class name");
+		run(ArrayTest.~[test set array index]~(Asserts <- this), "test set array index");
+		run(ArrayTest.~[test reset array index]~(Asserts <- this), "test reset array index");
+		run(ArrayTest.~[test set array array index index]~(Asserts <- this), "test set array array index index");
+		run(ArrayTest.~[test reset array array index index]~(Asserts <- this), "tset reset array array index index");
+		run(ArrayTest.~[test set multiple array indices]~(Asserts <- this), "test set multiple array indices");
+		run(ArrayTest.~[test set multiple array array indices indices]~(Asserts <- this), "test set multiple array array indices indices");
+		run(OptionalTypeTest.~[test optional int never set]~(), "test optional int never set");
+		run(OptionalTypeTest.~[test optional int set]~(), "teest optional int set");
+		run(OptionalTypeTest.~[test optional int not set will hit else]~(), "test optional int not set will hit else");
+		run(OptionalTypeTest.~[test optional int set wont hit else]~(), "test optional int set wont hit else");
+		run(AssignmentsTest.testPlusEquals(Asserts <- this), "testPlusEquals");
+		run(AssignmentsTest.testMinusEquals(Asserts <- this), "testMinusEquals");
+		run(AssignmentsTest.testTimesEquals(Asserts <- this), "testTimesEquals");
+		run(AssignmentsTest.testDivideEquals(Asserts <- this), "testDivideEquals");
+		run(AssignmentsTest.testUsingAssigmentReturnValues(Asserts <- this), "testUsingAssigmentReturnValues");
+		run(PropertyTest.~[test own properties]~(Asserts <- this), "test own properties");
+		run(PropertyTest.~[test others properties]~(Asserts <- this), "test others properties");
+		run(AutoboxingTest.testIntSquared(Asserts <- this), "testIntSquared");
+		run(AutoboxingTest.testAbsoluteValue(Asserts <- this), "testAbsoluteValue");
+		run(AutoboxingTest.testMaxOfInt(Asserts <- this), "testMaxOfInt");
+		run(AutoboxingTest.testMaxOfInts(Asserts <- this), "testMaxOfInts");
+		run(AutoboxingTest.testMinOfInt(Asserts <- this), "testMinOfInt");
+		run(AutoboxingTest.testMinOfInts(Asserts <- this), "testMinOfInts");
+		run(AutoboxingTest.testNumberOfDigits(Asserts <- this), "testNumberOfDigits");
+		run(AutoboxingTest.testToUpper(Asserts <- this), "testToUpper");
+		run(AutoboxingTest.testToLower(Asserts <- this), "testToLower");
+		run(AutoboxingTest.testSwitchCase(Asserts <- this), "testSwitchCase");
+		run(AutoboxingTest.testTrim(Asserts <- this), "testSwitchCase");
+		run(GenericTest.~[ test all start out as nothing in methods ]~(Asserts <- this), "test all start out as nothing in methods");
+		run(GenericTest.~[ test get otherwise in methods ]~(Asserts <- this), "test get otherwise in methods");
+		run(GenericTest.~[ test set and then get in methods ]~(Asserts <- this), "test set and then get in methods");
+		run(GenericTest.~[ test unset and then all is nothing ]~(Asserts <- this), "test unset and then all is nothing");
 
 		Printer.printLine("");
 		Printer.printLine("");

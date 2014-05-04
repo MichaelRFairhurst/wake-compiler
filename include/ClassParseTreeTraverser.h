@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <utility>
-#include "ObjectSymbolTable.h"
+#include "ClassSpaceSymbolTable.h"
 #include "ScopeSymbolTable.h"
 #include "SemanticError.h"
 #include "ErrorTracker.h"
@@ -21,7 +21,7 @@ using namespace std;
 
 class ClassParseTreeTraverser {
 	public:
-		ClassParseTreeTraverser(ErrorTracker* errors, ObjectSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, string classname, TypeChecker* typechecker, MethodSignatureParseTreeTraverser* methodanalyzer);
+		ClassParseTreeTraverser(ErrorTracker* errors, ClassSpaceSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, string classname, TypeChecker* typechecker, MethodSignatureParseTreeTraverser* methodanalyzer, PropertySymbolTable* propertysymtable);
 		void firstPass(Node* tree);
 		void secondPass(Node* tree);
 
@@ -40,7 +40,7 @@ class ClassParseTreeTraverser {
 		TypeChecker* typechecker;
 		ErrorTracker* errors;
 		ScopeSymbolTable* scopesymtable;
-		ObjectSymbolTable* objectsymtable;
+		ClassSpaceSymbolTable* classestable;
 		PropertySymbolTable* propertysymtable;
 };
 

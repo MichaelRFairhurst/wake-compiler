@@ -8,7 +8,7 @@
 #include "SimpleAddressTable.h"
 #include "ObjectFileHeaderData.h"
 #include "PropertySymbolTable.h"
-#include "ObjectSymbolTable.h"
+#include "ClassSpaceSymbolTable.h"
 
 extern "C" {
 	#include "objectfile.h"
@@ -18,11 +18,11 @@ class Linker {
 
 	public:
 		Linker(SimpleAddressTable& classTable, SimpleAddressTable& propertyTable) : classTable(classTable), propertyTable(propertyTable) {};
-		void loadTables(string dirname, ObjectSymbolTable& table);
+		void loadTables(string dirname, ClassSpaceSymbolTable& table);
 		void loadObject(std::string filename);
 		void write(std::ostream& objectfile);
-		void setMain(ostream& outfile, string classname, string methodname, ObjectSymbolTable& table);
-		void generateRecursiveConstructors(ostream& outfile, string ctedclass, ObjectSymbolTable& table);
+		void setMain(ostream& outfile, string classname, string methodname, ClassSpaceSymbolTable& table);
+		void generateRecursiveConstructors(ostream& outfile, string ctedclass, ClassSpaceSymbolTable& table);
 
 	private:
 		std::vector<ObjectFileHeaderData*> files;

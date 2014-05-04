@@ -3,7 +3,8 @@
 	every Architect is:
 		// Class declaration
 
-	every BadArchitect (an Architect) is:
+	class BadArchitect is:
+		an Architect;
 		// Subclass of BadArchictect
 
 	every CrappyArchitect (a CrappyEmployee) is:
@@ -161,45 +162,45 @@ Chainable
 	Object											YES		YES		YES		YES
 	alias Object									YES		YES		NO		NO
 	Object alias									YES		YES		NO		NO
-	alias Object{Specifier}						YES		NO		NO		NO
-	Object{Specifier} alias						YES		NO		NO		NO
+	alias Object:Specifier						YES		NO		NO		NO
+	Object:Specifier alias						YES		NO		NO		NO
 	$Object											YES		YES		YES		NO
-	$Object{Specifier}								YES		YES		NO		NO
+	$Object:Specifier								YES		YES		NO		NO
 	Object[]										YES		YES		YES		YES
 	alias Object[]									YES		YES		NO		NO
 	Object[] alias									YES		YES		NO		NO
-	Object[]{Specifier}								YES		NO	 	NO		YES
+	Object[]:Specifier								YES		NO	 	NO		YES
 	$Object[]										YES		YES		YES		NO
-	$Object[]{Specifier}							YES		NO		NO		NO
+	$Object[]:Specifier							YES		NO		NO		NO
 	Object[][]										YES		YES		YES		YES
 	alias Object[][]								YES		YES		NO		NO
 	Object[][] alias								YES		YES		NO		NO
-	Object[][]{Specifier}							YES		NO		NO		YES
-	alias Object[][]{Specifier}					YES		NO		NO		NO
-	Object[][]{Specifier} alias					YES		NO		NO		NO
+	Object[][]:Specifier							YES		NO		NO		YES
+	alias Object[][]:Specifier					YES		NO		NO		NO
+	Object[][]:Specifier alias					YES		NO		NO		NO
 	fn(Object)[]										NO		NO		NO		YES
 	alias (Object)[]								YES		YES		NO		NO
 	fn(Object)[] alias								NO		YES		NO		NO
-	fn(Object)[]{Specifier}							NO		NO 		NO		YES
-	alias (Object)[]{Specifier}					YES		NO 		NO		NO
-	fn(Object)[]{Specifier} alias					YES		NO 		NO		NO
+	fn(Object)[]:Specifier							NO		NO 		NO		YES
+	alias (Object)[]:Specifier					YES		NO 		NO		NO
+	fn(Object)[]:Specifier alias					YES		NO 		NO		NO
 	fn(Object[])[]									NO		YES		NO		YES
-	fn(Object[])[]{Specifier}							NO		NO		NO		YES
+	fn(Object[])[]:Specifier							NO		NO		NO		YES
 	Object -- fn(Object[])[]							NO		NO		NO		NO
 	alias Object -- fn(Object[])[]					NO		NO		NO		NO
 	Object -- fn(Object[])[] alias					NO		NO		NO		NO
-	Object -- fn(Object[])[]{Specifier}				NO		NO		NO		NO
-	alias Object -- fn(Object[])[]{Specifier}		NO		NO		NO		NO
-	Object -- fn(Object[])[]{Specifier} alias		NO		NO		NO		NO
-	Object -- fn(Object[])[][]{Specifier}				NO		NO		NO		NO
-	Object -- fn(Object[])[][]{Specifier} alias		NO		NO		NO		NO
-	alias Object -- (Object[])[][]{Specifier}		NO		NO		NO		NO
+	Object -- fn(Object[])[]:Specifier				NO		NO		NO		NO
+	alias Object -- fn(Object[])[]:Specifier		NO		NO		NO		NO
+	Object -- fn(Object[])[]:Specifier alias		NO		NO		NO		NO
+	Object -- fn(Object[])[][]:Specifier				NO		NO		NO		NO
+	Object -- fn(Object[])[][]:Specifier alias		NO		NO		NO		NO
+	alias Object -- (Object[])[][]:Specifier		NO		NO		NO		NO
 	fn(Object) -- fn(Object[])[]						NO		NO		NO		NO
 	fn(Object) -- fn(Object[])[]						NO		NO		NO		NO
 	fn(Object) -- fn(Object[])[]						NO		NO		NO		NO
-	fn(Object) -- fn(Object[])[]{Specifier}				NO		NO		NO		NO
-	alias (Object) -- (Object[])[]{Specifier}		NO		NO		NO		NO
-	fn(Object) -- fn(Object[])[]{Specifier} alias		NO		NO		NO		NO
+	fn(Object) -- fn(Object[])[]:Specifier				NO		NO		NO		NO
+	alias (Object) -- (Object[])[]:Specifier		NO		NO		NO		NO
+	fn(Object) -- fn(Object[])[]:Specifier alias		NO		NO		NO		NO
 
 
 
@@ -226,11 +227,11 @@ Chainable
 			Examiner,
 
 			// bind text & numbers, with identfiers
-			Text{DBUserName} <- "SooperSecUrUserNaem",
-			Int{DBPort} <- 3306,
+			Text:DBUserName <- "SooperSecUrUserNaem",
+			Int:DBPort <- 3306,
 
 			// Bind an injection to arbitrary behavior
-			User{LoggedIn} <- { return getLoggedInUser(); },
+			User:LoggedIn <- { return getLoggedInUser(); },
 
 			// Bind an injection to arbitrary behavior with a parameter
 			FileReader <(Text) { return getFileHandle("r", Text, FileSystemWrapper); },
@@ -256,16 +257,16 @@ Chainable
 			var Architect <(2, 4) provider;
 
 			// no args but yes label
-			var Architect{LoggedIn} <- provider;
+			var Architect:LoggedIn <- provider;
 
 			// args and label
-			var Architect{LoggedIn} <(2, 4) provider;
+			var Architect:LoggedIn <(2, 4) provider;
 
 			// get as an expression
-			return Architect{LoggedIn} <- provider);
+			return Architect:LoggedIn <- provider);
 		}
 
-		needs User{LoggedIn}, Provider, then {
+		needs User:LoggedIn, Provider, then {
 			// Method body
 		}
 
@@ -310,22 +311,22 @@ Chainable
 	var MyClass <- Provider;
 	var MyClass a <- Provider;
 	var a MyClass <- Provider;
-	var MyClass{Specialized} a <- Provider;
-	var a MyClass{Specialized} <- Provider;
+	var MyClass:Specialized a <- Provider;
+	var a MyClass:Specialized <- Provider;
 	var MyClass = CopyMyClass;
 	var a MyClass = CopyMyClass;
 	var MyClass a = CopyMyClass;
 	var MyClass a = CopyMyClass;
 
 	//Syntactic sugar:
-	:MyClass <- Provider;
+	var MyClass <- Provider;
 	// is actually
-	:MyClass = :(MyClass <- Provider);
+	var MyClass = MyClass <- Provider;
 
 	// Reassignment
 	MyClass = CopyMyClass;
 	a = CopyMyClass;
-	MyClass = :(MyClass{Specialty} <- Provider)
+	MyClass = MyClass:Specialty <- Provider;
 
 // IMPLICIT MAP
 
@@ -336,14 +337,30 @@ Chainable
 
 // GENERICS
 
-	var List<Architect>;
-	var List<List<Architect>>;
-	var Map<String,Architect>;
-	var List<Map<String,Architect>>;
-	var List<Map<String,from Architect>>;
-	var List<Map<String,to Architect>>;
-	var List<Map<String,from Employee to Architect>>;
-	var List<Map<String,anything>>;
+	var List{Architect};
+	var List{List{Architect}};
+	var Map{String,Architect};
+	var List{Map{String,Architect}};
+	var List{Map{String,from Architect}};
+	var List{Map{String,to Architect}};
+	var List{Map{String,from Employee to Architect}};
+	var List{Map{String,anything}};
+
+// PROVIDING GENERICS
+	// You can provide generics without parameters
+	provides List;
+	// However, not generics that parameterized needs
+	provides Container;
+	// unless you resolves the generic and meet its needs
+	provides Container{MyClass}, MyClass;
+	// or if you 'auto provide'
+	provides auto Container;
+	// Which results in runtime DI that provides defaults for everything except specialties
+	// disabled when reflection is turned off
+	provides T; // type error, because T can have any sort of transitive dependencies
+	provides auto T; // Doable!
+// TERNARY
+	return true if isOpen() else checkCanOpen();
 
 //PRIVATE METHODS
 //CALL PARENT METHODS

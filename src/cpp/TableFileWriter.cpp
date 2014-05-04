@@ -14,7 +14,7 @@ void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 		writeType(out, *it);
 	}
 
-	dataptr[0] = 0x00;
+	dataptr[0] = 0x00; // End Nededs
 	out.write(dataptr, 1);
 
 	for(map<string, ObjectProperty*>::iterator it = table->properties.begin(); it != table->properties.end(); ++it) {
@@ -25,7 +25,7 @@ void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 		writeProperty(out, it->second);
 	}
 
-	dataptr[0] = 0x05;
+	dataptr[0] = 0x00; // End Methods
 	out.write(dataptr, 1);
 
 	for(map<string, bool>::iterator it = table->parentage.begin(); it != table->parentage.end(); ++it) {
@@ -35,6 +35,13 @@ void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 
 		dataptr[0] = (char) it->second;
 		out.write(dataptr, 1);
+	}
+
+	dataptr[0] = 0x00; // End Inheritances
+	out.write(dataptr, 1);
+
+	for(auto it = table->getParameters().begin(); it != table->getParameters().end(); ++it) {
+		writeType(out, *it);
 	}
 	free(dataptr);
 }
@@ -50,24 +57,61 @@ void TableFileWriter::writeType(ostream& out, Type* type) {
 
 		out.write(type->typedata._class.classname, strlen(type->typedata._class.classname));
 
+		if(type->typedata._class.parameters != NULL) {
+			for(int i = 0; i < type->typedata._class.parameters->typecount; i++) {
+				writeType(out, type->typedata._class.parameters->types[i]);
+			}
+		}
+
+		dataptr[0] = 0x00;
+		out.write(dataptr, 1);
+
 		dataptr[0] = (char) type->typedata._class.shadow;
 		out.write(dataptr, 1);
-	} else {
+	} else if(type->type == TYPE_LAMBDA) {
 		dataptr[0] = TYPE_LAMBDA;
 		out.write(dataptr, 1);
 
 		if(type->typedata.lambda.returntype != NULL) {
-			dataptr[0] = 0x03;
+			dataptr[0] = 0x01;
 			out.write(dataptr, 1);
 
 			writeType(out, type->typedata.lambda.returntype);
+		} else {
+			dataptr[0] = 0x00;
+			out.write(dataptr, 1);
 		}
 
 		for(int i = 0; i < type->typedata.lambda.arguments->typecount; i++) {
 			writeType(out, type->typedata.lambda.arguments->types[i]);
 		}
 
-		dataptr[0] = 0x04;
+		dataptr[0] = 0x00;
+		out.write(dataptr, 1);
+	} else if(type->type == TYPE_PARAMETERIZED) {
+		dataptr[0] = TYPE_PARAMETERIZED;
+		out.write(dataptr, 1);
+
+		dataptr[0] = (char) strlen(type->typedata.parameterized.label);
+		out.write(dataptr, 1);
+
+		out.write(type->typedata.parameterized.label, strlen(type->typedata.parameterized.label));
+
+		if(type->typedata.parameterized.upperbound != NULL) {
+			writeType(out, type->typedata.parameterized.upperbound);
+		} else {
+			dataptr[0] = 0x00;
+			out.write(dataptr, 1);
+		}
+
+		if(type->typedata.parameterized.lowerbound != NULL) {
+			writeType(out, type->typedata.parameterized.lowerbound);
+		} else {
+			dataptr[0] = 0x00;
+			out.write(dataptr, 1);
+		}
+
+		dataptr[0] = type->typedata.parameterized.shadow;
 		out.write(dataptr, 1);
 	}
 
@@ -99,6 +143,11 @@ void TableFileWriter::writeType(ostream& out, Type* type) {
 
 void TableFileWriter::writeProperty(ostream& out, ObjectProperty* property) {
 	char * dataptr = (char*) malloc(1);
+
+	dataptr[0] = (char) property->casing.size();
+	out.write(dataptr, 1);
+	out.write(property->casing.c_str(), property->casing.size());
+
 	dataptr[0] = (char) property->flags;
 	out.write(dataptr, 1);
 

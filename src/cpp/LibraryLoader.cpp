@@ -4,7 +4,7 @@
 #include "TableFileReader.h"
 
 
-void LibraryLoader::loadImport(string importname, string importpath, ObjectSymbolTable& objtable) {
+void LibraryLoader::loadImport(string importname, string importpath, ClassSpaceSymbolTable& objtable) {
 	fstream importfile;
 	importfile.open(importpath + "/" + importname + ".table");
 	TableFileReader reader;
@@ -14,7 +14,7 @@ void LibraryLoader::loadImport(string importname, string importpath, ObjectSymbo
 	objtable.importClass(table);
 }
 
-void LibraryLoader::loadStdLibToTable(ObjectSymbolTable* table) {
+void LibraryLoader::loadStdLibToTable(ClassSpaceSymbolTable* table) {
 	#ifdef COMPILE_IN_PRIMITIVE_TYPES
 		#include "Int.table.h"
 		#include "Text.table.h"

@@ -2,3 +2,6 @@ gen
 bin
 todo.txt
 chivvy
+*.swp
+*.swa
+*.swo

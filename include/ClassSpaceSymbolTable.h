@@ -14,10 +14,10 @@
 
 using namespace std;
 
-class ObjectSymbolTable {
+class ClassSpaceSymbolTable {
 	public:
-		ObjectSymbolTable();
-		~ObjectSymbolTable();
+		ClassSpaceSymbolTable();
+		~ClassSpaceSymbolTable();
 
 		boost::optional<SemanticError*> addClass(string name);
 		boost::optional<SemanticError*> addInheritance(string child, bool issubclass);
@@ -28,10 +28,14 @@ class ObjectSymbolTable {
 
 		void propagateInheritance();
 		void propagateInheritanceToParent(string childname);
-		PropertySymbolTable* find(string name);
+		ReadOnlyPropertySymbolTable* find(Type* type);
+		ReadOnlyPropertySymbolTable* find(string name);
 		void assertTypeIsValid(Type* type);
 		TypeAnalyzer* getAnalyzer();
 		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);
+
+		PropertySymbolTable* findModifiable(string name);
+		PropertySymbolTable* findModifiable(Type* type);
 
 	private:
 

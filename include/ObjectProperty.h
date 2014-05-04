@@ -11,6 +11,7 @@ using namespace std;
 
 struct ObjectProperty {
 	string address;
+	string casing;
 	int flags;
 	Type* type;
 };

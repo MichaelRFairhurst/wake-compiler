@@ -20,7 +20,7 @@ extern "C" {
 	extern FILE *objectfilein;
 }
 
-void Linker::loadTables(string dirname, ObjectSymbolTable& table) {
+void Linker::loadTables(string dirname, ClassSpaceSymbolTable& table) {
 	if (!exists(dirname)) throw string("Directory " + dirname + " does not exist");
 
 	TableFileReader reader;
@@ -100,7 +100,7 @@ void Linker::write(ostream& outfile) {
 	}
 }
 
-void Linker::setMain(ostream& file, string classname, string methodname, ObjectSymbolTable& table) {
+void Linker::setMain(ostream& file, string classname, string methodname, ClassSpaceSymbolTable& table) {
 	file << "(";
 	generateRecursiveConstructors(file, classname, table);
 	file << ").";
@@ -110,7 +110,7 @@ void Linker::setMain(ostream& file, string classname, string methodname, ObjectS
 	file << "})();";
 }
 
-void Linker::generateRecursiveConstructors(ostream& file, string ctedclass, ObjectSymbolTable& table) {
+void Linker::generateRecursiveConstructors(ostream& file, string ctedclass, ClassSpaceSymbolTable& table) {
 	file << "new ";
 	file << "_" << classTable.getAddress(ctedclass);
 	file << "(";

@@ -1,11 +1,13 @@
 #include "TypeChecker.h"
 #include "CompilationExceptions.h"
+#include "TypeParameterizer.h"
 
-TypeChecker::TypeChecker(ErrorTracker* errors, ObjectSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, MethodSignatureParseTreeTraverser* methodanalyzer) {
+TypeChecker::TypeChecker(ErrorTracker* errors, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, MethodSignatureParseTreeTraverser* methodanalyzer) {
 	this->errors = errors;
-	this->objectsymtable = objectsymtable;
+	this->classestable = classestable;
 	this->scopesymtable = scopesymtable;
 	this->methodanalyzer = methodanalyzer;
+	thiscontext = NULL;
 }
 
 void TypeChecker::check(Node* tree) {
@@ -93,12 +95,16 @@ void TypeChecker::setReturnType(Type* returntype) {
 	this->returntype = returntype;
 }
 
-void TypeChecker::setThisContext(string name) {
-	thiscontext = name;
+void TypeChecker::setThisContext(Type* context) {
+	thiscontext = context;
+}
+
+void TypeChecker::setParameterizedTypes(const vector<Type*>& types) {
+	parameterizedtypes = types;
 }
 
 Type* TypeChecker::typeCheck(Node* tree) {
-	TypeAnalyzer* analyzer = objectsymtable->getAnalyzer();
+	TypeAnalyzer* analyzer = classestable->getAnalyzer();
 	Type* ret = NULL;
 	string erroneousstring;
 	string expectedstring;
@@ -125,8 +131,8 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				{
 					char* name = tree->node_data.string;
 					boost::optional<Type*> variable = scopesymtable->find(name);
-					if(!variable && thiscontext != "") {
-						PropertySymbolTable* proptable = objectsymtable->find(thiscontext);
+					if(!variable && thiscontext != NULL) {
+						PropertySymbolTable* proptable = classestable->findModifiable(thiscontext);
 						variable = proptable->find(name);
 						if(variable) {
 							name = strdup(name);
@@ -146,14 +152,17 @@ Type* TypeChecker::typeCheck(Node* tree) {
 
 			case NT_TYPEDATA:
 				{
+					TypeParameterizer parameterizer;
+					parameterizer.writeInParameterizations(&tree->node_data.type, parameterizedtypes);
 					boost::optional<Type*> variable = scopesymtable->find(tree->node_data.type);
-					if(!variable && thiscontext != "") {
-						PropertySymbolTable* proptable = objectsymtable->find(thiscontext);
+					if(!variable && thiscontext != NULL) {
+						PropertySymbolTable* proptable = classestable->findModifiable(thiscontext);
 						variable = proptable->find(scopesymtable->getNameForType(tree->node_data.type));
 						if(variable) {
+							char* propname = strdup(tree->node_data.type->typedata._class.classname);
 							tree->node_type = NT_MEMBER_ACCESS;
 							AddSubNode(tree, MakeEmptyNode(NT_THIS));
-							AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(tree->node_data.type->typedata._class.classname)));
+							AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, propname));
 						}
 					}
 					if(!variable) {
@@ -166,8 +175,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				break;
 
 			case NT_THIS:
-				ret = MakeType(TYPE_CLASS);
-				ret->typedata._class.classname = strdup(thiscontext.c_str());
+				ret = copyType(thiscontext);
 				break;
 
 			case NT_NOTHING:
@@ -528,7 +536,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 						i++;
 					}
 
-					PropertySymbolTable* methodtable = objectsymtable->find(subject->typedata._class.classname);
+					ReadOnlyPropertySymbolTable* methodtable = classestable->find(subject);
 					boost::optional<Type*> lambdatype = methodtable->find(methodtable->getSymbolNameOf(&method_segments));
 
 					if(subject->optional) {
@@ -538,13 +546,13 @@ Type* TypeChecker::typeCheck(Node* tree) {
 
 					if(lambdatype) {
 						ret = copyType((*lambdatype)->typedata.lambda.returntype);
+
+						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(subject->typedata._class.classname)));
+						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(methodtable->getAddress(methodtable->getSymbolNameOf(&method_segments)).c_str())));
 					} else {
 						errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Couldn't find property " + methodtable->getSymbolNameOf(&method_segments) + " on class" + subject->typedata._class.classname, tree));
 						ret = MakeType(TYPE_MATCHALL);
 					}
-
-					AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(subject->typedata._class.classname)));
-					AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(methodtable->getSymbolNameOf(&method_segments).c_str())));
 
 					freeType(subject);
 					for(vector<pair<string, TypeArray*> >::iterator it = method_segments.begin(); it != method_segments.end(); ++it)
@@ -554,8 +562,10 @@ Type* TypeChecker::typeCheck(Node* tree) {
 
 			case NT_DECLARATION:
 				try {
+					TypeParameterizer parameterizer;
+					parameterizer.writeInParameterizations(&tree->node_data.nodes[0]->node_data.type, parameterizedtypes);
 					Type* assignee = tree->node_data.nodes[0]->node_data.type;
-					objectsymtable->assertTypeIsValid(assignee);
+					classestable->assertTypeIsValid(assignee);
 					if(assignee->arrayed && tree->node_data.nodes[1]->subnodes == 0 && tree->node_data.nodes[1]->node_type == NT_ARRAY_DECLARATION) {
 						// Nothing to do here but relax.
 					} else {
@@ -577,8 +587,10 @@ Type* TypeChecker::typeCheck(Node* tree) {
 
 			case NT_CAST:
 				try {
+					TypeParameterizer parameterizer;
+					parameterizer.writeInParameterizations(&tree->node_data.nodes[0]->node_data.type, parameterizedtypes);
 					ret = copyType(tree->node_data.nodes[0]->node_data.type);
-					objectsymtable->assertTypeIsValid(ret);
+					classestable->assertTypeIsValid(ret);
 					Type* casted = typeCheckUsable(tree->node_data.nodes[1]);
 					if(!analyzer->isASubtypeOfB(casted, ret)) {
 						expectedstring = analyzer->getNameForType(ret);
@@ -596,14 +608,16 @@ Type* TypeChecker::typeCheck(Node* tree) {
 			case NT_RETRIEVAL:
 				{
 					Type* provider;
+					TypeParameterizer parameterizer;
+					parameterizer.writeInParameterizations(&tree->node_data.nodes[0]->node_data.type, parameterizedtypes);
 					try {
 						provider = typeCheckUsable(tree->node_data.nodes[2]);
 						ret = copyType(tree->node_data.nodes[0]->node_data.type);
 						//TODO index 1 is the arguments
-						objectsymtable->assertTypeIsValid(ret);
+						classestable->assertTypeIsValid(ret);
 						try {
 							// TODO This does more work than we need to since it recurses
-							objectsymtable->getAnalyzer()->assertClassCanProvide(provider, ret);
+							classestable->getAnalyzer()->assertClassCanProvide(provider, ret);
 						} catch(SemanticError *e) {
 							e->token = tree;
 							errors->addError(e);
@@ -664,7 +678,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 						tree->node_data.nodes[0] = MakeTwoBranchNode(NT_AUTOBOX, node, MakeNodeFromString(NT_COMPILER_HINT, strdup(boxedtype->c_str())));
 						delete boxedtype;
 					}
-					PropertySymbolTable* proptable = objectsymtable->find(subject->typedata._class.classname);
+					ReadOnlyPropertySymbolTable* proptable = classestable->find(subject->typedata._class.classname);
 					string name = tree->node_data.nodes[1]->node_type == NT_ALIAS
 						? tree->node_data.nodes[1]->node_data.string
 						: scopesymtable->getNameForType(tree->node_data.nodes[1]->node_data.type);

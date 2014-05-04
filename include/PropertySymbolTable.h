@@ -1,5 +1,5 @@
-#ifndef HEADER_OBJECT_SYMBOL
-#define HEADER_OBJECT_SYMBOL
+#ifndef HEADER_PROPERTY_SYMBOL
+#define HEADER_PROPERTY_SYMBOL
 #include <map>
 #include <string>
 #include <vector>
@@ -11,21 +11,18 @@ extern "C" {
 	#include "tree.h"
 }
 
+#include "ReadOnlyPropertySymbolTable.h"
 #include "ObjectProperty.h"
 #include "TypeAnalyzer.h"
 #include "SemanticError.h"
 #include "EntryPointAnalyzer.h"
 
-#define PROPERTY_PUBLIC 1
-#define PROPERTY_ABSTRACT 2
-
 using namespace std;
 
-class PropertySymbolTable {
+class PropertySymbolTable : public ReadOnlyPropertySymbolTable {
 	public:
 		PropertySymbolTable(TypeAnalyzer* tanalyzer);
 		~PropertySymbolTable();
-		map<string, bool> parentage;
 		boost::optional<Type*> find(string name);
 		bool isPublic(string name);
 		string getAddress(string name);
@@ -37,16 +34,25 @@ class PropertySymbolTable {
 		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);
 		vector<Type*>* getNeeds();
 		string getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments);
+		string getCasingNameOf(vector<pair<string, TypeArray*> >* segments_arguments);
 		bool isAbstract();
 		string classname;
 		bool abstract;
 		map<string, ObjectProperty*> properties;
+		const map<string, bool>& getParentage();
+		map<string, bool> parentage;
+		void setParameters(vector<Type*>* parameters);
+		const vector<Type*>& getParameters();
+		Type* getAsType();
+
+		ReadOnlyPropertySymbolTable* resolveParameters(vector<Type*>& parameters);
 
 		friend void propagateInheritanceTables(PropertySymbolTable* parent, PropertySymbolTable* child, bool extend);
 
 	private:
 		TypeAnalyzer* analyzer;
 		vector<Type*> needs;
+		vector<Type*>* declaredtypeparameters;
 };
 
 #endif

@@ -1,0 +1,239 @@
+We have Retrievable types:
+
+	provides Int{Version} <- {
+		var Int{Version} <- provider;
+		return Int{Version} <- provider;
+	}
+
+	which can have:
+		parameterization:
+			Container<Int>
+		optionality:
+			Int?
+			Container<Int>?
+		arrays:
+			Int[]
+			Int?[]
+			Int?[]?
+			Container<Int>[]
+			Container<Int>?[]
+			Container<Int>[]?
+			Container<Int>?[]?
+		functions:
+			Int -- fn()
+			Int -- fn()?
+			Int -- fn()[]
+			Int -- fn()?[]?
+		specialties:
+			Container<Int>{Blah}
+			Int?{Blah}
+			Container<Int>?{Blah}
+			Int[]{Blah}
+			Int?[]{Blah}
+			Int?[]?{Blah}
+			Container<Int>[]{Blah}
+			Container<Int>?[]{Blah}
+			Container<Int>[]?{Blah}
+			Container<Int>?[]?{Blah}
+			Int -- fn(){Blah}
+			Int -- fn()?{Blah}
+			Int -- fn()[]{Blah}
+			Int -- fn()?[]?{Blah}
+
+We have pure types:
+
+	Type -- myMethod() { }
+
+	which can have:
+		parameterization:
+			Container<Int>
+		optionality:
+			Int?
+			Container<Int>?
+		arrays:
+			Int[]
+			Int?[]
+			Int?[]?
+			Container<Int>[]
+			Container<Int>?[]
+			Container<Int>[]?
+			Container<Int>?[]?
+		functions:
+			Int -- fn()
+			Int -- fn()?
+			Int -- fn()[]
+			Int -- fn()?[]?
+		specialties:
+
+We have variables which may be types:
+
+	return Int + $Int;
+
+	which can have:
+		Shadow: $Int, $$Int
+
+and we have bindable types:
+
+	myMethod(Int a) {}
+
+	which can have:
+		parameterization:
+			Container<Int>
+		optionality:
+			Int?
+			Container<Int>?
+		arrays:
+			Int[]
+			Int?[]
+			Int?[]?
+			Container<Int>[]
+			Container<Int>?[]
+			Container<Int>[]?
+			Container<Int>?[]?
+		preceding aliases:
+			alias Container<Int>
+			Container<Int> alias
+			alias Int?
+			Int? alias
+			alias Container<Int>?
+			Container<Int>? alias
+			alias Int[]
+			Int[] alias
+			alias Int?[]
+			Int?[] alias
+			alias Int?[]?
+			Int?[]? alias
+			alias Container<Int>[]
+			Container<Int>[] alias
+			alias Container<Int>?[]
+			Container<Int>?[] alias
+			alias Container<Int>[]?
+			Container<Int>[]? alias
+			alias Container<Int>?[]?
+			Container<Int>?[]? alias
+		shadows:
+			$Container<Int>
+			$Int?
+			$Container<Int>?
+			$Int[]
+			$Int?[]
+			$Int?[]?
+			$Container<Int>[]
+			$Container<Int>?[]
+			$Container<Int>[]?
+			$Container<Int>?[]?
+		aliased functions:
+			myfn Int -- fn()
+			Int -- fn() myfn
+			myfn Int -- fn()?
+			Int -- fn()? myfn
+			myfn Int -- fn()[]
+			Int -- fn()[] myfn
+			myfn Int -- fn()?[]?
+			Int -- fn()?[]? myfn
+
+and we have specializable bindable types
+
+		parameterization:
+			Container<Int>
+		optionality:
+			Int?
+			Container<Int>?
+		arrays:
+			Int[]
+			Int?[]
+			Int?[]?
+			Container<Int>[]
+			Container<Int>?[]
+			Container<Int>[]?
+			Container<Int>?[]?
+		preceding aliases:
+			alias Container<Int>
+			Container<Int> alias
+			alias Int?
+			Int? alias
+			alias Container<Int>?
+			Container<Int>? alias
+			alias Int[]
+			Int[] alias
+			alias Int?[]
+			Int?[] alias
+			alias Int?[]?
+			Int?[]? alias
+			alias Container<Int>[]
+			Container<Int>[] alias
+			alias Container<Int>?[]
+			Container<Int>?[] alias
+			alias Container<Int>[]?
+			Container<Int>[]? alias
+			alias Container<Int>?[]?
+			Container<Int>?[]? alias
+		shadows:
+			$Container<Int>
+			$Int?
+			$Container<Int>?
+			$Int[]
+			$Int?[]
+			$Int?[]?
+			$Container<Int>[]
+			$Container<Int>?[]
+			$Container<Int>[]?
+			$Container<Int>?[]?
+		aliased functions:
+			myfn Int -- fn()
+			Int -- fn() myfn
+			myfn Int -- fn()?
+			Int -- fn()? myfn
+			myfn Int -- fn()[]
+			Int -- fn()[] myfn
+			myfn Int -- fn()?[]?
+			Int -- fn()?[]? myfn
+		specialties:
+			Container<Int>{Blah}
+			Int?{Blah}
+			Container<Int>?{Blah}
+			Int[]{Blah}
+			Int?[]{Blah}
+			Int?[]?{Blah}
+			Container<Int>[]{Blah}
+			Container<Int>?[]{Blah}
+			Container<Int>[]?{Blah}
+			Container<Int>?[]?{Blah}
+			alias Container<Int>{Blah}
+			Container<Int>{Blah} alias
+			alias Int?{Blah}
+			Int?{Blah} alias
+			alias Container<Int>?{Blah}
+			Container<Int>?{Blah} alias
+			alias Int[]{Blah}
+			Int[]{Blah} alias
+			alias Int?[]{Blah}
+			Int?[]{Blah} alias
+			alias Int?[]?{Blah}
+			Int?[]?{Blah} alias
+			alias Container<Int>[]{Blah}
+			Container<Int>[]{Blah} alias
+			alias Container<Int>?[]{Blah}
+			Container<Int>?[]{Blah} alias
+			alias Container<Int>[]?{Blah}
+			Container<Int>[]?{Blah} alias
+			alias Container<Int>?[]?{Blah}
+			Container<Int>?[]?{Blah} alias
+			$Container<Int>{Blah}
+			$Int?{Blah}
+			$Container<Int>?{Blah}
+			$Int[]{Blah}
+			$Int?[]{Blah}
+			$Int?[]?{Blah}
+			$Container<Int>[]{Blah}
+			$Container<Int>?[]{Blah}
+			$Container<Int>[]?{Blah}
+			$Container<Int>?[]?{Blah}
+			myfn Int -- fn(){Blah}
+			Int -- fn(){Blah} myfn
+			myfn Int -- fn()?{Blah}
+			Int -- fn()?{Blah} myfn
+			myfn Int -- fn()[]{Blah}
+			Int -- fn()[]{Blah} myfn
+			myfn Int -- fn()?[]?{Blah}
+			Int -- fn()?[]?{Blah} myfn

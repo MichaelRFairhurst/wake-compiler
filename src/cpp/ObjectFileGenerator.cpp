@@ -57,7 +57,6 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_INJECTION_ARG:
 		case NT_CTOR:
 		case NT_PARENT:
-		case NT_CLASSNAME:
 		case NT_LAMBDA_INVOCATION:
 		case NT_CAST:
 			{
@@ -78,11 +77,11 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_CLASS:
 			{
 				table.pushScope();
-				classname = tree->node_data.nodes[0]->node_data.string;
+				classname = tree->node_data.nodes[0]->node_data.type->typedata._class.classname;
 				header->addClassUsage(file.tellp(), classname);
 				file << "=function(";
 
-				vector<Type*>* needs = objects->find(classname)->getNeeds();
+				vector<Type*>* needs = classes->find(classname)->getNeeds();
 				for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
 					table.add(*it);
 					if(it != needs->begin()) file << ",";
@@ -100,25 +99,25 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 		case NT_PROVISION:
 			file << "this.";
-			header->addPropertyUsage(file.tellp(), objects->find(classname)->getProvisionSymbol(tree->node_data.nodes[0]->node_data.type));
+			header->addPropertyUsage(file.tellp(), classes->find(classname)->getProvisionSymbol(tree->node_data.nodes[0]->node_data.type));
 			file << "=function(){";
 			if(tree->subnodes == 1) {
 				string provisionname = tree->node_data.nodes[0]->node_data.type->typedata._class.classname;
 				file << "return new ";
 				header->addClassUsage(file.tellp(), provisionname);
 				file << "(";
-				vector<Type*>* needs = objects->find(provisionname)->getNeeds();
+				vector<Type*>* needs = classes->find(provisionname)->getNeeds();
 				for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
 					if(it != needs->begin()) file << ",";
 					file << "this.";
-					header->addPropertyUsage(file.tellp(), objects->find(classname)->getProvisionSymbol(*it));
+					header->addPropertyUsage(file.tellp(), classes->find(classname)->getProvisionSymbol(*it));
 					file << "()";
 				}
 				file << ");";
 			} else {
 				if(tree->node_data.nodes[1]->node_type == NT_TYPEDATA) {
 					file << "return this.";
-					header->addPropertyUsage(file.tellp(), objects->find(classname)->getProvisionSymbol(tree->node_data.nodes[1]->node_data.type));
+					header->addPropertyUsage(file.tellp(), classes->find(classname)->getProvisionSymbol(tree->node_data.nodes[1]->node_data.type));
 					file << "();";
 				}
 			}
@@ -154,10 +153,10 @@ void ObjectFileGenerator::generate(Node* tree) {
 			table.pushScope();
 			{
 				string name = tree->node_data.nodes[tree->subnodes - 1]->node_data.string;
-				TypeArray* arguments = (*objects->find(classname)->find(name))->typedata.lambda.arguments;
+				TypeArray* arguments = (*classes->find(classname)->find(name))->typedata.lambda.arguments;
 				int i;
 
-				//file << "this." << objects->find(classname)->getAddress(name) << "=function(";
+				//file << "this." << classes->find(classname)->getAddress(name) << "=function(";
 				file << "this.";
 				header->addPropertyUsage(file.tellp(), name);
 				file << "=function(";
@@ -189,7 +188,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 				string methodclass = tree->node_data.nodes[tree->subnodes - 2]->node_data.string;
 				string name = tree->node_data.nodes[tree->subnodes - 1]->node_data.string;
 
-				//file << "." << objects->find(methodclass)->getAddress(name) << "(";
+				//file << "." << classes->find(methodclass)->getAddress(name) << "(";
 				file << ".";
 				header->addPropertyUsage(file.tellp(), name);
 				file << "(";
@@ -224,7 +223,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 				string providerclass = tree->node_data.nodes[tree->subnodes - 1]->node_data.string;
 
 				file << ".";
-				header->addPropertyUsage(file.tellp(), objects->find(providerclass)->getProvisionSymbol(tree->node_data.nodes[0]->node_data.type));
+				header->addPropertyUsage(file.tellp(), classes->find(providerclass)->getProvisionSymbol(tree->node_data.nodes[0]->node_data.type));
 				file << "()";
 			}
 			break;
@@ -297,7 +296,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_SUBCLASS:
-			header->addClassUsage(file.tellp(), tree->node_data.string);
+			header->addClassUsage(file.tellp(), tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
 			file << ".call(this);";
 			break;
 
