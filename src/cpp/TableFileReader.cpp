@@ -156,7 +156,6 @@ void TableFileReader::readTypeCommon(Type* type, istream& s) {
 }
 
 void TableFileReader::readMethod(PropertySymbolTable* table, istream& s) {
-	//cout << "reading method" << endl;
 	ObjectProperty* prop = new ObjectProperty();
 	string name = readString(s);
 	prop->casing = readString(s);

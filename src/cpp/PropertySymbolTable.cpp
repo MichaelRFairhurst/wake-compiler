@@ -170,6 +170,7 @@ void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable*
 			ObjectProperty* propagate = new ObjectProperty;
 			propagate->type = copyType(it->second->type);
 			propagate->flags = it->second->flags;
+			propagate->casing = it->second->casing;
 			propagate->address = it->second->address;
 			if(!extend) {
 				propagate->flags |= PROPERTY_ABSTRACT;
