@@ -1,0 +1,29 @@
+import Printer;
+
+every Comparer{T} is:
+
+	needs Printer;
+
+	that(T)Equals($T) {
+		if(T != $T) {
+			Printer.printLine("Unequal comparison");
+		}
+	}
+
+	that(T?)Equals($T) {
+		that($T)Equals(T);
+	}
+
+	that(T)Equals($T?) {
+		if $T exists {
+			that(T)Equals($T);
+		} else {
+			that($T)IsNothing();
+		}
+	}
+
+	that(T?)IsNothing() {
+		if T exists {
+			Printer.printLine("Not nothing");
+		}
+	}

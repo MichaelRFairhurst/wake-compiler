@@ -1,5 +1,7 @@
 import Asserts;
 import SimpleGeneric;
+import Comparer;
+import Printer;
 
 every GenericTest is:
 
@@ -9,22 +11,22 @@ every GenericTest is:
 		nested SimpleGeneric{SimpleGeneric{Int, Text}, SimpleGeneric{Text, Int}};
 
 	Bool -- ~[ test all start out as nothing in methods ]~ (Asserts) {
-		Asserts.that(intText.getT1Optional() == nothing);
-		Asserts.that(intText.getT2Optional() == nothing);
-		Asserts.that(textInt.getT1Optional() == nothing);
-		Asserts.that(textInt.getT2Optional() == nothing);
-		Asserts.that(nested.getT1Optional() == nothing);
-		Asserts.that(nested.getT2Optional() == nothing);
+		(Comparer{Int} <- Asserts).that(intText.getT1Optional())IsNothing();
+		(Comparer{Text} <- Asserts).that(intText.getT2Optional())IsNothing();
+		(Comparer{Text} <- Asserts).that(textInt.getT1Optional())IsNothing();
+		(Comparer{Int} <- Asserts).that(textInt.getT2Optional())IsNothing();
+		(Comparer{SimpleGeneric{Int, Text}} <- Asserts).that(nested.getT1Optional())IsNothing();
+		(Comparer{SimpleGeneric{Text, Int}} <- Asserts).that(nested.getT2Optional())IsNothing();
 		return Asserts.allPassed();
 	}
 
 	Bool -- ~[ test get otherwise in methods ]~ (Asserts) {
-		Asserts.that(intText.getT1Otherwise(5) == 5);
-		Asserts.that(intText.getT2Otherwise("hello") == "hello");
-		Asserts.that(textInt.getT1Otherwise("hello") == "hello");
-		Asserts.that(textInt.getT2Otherwise(5) == 5);
-		Asserts.that(nested.getT1Otherwise(intText) == intText);
-		Asserts.that(nested.getT2Otherwise(textInt) == textInt);
+		Asserts.that(intText.getT1Otherwise(5))Equals(5);
+		Asserts.that(intText.getT2Otherwise("hello"))Equals("hello");
+		Asserts.that(textInt.getT1Otherwise("hello"))Equals("hello");
+		Asserts.that(textInt.getT2Otherwise(5))Equals(5);
+		Asserts.that(nested.getT1Otherwise(intText))Equals(intText);
+		Asserts.that(nested.getT2Otherwise(textInt))Equals(textInt);
 		return Asserts.allPassed();
 	}
 
@@ -32,38 +34,69 @@ every GenericTest is:
 		intText.setT1(4); intText.setT2("hi");
 		textInt.setT1("hey"); textInt.setT2(6);
 		nested.setT1(intText); nested.setT2(textInt);
-		Asserts.that(intText.getT1Optional() == 4);
-		Asserts.that(intText.getT2Optional() == "hi");
-		Asserts.that(textInt.getT1Optional() == "hey");
-		Asserts.that(textInt.getT2Optional() == 6);
-		Asserts.that(nested.getT1Optional() == intText);
-		Asserts.that(nested.getT2Optional() == textInt);
+		(Comparer{Int} <- Asserts).that(intText.getT1Optional())Equals(4);
+		(Comparer{Text} <- Asserts).that(intText.getT2Optional())Equals("hi");
+		(Comparer{Text} <- Asserts).that(textInt.getT1Optional())Equals("hey");
+		(Comparer{Int} <- Asserts).that(textInt.getT2Optional())Equals(6);
+		(Comparer{SimpleGeneric{Int, Text}} <- Asserts).that(nested.getT1Optional())Equals(intText);
+		(Comparer{SimpleGeneric{Text, Int}} <- Asserts).that(nested.getT2Optional())Equals(textInt);
 		return Asserts.allPassed();
 	}
 
 	Bool -- ~[ test unset and then all is nothing ]~ (Asserts) {
 		intText.unsetT1();
-		Asserts.that(intText.getT1Optional() == nothing);
+		(Comparer{Int} <- Asserts).that(intText.getT1Optional())IsNothing();
 		intText.unsetT2();
-		Asserts.that(intText.getT2Optional() == nothing);
+		(Comparer{Text} <- Asserts).that(intText.getT2Optional())IsNothing();
 		textInt.unsetT1();
-		Asserts.that(textInt.getT1Optional() == nothing);
+		(Comparer{Text} <- Asserts).that(textInt.getT1Optional())IsNothing();
 		textInt.unsetT2();
-		Asserts.that(textInt.getT2Optional() == nothing);
+		(Comparer{Int} <- Asserts).that(textInt.getT2Optional())IsNothing();
 		nested.unsetT1();
-		Asserts.that(nested.getT1Optional() == nothing);
+		(Comparer{SimpleGeneric{Int, Text}} <- Asserts).that(nested.getT1Optional())IsNothing();
 		nested.unsetT2();
-		Asserts.that(nested.getT2Optional() == nothing);
+		(Comparer{SimpleGeneric{Text, Int}} <- Asserts).that(nested.getT2Optional())IsNothing();
 		return Asserts.allPassed();
 	}
 
-	#>
 	Bool -- ~[ test all start out as nothing in properties]~ (Asserts) {
-		Asserts.that(intText.getT1Optional() == nothing);
-		Asserts.that(intText.getT2Optional() == nothing);
-		Asserts.that(textInt.getT1Optional() == nothing);
-		Asserts.that(textInt.getT2Optional() == nothing);
-		Asserts.that(nested.getT1Optional() == nothing);
-		Asserts.that(nested.getT2Optional() == nothing);
+		(Comparer{Int} <- Asserts).that(intText.T1)IsNothing();
+		(Comparer{Text} <- Asserts).that(intText.T2)IsNothing();
+		(Comparer{Text} <- Asserts).that(textInt.T1)IsNothing();
+		(Comparer{Int} <- Asserts).that(textInt.T2)IsNothing();
+		(Comparer{SimpleGeneric{Int, Text}} <- Asserts).that(nested.T1)IsNothing();
+		(Comparer{SimpleGeneric{Text, Int}} <- Asserts).that(nested.T2)IsNothing();
+		return Asserts.allPassed();
 	}
-	##
+
+	Bool -- ~[ test set and then get in properties]~ (Asserts) {
+		intText.T1 = 5;
+		(Comparer{Int} <- Asserts).that(intText.T1)Equals(5);
+		intText.T2 = "hello";
+		(Comparer{Text} <- Asserts).that(intText.T2)Equals("hello");
+		textInt.T1 = "yo";
+		(Comparer{Text} <- Asserts).that(textInt.T1)Equals("yo");
+		textInt.T2 = 6;
+		(Comparer{Int} <- Asserts).that(textInt.T2)Equals(6);
+		nested.T1 = intText;
+		(Comparer{SimpleGeneric{Int, Text}} <- Asserts).that(nested.T1)Equals(intText);
+		nested.T2 = textInt;
+		(Comparer{SimpleGeneric{Text, Int}} <- Asserts).that(nested.T2)Equals(textInt);
+		return Asserts.allPassed();
+	}
+
+	Bool -- ~[ test unset and then all is nothing in properties ]~ (Asserts) {
+		intText.T1 = nothing;
+		(Comparer{Int} <- Asserts).that(intText.T1)IsNothing();
+		intText.T2 = nothing;
+		(Comparer{Text} <- Asserts).that(intText.T2)IsNothing();
+		textInt.T1 = nothing;
+		(Comparer{Text} <- Asserts).that(textInt.T1)IsNothing();
+		textInt.T2 = nothing;
+		(Comparer{Int} <- Asserts).that(textInt.T2)IsNothing();
+		nested.T1 = nothing;
+		(Comparer{SimpleGeneric{Int, Text}} <- Asserts).that(nested.T1)IsNothing();
+		nested.T2 = nothing;
+		(Comparer{SimpleGeneric{Text, Int}} <- Asserts).that(nested.T2)IsNothing();
+		return Asserts.allPassed();
+	}

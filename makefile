@@ -55,7 +55,8 @@ WAKENAMES=ArrayTest.wk \
 			PropertyTest.wk \
 			AutoboxingTest.wk \
 			SimpleGeneric.wk \
-			GenericTest.wk
+			GenericTest.wk \
+			Comparer.wk
 
 WAKEOBJS=$(addprefix bin/wakeobj/, $(WAKENAMES:.wk=.o))
 
@@ -169,7 +170,10 @@ bin/wakeobj/InheritanceTestInterface.o: src/wake/test/InheritanceTestInterface.w
 bin/wakeobj/InheritanceTest.o: src/wake/test/InheritanceTest.wk bin/wake bin/wakeobj/InheritanceTestInterface.o bin/wakeobj/InheritanceTestOverride.o bin/wakeobj/InheritanceTestFallthrough.o bin/wakeobj/Asserts.o
 	time ./bin/wake -d bin/waketable $< -o $@
 
-bin/wakeobj/Asserts.o: src/wake/stdlib/Asserts.wk bin/wake $(WAKETABLEOBJS)
+bin/wakeobj/Asserts.o: src/wake/stdlib/Asserts.wk bin/wakeobj/Comparer.o bin/wake $(WAKETABLEOBJS)
+	time ./bin/wake -d bin/waketable $< -o $@
+
+bin/wakeobj/Comparer.o: src/wake/stdlib/Comparer.wk bin/wake $(WAKETABLEOBJS)
 	time ./bin/wake -d bin/waketable $< -o $@
 
 bin/wakeobj/%.o: src/wake/test/%.wk bin/wake $(WAKETABLEOBJS)

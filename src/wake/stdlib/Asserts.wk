@@ -1,4 +1,6 @@
 import Printer;
+import Comparer;
+import SimpleGeneric;
 
 #>
 # This takes assertions and prints failures, and then reports
@@ -8,6 +10,14 @@ import Printer;
 every Asserts is:
 
 	needs Printer;
+
+	provides
+		Comparer{Int},
+		Comparer{Text},
+		Comparer{Bool},
+		Comparer{SimpleGeneric{Int, Text}},
+		Comparer{SimpleGeneric{Text, Int}},
+		Printer;
 
 	with Bool hasfailed = false;
 	with Text lasttext = "";

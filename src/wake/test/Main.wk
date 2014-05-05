@@ -110,6 +110,7 @@ every Main is:
 		run(GenericTest.~[ test get otherwise in methods ]~(Asserts <- this), "test get otherwise in methods");
 		run(GenericTest.~[ test set and then get in methods ]~(Asserts <- this), "test set and then get in methods");
 		run(GenericTest.~[ test unset and then all is nothing ]~(Asserts <- this), "test unset and then all is nothing");
+		run(GenericTest.~[ test unset and then all is nothing ]~(Asserts <- this), "test unset and then all is nothing");
 
 		Printer.printLine("");
 		Printer.printLine("");
