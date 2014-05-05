@@ -22,7 +22,7 @@
 				<li><a href="#text">- Text</a></li>
 				<li><a href="#bool">- Bool</a></li>
 				<li><a href="#array">- Array</a></li>
-				<li><a href="#missingfeats">Known Issues</a></li>
+				<li><a href="#knownisssues">Known Issues</a></li>
 				<li><a href="#optionalarrays">- Optional Arrays</a></li>
 				<li><a href="#inheritneeds">- Inheritance + Needs</a></li>
 				<li><a href="#genericprops">- Generic Properties</a></li>
@@ -149,17 +149,52 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
 				<h3 id="array">Array</h1>
 				<p>stub</p>
 				<br/>
-				<h1 id="missingfeats">Known Issues</h1>
+				<h1 id="knownisssues">Known Issues</h1>
 				<p>stub</p>
 				<br/>
 				<h3 id="optionalarrays">Optional Arrays</h1>
-				<p>stub</p>
+				<p>Before I had optional types, I had array types. When adding optional types I did not consider that they could be combined. Int?[] and Int[]? were parse errors and all was well, albeit incomplete.</p>
+				<p>Now I think Int?[] and Int[]? are still parse errors, but at the very least its possible that these types will appear out in the wild through generics, since a class which returns T[] can be instantiated like Class{Int?}.</p>
+				<p>Anyways, the end result of this is that a type which is both optional and an array, acts as both an optional type, and an array. So depending on how it was used and when you call exists {}, its possible to access an index off of nothing, which makes your program explode.</p>
+			<span class="label label-info">wake</span>
+			<pre><code class="wake"
+>every Main is:
+
+    getElementOutOfNothing() {
+        var Int?[] = nothing;
+        var Int? yourProgramExplodesHere = Int[0];
+    }</code></pre>
+				<p>This fix is important but also requires essentially rewriting all array or all optional code. So it may be quite a while.</p>
 				<br/>
 				<h3 id="inheritneeds">Inheritance + Needs</h1>
-				<p>stub</p>
+				<p>For the sake of javascript optimization, I originally did not makes needs properties. Bad call, turns out, once you want to inherit from a class with needs. They won't be there!</p>
+			<span class="label label-info">wake</span>
+			<pre><code class="wake"
+>every ParentClassWithNeed is:
+
+    needs Printer;
+
+    usePrinter() {
+        Printer.printLine("This crashes when called on a ChildClass");
+    }
+
+every ChildClass (a ParentClassWithNeed) is:
+   // no class body necessary</code></pre>
 				<br/>
 				<h3 id="genericprops">Generic Properties</h1>
-				<p>stub</p>
+				<p>When a generic class has a generic type served as a public property, it isn't paramterized the way methods are. The name doesn't change and the type doesn't change either.</p>
+			<span class="label label-info">wake</span>
+			<pre><code class="wake"
+>every Generic{T} is:
+
+    with public T?;
+
+    typeErrors(Generic{Int}) {
+        var Int? = Generic.Int; // Doesn't compile: unknown property Int
+        var Int? = Generic.T; // Doesn't compile: expected: Int?, actual: T?
+        var T? wat = Generic.T; // Successfully compiles: WAT
+    }</code></pre>
+				<p>This is easy to fix, just low priority. Ping me for a, most likely, same-day fix.</p>
 				<br/>
 				<h3 id="overlappinggenerics">Overlapping Generics</h1>
 				<p>stub</p>
