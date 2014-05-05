@@ -47,7 +47,7 @@
 
 			<h1 id="installing">Installing</h1>
 			<p>I still need to build for windows, so somebody help me out with this. I've done it before, you just need gnu for windows and then some common libraries like yacc and lexx</p>
-			<p>On linux, clone the github repo, run <code>yum install bison-devel flex-devel libboost-devel</code> and then <code>make -DTEST=false</code> to get bin/wake and bin/wakeobj/libstd.o and bin/waketables/.</p>
+			<p>On linux, clone the github repo, run <code>yum install bison-devel flex-devel libboost-devel</code> and then <code>make TEST=false</code> to get bin/wake and bin/wakeobj/libstd.o and bin/waketables/.</p>
 			<p>Once built, you simply need wake.exe in your PATH.</p>
 			<p>You should also choose a place for where the standard library will live. This consists of two parts: stdlib.o and a directory of .table files. At the moment, the compiler can only use one directory of .table files, so you'll have to copy these files into every project.</p>
 			<p>At the moment wake only compiles into javascript, so install node too, if you want to run anything!</p>
