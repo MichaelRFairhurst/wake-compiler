@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Wake The Language</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<!-- Bootstrap -->
+		<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+		<link rel="stylesheet" href="/highlight.js/styles/tomorrow.css">
+		<script src="/highlight.js/highlight.pack.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script type="text/javascript" src="page.js"></script>
+		<link rel="stylesheet" type="text/css" href="page.css">
+	</head>
+	<body>
+		<div class="mynavbar">
+			<ul class="nav nav-tabs nav-stacked">
+				<li><a href="#installing">Installing</a></li>
+				<li><a href="#firstprogram">A First Program</a></li>
+				<li><a href="#compiling">Compiling</a></li>
+				<li><a href="#stdlib">Standard Library</a></li>
+				<li><a href="#ints">- Int</a></li>
+				<li><a href="#text">- Text</a></li>
+				<li><a href="#bool">- Bool</a></li>
+				<li><a href="#array">- Array</a></li>
+				<li><a href="#missingfeats">Missing Features + Workarounds</a></li>
+				<li><a href="#genericprovs">- Generic Provisions</a></li>
+				<li><a href="#genericprops">- Generic Properties</a></li>
+				<li><a href="#genericmethods">- Generic Methods</a></li>
+				<li><a href="#publicneeds">- Public Needs</a></li>
+				<li><a href="#ctorargs">- Constructor Arguments</a></li>
+				<li><a href="#inheritneeds">- Inheritance + Needs</a></li>
+				<li><a href="#behavioralprovisions">- Behavioral Provisions</a></li>
+				<li><a href="#reflection">- Reflection</a></li>
+				<li><a href="#exceptions">- Exceptions</a></li>
+				<li><a href="#recursiveimports">- Recursive Imports</a></li>
+				<li><a href="#lvaluesexist">- Exists on some L-Values</a></li>
+			</ul>
+		</div>
+		<div class="opennav"><button class="btn btn-inverse btn-small"><i class="icon-align-justify icon-white"></i></button></div>
+		<div class="content" data-spy="scroll" data-target=".mynavbar">
+			<div class="hero-unit" id="intro">
+				<h1>Wake The Language</h1>
+				<p>
+					Wake is a fast, expressive, typesafe language that gives you testability from the ground up.
+				</p>
+			</div>
+
+			<h1 id="installing">Installing</h1>
+			<p>I still need to build for windows, so somebody help me out with this. I've done it before, you just need gnu for windows and then some common libraries like yacc and lexx</p>
+			<p>On linux, clone the github repo, run <code>yum install bison-devel flex-devel libboost-devel</code> and then <code>make -DTEST=false</code> to get bin/wake and bin/wakeobj/libstd.o and bin/waketables/.</p>
+			<p>Once built, you simply need wake.exe in your PATH.</p>
+			<p>You should also choose a place for where the standard library will live. This consists of two parts: stdlib.o and a directory of .table files. At the moment, the compiler can only use one directory of .table files, so you'll have to copy these files into every project.</p>
+			<p>At the moment wake only compiles into javascript, so install node too, if you want to run anything!</p>
+			<p>I recommend something like this, in ~/wake</p>
+			<pre>
+~/wake
+  ├──installation/
+  │  ├──wake.exe
+  │  ├──stdlib.o
+  │  └──tables/
+  │     └──{table files here}
+  └──projects/
+     └──{project folders here}
+</pre>
+<br/>
+			<h1 id="firstprogram">A first program</h1>
+			<p>Create the following directory structure wherever you'd like your project to live</p>
+			<pre>
+~/projects
+  └──YourFirstProject/
+     ├──bin/
+     │  ├──obj/
+     │  │  └──{compiled files here}
+     │  └──tables/
+     │     └──{stlib tables and your tables here}
+     └──src/
+        ├──Main.wk
+        └──Hello.wk
+</pre>
+			<p>Copy all the table files from ~/wake/installation/tables/ into ~/projects/YourFirstProject/bin/obj/tables. This step won't always be necessary! :)</p>
+			<p>Then put this source code in these files. This program doesn't need two files, but its a good introduction to provisions.</p>
+			<span class="label label-info">Main.wk</span>
+			<pre><code class="wake"
+>import Printer;
+import Hello;
+
+every Main is:
+
+    provides Hello,
+        Printer,
+        Text:HelloText &lt;- "dependency injection!";
+
+    theMainMethod() {
+        var Hello &lt;- this;
+        Hello.hello();
+    }</code></pre>
+			<p>First of all, we use standard importing to get both the standard library's Printer, and secondly we import our own file Hello.wk (which we haven't written yet)</p>
+			<p><code>every Main is:</code> is a basic class definition. We define a class named Main, and then in it we say our Main can construct our class <code>Hello</code>. The other stuff we provide here is stuff needed by the class Hello. If we forgot to include it, the compiler would tell us to.</pre>
+			<p>In <code>theMainMethod()</code> we say <code>var Hello &lt;- this;</code>, which creates a Hello using our Main object, and assigns it to a variable named <code>Hello</code>. Then we can say <code>Hello.hello()</code> to call methods on it.</p>
+			<span class="label label-info">Hello.wk</span>
+			<pre><code class="wake"
+>import Printer;
+
+every Hello is:
+
+    needs Printer, Text:HelloText;
+
+    hello()
+        Printer.printLine("Hello " + Text);
+    }</code></pre>
+		<p>Once again we import Printer, and once again we have a class definition - <code>every Hello is:</code>. However, this time we do not <code>provide</code> objects, but rather, we <code>need</code> them.</p>
+		<p>These relate one-to-one with Main. Because Hello needs a Printer, Main provides one. But we also need <code>Text:HelloText</code>. This is an injected Text identified by a custom name. We called it <code>HelloText</code>.</p>
+		<p>As you can see in the method <code>hello()</code>, our needs are not only types, but also variables. We can use <code>Printer</code> like a variable, and we print "Hello" added to our variable <code>Text</code> (the :HelloText portion is only used for dependency injection). Its a simple example of how Hello does not know how its printing, and it does not know what it's saying Hello to. This is simple Dependency Injection.<p>
+		<p>As you might expect, this program will print "Hello dependency injection!". But we have to compile it first!</p>
+		<Br/>
+
+		<h1 id="compiling">Compiling</h1>
+		<p>To compile a wake program, we have to compile each file separately and then link them all together in the end. Additionally, at the moment, we have to be careful about the order we compile things in. Each file you compile needs to know the table directory to read & write from. The linker stage needs to know where your program begins, requiring the table directory, and where to find the standard library.</p>
+		<p>In the wake compiler source code, we automatically compile the standard library and some test files. It uses the program <code>make</code> to manage compilation order and rebuilding stale files. If you know make, it pairs well with wake.</p>
+		<p>If you don't know or don't want to use make, then either run these commands by hand or put them in a script.</p>
+		<pre>
+wake -d bin/tables -o bin/obj/Hello.o src/Hello.wk
+wake -d bin/tables -o bin/obj/Main.o src/Main.wk
+wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.o -o bin/YourFirstProgram.js --mainclass Main --mainmethod 'myMainMethod()'
+</pre>
+		<p>You can use <code>-c</code> instead of <code>--mainclass</code>, and <code>-m</code> instead of <code>--mainmethod</code> if you'd like, and if you start at <code>Main.main()</code> you can skip these options entirely. Eventually most all of these command switches will have default values like this.</p>
+
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+	</body>
+</html>
