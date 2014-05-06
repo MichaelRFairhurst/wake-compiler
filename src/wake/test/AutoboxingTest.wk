@@ -8,9 +8,9 @@ every AutoboxingTest is:
 	}
 
 	Bool -- testAbsoluteValue(Asserts) {
-		Asserts.that(5.absoluteValue())Equals(5);
-		Asserts.that(0.absoluteValue())Equals(0);
-		Asserts.that(-3.absoluteValue())Equals(3);
+		Asserts.that(5.abs())Equals(5);
+		Asserts.that(0.abs())Equals(0);
+		Asserts.that(-3.abs())Equals(3);
 		// TODO...NEGATIVES
 		return Asserts.allPassed();
 	}

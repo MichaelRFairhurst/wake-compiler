@@ -1,7 +1,7 @@
 every Int is:
 
 	Int -- squared() { return 0; }
-	Int -- absoluteValue() { return 0; } // ABS FAILS
+	Int -- abs() { return 0; }
 
 	Int -- orMaxOf(Int) { return 0; }
 	Int -- orMaxOf(Int[]) { return 0; }

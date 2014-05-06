@@ -33,7 +33,7 @@ var$ b='';
 		return$ a * a;
 	};
 
-	this.`absoluteValue()` = function() {
+	this.`abs()` = function() {
 		return$ a < 0 ? a * -1 : a;
 	};
 
@@ -62,7 +62,7 @@ var$ b='';
 	};
 
 	this.`numberOfDigits()` = function(b) {
-		var$ b = 1, c = this.`absoluteValue()`();
+		var$ b = 1, c = this.`abs()`();
 		while((c /= 10) > 1) b++;
 		return$ b;
 	};
