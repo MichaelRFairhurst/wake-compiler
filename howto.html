@@ -24,6 +24,7 @@
 				<li><a href="#array">- Array</a></li>
 				<li><a href="#knownisssues">Known Issues</a></li>
 				<li><a href="#optionalarrays">- Optional Arrays</a></li>
+				<li><a href="#nestedoptionals">- Nested Optionals</a></li>
 				<li><a href="#inheritneeds">- Inheritance + Needs</a></li>
 				<li><a href="#genericprops">- Generic Properties</a></li>
 				<li><a href="#overlappinggenerics">- Overlapping Generics</a></li>
@@ -33,15 +34,19 @@
 				<li><a href="#missingfeats">Missing Features + Workarounds</a></li>
 				<li><a href="#ctorargs">- Constructor Arguments</a></li>
 				<li><a href="#parentmethods">- Parent Method Calls</a></li>
+				<li><a href="#commonclass">- Common Object Class</a></li>
 				<li><a href="#namespaces">- Namespaces</a></li>
 				<li><a href="#nothingargs">- "Nothing" as an Argument</a></li>
+				<li><a href="#arrayliterals">- Array Literals</a></li>
 				<li><a href="#genericprovs">- Generic Provisions</a></li>
 				<li><a href="#genericinheritance">- Generic Inheritance</a></li>
 				<li><a href="#genericmethods">- Generic Methods</a></li>
+				<li><a href="#genericranges">- Generic Ranges</a></li>
 				<li><a href="#switchcase">- Switch/Case</a></li>
 				<li><a href="#behavioralprovisions">- Behavioral Provisions</a></li>
 				<li><a href="#reflection">- Reflection</a></li>
 				<li><a href="#exceptions">- Exceptions</a></li>
+				<li><a href="#enums">- Enums</a></li>
 				<li><a href="#recursiveimports">- Recursive Imports</a></li>
 			</ul>
 		</div>
@@ -137,22 +142,22 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
 				<h1 id="stdlib">Standard Library</h1>
 				<p>stub</p>
 				<br/>
-				<h3 id="ints">Int</h1>
+				<h3 id="ints">Int</h3>
 				<p>stub</p>
 				<br/>
-				<h3 id="text">Text</h1>
+				<h3 id="text">Text</h3>
 				<p>stub</p>
 				<br/>
-				<h3 id="bool">Bool</h1>
+				<h3 id="bool">Bool</h3>
 				<p>stub</p>
 				<br/>
-				<h3 id="array">Array</h1>
+				<h3 id="array">Array</h3>
 				<p>stub</p>
 				<br/>
 				<h1 id="knownisssues">Known Issues</h1>
-				<p>stub</p>
+				<p>These issues have the potential to crash/corrupt a running program. Some are pretty standard use cases - sorry! And others are pretty obscure/obviously wrong at compile-time.</p>
 				<br/>
-				<h3 id="optionalarrays">Optional Arrays</h1>
+				<h3 id="optionalarrays">Optional Arrays</h3>
 				<p>Before I had optional types, I had array types. When adding optional types I did not consider that they could be combined. Int?[] and Int[]? were parse errors and all was well, albeit incomplete.</p>
 				<p>Now I think Int?[] and Int[]? are still parse errors, but at the very least its possible that these types will appear out in the wild through generics, since a class which returns T[] can be instantiated like Class{Int?}.</p>
 				<p>Anyways, the end result of this is that a type which is both optional and an array, acts as both an optional type, and an array. So depending on how it was used and when you call exists {}, its possible to access an index off of nothing, which makes your program explode.</p>
@@ -166,7 +171,20 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
     }</code></pre>
 				<p>This fix is important but also requires essentially rewriting all array or all optional code. So it may be quite a while.</p>
 				<br/>
-				<h3 id="inheritneeds">Inheritance + Needs</h1>
+				<h3 id="nestedoptionals">Nested Optionals</h3>
+				<p>Another thing I had not considered when implementing optionals is that "null" is an idequate runtime representation of a true optional type system. What can optional types do that nulls can't? Nest, that's what!</p>
+			<pre><code class="wake"
+>every Main is:
+
+    nestedOptionalsInteractingWithExists() {
+        var Int? = nothing;
+        var Int?? nested = Int;
+        if Int exists { } // this check will fail as it should
+        if nested exists { } // this check should succeed, and won't!
+    }</code></pre>
+				<p>Basically, if you consider a language without optional types, if you had a function that searched through a list and returned either the last item or null, this API is inadequate for an array where the last element <i>is</i> null. The fix isn't too difficult, but optional types need to be stored in recursive wrappers, and unboxed when used within an "exists" check.</p>
+				<br/>
+				<h3 id="inheritneeds">Inheritance + Needs</h3>
 				<p>For the sake of javascript optimization, I originally did not makes needs properties. Bad call, turns out, once you want to inherit from a class with needs. They won't be there!</p>
 			<span class="label label-info">wake</span>
 			<pre><code class="wake"
@@ -181,7 +199,7 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
 every ChildClass (a ParentClassWithNeed) is:
    // no class body necessary</code></pre>
 				<br/>
-				<h3 id="genericprops">Generic Properties</h1>
+				<h3 id="genericprops">Generic Properties</h3>
 				<p>When a generic class has a generic type served as a public property, it isn't paramterized the way methods are. The name doesn't change and the type doesn't change either.</p>
 			<span class="label label-info">wake</span>
 			<pre><code class="wake"
@@ -196,56 +214,198 @@ every ChildClass (a ParentClassWithNeed) is:
     }</code></pre>
 				<p>This is easy to fix, just low priority. Ping me for a, most likely, same-day fix.</p>
 				<br/>
-				<h3 id="overlappinggenerics">Overlapping Generics</h1>
-				<p>stub</p>
+				<h3 id="overlappinggenerics">Overlapping Generics</h3>
+				<p>I knew about this issue I'm just a bit scared to really take it on in full. If you have two different types in a generic, you can declare & distinguish two methods by overloading. However, when you later use it with the two types matching, one method or another will quietly overwrite the other.</p>
+			<span class="label label-info">wake</span>
+			<pre><code class="wake"
+>every Generic{A, B} is:
+
+    needs Printer;
+
+    overlappingMethod(A) { Printer.printLine("MethodA"); }
+    overlappingMethod(B) { Printer.printLine("MethodB"); }
+
+    oneMethodIsLost(Generic{Int, Int}) {
+        Generic.overlappingMethod(5); // prints B...I think...
+    }</code></pre>
 				<br/>
-				<h3 id="publicneeds">Public Needs</h1>
-				<p>stub</p>
+				<h3 id="publicneeds">Public Needs</h3>
+				<p>Public needs are a problem just like inheritance with needs. Both of these problems exist because at runtime they are treated as variables instead of properties. The public keyword is valid syntactically but does nothing.</p>
 				<br/>
-				<h3 id="badimports">Bad Imports</h1>
-				<p>stub</p>
+				<h3 id="badimports">Bad Imports</h3>
+				<p>Be careful of importing misspelled files or uncompiled tables. Last I checked, the compiler will loop forever. Hit Control-C in a terminal to stop it...</p>
 				<br/>
-				<h3 id="lvaluesexist">Exists on some L-Values</h1>
-				<p>stub</p>
+				<h3 id="lvaluesexist">Exists on some L-Values</h3>
+				<p>For properties on external objects, and potentially other places, you can't use exists because it's very complex to add the value to a scope sym table. You must store it in an intermediate variable, sorry.</p>
+			<span class="label label-info">wake</span>
+			<pre><code class="wake"
+>every Link is:
+
+    with public Link? next;
+
+    cannotCheckExistanceDownChain() {
+        if next exists { // OK!
+            if next.next exists { }// No bueno!!
+            Link? farther = next.next; // OK!
+            if farther exists {} // OK!
+        }
+    }</code></pre>
 				<br/>
 				<h1 id="missingfeats">Missing Features + Workarounds</h1>
-				<p>stub</p>
+				<p>These missing functionalities should not crash or corrupt any programs, but they may get in the way of your designs. Sorry!</p>
 				<br/>
-				<h3 id="ctorargs">Constructor Arguments</h1>
-				<p>stub</p>
+				<h3 id="ctorargs">Constructor Arguments</h3>
+				<p>This is a big one!! While wake intended to make struct-like objects excellent to use:</p>
+			<span class="label label-info">wake</span>
+			<pre><code class="wake"
+>every Person is:
+
+    needs public Text firstname, public Text lastname, public Int age, public Gender;</code></pre>
+				<p>Easy! That's it!</p>
+				<p>Except, well, it won't work yet! I haven't fully decided whether this class, the providing class, or the class using the providing class, should allow and/or require manual ctor argument supplying. If you have been bitten by this in your designs and have any ideas for syntax, keywords, concepts, etc that can solve this problem, send it to me asap!!</p>
 				<br/>
-				<h3 id="parentmethods">Parent Method Calls</h1>
-				<p>stub</p>
+				<h3 id="parentmethods">Parent Method Calls</h3>
+				<p>This is a semantic analysis and parsing problem. I simply need to look for parent.aMethod() calls and treat them specially. Haven't done it yet. Also, I'm partially waiting on this one because I am pondering two-way-inheritance. There's an easy workaround, though!</p>
+			<span class="label label-info">wake</span>
+			<pre><code class="wake"
+>every ParentClass is:
+
+    myMethod() { } // this is inaccessible from Childclass.myMethod() !!
+    parent_myMethod() { } // but this IS accessible
+
+every ChildClass is:
+
+    myMethod() {
+        parent.myMethod(); // Won't compile :(
+        parent_myMethod(); // so create this method on ParentClass and have fun!
+    }</code></pre>
 				<br/>
-				<h3 id="namespaces">Namespaces</h1>
-				<p>stub</p>
+				<h3 id="commonclass">Common Object Class</h3>
+				<p>Its useful to have everything (and I mean everything) extend a single class, usually Object. A good example is database queries. It won't be hard to do, but its not done yet.</p>
+			<span class="label label-info">wake</span>
+			<pre><code class="wake"
+>every FetchUsersQuery is:
+
+    needs PDO;
+
+    getAllUsers(Object[] values) {
+        return PDO.prepare("SELECT * FROM user WHERE username = ? AND email = ?", values).find();
+    }</code></pre>
 				<br/>
-				<h3 id="nothingargs">"Nothing" as an Argument</h1>
-				<p>stub</p>
+				<h3 id="namespaces">Namespaces</h3>
+				<p>Yeah, just only have so much time. This one will be easy though.</p>
 				<br/>
-				<h3 id="genericprovs">Generic Provisions</h1>
-				<p>stub</p>
+				<h3 id="nothingargs">"Nothing" as an Argument</h3>
+				<p>This may be solved more generally eventually. Actually, its closer than ever now that generics have "casing" signatures that get filled in later. But basically, the compiler only finds methods by their signatures rather than their names. Since "nothing" is its own type, it never matches a method signaturee. Luckily you can cast it and achieve the same end.</p>
+			<span class="label label-info">wake</span>
+			<pre><code class="wake"
+>every MethodCallWithNothng is:
+
+    getAllUsersWith(Text? firstame, Text? lastname) { ... }
+
+    callGetAllUsersWithNothing() {
+        getAllUsersWith("ted", nothing); // Won't compile! The compiler can't find the method
+        getAllUsersWith("ted", (Text?) nothing); // Now the compiler can find the method :)
+    }</code></pre>
+				<p>Any big O and little O geeks out there should lend me hand on this one to create a fast binary tree or something. The only way that comes to mind for truly solving this problem would be O of n to the n, I think.</p>
 				<br/>
-				<h3 id="genericinheritance">Generic Inheritance</h1>
-				<p>stub</p>
+				<h3 id="arrayliterals">Array Literals</h3>
+				<p>Array literals requires Lowest-Common-Ancestor logic to be implemented, which isn't the easiest analysis to implement unfortunately. The only supported array literal is an empty array literal. This gets you far enough but I'll add this later.</p>
+
+			<span class="label label-info">wake</span>
+			<pre><code class="wake"
+>every DeclareArray is:
+
+    declareArray() {
+        Int[] = [1, 2, 3]; // not working yet :(
+        Int[] = []; Int[0] = 1; Int[1] = 2; Int[2] = 3; // This will have to do for now
+    }</code></pre>
+
+				<h3 id="genericprovs">Generic Provisions</h3>
+				<p>Not sure exactly how to put this one. Its a pretty big hole in wake. I'll list the things you can't do, because otherwise its tough to describe.</p>
+			<span class="label label-info">wake</span>
+			<pre><code class="wake"
+>every GenericProvider{T} is:
+
+    provides T, // won't compile. How can we provide T when T could require any sort of subsequent types?!
+         GenericProvider, // This should compile, since all types of GenericProvider have one type of need
+         GenericProvider{Int} &lt;- SomeSubclassOfGenericProvider; // It should be possible to do this too, not sure how best to make this happen.
+
+    useAProvider() {
+        T &lt;- SomeProvider; // Won't compile, for the same reason as java won't let you do "new T()". Likely will never fix this...its broken for very good reasons.
+    }</code></pre>
+
 				<br/>
-				<h3 id="genericmethods">Generic Methods</h1>
-				<p>stub</p>
+				<h3 id="genericinheritance">Generic Inheritance</h3>
+				<p>This just needs to happen, and its actually not so intimidating a feature. Also may hold up stdlib creation where generic inheritance is crazy.</p>
+			<span class="label label-info">wake</span>
+			<pre><code class="wake"
+>every Set{T} (a Collection{T}) is:</code></pre>
 				<br/>
-				<h3 id="switchcase">Switch/Case</h1>
-				<p>stub</p>
+				<h3 id="genericmethods">Generic Methods</h3>
+				<p>This is painfully obvious in Asserts. However its quite a difficult item to do...it requires some sweet type inference.</p>
+			<span class="label label-info">wake</span>
+			<pre><code class="wake"
+>every Asserts is:
+
+    {T extends Printable} that(T)Equals($T) {
+        if(T != $T) ...
+    }</code></pre>
+				<p>Also syntax is ugly. What can ya do.</p>
 				<br/>
-				<h3 id="behavioralprovisions">Behavioral Provisions</h1>
-				<p>stub</p>
+				<h3 id="genericranges">Generic Ranges</h3>
+				<p>At the moment all generics operate on any and all types. That is to say, a Generic{T} can be created with absolutely any type. It should be able to set a lower and upper limit. Don't worry, I anticipated this. Shouldn't be too bad once I get around to it.</p>
+			<span class="label label-info">wake</span>
+			<pre><code class="wake"
+>every Generic{P from Printer, L to Printer} is:
+
+    myMethod(P, L) {
+        P.printLine("not possible until 'P from Printer' is allowed.");
+        L = P; // Possible since the upper limit of L is a subclass of the lower limit of P :)
+    }</code></pre>
 				<br/>
-				<h3 id="reflection">Reflection</h1>
-				<p>stub</p>
+
+				<h3 id="switchcase">Switch/Case</h3>
+				<p>Actually, even though it currently parses switch/case like java, I want to revamp it. I have some good ideas but I'm a bit afraid of them, so they're on hold.</p>
 				<br/>
-				<h3 id="exceptions">Exceptions</h1>
-				<p>stub</p>
+				<h3 id="behavioralprovisions">Behavioral Provisions</h3>
+				<p>I'm just really not sure how necessary this is! I went years before seeing DI such as this, however, that's partly because of all the "new" spamming. Anyways, its possible, and should be done soon.</p>
+			<span class="label label-info">wake</span>
+			<pre><code class="wake"
+>every MyProvider is:
+
+    needs App;
+
+    provides User &lt;- { return App.getUser(); }</code></pre>
 				<br/>
-				<h3 id="recursiveimports">Recursive Imports</h1>
-				<p>stub</p>
+				<h3 id="reflection">Reflection</h3>
+				<p>Actually shouldn't be too bad to implement. But its not done yet, and its a big undertaking.</p>
+				<br/>
+				<h3 id="exceptions">Exceptions</h3>
+				<p>Similarly, not too bad to implement actually. However, I am curious about how best to do this. In the meantime, use an Error{V, E} to wrap potential errors and their errortype.</p>
+			<span class="label label-info">wake</span>
+			<pre><code class="wake"
+>every MightBeAnError is:
+
+    needs ErrorProvider;
+
+    Error{User, Text} -- findUser() {
+        var Error{User, Text} &lt;- ErrorProvider;
+        // do the lookup
+        if User exists {
+            Error.setSuccess(User);
+        } else {
+            Error.setError("Could not find user in db");
+        }
+        return Error;
+    }</code></pre>
+				<p>This solution runs out when you try to get a User out of an Error that doesn't have one, though!</p>
+				<br/>
+				<h3 id="enums">Enums</h3>
+				<p>Somebody who loves the feature-rich enums of java, and who understands Enum&lt;E extends Enum&lt;E&gt;&gt; should tell me all of the things I need do and not do to make powerful enums.</p>
+				<Br />
+				<h3 id="recursiveimports">Recursive Imports</h3>
+				<p>If two classes use each other, just stick them in one file and you're good. If you split them up into two different files you're screwed!</p>
 				<br/>
 
 		<script src="bootstrap/js/bootstrap.min.js"></script>
