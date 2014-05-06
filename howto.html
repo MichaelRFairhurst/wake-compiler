@@ -28,13 +28,13 @@
 				<li><a href="#inheritneeds">- Inheritance + Needs</a></li>
 				<li><a href="#genericprops">- Generic Properties</a></li>
 				<li><a href="#overlappinggenerics">- Overlapping Generics</a></li>
-				<li><a href="#publicneeds">- Public Needs</a></li>
 				<li><a href="#badimports">- Bad Imports</a></li>
-				<li><a href="#lvaluesexist">- Exists on some L-Values</a></li>
 				<li><a href="#missingfeats">Missing Features + Workarounds</a></li>
 				<li><a href="#ctorargs">- Constructor Arguments</a></li>
 				<li><a href="#parentmethods">- Parent Method Calls</a></li>
 				<li><a href="#commonclass">- Common Object Class</a></li>
+				<li><a href="#publicneeds">- Public Needs</a></li>
+				<li><a href="#lvaluesexist">- Exists on some L-Values</a></li>
 				<li><a href="#namespaces">- Namespaces</a></li>
 				<li><a href="#nothingargs">- "Nothing" as an Argument</a></li>
 				<li><a href="#arrayliterals">- Array Literals</a></li>
@@ -44,6 +44,7 @@
 				<li><a href="#genericranges">- Generic Ranges</a></li>
 				<li><a href="#switchcase">- Switch/Case</a></li>
 				<li><a href="#behavioralprovisions">- Behavioral Provisions</a></li>
+				<li><a href="#abstractprovisions">- Abstract Provisions</a></li>
 				<li><a href="#reflection">- Reflection</a></li>
 				<li><a href="#exceptions">- Exceptions</a></li>
 				<li><a href="#enums">- Enums</a></li>
@@ -229,28 +230,6 @@ every ChildClass (a ParentClassWithNeed) is:
         Generic.overlappingMethod(5); // prints B...I think...
     }</code></pre>
 				<br/>
-				<h3 id="publicneeds">Public Needs</h3>
-				<p>Public needs are a problem just like inheritance with needs. Both of these problems exist because at runtime they are treated as variables instead of properties. The public keyword is valid syntactically but does nothing.</p>
-				<br/>
-				<h3 id="badimports">Bad Imports</h3>
-				<p>Be careful of importing misspelled files or uncompiled tables. Last I checked, the compiler will loop forever. Hit Control-C in a terminal to stop it...</p>
-				<br/>
-				<h3 id="lvaluesexist">Exists on some L-Values</h3>
-				<p>For properties on external objects, and potentially other places, you can't use exists because it's very complex to add the value to a scope sym table. You must store it in an intermediate variable, sorry.</p>
-			<span class="label label-info">wake</span>
-			<pre><code class="wake"
->every Link is:
-
-    with public Link? next;
-
-    cannotCheckExistanceDownChain() {
-        if next exists { // OK!
-            if next.next exists { }// No bueno!!
-            Link? farther = next.next; // OK!
-            if farther exists {} // OK!
-        }
-    }</code></pre>
-				<br/>
 				<h1 id="missingfeats">Missing Features + Workarounds</h1>
 				<p>These missing functionalities should not crash or corrupt any programs, but they may get in the way of your designs. Sorry!</p>
 				<br/>
@@ -290,6 +269,28 @@ every ChildClass is:
 
     getAllUsers(Object[] values) {
         return PDO.prepare("SELECT * FROM user WHERE username = ? AND email = ?", values).find();
+    }</code></pre>
+				<br/>
+				<h3 id="publicneeds">Public Needs</h3>
+				<p>Public needs are a problem just like inheritance with needs. Both of these problems exist because at runtime they are treated as variables instead of properties. The public keyword is valid syntactically but does nothing.</p>
+				<br/>
+				<h3 id="badimports">Bad Imports</h3>
+				<p>Be careful of importing misspelled files or uncompiled tables. Last I checked, the compiler will loop forever. Hit Control-C in a terminal to stop it...</p>
+				<br/>
+				<h3 id="lvaluesexist">Exists on some L-Values</h3>
+				<p>For properties on external objects, and potentially other places, you can't use exists because it's very complex to add the value to a scope sym table. You must store it in an intermediate variable, sorry.</p>
+			<span class="label label-info">wake</span>
+			<pre><code class="wake"
+>every Link is:
+
+    with public Link? next;
+
+    cannotCheckExistanceDownChain() {
+        if next exists { // OK!
+            if next.next exists { }// No bueno!!
+            Link? farther = next.next; // OK!
+            if farther exists {} // OK!
+        }
     }</code></pre>
 				<br/>
 				<h3 id="namespaces">Namespaces</h3>
@@ -378,6 +379,18 @@ every ChildClass is:
 
     provides User &lt;- { return App.getUser(); }</code></pre>
 				<br/>
+				<h3 id="abstractprovisions">Abstract Provisions</h3>
+				<p>I wasn't entirely sure how typing for providers was going to work. There's still room for a great idea to make providers feel more dynamic. However, in the meantime, this uncertainty clouded my eyes so I didn't think of abstract provisions.</p>
+				<p>Essentially, since all classes are interfaces, and pure interface classes simply make all their methods abstract, there needs to be a way to say a class "provides SomeClass" without actually providing anything.</p>
+			<span class="label label-info">wake</span>
+			<pre><code class="wake"
+>every MyInterface is:
+    provides AClass; // Won't compile: need to provide AClass's dependencies.
+    // Or, inheritingfrom MyInterface gives you behavior you didn't realize
+
+    myAbstractMethod();
+    anotherAbstractMethod();</code></pre>
+				<br />
 				<h3 id="reflection">Reflection</h3>
 				<p>Actually shouldn't be too bad to implement. But its not done yet, and its a big undertaking.</p>
 				<br/>
