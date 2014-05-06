@@ -1,8 +1,8 @@
 SHELL=/bin/bash
 
 
-#OPT=-O3
-OPT=-O0 -g
+OPT=-O3
+#OPT=-O0 -g
 FLAGS=-Iinclude -Igen
 CC=cc $(FLAGS)
 CPP=g++ $(FLAGS) -std=c++11
@@ -127,7 +127,7 @@ bin/finaltest.js: $(WAKEOBJS) bin/wakeobj/std.o
 bin/wakeobj/std.o: src/wake/stdlib/myobj/std.o js_to_wakeobj.sh
 	cat $< | ./js_to_wakeobj.sh > $@
 
-bin/wakeobj/Main.o: src/wake/test/Main.wk bin/wake bin/wakeobj/PropertyTest.o bin/wakeobj/AutoboxingTest.o bin/wakeobj/Asserts.o bin/wakeobj/ArrayTest.o bin/wakeobj/MathTest.o bin/wakeobj/AssertsTest.o bin/wakeobj/BooleanLogicTest.o bin/wakeobj/OptionalTypeTest.o bin/wakeobj/InheritanceTest.o bin/wakeobj/AssignmentsTest.o $(WAKETABLEOBJS)
+bin/wakeobj/Main.o: src/wake/test/Main.wk bin/wake bin/wakeobj/PropertyTest.o bin/wakeobj/AutoboxingTest.o bin/wakeobj/Asserts.o bin/wakeobj/ArrayTest.o bin/wakeobj/MathTest.o bin/wakeobj/AssertsTest.o bin/wakeobj/BooleanLogicTest.o bin/wakeobj/OptionalTypeTest.o bin/wakeobj/InheritanceTest.o bin/wakeobj/AssignmentsTest.o bin/wakeobj/GenericTest.o $(WAKETABLEOBJS)
 	time ./bin/wake -d bin/waketable $< -o $@
 
 bin/wakeobj/MockPrinter.o: src/wake/test/MockPrinter.wk bin/wake bin/waketable/Printer.table

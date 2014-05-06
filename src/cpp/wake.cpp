@@ -35,6 +35,7 @@ void writeTableFiles(std::string dirname, ClassSpaceSymbolTable& table) {
 		file.open((dirname + "/" + (*it)->classname + ".table").c_str(), ios::out);
 		TableFileWriter writer;
 		writer.write(file, *it);
+		file.close();
 	}
 }
 
@@ -91,6 +92,7 @@ void compileFile(Options* options) {
 	file.open(options->outFilename.c_str(), ios::out);
 	renderer.writeOut(file, &header);
 	file << object.str();
+	file.close();
 
 	writeTableFiles(options->tabledir.c_str(), table);
 }
