@@ -38,24 +38,7 @@ CPPNAMES= \
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
 
-WAKENAMES=ArrayTest.wk \
-			InheritanceTestFallthrough.wk \
-			InheritanceTest.wk \
-			OptionalTypeTest.wk \
-			AssertsTest.wk \
-			InheritanceTestInterface.wk \
-			Main.wk \
-			Asserts.wk \
-			InheritanceTestOverride.wk \
-			MathTest.wk \
-			BooleanLogicTest.wk \
-			InheritanceTestParent.wk \
-			MockPrinter.wk \
-			AssignmentsTest.wk \
-			PropertyTest.wk \
-			AutoboxingTest.wk \
-			SimpleGeneric.wk \
-			GenericTest.wk
+WAKENAMES=Asserts.wk
 
 WAKEOBJS=$(addprefix bin/wakeobj/, $(WAKENAMES:.wk=.o))
 
@@ -121,53 +104,14 @@ bin/wake: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o bin/cpp/LibraryLoader-wi
 	@echo -- CHEERIO
 	@echo
 
-bin/finaltest.js: $(WAKEOBJS) bin/wakeobj/std.o
-	time ./bin/wake -d bin/waketable -l bin/wakeobj/std.o $(WAKEOBJS) -o bin/finaltest.js
+bin/finaltest.js: callwmake
+
+callwmake: $(WAKEOBJS) $(WAKETABLEOBJS) bin/wakeobj/std.o src/wake/test/*.wk bin/wake
+	time make -f wmake.mk
+	touch callwmake
 
 bin/wakeobj/std.o: src/wake/stdlib/myobj/std.o js_to_wakeobj.sh
 	cat $< | ./js_to_wakeobj.sh > $@
-
-bin/wakeobj/Main.o: src/wake/test/Main.wk bin/wake bin/wakeobj/PropertyTest.o bin/wakeobj/AutoboxingTest.o bin/wakeobj/Asserts.o bin/wakeobj/ArrayTest.o bin/wakeobj/MathTest.o bin/wakeobj/AssertsTest.o bin/wakeobj/BooleanLogicTest.o bin/wakeobj/OptionalTypeTest.o bin/wakeobj/InheritanceTest.o bin/wakeobj/AssignmentsTest.o bin/wakeobj/GenericTest.o $(WAKETABLEOBJS)
-	time ./bin/wake -d bin/waketable $< -o $@
-
-bin/wakeobj/MockPrinter.o: src/wake/test/MockPrinter.wk bin/wake bin/waketable/Printer.table
-	time ./bin/wake -d bin/waketable $< -o $@
-
-bin/wakeobj/GenericTest.o: src/wake/test/GenericTest.wk bin/wake bin/wakeobj/Asserts.o bin/wakeobj/SimpleGeneric.o
-	time ./bin/wake -d bin/waketable $< -o $@
-
-bin/wakeobj/AutoboxingTest.o: src/wake/test/AutoboxingTest.wk bin/wake bin/wakeobj/Asserts.o
-	time ./bin/wake -d bin/waketable $< -o $@
-
-bin/wakeobj/PropertyTest.o: src/wake/test/PropertyTest.wk bin/wake bin/wakeobj/Asserts.o
-	time ./bin/wake -d bin/waketable $< -o $@
-
-bin/wakeobj/AssignmentsTest.o: src/wake/test/AssignmentsTest.wk bin/wake bin/wakeobj/Asserts.o
-	time ./bin/wake -d bin/waketable $< -o $@
-
-bin/wakeobj/ArrayTest.o: src/wake/test/ArrayTest.wk bin/wake bin/wakeobj/Asserts.o
-	time ./bin/wake -d bin/waketable $< -o $@
-
-bin/wakeobj/MathTest.o: src/wake/test/MathTest.wk bin/wake bin/wakeobj/Asserts.o
-	time ./bin/wake -d bin/waketable $< -o $@
-
-bin/wakeobj/BooleanLogicTest.o: src/wake/test/BooleanLogicTest.wk bin/wake bin/wakeobj/Asserts.o
-	time ./bin/wake -d bin/waketable $< -o $@
-
-bin/wakeobj/AssertsTest.o: src/wake/test/AssertsTest.wk bin/wake bin/wakeobj/Asserts.o bin/wakeobj/MockPrinter.o
-	time ./bin/wake -d bin/waketable $< -o $@
-
-bin/wakeobj/InheritanceTestOverride.o: src/wake/test/InheritanceTestOverride.wk bin/wake bin/wakeobj/InheritanceTestParent.o
-	time ./bin/wake -d bin/waketable $< -o $@
-
-bin/wakeobj/InheritanceTestFallthrough.o: src/wake/test/InheritanceTestFallthrough.wk bin/wake bin/wakeobj/InheritanceTestParent.o
-	time ./bin/wake -d bin/waketable $< -o $@
-
-bin/wakeobj/InheritanceTestInterface.o: src/wake/test/InheritanceTestInterface.wk bin/wake bin/wakeobj/InheritanceTestParent.o
-	time ./bin/wake -d bin/waketable $< -o $@
-
-bin/wakeobj/InheritanceTest.o: src/wake/test/InheritanceTest.wk bin/wake bin/wakeobj/InheritanceTestInterface.o bin/wakeobj/InheritanceTestOverride.o bin/wakeobj/InheritanceTestFallthrough.o bin/wakeobj/Asserts.o
-	time ./bin/wake -d bin/waketable $< -o $@
 
 bin/wakeobj/Asserts.o: src/wake/stdlib/Asserts.wk bin/wake $(WAKETABLEOBJS)
 	time ./bin/wake -d bin/waketable $< -o $@
@@ -225,6 +169,8 @@ loo:
 	rm bin/wakeobj/* || :
 	rm bin/waketable/* || :
 	rm bin/finaltest.js || :
+	rm callwmake || :
+	make -f wmake.mk clean
 	@echo
 	@echo -- CLEANED MY ARSE
 	@echo
