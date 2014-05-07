@@ -28,7 +28,6 @@
 				<li><a href="#inheritneeds">- Inheritance + Needs</a></li>
 				<li><a href="#genericprops">- Generic Properties</a></li>
 				<li><a href="#overlappinggenerics">- Overlapping Generics</a></li>
-				<li><a href="#badimports">- Bad Imports</a></li>
 				<li><a href="#missingfeats">Missing Features + Workarounds</a></li>
 				<li><a href="#ctorargs">- Constructor Arguments</a></li>
 				<li><a href="#parentmethods">- Parent Method Calls</a></li>
@@ -273,9 +272,6 @@ every ChildClass is:
 				<br/>
 				<h3 id="publicneeds">Public Needs</h3>
 				<p>Public needs are a problem just like inheritance with needs. Both of these problems exist because at runtime they are treated as variables instead of properties. The public keyword is valid syntactically but does nothing.</p>
-				<br/>
-				<h3 id="badimports">Bad Imports</h3>
-				<p>Be careful of importing misspelled files or uncompiled tables. Last I checked, the compiler will loop forever. Hit Control-C in a terminal to stop it...</p>
 				<br/>
 				<h3 id="lvaluesexist">Exists on some L-Values</h3>
 				<p>For properties on external objects, and potentially other places, you can't use exists because it's very complex to add the value to a scope sym table. You must store it in an intermediate variable, sorry.</p>
