@@ -27,6 +27,7 @@ extern "C" {
 #include "TableFileWriter.h"
 #include "SimpleAddressTable.h"
 #include "ImportParseTreeTraverser.h"
+#include "ErrorTracker.h"
 
 void writeTableFiles(std::string dirname, ClassSpaceSymbolTable& table) {
 	vector<PropertySymbolTable*> tables = table.getDefinedClasses();
@@ -59,13 +60,16 @@ void compileFile(Options* options) {
 	//parser.print();exit(0);
 
 	ClassSpaceSymbolTable table;
+	ErrorTracker errors;
 	LibraryLoader loader;
 	loader.loadStdLibToTable(&table);
 	ImportParseTreeTraverser importer;
-	importer.traverse(parser.getParseTree(), table, loader, options->tabledir);
+	errors.pushContext("Import header");
+	importer.traverse(parser.getParseTree(), table, loader, errors, options->tabledir);
+	errors.popContext();
 
 	// Now do all the semantic analysis
-	ParseTreeTraverser traverser(&table);
+	ParseTreeTraverser traverser(&table, errors);
 	traverser.traverse(parser.getParseTree());
 
 	SemanticErrorPrinter printer;

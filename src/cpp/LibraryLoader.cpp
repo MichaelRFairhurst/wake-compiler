@@ -3,15 +3,18 @@
 #include <sstream>
 #include "TableFileReader.h"
 
-
-void LibraryLoader::loadImport(string importname, string importpath, ClassSpaceSymbolTable& objtable) {
+bool LibraryLoader::loadImport(string importname, string importpath, ClassSpaceSymbolTable& objtable) {
 	fstream importfile;
 	importfile.open(importpath + "/" + importname + ".table");
+	if(!importfile.is_open()) {
+		return false;
+	}
 	TableFileReader reader;
 
 	PropertySymbolTable* table = objtable.getEmptyPropertySymbolTable();
 	reader.read(table, importfile);
 	objtable.importClass(table);
+	return true;
 }
 
 void LibraryLoader::loadStdLibToTable(ClassSpaceSymbolTable* table) {

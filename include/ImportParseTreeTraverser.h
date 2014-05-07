@@ -4,6 +4,7 @@
 #include "LibraryLoader.h"
 #include "ClassSpaceSymbolTable.h"
 #include <string>
+#include "ErrorTracker.h"
 
 extern "C" {
 	#include "tree.h"
@@ -12,7 +13,7 @@ extern "C" {
 class ImportParseTreeTraverser {
 
 	public:
-		void traverse(Node* tree, ClassSpaceSymbolTable& o, LibraryLoader& l, std::string dirname);
+		void traverse(Node* tree, ClassSpaceSymbolTable& o, LibraryLoader& l, ErrorTracker& errors, std::string dirname);
 
 };
 

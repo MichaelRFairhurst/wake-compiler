@@ -4,6 +4,7 @@
 #include "Parser.h"
 #include "ParseTreeTraverser.h"
 #include "LibraryLoader.h"
+#include "ErrorTracker.h"
 
 BOOST_AUTO_TEST_SUITE( ParseTreeTraverserTest )
 
@@ -16,10 +17,11 @@ BOOST_AUTO_TEST_SUITE( ParseTreeTraverserTest )
 	BOOST_AUTO_TEST_CASE( NAME ) \
 	{ \
 		Parser p; \
+		ErrorTracker errors; \
 		ClassSpaceSymbolTable table; \
 		LibraryLoader loader; \
 		loader.loadStdLibToTable(&table); \
-		ParseTreeTraverser t(&table); \
+		ParseTreeTraverser t(&table, errors); \
 		MockSemanticErrorPrinter e; \
 		p.parse( "every Int is: every Bool is: every Text is: " CODE ); \
 		if(PTT_PRINT_TREE) p.print(); \

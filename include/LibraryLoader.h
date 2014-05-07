@@ -11,7 +11,7 @@ extern "C" {
 class LibraryLoader {
 
 	public:
-		void loadImport(string importname, string importpath, ClassSpaceSymbolTable& objtable);
+		bool loadImport(string importname, string importpath, ClassSpaceSymbolTable& objtable);
 		void loadStdLibToTable(ClassSpaceSymbolTable* table);
 
 };

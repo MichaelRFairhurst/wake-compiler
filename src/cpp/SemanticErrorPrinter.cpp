@@ -84,6 +84,8 @@ void SemanticErrorPrinter::print(SemanticError* e) {
 		case INVALID_GENERIC_TYPE:
 			cout << "Using a non-generic type as a generic, a generic type as a non-generic, or wrong number of types used in generic. @TODO split these up...";
 			break;
+		case BAD_IMPORT:
+			cout << "Import could not be found within the table directory. Has the file been compiled yet, or was the import misspelled?";
 		default:
 			cout << "bad error code provided";
 	}

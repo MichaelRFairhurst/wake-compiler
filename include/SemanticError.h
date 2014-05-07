@@ -33,8 +33,9 @@ enum SemanticErrorCode {
 	ABSTRACT_PROVISION,				// Providing a class directly that doesn't implement all of its methods
 	DIRECT_USE_OF_OPTIONAL_TYPE,	// :Printer = nothing;
 	EXISTS_ON_NONOPTIONAL_TYPE,		// needs Printer; Printer exists { }
-	USE_OF_ASSIGNMENT_VALUE,		// needs Printer; Printer exists { }
-	INVALID_GENERIC_TYPE,			// needs Printer; Printer exists { }
+	USE_OF_ASSIGNMENT_VALUE,		// a = b = c; --- should be a = b := c;
+	INVALID_GENERIC_TYPE,			// Printer{Int} or List or List{String, String} etc
+	BAD_IMPORT,						// Import sanhutohesuntho;
 };
 
 class SemanticError {
