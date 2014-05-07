@@ -241,6 +241,26 @@ every ChildClass (a ParentClassWithNeed) is:
     needs public Text firstname, public Text lastname, public Int age, public Gender;</code></pre>
 				<p>Easy! That's it!</p>
 				<p>Except, well, it won't work yet! I haven't fully decided whether this class, the providing class, or the class using the providing class, should allow and/or require manual ctor argument supplying. If you have been bitten by this in your designs and have any ideas for syntax, keywords, concepts, etc that can solve this problem, send it to me asap!!</p>
+				<p>In the meantime, do this dirty hack:</p>
+			<pre><code class="wake"
+>every PersonProvider is:
+
+    provides Person, Gender; // must provide gender since its a class!
+    Person -- getPerson(Text firstname, Text lastname, Int age, Gender) {
+        var Person &lt;- this;
+        Person.firstname = firstname;
+        Person.lastname = lastname;
+        Person.age = age;
+        Person.Gender = Gender;
+    }
+
+every Person is:
+
+    needs $Gender; // we need it since its a class
+    with public Gender = $Gender; // This is only necessary until public needs are supported
+    with public Text lastname = ""; // By starting with "", this field doesn't need to be optional
+    with public Text firstname = "";
+    with public Int age = 0;</code></pre>
 				<br/>
 				<h3 id="parentmethods">Parent Method Calls</h3>
 				<p>This is a semantic analysis and parsing problem. I simply need to look for parent.aMethod() calls and treat them specially. Haven't done it yet. Also, I'm partially waiting on this one because I am pondering two-way-inheritance. There's an easy workaround, though!</p>
