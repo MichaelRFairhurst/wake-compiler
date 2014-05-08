@@ -9,8 +9,8 @@ BOOST_AUTO_TEST_CASE(AddingNeedsAreGotten) {
 	PropertySymbolTable table(&analyzer);
 	Type* thefirsttype = MakeType(TYPE_CLASS);
 	Type* thesecondtype = MakeType(TYPE_CLASS);
-	table.addNeed(thefirsttype);
-	table.addNeed(thesecondtype);
+	table.addNeed(thefirsttype, 0);
+	table.addNeed(thesecondtype, 0);
 	BOOST_REQUIRE(table.getNeeds()->at(0) == thefirsttype);
 	BOOST_REQUIRE(table.getNeeds()->at(1) == thesecondtype);
 }

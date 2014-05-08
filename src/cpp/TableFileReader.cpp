@@ -9,7 +9,7 @@ void TableFileReader::read(PropertySymbolTable* table, istream& s) {
 	table->abstract = readUInt8(s);
 	unsigned char tag;
 	while(tag = readUInt8(s)) {
-		table->addNeed(readTypeByTag(tag, s));
+		table->addNeed(readTypeByTag(tag, s), 0);
 	}
 
 	while(true) {

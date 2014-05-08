@@ -16,7 +16,6 @@ class ObjectFileHeaderData {
 		std::string getFilename();
 		void addClassUsage(int location, std::string symbol);
 		void addPropertyUsage(int location, std::string symbol);
-		void addNeed(std::string classname, std::string need);
 
 		std::vector<std::pair<std::string, std::vector<std::string> > > getNeeds();
 		std::vector<std::string> getClasses();

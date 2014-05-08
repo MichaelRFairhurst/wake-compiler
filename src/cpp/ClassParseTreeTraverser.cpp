@@ -101,9 +101,13 @@ void ClassParseTreeTraverser::secondPass(Node* tree) {
 		case NT_CLASSBODY:
 			{
 				scopesymtable->pushScope();
-				loadCtorArgs(tree);
+				for(auto it = propertysymtable->getNeeds()->begin(); it != propertysymtable->getNeeds()->end(); ++it) {
+					scopesymtable->add(*it);
+				}
 				typechecker->setParameterizedTypes(propertysymtable->getParameters());
 				typeCheckProperties(tree);
+				scopesymtable->popScope();
+				scopesymtable->pushScope();
 				typechecker->setThisContext(propertysymtable->getAsType());
 				typeCheckMethods(tree);
 				scopesymtable->popScope();
@@ -136,7 +140,7 @@ void ClassParseTreeTraverser::checkCtorArgs(Node* tree) {
 						Type* needtype = tree->node_data.nodes[i]->node_data.nodes[0]->node_data.type;
 						classestable->assertTypeIsValid(needtype);
 						classestable->getAnalyzer()->assertNeedIsNotCircular(classname, needtype);
-						propertysymtable->addNeed(needtype);
+						propertysymtable->addNeed(copyType(needtype), 0);
 					} catch(SymbolNotFoundException* e) {
 						errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
 						delete e;
@@ -145,32 +149,6 @@ void ClassParseTreeTraverser::checkCtorArgs(Node* tree) {
 						errors->addError(e);
 					}
 				}
-			}
-	}
-}
-
-void ClassParseTreeTraverser::loadCtorArgs(Node* tree) {
-	switch(tree->node_type) {
-		case NT_CLASSBODY:
-			{
-				for(int i = 0; i < tree->subnodes; i++)
-				if(tree->node_data.nodes[i]->node_type == NT_CTOR) {
-					loadCtorArgs(tree->node_data.nodes[i]->node_data.nodes[0]);
-					return;
-				}
-			}
-			break;
-
-		case NT_CTOR_ARGS:
-			try {
-				for(int i = 0; i < tree->subnodes; i++) {
-					Type* need = tree->node_data.nodes[i]->node_data.nodes[0]->node_data.type;
-					scopesymtable->add(need);
-				}
-			} catch(SymbolNotFoundException* e) {
-				delete e;
-			} catch(SemanticError* e) {
-				delete e;
 			}
 	}
 }

@@ -7,6 +7,7 @@ PropertySymbolTable::PropertySymbolTable(TypeAnalyzer* analyzer) {
 	this->analyzer = analyzer;
 	abstract = false;
 	declaredtypeparameters = new vector<Type*>(); // @TODO this is a hack
+	needs = new vector<Type*>(); // @TODO so is this (kind of)
 }
 
 const map<string, bool>& PropertySymbolTable::getParentage() {
@@ -146,12 +147,13 @@ void PropertySymbolTable::printEntryPoints(EntryPointAnalyzer* entryanalyzer) {
 	}
 }
 
-void PropertySymbolTable::addNeed(Type* needed) {
-	needs.push_back(needed);
+void PropertySymbolTable::addNeed(Type* needed, int flags) {
+	needs->push_back(needed);
+	addProperty(needed, flags | PROPERTY_NEED);
 }
 
 vector<Type*>* PropertySymbolTable::getNeeds() {
-	return &needs;
+	return needs;
 }
 
 bool PropertySymbolTable::isAbstract() {
@@ -222,7 +224,7 @@ ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<Type*
 		newprop->casing = casing;
 		(*newprops)[casing] = newprop;
 	}
-	return new DerivedPropertySymbolTable(*analyzer, needs, *newprops, parentage);
+	return new DerivedPropertySymbolTable(*analyzer, *needs, *newprops, parentage);
 	return this;
 }
 

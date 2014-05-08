@@ -25,9 +25,6 @@ void ObjectFileHeaderData::addPropertyUsage(int location, std::string symbol) {
 	if(it == properties.end()) properties.push_back(symbol);
 }
 
-void ObjectFileHeaderData::addNeed(std::string classname, std::string need) {
-}
-
 void ObjectFileHeaderData::setFilename(std::string filename) {
 	this->filename = filename;
 }

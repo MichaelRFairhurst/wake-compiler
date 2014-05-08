@@ -27,7 +27,6 @@ class ClassParseTreeTraverser {
 
 	private:
 		void checkCtorArgs(Node* tree);
-		void loadCtorArgs(Node* tree);
 		void typeCheckProperties(Node* tree);
 		void typeCheckMethods(Node* tree);
 		Node* getMethodBody(Node* methoddef);

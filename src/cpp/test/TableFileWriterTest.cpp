@@ -17,12 +17,11 @@ BOOST_AUTO_TEST_CASE(TestWritesSimple)
 	PropertySymbolTable table(&tanalyzer);
 	table.classname = "classname";
 	writer.write(out, &table);
-	ASSERTLENGTH(14);
+	ASSERTLENGTH(13);
 
 	ASSERTCHAR(9);
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
-	ASSERTCHAR(0); // methods
 	ASSERTCHAR(0); // inheritances
 	ASSERTCHAR(0); // inheritance
 }
@@ -45,11 +44,10 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 
 	writer.write(out, &table);
 
-	ASSERTLENGTH(55);
+	ASSERTLENGTH(54);
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
-	ASSERTCHAR(0); // method flag
 	ASSERTCHAR(11); // method name length
 	ASSERTCHAR('p'); ASSERTCHAR('r'); ASSERTCHAR('i'); ASSERTCHAR('n'); ASSERTCHAR('t'); ASSERTCHAR('('); ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t'); ASSERTCHAR(')');
 	ASSERTCHAR(8);
@@ -83,14 +81,19 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 	PropertySymbolTable table(&tanalyzer);
 
 	Type* text = MakeType(TYPE_CLASS);text->typedata._class.classname = strdup("Text");
-	table.addNeed(text);
+	table.addNeed(text, 0);
 	table.classname = "classname";
 
 	writer.write(out, &table);
-	ASSERTLENGTH(26);
+	ASSERTLENGTH(36);
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
+	ASSERTCHAR(4); // property length
+	ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t');
+	ASSERTCHAR(4); // casing length
+	ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t');
+	ASSERTCHAR(4); // flags - need
 	ASSERTCHAR(2); // type
 	ASSERTCHAR(4); // classname length
 	ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t');
@@ -100,7 +103,6 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 	ASSERTCHAR(0); // alias length
 	ASSERTCHAR(0); // spec length
 	ASSERTCHAR(0); // optional
-	ASSERTCHAR(0); // methods
 	ASSERTCHAR(0); // inheritance
 	ASSERTCHAR(0); // parameters
 }
@@ -114,25 +116,21 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 
 	Type* text = MakeType(TYPE_CLASS);text->typedata._class.classname = strdup("Text");
 	Type* printer = MakeType(TYPE_CLASS);printer->typedata._class.classname = strdup("Printer");
-	table.addNeed(text);
-	table.addNeed(printer);
+	table.addNeed(text, 0);
+	table.addNeed(printer, 0);
 	table.classname = "classname";
 
 	writer.write(out, &table);
 
-	ASSERTLENGTH(41);
+	ASSERTLENGTH(68);
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
-	ASSERTCHAR(2); // type
-	ASSERTCHAR(4); // classname length
-	ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t');
-	ASSERTCHAR(0); // parameters
-	ASSERTCHAR(0); // shadow
-	ASSERTCHAR(0); // array
-	ASSERTCHAR(0); // alias length
-	ASSERTCHAR(0); // spec length
-	ASSERTCHAR(0); // optional
+	ASSERTCHAR(7); // property length
+	ASSERTCHAR('P'); ASSERTCHAR('r'); ASSERTCHAR('i'); ASSERTCHAR('n'); ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('r');
+	ASSERTCHAR(7); // casing length
+	ASSERTCHAR('P'); ASSERTCHAR('r'); ASSERTCHAR('i'); ASSERTCHAR('n'); ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('r');
+	ASSERTCHAR(4); // flags -- Type need
 	ASSERTCHAR(2); // type
 	ASSERTCHAR(7); // classname length
 	ASSERTCHAR('P'); ASSERTCHAR('r'); ASSERTCHAR('i'); ASSERTCHAR('n'); ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('r');
@@ -142,7 +140,20 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	ASSERTCHAR(0); // alias length
 	ASSERTCHAR(0); // spec length
 	ASSERTCHAR(0); // optional
-	ASSERTCHAR(0); // methods
+	ASSERTCHAR(4); // propname length
+	ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t');
+	ASSERTCHAR(4); // casing length
+	ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t');
+	ASSERTCHAR(4); // flags -- PROPERTY_NEED
+	ASSERTCHAR(2); // type
+	ASSERTCHAR(4); // classname length
+	ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t');
+	ASSERTCHAR(0); // parameters
+	ASSERTCHAR(0); // shadow
+	ASSERTCHAR(0); // array
+	ASSERTCHAR(0); // alias length
+	ASSERTCHAR(0); // spec length
+	ASSERTCHAR(0); // optional
 	ASSERTCHAR(0); // inheritance
 	ASSERTCHAR(0); // parameters
 }
@@ -157,12 +168,11 @@ BOOST_AUTO_TEST_CASE(TestWritesInheritance)
 	table.parentage["myparent"] = true;
 	table.parentage["myinterface"] = false;
 	writer.write(out, &table);
-	ASSERTLENGTH(37);
+	ASSERTLENGTH(36);
 
 	ASSERTCHAR(9);
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
-	ASSERTCHAR(0); // methods
 	ASSERTCHAR(0); // inheritance
 	ASSERTCHAR(11); // "myinterface" length
 	ASSERTCHAR('m'); ASSERTCHAR('y'); ASSERTCHAR('i'); ASSERTCHAR('n'); ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('r'); ASSERTCHAR('f'); ASSERTCHAR('a'); ASSERTCHAR('c'); ASSERTCHAR('e');
@@ -192,12 +202,11 @@ BOOST_AUTO_TEST_CASE(TestWritesParameters)
 	parameters.push_back(t); parameters.push_back(b);
 	table.setParameters(&parameters);
 	writer.write(out, &table);
-	ASSERTLENGTH(56);
+	ASSERTLENGTH(55);
 
 	ASSERTCHAR(9);
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
-	ASSERTCHAR(0); // methods
 	ASSERTCHAR(0); // inheritance
 	ASSERTCHAR(0); // parameters
 	ASSERTCHAR(3); // parameterized type

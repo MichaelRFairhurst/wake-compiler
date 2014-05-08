@@ -10,13 +10,6 @@ void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 	dataptr[0] = (char) table->isAbstract();
 	out.write(dataptr, 1);
 
-	for(vector<Type*>::iterator it = table->getNeeds()->begin(); it != table->getNeeds()->end(); ++it) {
-		writeType(out, *it);
-	}
-
-	dataptr[0] = 0x00; // End Nededs
-	out.write(dataptr, 1);
-
 	for(map<string, ObjectProperty*>::iterator it = table->properties.begin(); it != table->properties.end(); ++it) {
 		dataptr[0] = (char) it->first.size();
 		out.write(dataptr, 1);
