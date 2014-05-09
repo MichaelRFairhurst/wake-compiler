@@ -106,6 +106,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_PROVISION:
 			file << "this.";
 			header->addPropertyUsage(file.tellp(), classes->find(classname)->getProvisionSymbol(tree->node_data.nodes[0]->node_data.type));
+			file << "/*" <<  classes->find(classname)->getProvisionSymbol(tree->node_data.nodes[0]->node_data.type) << "*/";
 			file << "=function(){";
 			if(tree->subnodes == 1) {
 				string provisionname = tree->node_data.nodes[0]->node_data.type->typedata._class.classname;
@@ -125,6 +126,9 @@ void ObjectFileGenerator::generate(Node* tree) {
 					file << "return this.";
 					header->addPropertyUsage(file.tellp(), classes->find(classname)->getProvisionSymbol(tree->node_data.nodes[1]->node_data.type));
 					file << "();";
+				} else if(tree->node_data.nodes[1]->node_type == NT_STRINGLIT || tree->node_data.nodes[1]->node_type == NT_NUMBERLIT || tree->node_data.nodes[1]->node_type == NT_BOOLLIT) {
+					file << "return ";
+					generate(tree->node_data.nodes[1]);
 				}
 			}
 			file << "};";
@@ -302,8 +306,16 @@ void ObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_SUBCLASS:
+			{
 			header->addClassUsage(file.tellp(), tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
-			file << ".call(this);";
+			file << ".call(this, ";
+			PropertySymbolTable* proptable = classes->findModifiable(tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
+			for(auto it = proptable->getNeeds()->begin(); it != proptable->getNeeds()->end(); ++it) {
+				if(it != proptable->getNeeds()->begin()) cout << ",";
+				file << table.getAddress(*it);
+			}
+			file << ");";
+			}
 			break;
 
 		case NT_ARRAY_ACCESS:
