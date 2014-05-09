@@ -78,6 +78,9 @@ every Main is:
 		run(InheritanceTest.~[test implementing child gets child class name]~(Asserts <- this ), "test implementing child gets child class name");
 		run(InheritanceTest.~[test implementing child from provider gets child class name]~(Asserts <- this ), "test implementing child from proider gets child class name");
 		run(InheritanceTest.~[test implementing child after cast gets child class name]~(Asserts <- this ), "test implementing child after cast gets child class name");
+		run(InheritanceTest.~[test parent has need fulfilled]~(Asserts <- this ), "test parent has need fulfilled");
+		run(InheritanceTest.~[test fallthrough has need fulfilled]~(Asserts <- this ), "test fallthrough has need fulfilled");
+		run(InheritanceTest.~[test interface has need redefined]~(Asserts <- this ), "test interface has need redefined");
 		run(ArrayTest.~[test set array index]~(Asserts <- this), "test set array index");
 		run(ArrayTest.~[test reset array index]~(Asserts <- this), "test reset array index");
 		run(ArrayTest.~[test set array array index index]~(Asserts <- this), "test set array array index index");

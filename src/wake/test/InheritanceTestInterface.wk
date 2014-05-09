@@ -2,6 +2,8 @@ import InheritanceTestParent;
 
 every InheritanceTestInterface (capable InheritanceTestParent) is:
 
+with public Text = "not injected";
+
 Text -- getClassName() {
 	return "InheritanceTestInterface";
 }

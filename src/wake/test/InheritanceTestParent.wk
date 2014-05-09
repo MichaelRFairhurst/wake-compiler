@@ -1,5 +1,7 @@
 every InheritanceTestParent is:
 
+needs public Text:TestTransitiveNeeds;
+
 Text -- getClassName() {
 	return "InheritanceTestParent";
 }

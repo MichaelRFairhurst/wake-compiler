@@ -14,7 +14,13 @@ void ParseTreeTraverser::traverse(Node* tree) {
 			if(tree->subnodes > 1) secondPass(tree->node_data.nodes[1]);
 
 			if(!passesForCompilation()) return;
-			objectsymtable->propagateInheritance();
+			try {
+				objectsymtable->propagateInheritance();
+			} catch(SemanticError* e) {
+				e->token = tree;
+				errors.addError(e);
+				return;
+			}
 
 			thirdPass(tree->node_data.nodes[0]);
 			if(tree->subnodes > 1) thirdPass(tree->node_data.nodes[1]);

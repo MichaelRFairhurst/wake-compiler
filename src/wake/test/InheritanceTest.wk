@@ -9,6 +9,7 @@ import InheritanceTestInterface;
 every InheritanceTest is:
 
 	provides
+		Text:TestTransitiveNeeds <- "public need",
 		InheritanceTestParent,
 		InheritanceTestOverride,
 		InheritanceTestFallthrough,
@@ -76,5 +77,23 @@ every InheritanceTest is:
 	Bool -- ~[test implementing child after cast gets child class name]~(Asserts) {
 		var InheritanceTestParent = InheritanceTestInterface <- this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestInterface");
+		return Asserts.allPassed();
+	}
+
+	Bool -- ~[test parent has need fulfilled]~ (Asserts) {
+		var InheritanceTestParent <- this;
+		Asserts.that(InheritanceTestParent.Text)Equals("public need");
+		return Asserts.allPassed();
+	}
+
+	Bool -- ~[test fallthrough has need fulfilled]~ (Asserts) {
+		var InheritanceTestFallthrough <- this;
+		Asserts.that(InheritanceTestFallthrough.Text)Equals("public need");
+		return Asserts.allPassed();
+	}
+
+	Bool -- ~[test interface has need redefined]~ (Asserts) {
+		var InheritanceTestInterface <- this;
+		Asserts.that(InheritanceTestInterface.Text)Equals("not injected");
 		return Asserts.allPassed();
 	}

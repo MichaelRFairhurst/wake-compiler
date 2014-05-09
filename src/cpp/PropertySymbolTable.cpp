@@ -169,6 +169,7 @@ PropertySymbolTable::~PropertySymbolTable() {
 
 void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable* parent, bool extend) {
 	for(map<string, ObjectProperty*>::iterator it = parent->properties.begin(); it != parent->properties.end(); ++it) {
+		if(!extend && !(it->second->flags & PROPERTY_PUBLIC)) continue;
 		map<string, ObjectProperty*>::iterator searcher = child->properties.find(it->first);
 		if(searcher == child->properties.end()) {
 			ObjectProperty* propagate = new ObjectProperty;
@@ -186,6 +187,13 @@ void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable*
 		} else {
 			searcher->second->address = it->second->address;
 		}
+	}
+
+	if(!extend) return;
+
+	for(auto it = parent->getNeeds()->begin(); it != parent->getNeeds()->end(); ++it) {
+		child->analyzer->assertNeedIsNotCircular(child->classname, *it);
+		child->getNeeds()->push_back(*it);
 	}
 }
 

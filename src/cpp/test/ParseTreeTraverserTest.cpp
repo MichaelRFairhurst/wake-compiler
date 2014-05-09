@@ -2144,4 +2144,24 @@ PTT_TEST_CASE(
 	PTT_VALID
 );
 
+PTT_TEST_CASE(
+	TestCircularNeedThroughInheritanceIsInvalid,
+	"every SubClass (a MyClass) is: every MyClass is: needs SubClass;",
+	PTT_EXPECT(CIRCULAR_DEPENDENCIES)
+);
+
+PTT_TEST_CASE(
+	TestParentsNeedsAreVisibleToChild,
+	"every MyClass is: needs Text:hey; every SubClass (a MyClass) is: Text -- getHey() { return Text; }",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestParentNeedsAreNecessaryToProvide,
+	"every MyClass is: needs Text:hey;	\n\
+	every SubClass (a MyClass) is:		\n\
+		provides SubClass;",
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+);
+
 BOOST_AUTO_TEST_SUITE_END()
