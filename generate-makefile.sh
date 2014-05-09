@@ -1,3 +1,4 @@
+#!/bin/bash
 deps=( )
 while IFS='' read LINE
 do
