@@ -126,20 +126,6 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
-	ASSERTCHAR(7); // property length
-	ASSERTCHAR('P'); ASSERTCHAR('r'); ASSERTCHAR('i'); ASSERTCHAR('n'); ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('r');
-	ASSERTCHAR(7); // casing length
-	ASSERTCHAR('P'); ASSERTCHAR('r'); ASSERTCHAR('i'); ASSERTCHAR('n'); ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('r');
-	ASSERTCHAR(4); // flags -- Type need
-	ASSERTCHAR(2); // type
-	ASSERTCHAR(7); // classname length
-	ASSERTCHAR('P'); ASSERTCHAR('r'); ASSERTCHAR('i'); ASSERTCHAR('n'); ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('r');
-	ASSERTCHAR(0); // parameters
-	ASSERTCHAR(0); // shadow
-	ASSERTCHAR(0); // array
-	ASSERTCHAR(0); // alias length
-	ASSERTCHAR(0); // spec length
-	ASSERTCHAR(0); // optional
 	ASSERTCHAR(4); // propname length
 	ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t');
 	ASSERTCHAR(4); // casing length
@@ -148,6 +134,20 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	ASSERTCHAR(2); // type
 	ASSERTCHAR(4); // classname length
 	ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t');
+	ASSERTCHAR(0); // parameters
+	ASSERTCHAR(0); // shadow
+	ASSERTCHAR(0); // array
+	ASSERTCHAR(0); // alias length
+	ASSERTCHAR(0); // spec length
+	ASSERTCHAR(0); // optional
+	ASSERTCHAR(7); // property length
+	ASSERTCHAR('P'); ASSERTCHAR('r'); ASSERTCHAR('i'); ASSERTCHAR('n'); ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('r');
+	ASSERTCHAR(7); // casing length
+	ASSERTCHAR('P'); ASSERTCHAR('r'); ASSERTCHAR('i'); ASSERTCHAR('n'); ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('r');
+	ASSERTCHAR(4); // flags -- Type need
+	ASSERTCHAR(2); // type
+	ASSERTCHAR(7); // classname length
+	ASSERTCHAR('P'); ASSERTCHAR('r'); ASSERTCHAR('i'); ASSERTCHAR('n'); ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('r');
 	ASSERTCHAR(0); // parameters
 	ASSERTCHAR(0); // shadow
 	ASSERTCHAR(0); // array

@@ -86,10 +86,16 @@ void ObjectFileGenerator::generate(Node* tree) {
 					table.add(*it);
 					if(it != needs->begin()) file << ",";
 					file << table.getAddress(*it);
-					//header->addClassUsage(file.tellp(), typeanalyzer.getNameForType(*it));
 				}
 
 				file << "){";
+
+				for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
+					file << "this.";
+					header->addPropertyUsage(file.tellp(), table.getNameForType(*it));
+					file << "=" << table.getAddress(*it) << ";";
+				}
+
 				generate(tree->node_data.nodes[1]);
 				if(tree->subnodes > 2) generate(tree->node_data.nodes[2]);
 				file << "};";

@@ -8,11 +8,11 @@ BOOST_AUTO_TEST_SUITE(TableFileReaderTest)
 
 BOOST_AUTO_TEST_CASE(TestReadsSimple)
 {
-					// classname length 9  classname   not abstract begin methods begin inheritance begin parameters
-	char* dataptr = "\011"                 "classname" "\000"       "\000"        "\000"			"\000";
+					// classname length 9  classname   not abstract begin inheritance begin parameters
+	char* dataptr = "\011"                 "classname" "\000"       "\000"			"\000";
 
 	std::stringstream in;
-	in.write(dataptr, 14);
+	in.write(dataptr, 13);
 
 	TableFileReader reader;
 
@@ -33,7 +33,6 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 	char* dataptr = "\011" // classname length of 9
 					"classname"
 					"\000" // not abstract
-					"\000" // method flag
 					"\013" // method name length of 11
 					"print(Text)"
 					"\010" // casing length of 8
@@ -59,7 +58,7 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 					"\000"; // begin parameters
 
 	std::stringstream in;
-	in.write(dataptr, 55);
+	in.write(dataptr, 54);
 
 	TableFileReader reader;
 
@@ -96,6 +95,11 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 	char* dataptr = "\011" // classname length of 9
 					"classname"
 					"\000" // not abstract
+					"\004" // property len
+					"Text"
+					"\004" // casing len
+					"Text"
+					"\004" // flags - NEED
 					"\002" // type
 					"\004" // classname length
 					"Text"
@@ -105,12 +109,11 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 					"\000" // alias length
 					"\000" // spec length
 					"\000" // optional
-					"\000" // methods
 					"\000" // begin inheritance
 					"\000"; // begin parameters
 
 	std::stringstream in;
-	in.write(dataptr, 26);
+	in.write(dataptr, 36);
 
 	TableFileReader reader;
 
@@ -129,7 +132,8 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 	BOOST_CHECK(table.getNeeds()->at(0)->alias == NULL);
 	BOOST_CHECK(table.getNeeds()->at(0)->specialty == NULL);
 	BOOST_CHECK(table.getNeeds()->at(0)->optional == NULL);
-	BOOST_CHECK(table.properties.size() == 0);
+	BOOST_CHECK(table.properties.size() == 1);
+	BOOST_CHECK(table.properties["Text"]->type == table.getNeeds()->at(0));
 	BOOST_CHECK(table.parentage.size() == 0);
 	BOOST_CHECK(table.getParameters().size() == 0);
 }
@@ -139,6 +143,11 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	char* dataptr = "\011" // classname length of 9
 					"classname"
 					"\000" // not abstract
+					"\004" // property length
+					"Text"
+					"\004" // casing length
+					"Text"
+					"\004" // flags - NEED
 					"\002" // type
 					"\004" // classname length
 					"Text"
@@ -148,6 +157,11 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 					"\000" // alias length
 					"\000" // spec length
 					"\000" // optional
+					"\007" // property length
+					"Printer"
+					"\007" // casing length
+					"Printer"
+					"\004" // flags - NEED
 					"\002" // type
 					"\007" // classname length
 					"Printer"
@@ -157,12 +171,11 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 					"\000" // alias length
 					"\000" // spec length
 					"\000" // optional
-					"\000" // methods
 					"\000" // begin inheritance
 					"\000"; // begin parameters
 
 	std::stringstream in;
-	in.write(dataptr, 41);
+	in.write(dataptr, 68);
 
 	TableFileReader reader;
 
@@ -189,7 +202,9 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	BOOST_CHECK(table.getNeeds()->at(1)->alias == NULL);
 	BOOST_CHECK(table.getNeeds()->at(1)->specialty == NULL);
 	BOOST_CHECK(table.getNeeds()->at(1)->optional == NULL);
-	BOOST_CHECK(table.properties.size() == 0);
+	BOOST_CHECK(table.properties.size() == 2);
+	BOOST_CHECK(table.properties["Text"]->type == table.getNeeds()->at(0));
+	BOOST_CHECK(table.properties["Printer"]->type == table.getNeeds()->at(1));
 	BOOST_CHECK(table.parentage.size() == 0);
 }
 
@@ -198,7 +213,6 @@ BOOST_AUTO_TEST_CASE(TestReadsInheritance)
 	char* dataptr = "\011" // classname len
 					"classname"
 					"\000" // not abstract
-					"\000" // begin methods
 					"\000" // begin inheritance
 					"\010" // parent legnth 8
 					"myparent"
@@ -209,7 +223,7 @@ BOOST_AUTO_TEST_CASE(TestReadsInheritance)
 					"\000"; // begin parameters
 
 	std::stringstream in;
-	in.write(dataptr, 37);
+	in.write(dataptr, 36);
 
 	TableFileReader reader;
 
@@ -232,7 +246,6 @@ BOOST_AUTO_TEST_CASE(TestReadsParameters)
 	char* dataptr = "\011" // classname len
 					"classname"
 					"\000" // not abstract
-					"\000" // begin methods
 					"\000" // begin inheritance
 					"\000" // begin parameters
 					"\003" // parameterized type
@@ -269,7 +282,7 @@ BOOST_AUTO_TEST_CASE(TestReadsParameters)
 					"\000"; // optional
 
 	std::stringstream in;
-	in.write(dataptr, 56);
+	in.write(dataptr, 55);
 
 	TableFileReader reader;
 

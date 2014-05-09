@@ -10,7 +10,20 @@ void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 	dataptr[0] = (char) table->isAbstract();
 	out.write(dataptr, 1);
 
+	// Its very important that our methods section has our needs listed in order!
+	for(vector<Type*>::iterator need = table->getNeeds()->begin(); need != table->getNeeds()->end(); ++need) {
+		for(map<string, ObjectProperty*>::iterator it = table->properties.begin(); it != table->properties.end(); ++it) {
+			if(*need != it->second->type) continue;
+			dataptr[0] = (char) it->first.size();
+			out.write(dataptr, 1);
+			out.write(it->first.c_str(), it->first.size());
+
+			writeProperty(out, it->second);
+		}
+	}
+
 	for(map<string, ObjectProperty*>::iterator it = table->properties.begin(); it != table->properties.end(); ++it) {
+		if(it->second->flags & PROPERTY_NEED) continue;
 		dataptr[0] = (char) it->first.size();
 		out.write(dataptr, 1);
 		out.write(it->first.c_str(), it->first.size());

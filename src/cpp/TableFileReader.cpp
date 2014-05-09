@@ -8,10 +8,6 @@ void TableFileReader::read(PropertySymbolTable* table, istream& s) {
 	table->classname = readString(s);
 	table->abstract = readUInt8(s);
 	unsigned char tag;
-	while(tag = readUInt8(s)) {
-		table->addNeed(readTypeByTag(tag, s), 0);
-	}
-
 	while(true) {
 		tag = readUInt8(s);
 		if(tag == 0x00) break;
@@ -163,6 +159,7 @@ void TableFileReader::readMethod(PropertySymbolTable* table, istream& s) {
 	prop->flags = readUInt8(s);
 	prop->type = readType(s);
 	table->properties[name] = prop;
+	if(prop->flags & PROPERTY_NEED) table->getNeeds()->push_back(prop->type);
 }
 
 void TableFileReader::readInheritance(PropertySymbolTable* table, istream& s) {
