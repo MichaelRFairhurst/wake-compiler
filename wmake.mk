@@ -12,13 +12,13 @@ $(SRCDIR)/%.d: $(SRCDIR)/%.wk
 	@./generate-makefile.sh $< $(TABLEDIR) > $@
 
 $(TABLEDIR)/%.table: $(SRCDIR)/%.wk
-	wake $< -d $(TABLEDIR) -t
+	bin/wake $< -d $(TABLEDIR) -t
 
 $(OBJECTDIR)/%.o: $(SRCDIR)/%.wk
-	wake $< -d $(TABLEDIR) -o $@
+	bin/wake $< -d $(TABLEDIR) -o $@
 
 bin/$(PROGRAM): $(OBJECTFILES)
-	wake -l -d $(TABLEDIR) -o bin/$(PROGRAM) $(OBJECTFILES) $(LIBRARYFILES)
+	bin/wake -l -d $(TABLEDIR) -o bin/$(PROGRAM) $(OBJECTFILES) $(LIBRARYFILES)
 
 ifneq "$(MAKECMDGOALS)" "clean"
 -include ${SOURCEFILES:.wk=.d}
