@@ -25,7 +25,6 @@
 				<li><a href="#knownisssues">Known Issues</a></li>
 				<li><a href="#optionalarrays">- Optional Arrays</a></li>
 				<li><a href="#nestedoptionals">- Nested Optionals</a></li>
-				<li><a href="#inheritneeds">- Inheritance + Needs</a></li>
 				<li><a href="#genericprops">- Generic Properties</a></li>
 				<li><a href="#overlappinggenerics">- Overlapping Generics</a></li>
 				<li><a href="#missingfeats">Missing Features + Workarounds</a></li>
@@ -184,21 +183,6 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
     }</code></pre>
 				<p>Basically, if you consider a language without optional types, if you had a function that searched through a list and returned either the last item or null, this API is inadequate for an array where the last element <i>is</i> null. The fix isn't too difficult, but optional types need to be stored in recursive wrappers, and unboxed when used within an "exists" check.</p>
 				<br/>
-				<h3 id="inheritneeds">Inheritance + Needs</h3>
-				<p>For the sake of javascript optimization, I originally did not makes needs properties. Bad call, turns out, once you want to inherit from a class with needs. They won't be there!</p>
-			<span class="label label-info">wake</span>
-			<pre><code class="wake"
->every ParentClassWithNeed is:
-
-    needs Printer;
-
-    usePrinter() {
-        Printer.printLine("This crashes when called on a ChildClass");
-    }
-
-every ChildClass (a ParentClassWithNeed) is:
-   // no class body necessary</code></pre>
-				<br/>
 				<h3 id="genericprops">Generic Properties</h3>
 				<p>When a generic class has a generic type served as a public property, it isn't paramterized the way methods are. The name doesn't change and the type doesn't change either.</p>
 			<span class="label label-info">wake</span>
@@ -240,7 +224,7 @@ every ChildClass (a ParentClassWithNeed) is:
 
     needs public Text firstname, public Text lastname, public Int age, public Gender;</code></pre>
 				<p>Easy! That's it!</p>
-				<p>Except, well, it won't work yet! I haven't fully decided whether this class, the providing class, or the class using the providing class, should allow and/or require manual ctor argument supplying. If you have been bitten by this in your designs and have any ideas for syntax, keywords, concepts, etc that can solve this problem, send it to me asap!!</p>
+				<p>Except, well, you can't supply these values, only the providing class can provide them. I haven't fully decided whether this class, the providing class, or the class using the providing class, should allow and/or require manual ctor argument supplying. If you have been bitten by this in your designs and have any ideas for syntax, keywords, concepts, etc that can solve this problem, send it to me asap!!</p>
 				<p>In the meantime, do this dirty hack:</p>
 			<pre><code class="wake"
 >every PersonProvider is:
@@ -256,8 +240,7 @@ every ChildClass (a ParentClassWithNeed) is:
 
 every Person is:
 
-    needs $Gender; // we need it since its a class
-    with public Gender = $Gender; // This is only necessary until public needs are supported
+    needs public Gender;
     with public Text lastname = ""; // By starting with "", this field doesn't need to be optional
     with public Text firstname = "";
     with public Int age = 0;</code></pre>
@@ -289,9 +272,6 @@ every ChildClass is:
     getAllUsers(Object[] values) {
         return PDO.prepare("SELECT * FROM user WHERE username = ? AND email = ?", values).find();
     }</code></pre>
-				<br/>
-				<h3 id="publicneeds">Public Needs</h3>
-				<p>Public needs are a problem just like inheritance with needs. Both of these problems exist because at runtime they are treated as variables instead of properties. The public keyword is valid syntactically but does nothing.</p>
 				<br/>
 				<h3 id="lvaluesexist">Exists on some L-Values</h3>
 				<p>For properties on external objects, and potentially other places, you can't use exists because it's very complex to add the value to a scope sym table. You must store it in an intermediate variable, sorry.</p>

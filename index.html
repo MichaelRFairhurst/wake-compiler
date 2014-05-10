@@ -91,10 +91,10 @@
     }
 
     Int -- <span class="goodcode" title="A uniquely clear method naming system">sumFrom( Int )To( $Int )</span> {
-        var Int @sum = generate(Int);
+        var Int sum = generate(Int);
         if(Int &gt; $Int)
-            return @sum + sumFrom(Int - 1)To($Int);
-        else return @sum;
+            return sum + sumFrom(Int - 1)To($Int);
+        else return sum;
     }
 
     printUpTo( Int ) {
@@ -329,20 +329,20 @@
 			</div>
 			<h3 id="aliases">2. Aliasing <span class="label label-inverse">readable</span> <span class="label label-inverse">safe</span></h3>
 			<p>In our previous example, calling a person's ID <code>Int</code> is a bit ambiguous. When a type isn't meaningful for a context, use aliases.</p>
-			<p>To aid the compiler, we must write <code>@</code> as a hint that its not a type. But luckily, it turns out that the same idea is useful to humans as well.</p>
+			<p>To aid the compiler, we must write aliases in lowercase, to hint that its not a type. But luckily, it turns out that the same idea is useful to humans as well. It also allows us to write aliases before or after our type to make our code more literate.</p>
 			<div class="row">
 				<div class="span6">
 					<span class="label label-info">Wake</span>
 					<pre><code class="wake"
 >every Person is:
 
-    needs Int <span class="goodcode" title="Here we give our Int a name.">@id</span>;
+    needs Int <span class="goodcode" title="Here we give our Int a name.">id</span>;
 
     Int -- getId() {
-        return <span class="goodcode" title="Here we use our Int by its alias, @id. We know that it is not a typename.">@id</span>
+        return <span class="goodcode" title="Here we use our Int by its alias, id. We know that it is not a typename.">id</span>
     }
 
-    setIdThenSave(<span class="goodcode" title="You can precede variables with aliases.">@newid Int</span>, <span class="goodcode" title="You can also precede variables by their type.">Truth @recursively</span>) {
+    setIdThenSave(<span class="goodcode" title="You can precede variables with aliases.">newid Int</span>, <span class="goodcode" title="You can also precede variables by their type.">Truth recursively</span>) {
         ...
     }</code></pre>
 				</div>
@@ -369,7 +369,7 @@
 			</div>
 			<h3 id="shadowing">3. Shadowing <span class="label label-inverse">concise</span> <span class="label label-inverse">safe</span></h3>
 			<p>Following from the idea that the most meaningful name for a variable often <i>is</i> its type, we have a problem with places like 'setter' methods. The new value is of the same type as the old value, but they must be distinguished.</p>
-			<p>Instead of creating meaningless aliases as we arguably did with <code>@newid</code>, we can add <code>$</code> to preserve type information while also creating a unique instance</p>
+			<p>Instead of creating meaningless aliases as we arguably did with <code>newid</code>, we can add <code>$</code> to preserve type information while also creating a unique instance</p>
 			<span class="label label-info">Wake</span>
 			<pre><code class="wake"
 >every IntContainer is:
@@ -385,15 +385,16 @@
 			<pre><code class="wake"
 >every DeclarationExample is:
 
-    <span class="goodcode" title="Here we define an object property.">with Int @a = 4;</span>
-    with @an Int = 4;
+    <span class="goodcode" title="Here we define an object property.">with Int here = 4;</span>
+    with some Int = 4;
     with $Int = 4;
+    <span class="goodcode" title="Properties can be public.">with public Int publicexample = 5;</span>
 
-    <span class="goodcode" title="Here we define dependencies.">needs @another Int, $$Int, Int @again;</span>
+    <span class="goodcode" title="Here we define dependencies.">needs another Int, $$Int, Int again;</span>
 
     declareThem() {
-        <span class="goodcode" title="Here we define variables within a method.">var Int @local = 4;</span>
-        :@second Int = 4;
+        <span class="goodcode" title="Here we define variables within a method.">var local Int = 4;</span>
+        :second Int = 4;
         :$$$Int = 5;
         <span class="badcode" title="Compiler error! In Wake you cannot redefine variables.">var Int = 3</span>;
     }</code></pre>
@@ -424,9 +425,9 @@
 
     methodWithListArgument(<span class="goodcode" title="Here we accept a list of Ints">Int[]</span>) {
         <span class="goodcode" title="Set the first Int in the list.">Int[0] = 5;</span>
-        <span class="goodcode" title="Declare an empty list of Ints again.">:$Int[] = [];</span>
-        <span class="goodcode" title="Declare a list of Ints again, except with three starting values.">:$$Int[] = [1, 2, 3];</span>
-        <span class="goodcode" title="Declare a list lists of Ints, containing our lists of ints.">:@combined $Int[][] = [Int[], $Int[], $$Int[]];</span>
+        <span class="goodcode" title="Declare an empty list of Ints again.">var $Int[] = [];</span>
+        <span class="goodcode" title="Declare a list of Ints again, except with three starting values.">var $$Int[] = [1, 2, 3];</span>
+        <span class="goodcode" title="Declare a list lists of Ints, containing our lists of ints.">var combined $Int[][] = [Int[], $Int[], $$Int[]];</span>
     }</code></pre>
 			<hr />
 			<h1 id="classes">Classes in Wake <span class="label label-inverse">concise</span> <span class="label label-inverse">readable</span></h1>
@@ -435,10 +436,10 @@
 			<span class="label label-info">Wake</span>
 			<pre><code class="wake"
 >every MyClass is:
-    <span class="goodcode" title="Here we have an object property.">with public Text @name;</span>
-    <span class="goodcode" title="Properties default to private.">with Text @ssn;</span>
+    <span class="goodcode" title="Here we have an object property.">with public Text name;</span>
+    <span class="goodcode" title="Properties default to private.">with Text ssn;</span>
 
-    needs <span class="goodcode" title="Here we have dependencies. The object cannot exist without them.">Int @id, Printer</span> then {
+    needs <span class="goodcode" title="Here we have dependencies. The object cannot exist without them.">Int id, Printer</span> then {
         <span class="goodcode" title="You can declare 'needs nothing then {...} to have a constructor with no dependencies.">// constructor body</span>
     }
 
@@ -449,21 +450,21 @@
     }</code></pre>
 			<h3 id="dependencies">Dependencies <span class="label label-inverse">concise</span> <span class="label label-inverse">testable</span></h3>
 			<p>When an object is constructed, first the dependencies are all resolved by means of provisions. This means that you can simply say your object <code>needs Printer</code>, and you will always have one.</p>
+			<pre><code class="wake"
+>every FileStream is:
+    needs Text filename, <span class="goodcode" title="needs can be public properties, too.">public OutStream;</span></code></pre>
 			<h3 id="properties">Properties <span class="label label-inverse">flexible</span></h3>
-			<p>At this point the object has its dependencies met, and each property is evaluated in order. Each assigned value can be a full expression referencing needs or already-evaluated properties. Then the constructor is called.</p>
+			<p>At this point the object has its dependencies met, and each property can use the needs in their initialization. Then the constructor is called.</p>
 			<span class="label label-info">Wake</span>
 			<pre><code class="wake"
 >every IncrementingProperties is:
-    needs Int @starter, Printer {
-        Printer.print(<span class="goodcode" title="By now, the property @sum exists.">@sum</span>);
+    needs Int starter, Printer {
+        Printer.print(<span class="goodcode" title="By now, the property sum exists.">sum</span>);
     }
 
-    with Int <span class="goodcode" title="When @plusone is declared, @starter already exists since its a dependency.">@plusone = @starter + 1;</span>
-    with Int <span class="goodcode" title="Since @plustwo is declared after @plusone, we can use it to evaluate its initial value.">@plustwo = @plusone + 1;</span>
-    with Int <span class="goodcode" title="Since @plustwo is declared after @plusone, we can use it to evaluate its initial value.">@plusthree = @plusthree + 1;</span>
-    with Int <span class="goodcode" title="As the last property, we can use every other property to define its initial value.">@sum = @starter + @plusone + @plustwo + @plusthree;</span></code></pre>
+    with Int <span class="goodcode" title="When plusone is declared, starter already exists since its a dependency.">plusone = starter + 1;</span>
+    with Int <span class="goodcode" title="Since plustwo is declared after plusone, we can use it to evaluate its initial value.">plustwo = starter + 2;</span></code></pre>
 			<h3 id="inheritance">Inheritance <span class="label label-inverse">testable</span> <span class="label label-inverse">flexible</span> <span class="label label-inverse">readable</span></h3>
-			<p class="alert alert-error">Inheritance is not fully implemented just yet. But this is how it will work.</p>
 			<p>Every class can be inherited with or without keeping behavior, with the keywords <code>a</code>/<code>an</code>, and <code>capable</code>. Usually in small projects the point of inheritance is to copy the code from that class, however, it is not always desirable. If you use <code>capable</code>, you must rewrite the methods of your child class. These actions are called <i>extending</i> vs <i>implementing</i>.</p>
 			<p>An additional value to implementing classes with <code>capable</code> instead of extending classes with <code>a</code>/<code>an</code>, is that you can implement multiple classes even though you can only extend one class.</p>
 			<p>An object which extends or implements another class can be used as that subclass elsewhere in the code.</p>
@@ -486,7 +487,6 @@ every SubClass (<span class="goodcode" title="Subclass extends BaseClass, meanin
     <span class="goodcode" title="Running this method will output &quot;SubClass printing: BaseClass&quot;">useThisAsPrinter</span>() {
         <span class="goodcode" title="Use BaseClass.myMethod since SubClass is a BaseClass. You can also do this with parent.myMethod()">myMethod</span>(<span class="goodcode" title="We can send 'this' as the argument of myMethod(Printer) since SubClass is a capable Printer.">this</span>);
     }</code></pre>
-
 			<hr />
 			<h1 id="methods">Valid Methods in Wake <span class="label label-inverse">concise</span> <span class="label label-inverse">readable</span></h1>
 			<div class="alert alert-info">
@@ -500,8 +500,8 @@ every SubClass (<span class="goodcode" title="Subclass extends BaseClass, meanin
     methodWithNoReturnValue() {}
     abstractMethodWithNoImplementation();
     methodWithArgument(Int) {}
-    methodWithArgument(@this Int) {}
-    methodWithArgument(Int @here) {}
+    methodWithArgument(this Int) {}
+    methodWithArgument(Int here) {}
     methodWith(Int)ArgumentAnd(Text)Argument() {}</code></pre>
 			<h3 id="invoking">Invoking Methods <span class="label label-inverse">readable</span></h3>
 			<p>Invoking methods (that is, calling a method's code on a particular object and argument set) looks almost exactly like defining one.</p>
@@ -599,6 +599,7 @@ every User is:
         Int:Port &lt;- 3307,
         Text:Username &lt;- "Test",
         DBConnection:Test &lt;- DBConnection(<span class="goodcode" title="If a DBConnection accepts any Text username, we can create specialized connections by letting the provider find the right Username and Port.">Text:Username, Int:Port</span>),
+		<p>If a class with needs extends another class with needs, constructor provisions require that you supply all of these. When doing this, supply the childclass needs first, and then the parent class needs, in that order. And don't worry, the compiler will make sure you don't mess up.</p>
         <span class="goodcode" title="Constructor provisions do not require specialization.">User</span> &lt;- <span class="goodcode" title="Constructor provisions can be used with subtype provision simultaneously.">TestUser</span>(DBConnection:Test);</code></pre>
 		<h3 id="behavioralprovisions">Behavioral Provisions <span class="label label-inverse">flexible</span></h3>
 		<div class="alert alert-error">These are not supported quite just yet.</div>
