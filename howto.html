@@ -18,7 +18,7 @@
 				<li><a href="#firstprogram">A First Program</a></li>
 				<li><a href="#compiling">Compiling</a></li>
 				<li><a href="#stdlib">Standard Library</a></li>
-				<li><a href="#ints">- Int</a></li>
+				<li><a href="#ints">- Num</a></li>
 				<li><a href="#text">- Text</a></li>
 				<li><a href="#bool">- Bool</a></li>
 				<li><a href="#array">- Array</a></li>
@@ -141,7 +141,7 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
 				<h1 id="stdlib">Standard Library</h1>
 				<p>stub</p>
 				<br/>
-				<h3 id="ints">Int</h3>
+				<h3 id="ints">Num</h3>
 				<p>stub</p>
 				<br/>
 				<h3 id="text">Text</h3>
@@ -157,16 +157,16 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
 				<p>These issues have the potential to crash/corrupt a running program. Some are pretty standard use cases - sorry! And others are pretty obscure/obviously wrong at compile-time.</p>
 				<br/>
 				<h3 id="optionalarrays">Optional Arrays</h3>
-				<p>Before I had optional types, I had array types. When adding optional types I did not consider that they could be combined. Int?[] and Int[]? were parse errors and all was well, albeit incomplete.</p>
-				<p>Now I think Int?[] and Int[]? are still parse errors, but at the very least its possible that these types will appear out in the wild through generics, since a class which returns T[] can be instantiated like Class{Int?}.</p>
+				<p>Before I had optional types, I had array types. When adding optional types I did not consider that they could be combined. Num?[] and Num[]? were parse errors and all was well, albeit incomplete.</p>
+				<p>Now I think Num?[] and Num[]? are still parse errors, but at the very least its possible that these types will appear out in the wild through generics, since a class which returns T[] can be instantiated like Class{Num?}.</p>
 				<p>Anyways, the end result of this is that a type which is both optional and an array, acts as both an optional type, and an array. So depending on how it was used and when you call exists {}, its possible to access an index off of nothing, which makes your program explode.</p>
 			<span class="label label-info">wake</span>
 			<pre><code class="wake"
 >every Main is:
 
     getElementOutOfNothing() {
-        var Int?[] = nothing;
-        var Int? yourProgramExplodesHere = Int[0];
+        var Num?[] = nothing;
+        var Num? yourProgramExplodesHere = Num[0];
     }</code></pre>
 				<p>This fix is important but also requires essentially rewriting all array or all optional code. So it may be quite a while.</p>
 				<br/>
@@ -176,9 +176,9 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
 >every Main is:
 
     nestedOptionalsInteractingWithExists() {
-        var Int? = nothing;
-        var Int?? nested = Int;
-        if Int exists { } // this check will fail as it should
+        var Num? = nothing;
+        var Num?? nested = Num;
+        if Num exists { } // this check will fail as it should
         if nested exists { } // this check should succeed, and won't!
     }</code></pre>
 				<p>Basically, if you consider a language without optional types, if you had a function that searched through a list and returned either the last item or null, this API is inadequate for an array where the last element <i>is</i> null. The fix isn't too difficult, but optional types need to be stored in recursive wrappers, and unboxed when used within an "exists" check.</p>
@@ -191,9 +191,9 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
 
     with public T?;
 
-    typeErrors(Generic{Int}) {
-        var Int? = Generic.Int; // Doesn't compile: unknown property Int
-        var Int? = Generic.T; // Doesn't compile: expected: Int?, actual: T?
+    typeErrors(Generic{Num}) {
+        var Num? = Generic.Num; // Doesn't compile: unknown property Num
+        var Num? = Generic.T; // Doesn't compile: expected: Num?, actual: T?
         var T? wat = Generic.T; // Successfully compiles: WAT
     }</code></pre>
 				<p>This is easy to fix, just low priority. Ping me for a, most likely, same-day fix.</p>
@@ -209,7 +209,7 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
     overlappingMethod(A) { Printer.printLine("MethodA"); }
     overlappingMethod(B) { Printer.printLine("MethodB"); }
 
-    oneMethodIsLost(Generic{Int, Int}) {
+    oneMethodIsLost(Generic{Num, Num}) {
         Generic.overlappingMethod(5); // prints B...I think...
     }</code></pre>
 				<br/>
@@ -222,7 +222,7 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
 			<pre><code class="wake"
 >every Person is:
 
-    needs public Text firstname, public Text lastname, public Int age, public Gender;</code></pre>
+    needs public Text firstname, public Text lastname, public Num age, public Gender;</code></pre>
 				<p>Easy! That's it!</p>
 				<p>Except, well, you can't supply these values, only the providing class can provide them. I haven't fully decided whether this class, the providing class, or the class using the providing class, should allow and/or require manual ctor argument supplying. If you have been bitten by this in your designs and have any ideas for syntax, keywords, concepts, etc that can solve this problem, send it to me asap!!</p>
 				<p>In the meantime, do this dirty hack:</p>
@@ -230,7 +230,7 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
 >every PersonProvider is:
 
     provides Person, Gender; // must provide gender since its a class!
-    Person -- getPerson(Text firstname, Text lastname, Int age, Gender) {
+    Person -- getPerson(Text firstname, Text lastname, Num age, Gender) {
         var Person &lt;- this;
         Person.firstname = firstname;
         Person.lastname = lastname;
@@ -243,7 +243,7 @@ every Person is:
     needs public Gender;
     with public Text lastname = ""; // By starting with "", this field doesn't need to be optional
     with public Text firstname = "";
-    with public Int age = 0;</code></pre>
+    with public Num age = 0;</code></pre>
 				<br/>
 				<h3 id="parentmethods">Parent Method Calls</h3>
 				<p>This is a semantic analysis and parsing problem. I simply need to look for parent.aMethod() calls and treat them specially. Haven't done it yet. Also, I'm partially waiting on this one because I am pondering two-way-inheritance. There's an easy workaround, though!</p>
@@ -314,8 +314,8 @@ every ChildClass is:
 >every DeclareArray is:
 
     declareArray() {
-        Int[] = [1, 2, 3]; // not working yet :(
-        Int[] = []; Int[0] = 1; Int[1] = 2; Int[2] = 3; // This will have to do for now
+        Num[] = [1, 2, 3]; // not working yet :(
+        Num[] = []; Num[0] = 1; Num[1] = 2; Num[2] = 3; // This will have to do for now
     }</code></pre>
 
 				<h3 id="genericprovs">Generic Provisions</h3>
@@ -326,7 +326,7 @@ every ChildClass is:
 
     provides T, // won't compile. How can we provide T when T could require any sort of subsequent types?!
          GenericProvider, // This should compile, since all types of GenericProvider have one type of need
-         GenericProvider{Int} &lt;- SomeSubclassOfGenericProvider; // It should be possible to do this too, not sure how best to make this happen.
+         GenericProvider{Num} &lt;- SomeSubclassOfGenericProvider; // It should be possible to do this too, not sure how best to make this happen.
 
     useAProvider() {
         T &lt;- SomeProvider; // Won't compile, for the same reason as java won't let you do "new T()". Likely will never fix this...its broken for very good reasons.
