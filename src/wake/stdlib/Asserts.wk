@@ -30,11 +30,11 @@ every Asserts is:
 		that(Bool)Equals(true);
 	}
 
-	that(actual Int)Equals(Int) {
-		if(Int != actual) {
+	that(actual Num)Equals(Num) {
+		if(Num != actual) {
 			lasttext = "Failed asserting that two numbers are equal" ;
 			Printer.printLine(lasttext);
-			Printer.printLine(Int);
+			Printer.printLine(Num);
 			Printer.printLine(actual);
 			hasfailed = true;
 		}

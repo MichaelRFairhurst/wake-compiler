@@ -215,8 +215,8 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 							errors->addError(new SemanticError(TYPE_ERROR, "Bound a Text value to something that is not a Text", tree));
 						break;
 					case NT_NUMBERLIT:
-						if(!classestable->getAnalyzer()->isPrimitiveTypeInt(provision))
-							errors->addError(new SemanticError(TYPE_ERROR, "Bound an Int value to something that is not an Int", tree));
+						if(!classestable->getAnalyzer()->isPrimitiveTypeNum(provision))
+							errors->addError(new SemanticError(TYPE_ERROR, "Bound an Num value to something that is not an Num", tree));
 						break;
 					case NT_TYPEDATA:
 						try {
@@ -258,7 +258,7 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 										break;
 									case NT_NUMBERLIT:
 										actual = MakeType(TYPE_CLASS);
-										actual->typedata._class.classname = "Int";
+										actual->typedata._class.classname = "Num";
 										break;
 								}
 

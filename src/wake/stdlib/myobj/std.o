@@ -2,7 +2,7 @@ var$ b='';
 
 ~Printer~ = function(){
 	this.`print(Text)` =
-	this.`print(Int)` = function(a) {
+	this.`print(Num)` = function(a) {
 		if(typeof$ process != 'undefined'
 				&& typeof$ process.stdout != 'undefined'
 				&& typeof$ process.stdout.write != 'undefined')
@@ -12,7 +12,7 @@ var$ b='';
 	};
 
 	this.`printLine(Text)` =
-	this.`printLine(Int)` = function(a) {
+	this.`printLine(Num)` = function(a) {
 		if(typeof$ process != 'undefined'
 				&& typeof$ process.stdout != 'undefined'
 				&& typeof$ process.stdout.write != 'undefined') return$ this.`print(Text)`(a + '\n');
@@ -22,13 +22,13 @@ var$ b='';
 };
 
 ~System~ = function() {
-	this.`exit(Int)` = function(a) {
+	this.`exit(Num)` = function(a) {
 		if(typeof$ process!='undefined' && typeof$ process.exit!='undefined')
 			process.exit(a);
 	};
 };
 
-~Int~ = function(a) {
+~Num~ = function(a) {
 	this.`squared()` = function() {
 		return$ a * a;
 	};
@@ -37,11 +37,11 @@ var$ b='';
 		return$ a < 0 ? a * -1 : a;
 	};
 
-	this.`orMaxOf(Int)` = function(b) {
+	this.`orMaxOf(Num)` = function(b) {
 		return$ a < b ? b : a;
 	};
 
-	this.`orMaxOf(Int[])` = function(b) {
+	this.`orMaxOf(Num[])` = function(b) {
 		var$ c = 0, d;
 		for(d = a; c < b.length; c++) {
 			if(a < b[c]) d = b[c];
@@ -49,11 +49,11 @@ var$ b='';
 		return$ d;
 	};
 
-	this.`orMinOf(Int)` = function(b) {
+	this.`orMinOf(Num)` = function(b) {
 		return$ a > b ? b : a;
 	};
 
-	this.`orMinOf(Int[])` = function(b) {
+	this.`orMinOf(Num[])` = function(b) {
 		var$ c = 0, d;
 		for(d = a; c < b.length; c++) {
 			if(a > b[c]) d = b[c];

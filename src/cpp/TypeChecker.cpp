@@ -119,7 +119,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 
 			case NT_NUMBERLIT:
 				ret = MakeType(TYPE_CLASS);
-				ret->typedata._class.classname = strdup("Int");
+				ret->typedata._class.classname = strdup("Num");
 				break;
 
 			case NT_BOOLLIT:
@@ -203,10 +203,10 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					Type* additive = typeCheckUsable(tree->node_data.nodes[1]);
 					//if(ret->type == TYPE_UNUSABLE || additive->type == TYPE_UNUSABLE
 
-					if(analyzer->isPrimitiveTypeInt(ret)) {
-						if(!analyzer->isPrimitiveTypeInt(additive)) {
+					if(analyzer->isPrimitiveTypeNum(ret)) {
+						if(!analyzer->isPrimitiveTypeNum(additive)) {
 							erroneousstring = analyzer->getNameForType(additive); freeType(additive);
-							expectedstring = "Int";
+							expectedstring = "Num";
 							throw string("Addition with a non-numeral");
 						}
 
@@ -218,7 +218,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 						}
 
 					} else {
-						expectedstring = "Int' or 'Text";
+						expectedstring = "Num' or 'Text";
 						erroneousstring = analyzer->getNameForType(ret);
 						freeType(additive); freeType(ret);
 						ret = MakeType(TYPE_ERROR);
@@ -245,15 +245,15 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					ret = typeCheckUsable(tree->node_data.nodes[0]);
 					Type* factor = typeCheckUsable(tree->node_data.nodes[1]);
 
-					if(!analyzer->isPrimitiveTypeInt(ret) || !analyzer->isPrimitiveTypeInt(factor)) {
-						expectedstring = "Int";
+					if(!analyzer->isPrimitiveTypeNum(ret) || !analyzer->isPrimitiveTypeNum(factor)) {
+						expectedstring = "Num";
 
-						if(analyzer->isPrimitiveTypeInt(ret)) {
+						if(analyzer->isPrimitiveTypeNum(ret)) {
 							erroneousstring = analyzer->getNameForType(factor);
 						} else {
 							erroneousstring = analyzer->getNameForType(ret); freeType(ret);
 							ret = MakeType(TYPE_CLASS);
-							ret->typedata._class.classname = strdup("Int");
+							ret->typedata._class.classname = strdup("Num");
 						}
 
 						freeType(factor);
@@ -276,10 +276,10 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					Type* a = typeCheckUsable(tree->node_data.nodes[0]);
 					Type* b = typeCheckUsable(tree->node_data.nodes[1]);
 
-					if(!analyzer->isPrimitiveTypeInt(a) || !analyzer->isPrimitiveTypeInt(b)) {
-						expectedstring = "Int";
+					if(!analyzer->isPrimitiveTypeNum(a) || !analyzer->isPrimitiveTypeNum(b)) {
+						expectedstring = "Num";
 
-						if(analyzer->isPrimitiveTypeInt(a)) {
+						if(analyzer->isPrimitiveTypeNum(a)) {
 							erroneousstring = analyzer->getNameForType(b);
 						} else {
 							erroneousstring = analyzer->getNameForType(a);
@@ -359,9 +359,9 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					Type* index = typeCheckUsable(tree->node_data.nodes[1]);
 					--ret->arrayed;
 
-					if(!analyzer->isPrimitiveTypeInt(index)) {
+					if(!analyzer->isPrimitiveTypeNum(index)) {
 						erroneousstring = analyzer->getNameForType(index); freeType(index);
-						expectedstring = "Int";
+						expectedstring = "Num";
 						throw string("Array indices must be numeric");
 					} else if(ret->arrayed < 0) {
 						erroneousstring = analyzer->getNameForType(ret); freeType(index);

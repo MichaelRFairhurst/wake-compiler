@@ -27,7 +27,7 @@ syn region	blockcomment	start="#>" end="##"
 syn match	blockcomment	"##"
 syn keyword	inheritancekeyword	a an contained
 syn keyword	interfacekeyword	capable
-syn keyword	mytype	Int Bool Text Char
+syn keyword	mytype	Num Bool Text Char
 syn match	alias	"\<[a-z][a-zA-Z0-9]*\>"
 syn match	withinregionkeyword	"\(every\|is:\)"
 syn match	shadow	"\$"

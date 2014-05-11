@@ -1,5 +1,5 @@
 import Text;
-import Int;
+import Num;
 
 #>
 # This only defines the signatures, and will be used to
@@ -9,5 +9,5 @@ every Printer is:
 
 	print(Text) {}
 	printLine(Text) {}
-	print(Int) {}
-	printLine(Int) {}
+	print(Num) {}
+	printLine(Num) {}

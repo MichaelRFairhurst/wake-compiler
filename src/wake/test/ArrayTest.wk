@@ -3,69 +3,69 @@ import Asserts;
 every ArrayTest is:
 
 	Bool -- ~[test set array index]~(Asserts) {
-		var Int[] = [];
-		Int[0] = 5;
-		Asserts.that(Int[0])Equals(5);
+		var Num[] = [];
+		Num[0] = 5;
+		Asserts.that(Num[0])Equals(5);
 		return Asserts.allPassed();
 	}
 
 	Bool -- ~[test reset array index]~(Asserts) {
-		var Int[] = [];
-		Int[0] = 5;
-		Int[0] = 3;
-		Asserts.that(Int[0])Equals(3);
+		var Num[] = [];
+		Num[0] = 5;
+		Num[0] = 3;
+		Asserts.that(Num[0])Equals(3);
 		return Asserts.allPassed();
 	}
 
 	Bool -- ~[test set array array index index]~(Asserts) {
-		var Int[][] = [];
-		Int[0] = [];
-		Int[0][0] = 3;
-		Asserts.that(Int[0][0])Equals(3);
+		var Num[][] = [];
+		Num[0] = [];
+		Num[0][0] = 3;
+		Asserts.that(Num[0][0])Equals(3);
 		return Asserts.allPassed();
 	}
 
 	Bool -- ~[test reset array array index index]~(Asserts) {
-		var Int[][] = [];
-		Int[0] = [];
-		Int[0][0] = 3;
-		Int[0][0] = 5;
-		Asserts.that(Int[0][0])Equals(5);
+		var Num[][] = [];
+		Num[0] = [];
+		Num[0][0] = 3;
+		Num[0][0] = 5;
+		Asserts.that(Num[0][0])Equals(5);
 		return Asserts.allPassed();
 	}
 
 	Bool -- ~[test set multiple array indices]~(Asserts) {
-		var Int[] = [];
-		Int[0] = 5;
-		Int[1] = 6;
-		Int[2] = 7;
-		Int[3] = 8;
-		Asserts.that(Int[0])Equals(5);
-		Asserts.that(Int[1])Equals(6);
-		Asserts.that(Int[2])Equals(7);
-		Asserts.that(Int[3])Equals(8);
+		var Num[] = [];
+		Num[0] = 5;
+		Num[1] = 6;
+		Num[2] = 7;
+		Num[3] = 8;
+		Asserts.that(Num[0])Equals(5);
+		Asserts.that(Num[1])Equals(6);
+		Asserts.that(Num[2])Equals(7);
+		Asserts.that(Num[3])Equals(8);
 		return Asserts.allPassed();
 	}
 
 	Bool -- ~[test set multiple array array indices indices]~(Asserts) {
-		var Int[][] = [];
-		Int[0] = [];
-		Int[1] = [];
-		Int[0][0] = 5;
-		Int[0][1] = 6;
-		Int[0][2] = 7;
-		Int[1][0] = 6;
-		Int[1][1] = 7;
-		Int[1][2] = 8;
-		Int[2] = Int[1];
-		Asserts.that(Int[0][0])Equals(5);
-		Asserts.that(Int[0][1])Equals(6);
-		Asserts.that(Int[0][2])Equals(7);
-		Asserts.that(Int[1][0])Equals(6);
-		Asserts.that(Int[1][1])Equals(7);
-		Asserts.that(Int[1][2])Equals(8);
-		Asserts.that(Int[2][0])Equals(6);
-		Asserts.that(Int[2][1])Equals(7);
-		Asserts.that(Int[2][2])Equals(8);
+		var Num[][] = [];
+		Num[0] = [];
+		Num[1] = [];
+		Num[0][0] = 5;
+		Num[0][1] = 6;
+		Num[0][2] = 7;
+		Num[1][0] = 6;
+		Num[1][1] = 7;
+		Num[1][2] = 8;
+		Num[2] = Num[1];
+		Asserts.that(Num[0][0])Equals(5);
+		Asserts.that(Num[0][1])Equals(6);
+		Asserts.that(Num[0][2])Equals(7);
+		Asserts.that(Num[1][0])Equals(6);
+		Asserts.that(Num[1][1])Equals(7);
+		Asserts.that(Num[1][2])Equals(8);
+		Asserts.that(Num[2][0])Equals(6);
+		Asserts.that(Num[2][1])Equals(7);
+		Asserts.that(Num[2][2])Equals(8);
 		return Asserts.allPassed();
 	}

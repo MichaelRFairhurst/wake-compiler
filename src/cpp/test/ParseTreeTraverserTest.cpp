@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_SUITE( ParseTreeTraverserTest )
 		loader.loadStdLibToTable(&table); \
 		ParseTreeTraverser t(&table, errors); \
 		MockSemanticErrorPrinter e; \
-		p.parse( "every Int is: every Bool is: every Text is: " CODE ); \
+		p.parse( "every Num is: every Bool is: every Text is: " CODE ); \
 		if(PTT_PRINT_TREE) p.print(); \
 		{ EXPECTATIONS } \
 		t.traverse(p.getParseTree()); \
@@ -243,13 +243,13 @@ PTT_TEST_CASE(
 )
 
 PTT_TEST_CASE(
-	MultiplyIntsAndAnythingElseIsTypeError,
+	MultiplyNumsAndAnythingElseIsTypeError,
 	"every MyClass is:															\n\
-		multiplyIntByString() { 5 * 'test'; }									\n\
-		multiplyStringByInt() { 'test' * 5; }									\n\
-		multiplyIntByObject(MyClass) { 5 * MyClass; }							\n\
-		multiplyObjectByInt(MyClass) { MyClass * 5; }							\n\
-		multiplyLambdaByInt(MyClass --fn(MyClass) lambda) { lambda * 5; }		\n\
+		multiplyNumByString() { 5 * 'test'; }									\n\
+		multiplyStringByNum() { 'test' * 5; }									\n\
+		multiplyNumByObject(MyClass) { 5 * MyClass; }							\n\
+		multiplyObjectByNum(MyClass) { MyClass * 5; }							\n\
+		multiplyLambdaByNum(MyClass --fn(MyClass) lambda) { lambda * 5; }		\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -259,13 +259,13 @@ PTT_TEST_CASE(
 )
 
 PTT_TEST_CASE(
-	DivideIntsAndAnythingElseIsTypeError,
+	DivideNumsAndAnythingElseIsTypeError,
 	"every MyClass is:											\n\
-		divideIntByString() { 5 / 'test'; }						\n\
-		divideStringByInt() { 'test' / 5; }						\n\
-		divideIntByObject(MyClass) { 5 / MyClass; }				\n\
-		divideObjectByInt(MyClass) { MyClass / 5; }				\n\
-		divideLambdaByInt(fn() lambda) { lambda / 5; }		\n\
+		divideNumByString() { 5 / 'test'; }						\n\
+		divideStringByNum() { 'test' / 5; }						\n\
+		divideNumByObject(MyClass) { 5 / MyClass; }				\n\
+		divideObjectByNum(MyClass) { MyClass / 5; }				\n\
+		divideLambdaByNum(fn() lambda) { lambda / 5; }		\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -275,13 +275,13 @@ PTT_TEST_CASE(
 )
 
 PTT_TEST_CASE(
-	AddIntsAndAnythingElseIsTypeError,
+	AddNumsAndAnythingElseIsTypeError,
 	"every MyClass is:											\n\
-		addIntByString() { 5 + 'test'; }						\n\
-		addStringByInt() { 'test' + 5; }						\n\
-		addIntByObject(MyClass) { 5 + MyClass; }				\n\
-		addObjectByInt(MyClass) { MyClass + 5; }				\n\
-		addLambdaByInt(fn() lambda) { lambda + 5; }			\n\
+		addNumByString() { 5 + 'test'; }						\n\
+		addStringByNum() { 'test' + 5; }						\n\
+		addNumByObject(MyClass) { 5 + MyClass; }				\n\
+		addObjectByNum(MyClass) { MyClass + 5; }				\n\
+		addLambdaByNum(fn() lambda) { lambda + 5; }			\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -291,13 +291,13 @@ PTT_TEST_CASE(
 )
 
 PTT_TEST_CASE(
-	SubtractIntsAndAnythingElseIsTypeError,
+	SubtractNumsAndAnythingElseIsTypeError,
 	"every MyClass is:											\n\
-		subtractIntByString() { 5 - 'test'; }					\n\
-		subtractStringByInt() { 'test' - 5; }					\n\
-		subtractIntByObject(MyClass) { 5 - MyClass; }			\n\
-		subtractObjectByInt(MyClass) { MyClass - 5; }			\n\
-		subtractLambdaByInt(fn() lambda) { lambda - 5; }		\n\
+		subtractNumByString() { 5 - 'test'; }					\n\
+		subtractStringByNum() { 'test' - 5; }					\n\
+		subtractNumByObject(MyClass) { 5 - MyClass; }			\n\
+		subtractObjectByNum(MyClass) { MyClass - 5; }			\n\
+		subtractLambdaByNum(fn() lambda) { lambda - 5; }		\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -353,8 +353,8 @@ PTT_TEST_CASE(
 	"every MyClass is:								\n\
 		andString() { 'test' && 'test'; }			\n\
 		orString() { 'test' || 'test'; }			\n\
-		andInt() { 6 && 6; }						\n\
-		orInt() { 6 || 6; }							\n\
+		andNum() { 6 && 6; }						\n\
+		orNum() { 6 || 6; }							\n\
 		andClass(MyClass) { MyClass && MyClass; }	\n\
 		orClass(MyClass) { MyClass || MyClass; }	\n\
 	",
@@ -378,11 +378,11 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ArrayIndexAccessTypeErrors,
 	"every MyClass is:											\n\
-		arrayAccessOnInt() { 9[1]; }							\n\
+		arrayAccessOnNum() { 9[1]; }							\n\
 		arrayAccessOnString() { 'abcd'[1]; }					\n\
 		arrayAccessOnClass(MyClass) { MyClass[1]; }				\n\
-		arrayAccessWithClass(MyClass, Int[]) { Int[MyClass]; }	\n\
-		arrayAccessWithString(Int[]) { Int['test']; }			\n\
+		arrayAccessWithClass(MyClass, Num[]) { Num[MyClass]; }	\n\
+		arrayAccessWithString(Num[]) { Num['test']; }			\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -394,10 +394,10 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ValidArrayIndexAccessAndReturningValidTypes,
 	"every MyClass is:														\n\
-		intArrayBecomesInt(Int[]) { Int[0] + 3; }							\n\
+		intArrayBecomesNum(Num[]) { Num[0] + 3; }							\n\
 		stringArrayBecomesString(Text[]) { Text[1] + 'test'; }				\n\
 		stringArrayArrayBecomesString(Text[][]) { Text[1][1] + 'test'; }	\n\
-		intArrayArrayBecomesInt(Int[][]) { Int[1][1] + 5; }					\n\
+		intArrayArrayBecomesNum(Num[][]) { Num[1][1] + 5; }					\n\
 	",
 	PTT_VALID
 )
@@ -405,16 +405,16 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	CannotIfCondOrInvertWithAnythingButBools,
 	"every MyClass is:											\n\
-		ifConditionWithInt() { if(5) 5; }						\n\
+		ifConditionWithNum() { if(5) 5; }						\n\
 		ifConditionWith( MyClass ) { if(MyClass) 5; }			\n\
 		ifConditionWithText() { if('test') 5; }					\n\
-		whileConditionWithInt() { while(5) 5; }					\n\
+		whileConditionWithNum() { while(5) 5; }					\n\
 		whileConditionWith( MyClass ) { while(MyClass) 5; }		\n\
 		whileConditionWithText() { while('test') 5; }			\n\
-		forConditionWithInt() { for(5; 5; 5) 5; }				\n\
+		forConditionWithNum() { for(5; 5; 5) 5; }				\n\
 		forConditionWith( MyClass ) { for(5; MyClass; 5) 5; }	\n\
 		forConditionWithText() { for(5; 'test'; 5) 5; }			\n\
-		invertInt() { !5; }										\n\
+		invertNum() { !5; }										\n\
 		invertText() { !'test'; }								\n\
 		invert( MyClass ) { !MyClass; }							\n\
 	",
@@ -488,13 +488,13 @@ PTT_TEST_CASE(
 		Text -- returnNumberLiteralAsText() { return 1; }									\n\
 		Text -- returnClassAsText(MyClass) { return MyClass; }								\n\
 		Text -- returnNothingAsText() { return; }											\n\
-		Int -- returnBoolLiteralAsInt() { return true; }									\n\
-		Int -- returnTextLiteralAsInt() { return 'text'; }									\n\
-		Int -- returnClassAsInt(MyClass) { return MyClass; }								\n\
-		Int -- returnNothingAsInt() { return; }												\n\
+		Num -- returnBoolLiteralAsNum() { return true; }									\n\
+		Num -- returnTextLiteralAsNum() { return 'text'; }									\n\
+		Num -- returnClassAsNum(MyClass) { return MyClass; }								\n\
+		Num -- returnNothingAsNum() { return; }												\n\
 		MyClass -- returnBoolLiteralAsClass() { return true; }								\n\
 		MyClass -- returnTextLiteralAsClass() { return 'test'; }							\n\
-		MyClass -- returnIntLiteralAsClass() { return 1; }									\n\
+		MyClass -- returnNumLiteralAsClass() { return 1; }									\n\
 		MyClass -- returnUnrelatedClassAsClass(UnrelatedClass) { return UnrelatedClass; }	\n\
 		MyClass -- returnParentClassAsClass(ParentClass) { return ParentClass; }			\n\
 		MyClass -- returnNothingAsMyClass() { return; }										\n\
@@ -533,7 +533,7 @@ PTT_TEST_CASE(
 	every MyClass is:																\n\
 		Bool -- returnBool() { return true; }										\n\
 		Text -- returnText() { return 'text'; }										\n\
-		Int -- returnInt() { return 5; }											\n\
+		Num -- returnNum() { return 5; }											\n\
 		MyClass -- returnAMyClass(MyClass) { return MyClass; }						\n\
 		MyClass -- returnARelatedClass(RelatedClass) { return RelatedClass; }		\n\
 		MyClass -- returnRelatedClassAsClass(RelatedClass) { return RelatedClass; }	\n\
@@ -547,11 +547,11 @@ PTT_TEST_CASE(
 	"every UnrelatedClass is:												\n\
 	every ParentClass is:													\n\
 	every MyClass (a ParentClass) is:										\n\
-		assignBoolTo(Int) { Int = true; }									\n\
-		assignTextTo(Int) { Int = 'text'; }									\n\
-		assignA(MyClass)To(Int) { Int = MyClass; }							\n\
+		assignBoolTo(Num) { Num = true; }									\n\
+		assignTextTo(Num) { Num = 'text'; }									\n\
+		assignA(MyClass)To(Num) { Num = MyClass; }							\n\
 		assignBoolTo(Text) { Text = true; }								\n\
-		assignIntTo(Text) { Text = 5; }										\n\
+		assignNumTo(Text) { Text = 5; }										\n\
 		assignA(MyClass)To(Text) { Text = MyClass; }						\n\
 		assignAn(UnrelatedClass)To(MyClass) { MyClass = UnrelatedClass; }	\n\
 		assignA(ParentClass)To(MyClass) { MyClass = ParentClass; }			\n\
@@ -572,7 +572,7 @@ PTT_TEST_CASE(
 	every MyClass (a ParentClass) is:								\n\
 		assignBoolTo(Bool) { Bool = true; }						\n\
 		assignTextTo(Text) { Text = 'text'; }						\n\
-		assignIntTo(Int) { Int = 5; }								\n\
+		assignNumTo(Num) { Num = 5; }								\n\
 		assign(MyClass c)To(MyClass b) { c = b; }				\n\
 		assignA(MyClass)To(ParentClass) { ParentClass = MyClass; }	\n\
 	",
@@ -583,16 +583,16 @@ PTT_TEST_CASE(
 	InvalidLambdaInvocations,
 	"every UnrelatedClass is: every ParentClass is:							\n\
 	every MyClass (a ParentClass) is:										\n\
-		call(fn(Text) lambda)WithInt() { lambda(4); }								\n\
+		call(fn(Text) lambda)WithNum() { lambda(4); }								\n\
 		call(fn(Text) lambda)WithBool() { lambda(true); }						\n\
 		call(fn(Text) lambda)With(MyClass) { lambda(MyClass); }					\n\
 		call(fn(Bool) lambda)With(MyClass) { lambda(MyClass); }					\n\
-		call(fn(Bool) lambda)WithInt() { lambda(4); }							\n\
+		call(fn(Bool) lambda)WithNum() { lambda(4); }							\n\
 		call(fn(Bool) lambda)WithText() { lambda('test'); }						\n\
-		call(fn(Int) lambda)WithText() { lambda('test'); }						\n\
-		call(fn(Int) lambda)WithBool() { lambda(true); }							\n\
-		call(fn(Int) lambda)With(MyClass) { lambda(MyClass); }					\n\
-		call(fn(Int, Text) lambda)WithTextInt() { lambda('abc', 4); }				\n\
+		call(fn(Num) lambda)WithText() { lambda('test'); }						\n\
+		call(fn(Num) lambda)WithBool() { lambda(true); }							\n\
+		call(fn(Num) lambda)With(MyClass) { lambda(MyClass); }					\n\
+		call(fn(Num, Text) lambda)WithTextNum() { lambda('abc', 4); }				\n\
 		call(fn(MyClass) lambda)With(UnrelatedClass) { lambda(UnrelatedClass); }	\n\
 		call(fn(MyClass) lambda)With(ParentClass) { lambda(ParentClass); }		\n\
 	",
@@ -619,23 +619,23 @@ PTT_TEST_CASE(
 																														\n\
 		call(fn(Bool) lambda)WithBool() { lambda(true); }																	\n\
 																														\n\
-		call(fn(Int) lambda)WithInt() { lambda(4); }																			\n\
+		call(fn(Num) lambda)WithNum() { lambda(4); }																			\n\
 																														\n\
 		call(fn(ParentClass) lambda)With(MyClass) { lambda(MyClass); }														\n\
 																														\n\
-		Text -- call(Text -- fn(Text, Int, Bool, ParentClass) lambda)WithProperArgsAnd(MyClass) {							\n\
+		Text -- call(Text -- fn(Text, Num, Bool, ParentClass) lambda)WithProperArgsAnd(MyClass) {							\n\
 			return lambda('text', 4, true, MyClass);																		\n\
 		}																												\n\
 																														\n\
-		Int -- call(Int -- fn(Int, Bool, ParentClass, Text) lambda)WithProperArgsAnd(MyClass) {							\n\
+		Num -- call(Num -- fn(Num, Bool, ParentClass, Text) lambda)WithProperArgsAnd(MyClass) {							\n\
 			return lambda(4, true, MyClass, 'text');																		\n\
 		}																												\n\
 																														\n\
-		Bool -- call(Bool -- fn(Bool, ParentClass, Text, Int) lambda)WitProperArgsAnd(MyClass) {						\n\
+		Bool -- call(Bool -- fn(Bool, ParentClass, Text, Num) lambda)WitProperArgsAnd(MyClass) {						\n\
 			return lambda(true, MyClass, 'text', 4);																		\n\
 		}																												\n\
 																														\n\
-		MyClass -- call(MyClass -- fn(ParentClass, Bool, Text, Int) lambda)WithProperArgsAnd(MyClass) {					\n\
+		MyClass -- call(MyClass -- fn(ParentClass, Bool, Text, Num) lambda)WithProperArgsAnd(MyClass) {					\n\
 			return lambda(MyClass, true, 'text', 4);																		\n\
 		}																												\n\
 	",
@@ -662,21 +662,21 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	AssignMultiplePropertiesRightOrderIsntOK,
-	"every MyClass is: with Int = 5; with $Int = Int; with $$Int = $Int;",
+	"every MyClass is: with Num = 5; with $Num = Num; with $$Num = $Num;",
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 )
 
 PTT_TEST_CASE(
 	AssignMultiplePropertiesLeftOrderIsntOK,
-	"every MyClass is: with Int = $Int; with $Int = $$Int; with $$Int = 5;",
+	"every MyClass is: with Num = $Num; with $Num = $$Num; with $$Num = 5;",
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 )
 
 PTT_TEST_CASE(
 	AssignPropertyFromCtorIsOK,
-	"every MyClass is: with Int too = Int; needs Int;",
+	"every MyClass is: with Num too = Num; needs Num;",
 	PTT_VALID
 )
 
@@ -688,7 +688,7 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	MulipleCtorDefinition,
-	"every MyClass is: needs Int; needs Int;",
+	"every MyClass is: needs Num; needs Num;",
 	PTT_EXPECT(MULTIPLE_METHOD_DEFINITION)
 )
 
@@ -741,10 +741,10 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	MethodInvocationOfClassNotThisArgumentsAreTypeChecked,
 	"every MyClass is:																								\n\
-		MyClass -- argIsInvalidType(MyClass c, Int) { return c.argIsInvalidType(c, 'test'); }					\n\
-		MyClass -- argIsInvalidExpression(MyClass c, Int) { return c.argIsInvalidExpression(c, 5 + 'test'); }	\n\
-		Text -- argIsInvalidReturn(MyClass c, Int) { return c.argIsInvalidType(c, 5); }							\n\
-		MyClass -- argIsInvalidArgumentCount(MyClass c, Int) { return c.argIsInvalidType(c); }					\n\
+		MyClass -- argIsInvalidType(MyClass c, Num) { return c.argIsInvalidType(c, 'test'); }					\n\
+		MyClass -- argIsInvalidExpression(MyClass c, Num) { return c.argIsInvalidExpression(c, 5 + 'test'); }	\n\
+		Text -- argIsInvalidReturn(MyClass c, Num) { return c.argIsInvalidType(c, 5); }							\n\
+		MyClass -- argIsInvalidArgumentCount(MyClass c, Num) { return c.argIsInvalidType(c); }					\n\
 	",
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 	PTT_EXPECT(TYPE_ERROR)
@@ -767,10 +767,10 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	MethodInvocationOfClassUsingThisArgumentsAreTypeChecked,
 	"every MyClass is:																							\n\
-		MyClass -- argIsInvalidType(MyClass c, Int) { return argIsInvalidType(c, 'test'); }					\n\
-		MyClass -- argIsInvalidExpression(MyClass c, Int) { return argIsInvalidExpression(c, 5 + 'test'); }	\n\
-		Text -- argIsInvalidReturn(MyClass c, Int) { return argIsInvalidType(c, 5); }							\n\
-		MyClass -- argIsInvalidArgumentCount(MyClass c, Int) { return argIsInvalidType(c); }					\n\
+		MyClass -- argIsInvalidType(MyClass c, Num) { return argIsInvalidType(c, 'test'); }					\n\
+		MyClass -- argIsInvalidExpression(MyClass c, Num) { return argIsInvalidExpression(c, 5 + 'test'); }	\n\
+		Text -- argIsInvalidReturn(MyClass c, Num) { return argIsInvalidType(c, 5); }							\n\
+		MyClass -- argIsInvalidArgumentCount(MyClass c, Num) { return argIsInvalidType(c); }					\n\
 	",
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 	PTT_EXPECT(TYPE_ERROR)
@@ -793,10 +793,10 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	MethodInvocationOfClassUsingThisExplicitArgumentsAreTypeChecked,
 	"every MyClass is:																								\n\
-		MyClass -- argIsInvalidType(MyClass c, Int) { return this.argIsInvalidType(c, 'test'); }					\n\
-		MyClass -- argIsInvalidExpression(MyClass c, Int) { return this.argIsInvalidExpression(c, 5 + 'test'); }	\n\
-		Text -- argIsInvalidReturn(MyClass c, Int) { return this.argIsInvalidType(c, 5); }							\n\
-		MyClass -- argIsInvalidArgumentCount(MyClass c, Int) { return this.argIsInvalidType(c); }					\n\
+		MyClass -- argIsInvalidType(MyClass c, Num) { return this.argIsInvalidType(c, 'test'); }					\n\
+		MyClass -- argIsInvalidExpression(MyClass c, Num) { return this.argIsInvalidExpression(c, 5 + 'test'); }	\n\
+		Text -- argIsInvalidReturn(MyClass c, Num) { return this.argIsInvalidType(c, 5); }							\n\
+		MyClass -- argIsInvalidArgumentCount(MyClass c, Num) { return this.argIsInvalidType(c); }					\n\
 	",
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 	PTT_EXPECT(TYPE_ERROR)
@@ -935,26 +935,26 @@ PTT_TEST_CASE(
 )
 
 PTT_TEST_CASE(
-	TestDeclareAnInt,
-	"every MyClass is: Int -- myfn() { var Int = 5; return Int; }",
+	TestDeclareAnNum,
+	"every MyClass is: Num -- myfn() { var Num = 5; return Num; }",
 	PTT_VALID
 )
 
 PTT_TEST_CASE(
-	TestDeclareAnIntWithBadType,
-	"every MyClass is: myfn() { var Int = 'test'; }",
+	TestDeclareAnNumWithBadType,
+	"every MyClass is: myfn() { var Num = 'test'; }",
 	PTT_EXPECT(TYPE_ERROR)
 )
 
 PTT_TEST_CASE(
-	TestDeclareAnIntWithUnknownType,
-	"every MyClass is: myfn() { var LInt = 'test'; }",
+	TestDeclareAnNumWithUnknownType,
+	"every MyClass is: myfn() { var LNum = 'test'; }",
 	PTT_EXPECT(CLASSNAME_NOT_FOUND)
 )
 
 PTT_TEST_CASE(
-	TestDeclareAnIntIsScoped,
-	"every MyClass is: Int -- myfn() { if(true) { var Int = 5; } return Int; }",
+	TestDeclareAnNumIsScoped,
+	"every MyClass is: Num -- myfn() { if(true) { var Num = 5; } return Num; }",
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 )
 
@@ -981,7 +981,7 @@ PTT_TEST_CASE(
 )
 
 PTT_TEST_CASE(
-	TestProvideIntOnNonIntIsBadNewsBears,
+	TestProvideNumOnNonNumIsBadNewsBears,
 	"every MyClass is:			\n\
 		provides MyClass <- 4;	\n\
 	",
@@ -1010,7 +1010,7 @@ PTT_TEST_CASE(
 	"every ParentClass is:					\n\
 	every MyClass (a ParentClass) is:		\n\
 		provides							\n\
-			Int <- 4,						\n\
+			Num <- 4,						\n\
 			Text <- 'Test',					\n\
 			ParentClass <- MyClass,			\n\
 			MyClass <- MyClass;				\n\
@@ -1032,7 +1032,7 @@ PTT_TEST_CASE(
 	InjectCtorIsTooFewDependencies,
 	"every ClassA is:						\n\
 	every ClassB is:						\n\
-		needs Int, ClassA;					\n\
+		needs Num, ClassA;					\n\
 		provides ClassB <- ClassB(5);		\n\
 	",
 	PTT_EXPECT(MISMATCHED_INJECTION)
@@ -1081,7 +1081,7 @@ PTT_TEST_CASE(
 )
 
 PTT_TEST_CASE(
-	InjectCtorWithIntNotNeeded,
+	InjectCtorWithNumNotNeeded,
 	"every ClassA is:					\n\
 	every ClassB is:					\n\
 		needs ClassA;					\n\
@@ -1101,10 +1101,10 @@ PTT_TEST_CASE(
 )
 
 PTT_TEST_CASE(
-	InjectCtorWithTextAndIntOK,
+	InjectCtorWithTextAndNumOK,
 	"every ClassA is:							\n\
 	every ClassB is:							\n\
-		needs Int, Text;						\n\
+		needs Num, Text;						\n\
 		provides ClassB <- ClassB(5, 'test');	\n\
 	",
 	PTT_VALID
@@ -1148,7 +1148,7 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	BindToCtorNonexistProviding,
-	"every MyClass is: needs Int, Text; provides Int <- 5, MyClass <- MyClass(Int, Text);",
+	"every MyClass is: needs Num, Text; provides Num <- 5, MyClass <- MyClass(Num, Text);",
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 )
 
@@ -1156,12 +1156,12 @@ PTT_TEST_CASE(
 	RetrieveFromClassCtordSpecialtiedValid,
 	"every MyDB is:										\n\
 														\n\
-		needs Int:Port, Text:Username;				\n\
+		needs Num:Port, Text:Username;				\n\
 														\n\
 		provides										\n\
-			Int:Port <- 55,							\n\
+			Num:Port <- 55,							\n\
 			Text:Username <- 'Bilbo',					\n\
-			MyDB <- MyDB(Int:Port, Text:Username);	\n\
+			MyDB <- MyDB(Num:Port, Text:Username);	\n\
 														\n\
 		MyDB -- cloneMe() {								\n\
 			return MyDB <- this;						\n\
@@ -1173,16 +1173,16 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	InjectionsAndProvisionsRequireTransitiveProvidability,
 	"every ClassA is:							\n\
-		needs Int:Port;						\n\
+		needs Num:Port;						\n\
 	every ClassB is:							\n\
 		needs ClassA, Text:Stuff;				\n\
 	every ClassC is:							\n\
-		needs ClassB, Int:ID;					\n\
+		needs ClassB, Num:ID;					\n\
 	every Provider is:							\n\
 		provides								\n\
 			ClassB,								\n\
 			ClassC,								\n\
-			Int:ID,							\n\
+			Num:ID,							\n\
 			Text:Stuff;						\n\
 	",
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
@@ -1192,20 +1192,20 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	InjectionsAndProvisionsRequireTransitiveProvidabilityOK,
 	"every ClassA is:					\n\
-		needs Int:Port;				\n\
+		needs Num:Port;				\n\
 										\n\
 	every ClassB is:					\n\
 		needs ClassA, Text:Stuff;		\n\
 										\n\
 	every ClassC is:					\n\
-		needs ClassB, Int:ID;			\n\
+		needs ClassB, Num:ID;			\n\
 										\n\
 	every Provider is:					\n\
 		provides						\n\
 			ClassC,						\n\
-			Int:ID,					\n\
+			Num:ID,					\n\
 			Text:Stuff,				\n\
-			Int:Port,					\n\
+			Num:Port,					\n\
 			ClassB,						\n\
 			ClassA;						\n\
 	",
@@ -1250,9 +1250,9 @@ PTT_TEST_CASE(
 			var MyClass[] = [];						\n\
 			var $MyClass[][] = [];						\n\
 		}											\n\
-		declareEmptyIntArrayAndArrayArray() {		\n\
-			var Int[] = [];							\n\
-			var $Int[][] = [];							\n\
+		declareEmptyNumArrayAndArrayArray() {		\n\
+			var Num[] = [];							\n\
+			var $Num[][] = [];							\n\
 		}											\n\
 		declareEmptyStringArrayAndArrayArray() {	\n\
 			var Text[] = [];							\n\
@@ -1265,20 +1265,20 @@ PTT_TEST_CASE(
 	AssignIndexesWrongTypes,
 	"every MyClass is:										\n\
 		with MyClass[] = [];								\n\
-		with Int[] = [];									\n\
+		with Num[] = [];									\n\
 		with Text[] = [];									\n\
 		with Bool[] = [];									\n\
-		assignIntToMyClasses() { MyClass[1] = 5; }			\n\
+		assignNumToMyClasses() { MyClass[1] = 5; }			\n\
 		assignTextToMyClasses() { MyClass[1] = 'test'; }	\n\
 		assignBoolToMyClasses() { MyClass[1] = true; }		\n\
-		assignMyClassToInts() { Int[1] = this; }			\n\
-		assignTextToInts() { Int[1] = 'test'; }				\n\
-		assignBoolToInts() { Int[1] = true; }				\n\
+		assignMyClassToNums() { Num[1] = this; }			\n\
+		assignTextToNums() { Num[1] = 'test'; }				\n\
+		assignBoolToNums() { Num[1] = true; }				\n\
 		assignMyClassToTexts() { Text[1] = this; }			\n\
-		assignIntToTexts() { Text[1] = 4; }					\n\
+		assignNumToTexts() { Text[1] = 4; }					\n\
 		assignBoolToTexts() { Text[1] = true; }			\n\
 		assignMyClassToBools() { Bool[1] = this; }		\n\
-		assignIntToBools() { Bool[1] = 4; }				\n\
+		assignNumToBools() { Bool[1] = 4; }				\n\
 		assignTextToBools() { Bool[1] = 'test'; }			\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
@@ -1299,13 +1299,13 @@ PTT_TEST_CASE(
 	ValidEmptyArrayAssignments,
 	"every MyClass is:										\n\
 		with MyClass[][] = [];								\n\
-		with Int[][] = [];									\n\
+		with Num[][] = [];									\n\
 		with Text[][] = [];									\n\
 		with Bool[][] = [];								\n\
 		assignToMyClasses() { MyClass[][] = []; }			\n\
 		assignToMyClassesIndex() { MyClass[1] = []; }		\n\
-		assignToInts() { Int[][] = []; }					\n\
-		assignToIntsIndex() { Int[1] = []; }				\n\
+		assignToNums() { Num[][] = []; }					\n\
+		assignToNumsIndex() { Num[1] = []; }				\n\
 		assignToTexts() { Text[][] = []; }					\n\
 		assignToTextsIndex() { Text[1] = []; }				\n\
 		assignToBools() { Bool[][] = []; }				\n\
@@ -1317,15 +1317,15 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	InvalidEmptyArrayAssignments,
 	"every MyClass is:										\n\
-		with $Int = [];										\n\
+		with $Num = [];										\n\
 		with $Text = [];									\n\
 		with $MyClass = [];									\n\
 		with $Bool = [];									\n\
-		with Int[] = []; //valid							\n\
+		with Num[] = []; //valid							\n\
 		with Text[] = []; //valid							\n\
 		with Bool[] = []; //valid							\n\
 		with MyClass[] = []; //valid						\n\
-		assignToIntsIndex() { Int[1] = []; }				\n\
+		assignToNumsIndex() { Num[1] = []; }				\n\
 		assignToTextsIndex() { Text[1] = []; }				\n\
 		assignToBoolsIndex() { Bool[1] = []; }			\n\
 		assignToMyClassesIndex() { MyClass[1] = []; }		\n\
@@ -1374,7 +1374,7 @@ PTT_TEST_CASE(
 );
 
 PTT_TEST_CASE(
-	UnimplementedInterfaceMethodMakesClassAbstract,
+	UnimplementedNumerfaceMethodMakesClassAbstract,
 	"every MyClass (capable ParentClass) is:	\n\
 		provides MyClass;						\n\
 	every ParentClass is:						\n\
@@ -1400,7 +1400,7 @@ PTT_TEST_CASE(
 );
 
 PTT_TEST_CASE(
-	UnimplementedInterfaceMethodMakesClassAbstractIndirectProvision,
+	UnimplementedNumerfaceMethodMakesClassAbstractIndirectProvision,
 	"every MyClass (capable ParentClass) is:	\n\
 		provides MyClass <- MyClass;			\n\
 	every ParentClass is:						\n\
@@ -1555,12 +1555,12 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ExistsClauseMakesOptionalTypeReturnable,
 	"every MyClass is:			\n\
-		needs $Int;				\n\
-		Int -- myMethod(Int?) {	\n\
-			if Int exists {		\n\
-				return Int;		\n\
+		needs $Num;				\n\
+		Num -- myMethod(Num?) {	\n\
+			if Num exists {		\n\
+				return Num;		\n\
 			}					\n\
-			return $Int;		\n\
+			return $Num;		\n\
 		}",
 	PTT_VALID
 );
@@ -1607,12 +1607,12 @@ PTT_TEST_CASE(
 );
 
 PTT_TEST_CASE(
-	OptionalIntsBoolsAndTextsCantBeUsed,
+	OptionalNumsBoolsAndTextsCantBeUsed,
 	"every MyClass is:											\n\
-		addOptionalInts(Int?, $Int?) { Int + $Int; }			\n\
-		subtractOptionalInts(Int?, $Int?) { Int - $Int; }		\n\
-		divideOptionalInts(Int?, $Int?) { Int / $Int; }			\n\
-		multiplyOptionalInts(Int?, $Int?) { Int * $Int; }		\n\
+		addOptionalNums(Num?, $Num?) { Num + $Num; }			\n\
+		subtractOptionalNums(Num?, $Num?) { Num - $Num; }		\n\
+		divideOptionalNums(Num?, $Num?) { Num / $Num; }			\n\
+		multiplyOptionalNums(Num?, $Num?) { Num * $Num; }		\n\
 		concatOptionalTexts(Text?, $Text?) { Text * Text; }		\n\
 		notOptionalBool(Bool?) { !Bool; }					\n\
 		andOptionalBools(Bool?, $Bool?) { Bool && $Bool; }	\n\
@@ -1632,9 +1632,9 @@ PTT_TEST_CASE(
 	ExistsElseStatementIsTypeChecked,
 	"every MyClass is:				\n\
 		myMethod() {				\n\
-			var Int? = 4;				\n\
-			if Int exists {} else { \n\
-				Int + 4;			\n\
+			var Num? = 4;				\n\
+			if Num exists {} else { \n\
+				Num + 4;			\n\
 			}						\n\
 		}",
 	PTT_EXPECT(TYPE_ERROR)
@@ -1643,8 +1643,8 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ReturningWithinExistsIsNotExhaustive,
 	"every MyClass is:				\n\
-		Bool -- myMethod(Int?) {	\n\
-			if Int exists {			\n\
+		Bool -- myMethod(Num?) {	\n\
+			if Num exists {			\n\
 				return true;		\n\
 			}						\n\
 		}",
@@ -1654,8 +1654,8 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ReturningWithinExistsElseIsNotExhaustive,
 	"every MyClass is:				\n\
-		Bool -- myMethod(Int?) {	\n\
-			if Int exists {			\n\
+		Bool -- myMethod(Num?) {	\n\
+			if Num exists {			\n\
 			} else {				\n\
 				return true;		\n\
 			}						\n\
@@ -1666,8 +1666,8 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ReturningWithinExistsWithAnElseIsNotExhaustive,
 	"every MyClass is:				\n\
-		Bool -- myMethod(Int?) {	\n\
-			if Int exists {			\n\
+		Bool -- myMethod(Num?) {	\n\
+			if Num exists {			\n\
 				return true;		\n\
 			} else {				\n\
 			}						\n\
@@ -1678,8 +1678,8 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ReturningWithinExistsAndElseIsExhaustive,
 	"every MyClass is:				\n\
-		Bool -- myMethod(Int?) {	\n\
-			if Int exists {			\n\
+		Bool -- myMethod(Num?) {	\n\
+			if Num exists {			\n\
 				return true;		\n\
 			} else {				\n\
 				return false;		\n\
@@ -1700,7 +1700,7 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ReturnMethodCallOnAnUnknownClassIsUnknownVariableError,
 	"every MyClass is:					\n\
-		Int --  myMethod() {			\n\
+		Num --  myMethod() {			\n\
 			return Whatever.whatever();	\n\
 		}",
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
@@ -1719,22 +1719,22 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	UsingNormalAssignmentAsValueIsNotAllowed,
 	"every MyClass is:												\n\
-		with Int = 0;												\n\
+		with Num = 0;												\n\
 		with Bool = false;											\n\
 		with MyClass? = nothing;									\n\
-		inAddition() { (Int = 3) + 2; }								\n\
-		inSubtraction() { (Int = 3) - 2; }							\n\
-		inDivision() { (Int = 3) / 2; }								\n\
-		inMultiplication() { (Int = 3) * 2; }						\n\
-		inAssignment() { Int = (Int = 3); }							\n\
-		Int -- inReturn() { return Int = 3; }						\n\
+		inAddition() { (Num = 3) + 2; }								\n\
+		inSubtraction() { (Num = 3) - 2; }							\n\
+		inDivision() { (Num = 3) / 2; }								\n\
+		inMultiplication() { (Num = 3) * 2; }						\n\
+		inAssignment() { Num = (Num = 3); }							\n\
+		Num -- inReturn() { return Num = 3; }						\n\
 		inMethodSubject() { (MyClass = this).inMethodSubject(); }	\n\
-		inEquivalence() { (Int = 5) == 5; }							\n\
-		inLT() { (Int = 5) <= 5; }									\n\
-		inGT() { (Int = 5) >= 5; }									\n\
+		inEquivalence() { (Num = 5) == 5; }							\n\
+		inLT() { (Num = 5) <= 5; }									\n\
+		inGT() { (Num = 5) >= 5; }									\n\
 		inIfStmt() { if(Bool = true) {} }							\n\
 		inWhileStmt() { while(Bool = true) {} }						\n\
-		inMethodArg($Int) { inMethodArg(Int = 5); }					\n\
+		inMethodArg($Num) { inMethodArg(Num = 5); }					\n\
 	",
 	PTT_EXPECT(USE_OF_ASSIGNMENT_VALUE)
 	PTT_EXPECT(USE_OF_ASSIGNMENT_VALUE)
@@ -1755,19 +1755,19 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	UsingValuedAssignmentAsValueIsOK,
 	"every MyClass is:															\n\
-		with Int = 0;															\n\
+		with Num = 0;															\n\
 		with Bool = false;														\n\
-		inAddition() { (Int := 3) + 2; }										\n\
-		inSubtraction() { (Int := 3) - 2; }										\n\
-		inDivision() { (Int := 3) / 2; }										\n\
-		inMultiplication() { (Int := 3) * 2; }									\n\
-		inAssignment() { Int = (Int := 3); }									\n\
-		Int -- inReturn() { return Int := 3; }									\n\
+		inAddition() { (Num := 3) + 2; }										\n\
+		inSubtraction() { (Num := 3) - 2; }										\n\
+		inDivision() { (Num := 3) / 2; }										\n\
+		inMultiplication() { (Num := 3) * 2; }									\n\
+		inAssignment() { Num = (Num := 3); }									\n\
+		Num -- inReturn() { return Num := 3; }									\n\
 		inMethodSubject(MyClass) { (MyClass := this).inMethodSubject(this); }	\n\
-		inMethodArg($Int) { inMethodArg(Int := 5); }							\n\
-		inEquivalence() { (Int := 5) == 5; }									\n\
-		inLT() { (Int := 5) <= 5; }												\n\
-		inGT() { (Int := 5) >= 5; }												\n\
+		inMethodArg($Num) { inMethodArg(Num := 5); }							\n\
+		inEquivalence() { (Num := 5) == 5; }									\n\
+		inLT() { (Num := 5) <= 5; }												\n\
+		inGT() { (Num := 5) >= 5; }												\n\
 		inIfStmt() { if(Bool := true) {} }										\n\
 		inWhileStmt() { while(Bool := true) {} }								\n\
 	",
@@ -1777,14 +1777,14 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	TestUsePublicPropertiesOnOtherObjectAndThis,
 	"every MyClass is:						\n\
-		with public Int = 3;				\n\
-		with public Int aliased = 3;		\n\
+		with public Num = 3;				\n\
+		with public Num aliased = 3;		\n\
 		myMethod(MyClass) {					\n\
-			MyClass.Int + MyClass.aliased;	\n\
-			MyClass.Int = 3;				\n\
+			MyClass.Num + MyClass.aliased;	\n\
+			MyClass.Num = 3;				\n\
 			MyClass.aliased = 3;			\n\
-			this.Int + this.aliased;		\n\
-			this.Int = 3;					\n\
+			this.Num + this.aliased;		\n\
+			this.Num = 3;					\n\
 			this.aliased = 3;				\n\
 		}",
 	PTT_VALID
@@ -1799,23 +1799,23 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	TestUsePublicPropertiesOnOtherObjectAndThisInvalid,
 	"every MyClass is:							\n\
-		with public Int = 3;					\n\
-		with public Int aliased = 3;			\n\
+		with public Num = 3;					\n\
+		with public Num aliased = 3;			\n\
 		myMethod(MyClass) {						\n\
-			MyClass.Int == this;				\n\
-			MyClass.Int.nonExistMethod();		\n\
+			MyClass.Num == this;				\n\
+			MyClass.Num.nonExistMethod();		\n\
 			MyClass.aliased == this;			\n\
 			MyClass.aliased.nonExistMethod();	\n\
-			MyClass.Int = this;					\n\
-			MyClass.Int = true;					\n\
+			MyClass.Num = this;					\n\
+			MyClass.Num = true;					\n\
 			MyClass.aliased = this;				\n\
 			MyClass.aliased = true;				\n\
-			this.Int == this;					\n\
-			this.Int.nonExistMethod();			\n\
+			this.Num == this;					\n\
+			this.Num.nonExistMethod();			\n\
 			this.aliased == this;				\n\
 			this.aliased.nonExistMethod();		\n\
-			this.Int = this;					\n\
-			this.Int = true;					\n\
+			this.Num = this;					\n\
+			this.Num = true;					\n\
 			this.aliased = this;				\n\
 			this.aliased = true;				\n\
 		}",
@@ -1865,7 +1865,7 @@ PTT_TEST_CASE(
 			return 'Test';		\n\
 		}						\n\
 								\n\
-		E -- returnInt() {		\n\
+		E -- returnNum() {		\n\
 			return 5;			\n\
 		}						\n\
 								\n\
@@ -1888,7 +1888,7 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	TestUseConcreteParameterizedClasses,
 	"every MyClass{T} is:								\n\
-		MyClass{Int} -- takeWithInt(MyClass{Int}) {		\n\
+		MyClass{Num} -- takeWithNum(MyClass{Num}) {		\n\
 			return MyClass;								\n\
 		}												\n\
 		MyClass{Text} -- takeWithText(MyClass{Text}) {	\n\
@@ -1903,13 +1903,13 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	TestUseConcreteParameterizedClassesIncorrectly,
 	"every MyClass{T} is:									\n\
-		MyClass{Text} -- returnIntAsText(MyClass{Int}) {	\n\
+		MyClass{Text} -- returnNumAsText(MyClass{Num}) {	\n\
 			return MyClass;									\n\
 		}													\n\
 		MyClass{Text} -- returnTAsText(MyClass{T}) {		\n\
 			return MyClass;									\n\
 		}													\n\
-		MyClass{T} -- returnIntAsT(MyClass{Int}) {			\n\
+		MyClass{T} -- returnNumAsT(MyClass{Num}) {			\n\
 			return MyClass;									\n\
 		}													\n\
 		MyClass{T} -- returnTextAsT(MyClass{Text}) {		\n\
@@ -1927,7 +1927,7 @@ PTT_TEST_CASE(
 		T -- returnATypeT() {												\n\
 			return returnATypeT();											\n\
 		}																	\n\
-		Int -- returnATypeInt(MyClass{Int}) {								\n\
+		Num -- returnATypeNum(MyClass{Num}) {								\n\
 			return MyClass.returnATypeT();									\n\
 		}																	\n\
 		Text -- returnAText(MyClass{Text}) {								\n\
@@ -1939,10 +1939,10 @@ PTT_TEST_CASE(
 		MyClass{T} -- returnAMyClassT(MyClass{MyClass{T}}) {				\n\
 			return MyClass.returnATypeT();									\n\
 		}																	\n\
-		Int? -- returnOptionalIntArray(MyClass{Int?}) {						\n\
+		Num? -- returnOptionalNumArray(MyClass{Num?}) {						\n\
 			return MyClass.returnATypeT();									\n\
 		}																	\n\
-		Int[] -- returnIntArray(MyClass{Int[]}) {							\n\
+		Num[] -- returnNumArray(MyClass{Num[]}) {							\n\
 			return MyClass.returnATypeT();									\n\
 		}																	\n\
 		T[] -- returnTArray(MyClass{T[]}) {									\n\
@@ -1951,7 +1951,7 @@ PTT_TEST_CASE(
 		T? -- returnOptionalT(MyClass{T?}) {								\n\
 			return MyClass.returnATypeT();									\n\
 		}																	\n\
-		Int? -- returnOptionalInt(MyClass{Int?}) {							\n\
+		Num? -- returnOptionalNum(MyClass{Num?}) {							\n\
 			return MyClass.returnATypeT();									\n\
 		}",
 	PTT_VALID
@@ -2027,27 +2027,27 @@ PTT_TEST_CASE(
 		arrayed2(T2[]) {}						\n\
 		contained(Generic{T1, T2}) {}			\n\
 	every MyClass is:							\n\
-		needs Int,								\n\
-			Int? optionalInt,					\n\
-			Int[] intArray,						\n\
+		needs Num,								\n\
+			Num? optionalNum,					\n\
+			Num[] intArray,						\n\
 			Text,								\n\
 			Text? optionalText,					\n\
 			Text[] textArray;					\n\
-		testIntText(Generic{Int,Text}) {		\n\
-			Generic.type1(Int);					\n\
-			Generic.optional1(optionalInt);		\n\
+		testNumText(Generic{Num,Text}) {		\n\
+			Generic.type1(Num);					\n\
+			Generic.optional1(optionalNum);		\n\
 			Generic.arrayed1(intArray);			\n\
 			Generic.type2(Text);				\n\
 			Generic.optional2(optionalText);	\n\
 			Generic.arrayed2(textArray);		\n\
 			Generic.contained(Generic);			\n\
 		}										\n\
-		testTextInt(Generic{Text,Int}) {		\n\
+		testTextNum(Generic{Text,Num}) {		\n\
 			Generic.type1(Text);				\n\
 			Generic.optional1(optionalText);	\n\
 			Generic.arrayed1(textArray);		\n\
-			Generic.type2(Int);					\n\
-			Generic.optional2(optionalInt);		\n\
+			Generic.type2(Num);					\n\
+			Generic.optional2(optionalNum);		\n\
 			Generic.arrayed2(intArray);			\n\
 			Generic.contained(Generic);			\n\
 		}",
@@ -2058,38 +2058,38 @@ PTT_TEST_CASE(
 	TestCanProvideAndRetrieveValidGenericImplementations,
 	"every MyClass{T} is:						\n\
 		provides								\n\
-			MyClass{Int},						\n\
+			MyClass{Num},						\n\
 			MyClass{Text},						\n\
 			MyClass{Bool},						\n\
-			MyClass{Int?},						\n\
+			MyClass{Num?},						\n\
 			MyClass{Text?},						\n\
 			MyClass{Bool?},						\n\
-			MyClass{Int[]},						\n\
+			MyClass{Num[]},						\n\
 			MyClass{Text[]},					\n\
 			MyClass{Bool[]},					\n\
-			MyClass{MyClass{Int}},				\n\
+			MyClass{MyClass{Num}},				\n\
 			MyClass{MyClass{Text}},				\n\
 			MyClass{MyClass{Bool}},				\n\
-			MyClass{MyClass{Int?}},				\n\
+			MyClass{MyClass{Num?}},				\n\
 			MyClass{MyClass{Text?}},			\n\
 			MyClass{MyClass{Bool?}},			\n\
-			MyClass{MyClass{Int[]}},			\n\
+			MyClass{MyClass{Num[]}},			\n\
 			MyClass{MyClass{Text[]}},			\n\
 			MyClass{MyClass{Bool[]}};			\n\
 		useProvisions() {						\n\
-			MyClass{Int} <- this;				\n\
+			MyClass{Num} <- this;				\n\
 			MyClass{Text} <- this;				\n\
 			MyClass{Bool} <- this;				\n\
-			MyClass{Int?} <- this;				\n\
+			MyClass{Num?} <- this;				\n\
 			MyClass{Text?} <- this;				\n\
 			MyClass{Bool?} <- this;				\n\
-			MyClass{Int[]} <- this;				\n\
+			MyClass{Num[]} <- this;				\n\
 			MyClass{Text[]} <- this;			\n\
 			MyClass{Bool[]} <- this;			\n\
-			MyClass{MyClass{Int}} <- this;		\n\
+			MyClass{MyClass{Num}} <- this;		\n\
 			MyClass{MyClass{Text}} <- this;		\n\
 			MyClass{MyClass{Bool}} <- this;		\n\
-			MyClass{MyClass{Int?}} <- this;		\n\
+			MyClass{MyClass{Num?}} <- this;		\n\
 			MyClass{MyClass{Text?}} <- this;	\n\
 			MyClass{MyClass{Bool?}} <- this;	\n\
 		}",

@@ -22,14 +22,14 @@ every Main is:
 	needs System, AssertsTest, Printer, MathTest, BooleanLogicTest, InheritanceTest, ArrayTest, OptionalTypeTest, AssignmentsTest, PropertyTest, AutoboxingTest, GenericTest;
 
 	provides Printer, Asserts,
-		SimpleGeneric{Int, Text},
-		SimpleGeneric{Text, Int},
-		SimpleGeneric{SimpleGeneric{Int, Text}, SimpleGeneric{Text, Int}};
+		SimpleGeneric{Num, Text},
+		SimpleGeneric{Text, Num},
+		SimpleGeneric{SimpleGeneric{Num, Text}, SimpleGeneric{Text, Num}};
 
 	with Bool passed = true;
-	with Int totalcount = 0;
-	with Int failedcount = 0;
-	with Int passedcount = 0;
+	with Num totalcount = 0;
+	with Num failedcount = 0;
+	with Num passedcount = 0;
 	with Text[] failed `tests by name` = [];
 
 	run(Bool result, test Text) {
@@ -98,12 +98,12 @@ every Main is:
 		run(AssignmentsTest.testUsingAssigmentReturnValues(Asserts <- this), "testUsingAssigmentReturnValues");
 		run(PropertyTest.~[test own properties]~(Asserts <- this), "test own properties");
 		run(PropertyTest.~[test others properties]~(Asserts <- this), "test others properties");
-		run(AutoboxingTest.testIntSquared(Asserts <- this), "testIntSquared");
+		run(AutoboxingTest.testNumSquared(Asserts <- this), "testNum");
 		run(AutoboxingTest.testAbsoluteValue(Asserts <- this), "testAbsoluteValue");
-		run(AutoboxingTest.testMaxOfInt(Asserts <- this), "testMaxOfInt");
-		run(AutoboxingTest.testMaxOfInts(Asserts <- this), "testMaxOfInts");
-		run(AutoboxingTest.testMinOfInt(Asserts <- this), "testMinOfInt");
-		run(AutoboxingTest.testMinOfInts(Asserts <- this), "testMinOfInts");
+		run(AutoboxingTest.testMaxOfNum(Asserts <- this), "testMaxOfNum");
+		run(AutoboxingTest.testMaxOfNums(Asserts <- this), "testMaxOfNums");
+		run(AutoboxingTest.testMinOfNum(Asserts <- this), "testMinOfNum");
+		run(AutoboxingTest.testMinOfNums(Asserts <- this), "testMinOfNums");
 		run(AutoboxingTest.testNumberOfDigits(Asserts <- this), "testNumberOfDigits");
 		run(AutoboxingTest.testToUpper(Asserts <- this), "testToUpper");
 		run(AutoboxingTest.testToLower(Asserts <- this), "testToLower");
@@ -126,10 +126,10 @@ every Main is:
 		if(passed) System.exit(0);
 		Printer.printLine("FAILURES:");
 
-		var Int = 0;
-		while(Int < failedcount) {
-			Printer.printLine(failed[Int]);
-			Int += 1;
+		var Num = 0;
+		while(Num < failedcount) {
+			Printer.printLine(failed[Num]);
+			Num += 1;
 		}
 
 		System.exit(1);

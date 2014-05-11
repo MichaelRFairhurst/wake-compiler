@@ -1,4 +1,4 @@
-import Int;
+import Num;
 
 #>
 # This only defines the signatures, and will be used to
@@ -6,4 +6,4 @@ import Int;
 ##
 every System is:
 
-	exit(Int) {}
+	exit(Num) {}

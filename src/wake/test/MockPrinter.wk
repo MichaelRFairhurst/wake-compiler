@@ -9,7 +9,7 @@ every MockPrinter (capable Printer) is:
 	#>
 	# Must be defined but all noops
 	##
-	print(Int) {}
+	print(Num) {}
 	print(Text) {}
-	printLine(Int) {}
+	printLine(Num) {}
 	printLine(Text) {}

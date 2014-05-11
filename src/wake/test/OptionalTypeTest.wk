@@ -1,32 +1,32 @@
 every OptionalTypeTest is:
 
 	Bool -- ~[test optional int never set]~() {
-		var Int? = nothing;
-		if Int exists {
+		var Num? = nothing;
+		if Num exists {
 			return false;
 		}
 		return true;
 	}
 
 	Bool -- ~[test optional int set]~() {
-		var Int? = 5;
-		if Int exists {
-			return Int == 5;
+		var Num? = 5;
+		if Num exists {
+			return Num == 5;
 		}
 		return false;
 	}
 
 	Bool -- ~[test optional int not set will hit else]~() {
-		var Int? = nothing;
-		if Int exists {} else {
+		var Num? = nothing;
+		if Num exists {} else {
 			return true;
 		}
 		return false;
 	}
 
 	Bool -- ~[test optional int set wont hit else]~() {
-		var Int? = 5;
-		if Int exists {} else {
+		var Num? = 5;
+		if Num exists {} else {
 			return false;
 		}
 		return true;

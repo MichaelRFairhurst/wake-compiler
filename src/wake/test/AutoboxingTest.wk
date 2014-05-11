@@ -2,7 +2,7 @@ import Asserts;
 
 every AutoboxingTest is:
 
-	Bool -- testIntSquared(Asserts) {
+	Bool -- testNumSquared(Asserts) {
 		Asserts.that(5.squared())Equals(25);
 		return Asserts.allPassed();
 	}
@@ -15,39 +15,39 @@ every AutoboxingTest is:
 		return Asserts.allPassed();
 	}
 
-	Bool -- testMaxOfInt(Asserts) {
+	Bool -- testMaxOfNum(Asserts) {
 		Asserts.that(5.orMaxOf(5))Equals(5);
 		Asserts.that(5.orMaxOf(4))Equals(5);
 		Asserts.that(5.orMaxOf(6))Equals(6);
 		return Asserts.allPassed();
 	}
 
-	Bool -- testMaxOfInts(Asserts) {
-		var Int[] = [];
-		Int[0] = 5;
-		Asserts.that(5.orMaxOf(Int))Equals(5);
-		Int[1] = 4;
-		Asserts.that(5.orMaxOf(Int))Equals(5);
-		Int[2] = 6;
-		Asserts.that(5.orMaxOf(Int))Equals(6);
+	Bool -- testMaxOfNums(Asserts) {
+		var Num[] = [];
+		Num[0] = 5;
+		Asserts.that(5.orMaxOf(Num))Equals(5);
+		Num[1] = 4;
+		Asserts.that(5.orMaxOf(Num))Equals(5);
+		Num[2] = 6;
+		Asserts.that(5.orMaxOf(Num))Equals(6);
 		return Asserts.allPassed();
 	}
 
-	Bool -- testMinOfInt(Asserts) {
+	Bool -- testMinOfNum(Asserts) {
 		Asserts.that(5.orMinOf(5))Equals(5);
 		Asserts.that(5.orMinOf(4))Equals(4);
 		Asserts.that(5.orMinOf(6))Equals(5);
 		return Asserts.allPassed();
 	}
 
-	Bool -- testMinOfInts(Asserts) {
-		var Int[] = [];
-		Int[0] = 5;
-		Asserts.that(5.orMinOf(Int))Equals(5);
-		Int[1] = 4;
-		Asserts.that(5.orMinOf(Int))Equals(4);
-		Int[2] = 6;
-		Asserts.that(5.orMinOf(Int))Equals(4);
+	Bool -- testMinOfNums(Asserts) {
+		var Num[] = [];
+		Num[0] = 5;
+		Asserts.that(5.orMinOf(Num))Equals(5);
+		Num[1] = 4;
+		Asserts.that(5.orMinOf(Num))Equals(4);
+		Num[2] = 6;
+		Asserts.that(5.orMinOf(Num))Equals(4);
 		return Asserts.allPassed();
 	}
 

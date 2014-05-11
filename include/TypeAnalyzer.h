@@ -23,7 +23,7 @@ class TypeAnalyzer {
 		void assertClassCanBeBound(Type* binding);
 		void assertNeedIsNotCircular(string classname, Type* need);
 		Type* getCommonSubtypeOf(Type* a, Type* b);
-		bool isPrimitiveTypeInt(Type* theint);
+		bool isPrimitiveTypeNum(Type* theint);
 		bool isPrimitiveTypeText(Type* theint);
 		bool isPrimitiveTypeBool(Type* theint);
 		bool isAutoboxedType(Type* theint, string** thetype);

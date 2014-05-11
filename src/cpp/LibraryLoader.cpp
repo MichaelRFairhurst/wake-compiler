@@ -19,7 +19,7 @@ bool LibraryLoader::loadImport(string importname, string importpath, ClassSpaceS
 
 void LibraryLoader::loadStdLibToTable(ClassSpaceSymbolTable* table) {
 	#ifdef COMPILE_IN_PRIMITIVE_TYPES
-		#include "Int.table.h"
+		#include "Num.table.h"
 		#include "Text.table.h"
 		#include "Bool.table.h"
 
@@ -33,7 +33,7 @@ void LibraryLoader::loadStdLibToTable(ClassSpaceSymbolTable* table) {
 		TableFileReader reader;
 		PropertySymbolTable* ptable;
 
-		LOAD_MEMORY_TABLE_FILE(Int);
+		LOAD_MEMORY_TABLE_FILE(Num);
 		LOAD_MEMORY_TABLE_FILE(Text);
 		LOAD_MEMORY_TABLE_FILE(Bool);
 

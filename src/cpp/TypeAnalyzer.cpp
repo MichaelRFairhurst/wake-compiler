@@ -174,9 +174,9 @@ Type* TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
 	return a;
 }
 
-bool TypeAnalyzer::isPrimitiveTypeInt(Type* type) {
+bool TypeAnalyzer::isPrimitiveTypeNum(Type* type) {
 	if(type->type == TYPE_MATCHALL) return true;
-	return type->type != TYPE_LAMBDA && type->typedata._class.classname == string("Int") && type->arrayed == 0 && type->optional == 0;
+	return type->type != TYPE_LAMBDA && type->typedata._class.classname == string("Num") && type->arrayed == 0 && type->optional == 0;
 }
 
 bool TypeAnalyzer::isPrimitiveTypeText(Type* type) {
@@ -206,7 +206,7 @@ bool TypeAnalyzer::isAutoboxedType(Type* type, string** boxed) {
 
 	if(isPrimitiveTypeBool(type)) { *boxed = new string("Bool"); return true; }
 	if(isPrimitiveTypeText(type)) { *boxed = new string("Text"); return true; }
-	if(isPrimitiveTypeInt(type)) { *boxed = new string("Int"); return true; }
+	if(isPrimitiveTypeNum(type)) { *boxed = new string("Num"); return true; }
 
 	return false;
 }

@@ -4,44 +4,44 @@ every PropertyTest is:
 
 	provides PropertyTest;
 
-	with public Int = 5;
-	with public Int six = 6;
+	with public Num = 5;
+	with public Num six = 6;
 
 	Bool -- ~[test own properties]~(Asserts) {
-		Asserts.that(Int)Equals(5);
+		Asserts.that(Num)Equals(5);
 		Asserts.that(six)Equals(6);
-		Asserts.that(this.Int)Equals(5);
+		Asserts.that(this.Num)Equals(5);
 		Asserts.that(this.six)Equals(6);
-		Int = 2;
+		Num = 2;
 		six = 3;
-		Asserts.that(Int)Equals(2);
+		Asserts.that(Num)Equals(2);
 		Asserts.that(six)Equals(3);
-		Asserts.that(this.Int)Equals(2);
+		Asserts.that(this.Num)Equals(2);
 		Asserts.that(this.six)Equals(3);
-		this.Int = 3;
+		this.Num = 3;
 		this.six = 4;
-		Asserts.that(Int)Equals(3);
+		Asserts.that(Num)Equals(3);
 		Asserts.that(six)Equals(4);
-		Asserts.that(this.Int)Equals(3);
+		Asserts.that(this.Num)Equals(3);
 		Asserts.that(this.six)Equals(4);
 		return Asserts.allPassed();
 	}
 
 	Bool -- ~[test others properties]~(Asserts) {
 		var PropertyTest <- this;
-		Asserts.that(PropertyTest.Int)Equals(5);
+		Asserts.that(PropertyTest.Num)Equals(5);
 		Asserts.that(PropertyTest.six)Equals(6);
-		PropertyTest.Int = 2;
+		PropertyTest.Num = 2;
 		PropertyTest.six = 3;
-		Asserts.that(PropertyTest.Int)Equals(2);
+		Asserts.that(PropertyTest.Num)Equals(2);
 		Asserts.that(PropertyTest.six)Equals(3);
 
 		var $PropertyTest <- this;
-		Asserts.that($PropertyTest.Int)Equals(5);
+		Asserts.that($PropertyTest.Num)Equals(5);
 		Asserts.that($PropertyTest.six)Equals(6);
-		$PropertyTest.Int = 2;
+		$PropertyTest.Num = 2;
 		$PropertyTest.six = 3;
-		Asserts.that($PropertyTest.Int)Equals(2);
+		Asserts.that($PropertyTest.Num)Equals(2);
 		Asserts.that($PropertyTest.six)Equals(3);
 		return Asserts.allPassed();
 	}
