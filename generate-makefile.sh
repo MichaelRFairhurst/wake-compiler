@@ -15,7 +15,8 @@ do
     continue
   fi
 
-  deps[${#deps[@]}]="$2/$(echo $LINE | sed 's/^import \(.*\);$/\1/').table"
+  deps[${#deps[@]}]="$2/$(echo $LINE | sed 's/^import \(.*\);$/\1/').table.md5"
 done < $1
 
-echo bin/wakeobj/$( basename $1 | sed 's/\.wk/.o/'): ${deps[@]}
+echo bin/wakeobj/$( basename $1 | sed 's/\.wk/.o/'): $1 ${deps[@]}
+echo bin/waketable/$( basename $1 | sed 's/\.wk/.table/'): $1 ${deps[@]}

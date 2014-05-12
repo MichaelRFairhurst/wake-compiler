@@ -1,5 +1,8 @@
 SHELL=/bin/bash
 
+all: chatup
+
+include wmake.mk
 
 OPT=-O3
 #OPT=-O0 -g
@@ -104,20 +107,18 @@ bin/wake: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o bin/cpp/LibraryLoader-wi
 	@echo -- CHEERIO
 	@echo
 
-bin/finaltest.js: callwmake
-
-callwmake: $(WAKEOBJS) $(WAKETABLEOBJS) bin/wakeobj/std.o src/wake/test/*.wk bin/wake
-	time make -f wmake.mk
-	touch callwmake
-
 bin/wakeobj/std.o: src/wake/stdlib/myobj/std.o js_to_wakeobj.sh
 	cat $< | ./js_to_wakeobj.sh > $@
 
-bin/wakeobj/Asserts.o: src/wake/stdlib/Asserts.wk bin/wake $(WAKETABLEOBJS)
-	time ./bin/wake -d bin/waketable $< -o $@
+$(OBJECTFILES) : bin/wake
+$(TABLEFILES) : bin/wake
+bin/finaltest.js: bin/wakeobj/Asserts.o
 
-bin/wakeobj/%.o: src/wake/test/%.wk bin/wake $(WAKETABLEOBJS)
-	time ./bin/wake -d bin/waketable $< -o $@
+bin/wakeobj/Asserts.o: src/wake/stdlib/Asserts.wk bin/wake $(WAKETABLEOBJS)
+	./bin/wake -d bin/waketable $< -o $@
+
+bin/waketable/Asserts.table: src/wake/stdlib/Asserts.wk bin/wake $(WAKETABLEOBJS)
+	./bin/wake -t -d bin/waketable $<
 
 bin/waketable/%.table: src/wake/stdlib/tables/%.wk bin/wake-nolib
 	./bin/wake-nolib -d bin/waketable -t $< -d bin/waketable
@@ -156,7 +157,7 @@ gen/lex.%.c: src/flex/%lexer.l gen/wake.tab.c gen/objectfile.tab.c
 loc:
 	find src -type f -print0 | xargs -0 wc -l makefile include/* js_to_wakeobj.sh
 
-loo:
+loo: clean
 	@echo
 	@echo -- IN THE LOO
 	@echo
