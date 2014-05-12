@@ -1,1 +1,7 @@
-every Array is:
+import Num;
+import Bool;
+
+every Array{T} is:
+
+	Num -- getSize() { return 0; }
+	Bool -- contains(T) { return false; }

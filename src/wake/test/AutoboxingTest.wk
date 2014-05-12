@@ -87,3 +87,34 @@ every AutoboxingTest is:
 		Asserts.that("blah blah".trim())Equals("blah blah");
 		return Asserts.allPassed();
 	}
+
+	Bool -- testArraySize(Asserts) {
+		var Num[] = [];
+		Asserts.that(Num.getSize())Equals(0);
+		Num[0] = 1;
+		Asserts.that(Num.getSize())Equals(1);
+		Num[1] = 1;
+		Asserts.that(Num.getSize())Equals(2);
+		return Asserts.allPassed();
+	}
+
+	Bool -- testArrayContains(Asserts) {
+		var Num[] = [];
+		var Text[] = [];
+		var AutoboxingTest[] = [];
+		Asserts.that(Num.contains(5))IsFalse();
+		Asserts.that(Text.contains("test"))IsFalse();
+		Asserts.that(AutoboxingTest.contains(this))IsFalse();
+		Num[0] = 4;
+		Text[0] = "hey";
+		Asserts.that(Num.contains(5))IsFalse();
+		Asserts.that(Text.contains("test"))IsFalse();
+		Asserts.that(AutoboxingTest.contains(this))IsFalse();
+		Num[1] = 5;
+		Text[1] = "test";
+		AutoboxingTest[0] = this;
+		Asserts.that(Num.contains(5));
+		Asserts.that(Text.contains("test"));
+		Asserts.that(AutoboxingTest.contains(this));
+		return Asserts.allPassed();
+	}
