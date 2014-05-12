@@ -1,7 +1,7 @@
 import Num;
 import Bool;
 
-every Array{T} is:
+every List{T} is:
 
 	Num -- getSize() { return 0; }
 	Bool -- contains(T) { return false; }

@@ -42,7 +42,7 @@ WAKENAMES=Asserts.wk
 
 WAKEOBJS=$(addprefix bin/wakeobj/, $(WAKENAMES:.wk=.o))
 
-WAKETABLENAMES=Printer.wk System.wk Num.wk Text.wk Bool.wk
+WAKETABLENAMES=Printer.wk System.wk Num.wk Text.wk Bool.wk List.wk
 WAKETABLEOBJS=$(addprefix bin/waketable/, $(WAKETABLENAMES:.wk=.table))
 WAKETABLEINCLUDES=$(addprefix gen/, $(WAKETABLENAMES:.wk=.table.h))
 
@@ -124,6 +124,7 @@ bin/waketable/%.table: src/wake/stdlib/tables/%.wk bin/wake-nolib
 
 bin/waketable/Printer.table: bin/waketable/Num.table bin/waketable/Text.table bin/wake-nolib src/wake/stdlib/tables/Printer.wk
 bin/waketable/System.table: bin/waketable/Num.table bin/wake-nolib src/wake/stdlib/tables/System.wk
+bin/waketable/List.table: bin/waketable/Num.table bin/wake-nolib src/wake/stdlib/tables/List.wk
 
 bin/gen/%.o: gen/%.c gen/wake.tab.c
 	$(CC) $(OPT) -c $< -o $@

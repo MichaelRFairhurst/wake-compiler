@@ -102,19 +102,19 @@ every AutoboxingTest is:
 		var Num[] = [];
 		var Text[] = [];
 		var AutoboxingTest[] = [];
-		Asserts.that(Num.contains(5))IsFalse();
-		Asserts.that(Text.contains("test"))IsFalse();
-		Asserts.that(AutoboxingTest.contains(this))IsFalse();
+		Asserts.isFalse(Num.contains(5));
+		Asserts.isFalse(Text.contains("test"));
+		Asserts.isFalse(AutoboxingTest.contains(this));
 		Num[0] = 4;
 		Text[0] = "hey";
-		Asserts.that(Num.contains(5))IsFalse();
-		Asserts.that(Text.contains("test"))IsFalse();
-		Asserts.that(AutoboxingTest.contains(this))IsFalse();
+		Asserts.isFalse(Num.contains(5));
+		Asserts.isFalse(Text.contains("test"));
+		Asserts.isFalse(AutoboxingTest.contains(this));
 		Num[1] = 5;
 		Text[1] = "test";
 		AutoboxingTest[0] = this;
-		Asserts.that(Num.contains(5));
-		Asserts.that(Text.contains("test"));
-		Asserts.that(AutoboxingTest.contains(this));
+		Asserts.isTrue(Num.contains(5));
+		Asserts.isTrue(Text.contains("test"));
+		Asserts.isTrue(AutoboxingTest.contains(this));
 		return Asserts.allPassed();
 	}

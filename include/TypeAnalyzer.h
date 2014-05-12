@@ -26,7 +26,7 @@ class TypeAnalyzer {
 		bool isPrimitiveTypeNum(Type* theint);
 		bool isPrimitiveTypeText(Type* theint);
 		bool isPrimitiveTypeBool(Type* theint);
-		bool isAutoboxedType(Type* theint, string** thetype);
+		bool isAutoboxedType(Type* type, Type** boxedtype);
 		string getNameForType(Type* type);
 		string getNameForTypeAsProperty(Type* type);
 

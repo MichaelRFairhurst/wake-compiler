@@ -108,7 +108,9 @@ every Main is:
 		run(AutoboxingTest.testToUpper(Asserts <- this), "testToUpper");
 		run(AutoboxingTest.testToLower(Asserts <- this), "testToLower");
 		run(AutoboxingTest.testSwitchCase(Asserts <- this), "testSwitchCase");
-		run(AutoboxingTest.testTrim(Asserts <- this), "testSwitchCase");
+		run(AutoboxingTest.testTrim(Asserts <- this), "testTrim");
+		run(AutoboxingTest.testArraySize(Asserts <- this), "testArraySize");
+		run(AutoboxingTest.testArrayContains(Asserts <- this), "testArrayContains");
 		run(GenericTest.~[ test all start out as nothing in methods ]~(Asserts <- this), "test all start out as nothing in methods");
 		run(GenericTest.~[ test get otherwise in methods ]~(Asserts <- this), "test get otherwise in methods");
 		run(GenericTest.~[ test set and then get in methods ]~(Asserts <- this), "test set and then get in methods");

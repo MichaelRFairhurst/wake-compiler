@@ -22,6 +22,7 @@ void LibraryLoader::loadStdLibToTable(ClassSpaceSymbolTable* table) {
 		#include "Num.table.h"
 		#include "Text.table.h"
 		#include "Bool.table.h"
+		#include "List.table.h"
 
 		#define LOAD_MEMORY_TABLE_FILE(tname) \
 			stringstream importbin ## tname; \
@@ -36,6 +37,7 @@ void LibraryLoader::loadStdLibToTable(ClassSpaceSymbolTable* table) {
 		LOAD_MEMORY_TABLE_FILE(Num);
 		LOAD_MEMORY_TABLE_FILE(Text);
 		LOAD_MEMORY_TABLE_FILE(Bool);
+		LOAD_MEMORY_TABLE_FILE(List);
 
 	#endif
 }

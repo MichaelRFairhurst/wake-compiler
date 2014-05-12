@@ -189,24 +189,50 @@ bool TypeAnalyzer::isPrimitiveTypeBool(Type* type) {
 	return type->type != TYPE_LAMBDA && type->typedata._class.classname == string("Bool") && type->arrayed == 0 && type->optional == 0;
 }
 
-bool TypeAnalyzer::isAutoboxedType(Type* type, string** boxed) {
+bool TypeAnalyzer::isAutoboxedType(Type* type, Type** boxed) {
 	if(type->type == TYPE_MATCHALL) return false;
-
-	// need to return a generic autoboxed type according to arguments/return
-	if(type->type == TYPE_LAMBDA) { *boxed = new string("lambda"); return true; }
 
 	// shouldn't be here...throw exception?
 	if(type->type == TYPE_UNUSABLE) return false;
 
-	// shouldn't be here,..unless I decide to make, say, T?.exists() and/or T?.applyIfExists(fn(T))
+	// need to return a List<T>
+	if(type->arrayed) {
+		*boxed = MakeType(TYPE_CLASS);
+		Type* loweredtype = copyType(type);
+		loweredtype->arrayed--;
+		(*boxed)->typedata._class.classname = strdup("List");
+		(*boxed)->typedata._class.parameters = MakeTypeArray();
+		AddTypeToTypeArray(loweredtype, (*boxed)->typedata._class.parameters);
+		return true;
+	}
+
+	// need to return a generic autoboxed type according to arguments/return
+	if(type->type == TYPE_LAMBDA) {
+		*boxed = MakeType(TYPE_CLASS);
+		(*boxed)->typedata._class.classname = strdup("lambda");
+		return true;
+	}
+
+	// shouldn't ever get here,..unless I decide to make, say, T?.exists() and/or T?.applyIfExists(fn(T))
 	if(type->optional) return false;
 
-	// need to return a Array<T>
-	if(type->arrayed) { *boxed = new string("Array"); return true; }
+	if(isPrimitiveTypeBool(type)) {
+		*boxed = MakeType(TYPE_CLASS);
+		(*boxed)->typedata._class.classname = strdup("Bool");
+		return true;
+	}
 
-	if(isPrimitiveTypeBool(type)) { *boxed = new string("Bool"); return true; }
-	if(isPrimitiveTypeText(type)) { *boxed = new string("Text"); return true; }
-	if(isPrimitiveTypeNum(type)) { *boxed = new string("Num"); return true; }
+	if(isPrimitiveTypeText(type)) {
+		*boxed = MakeType(TYPE_CLASS);
+		(*boxed)->typedata._class.classname = strdup("Text");
+		return true;
+	}
+
+	if(isPrimitiveTypeNum(type)) {
+		*boxed = MakeType(TYPE_CLASS);
+		(*boxed)->typedata._class.classname = strdup("Num");
+		return true;
+	}
 
 	return false;
 }

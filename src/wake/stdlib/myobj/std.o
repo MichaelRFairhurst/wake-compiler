@@ -92,3 +92,14 @@ var$ b='';
 	};
 
 };
+
+~List~ = function(a) {
+    this.`getSize()` = function() {
+		return$ a.length;
+	};
+
+	this.`contains(T)` = function(b) {
+		return$ a.indexOf(b) > -1;
+	};
+
+};
