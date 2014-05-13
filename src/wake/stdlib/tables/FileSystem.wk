@@ -1,0 +1,13 @@
+import Text;
+import Num;
+import FilePath;
+
+every FileSystem is:
+
+	FilePath -- getPath(Text) { var FilePath[] = []; return FilePath[0]; }
+
+	FilePath[] -- listRoots() { var FilePath[] = []; return FilePath; }
+
+	Text -- getPathSeparator() { return ""; }
+
+	FilePath -- getTempFile(Text prefix, Text suffix, FilePath) { return FilePath; }

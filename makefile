@@ -45,7 +45,7 @@ WAKENAMES=Asserts.wk
 
 WAKEOBJS=$(addprefix bin/wakeobj/, $(WAKENAMES:.wk=.o))
 
-WAKETABLENAMES=Printer.wk System.wk Num.wk Text.wk Bool.wk List.wk
+WAKETABLENAMES=Printer.wk System.wk Num.wk Text.wk Bool.wk List.wk File.wk FilePath.wk FileSystem.wk
 WAKETABLEOBJS=$(addprefix bin/waketable/, $(WAKETABLENAMES:.wk=.table))
 WAKETABLEINCLUDES=$(addprefix gen/, $(WAKETABLENAMES:.wk=.table.h))
 
@@ -116,6 +116,11 @@ bin/wakeobj/std.o: src/wake/stdlib/myobj/std.o js_to_wakeobj.sh
 $(OBJECTFILES) : bin/wake
 $(TABLEFILES) : bin/wake
 bin/finaltest.js: bin/wakeobj/Asserts.o
+
+bin/waketable/FilePath.table: bin/waketable/File.table bin/waketable/Text.table bin/waketable/Num.table bin/waketable/Bool.table
+	echo this overrides the wildcard that doesnt work
+
+bin/waketable/FileSystem.table: bin/waketable/File.table bin/waketable/Text.table bin/waketable/Num.table
 
 bin/wakeobj/Asserts.o: src/wake/stdlib/Asserts.wk bin/wake $(WAKETABLEOBJS)
 	./bin/wake -d bin/waketable $< -o $@

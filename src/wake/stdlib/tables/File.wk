@@ -1,0 +1,50 @@
+import Text;
+import Num;
+import Bool;
+
+every FilePath is:
+
+	needs Text:DoNotUse filename;
+
+	provides File, FilePath:DoNotUse, Text:DoNotUse;
+
+	Text -- getPath() { return filename; }
+
+	Text -- getBasename() { return ""; }
+
+	Text -- getDirname() { return ""; }
+
+	Bool -- isFile() { return true; }
+
+	Bool -- isDirectory() { return true; }
+
+	Bool -- fileExists() { return true; }
+
+	makeDirectory() { }
+
+	FilePath[] -- getChildren() { var FilePath[] = []; return FilePath; }
+
+	FilePath? -- getParent() { return nothing; }
+
+	delete() { }
+
+
+every File is:
+
+	needs FilePath:DoNotUse;
+
+	FilePath -- getPath() { return FilePath; }
+
+	Text -- read(Num) { return ""; }
+
+	Num -- readUnsignedChar() { return 0; }
+
+	write(Text) { }
+
+	writeUnsignedChar(Num) { }
+
+	close() { }
+
+	Num -- tell() { return 0; }
+
+	seek(Num) { }
