@@ -1,6 +1,9 @@
+import Num;
+
 every Text is:
 
 	Text -- toUpper() { return "stub"; }
 	Text -- toLower() { return "stub"; }
 	Text -- switchCase() { return "stub"; }
 	Text -- trim() { return "stub"; }
+	Num -- getSize() { return 0; }

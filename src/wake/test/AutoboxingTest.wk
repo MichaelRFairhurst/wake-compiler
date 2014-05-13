@@ -118,3 +118,11 @@ every AutoboxingTest is:
 		Asserts.isTrue(AutoboxingTest.contains(this));
 		return Asserts.allPassed();
 	}
+
+	Bool -- testTextLength(Asserts) {
+		Asserts.that("hello".getSize())Equals(5);
+		Asserts.that("h".getSize())Equals(1);
+		Asserts.that("".getSize())Equals(0);
+		Asserts.that("suuuuuuuuuuuuuuuuuupa coooooooooooooooooool".getSize())Equals(43);
+		return Asserts.allPassed();
+	}

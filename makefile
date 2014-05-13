@@ -134,6 +134,8 @@ bin/waketable/%.table: src/wake/stdlib/tables/%.wk bin/wake-nolib
 bin/waketable/Printer.table: bin/waketable/Num.table bin/waketable/Text.table bin/wake-nolib src/wake/stdlib/tables/Printer.wk
 bin/waketable/System.table: bin/waketable/Num.table bin/wake-nolib src/wake/stdlib/tables/System.wk
 bin/waketable/List.table: bin/waketable/Num.table bin/wake-nolib src/wake/stdlib/tables/List.wk
+bin/waketable/Text.table: bin/waketable/Num.table bin/wake-nolib src/wake/stdlib/tables/Text.wk
+bin/waketable/File.table: src/wake/stdlib/tables/File.wk bin/waketable/Text.table bin/waketable/Num.table bin/waketable/Bool.table
 
 bin/gen/%.o: gen/%.c gen/wake.tab.c
 	$(CC) $(OPT) -c $< -o $@

@@ -91,6 +91,10 @@ var$ b='';
 		return$ a.trim();
 	};
 
+	this.`getSize()` = function()  {
+		return$ a.length;
+	}
+
 };
 
 ~List~ = function(a) {
