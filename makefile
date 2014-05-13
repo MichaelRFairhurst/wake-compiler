@@ -70,6 +70,9 @@ TESTNAMES=CompilerTests.cpp \
 
 TESTOBJS=$(addprefix bin/tests/, $(TESTNAMES:.cpp=.o))
 
+windowsbuildready: $(GENOBJS) $(WAKETABLEINCLUDES) bin/wakeobj/std.o
+	zip windowsbuildready -r .
+
 chatup: bin/finaltest.js
 	@echo
 	@echo -- CHAT UP THE BIN

@@ -11,7 +11,7 @@ LIBRARYFILES := bin/wakeobj/Asserts.o bin/wakeobj/std.o
 to-md5 = $1 $(addsuffix .md5,$1)
 
 %.md5: % FORCE
-	$(if $(filter-out $(shell cat $@ 2>/dev/null),$(shell md5sum $*)),md5sum $* > $@)
+	@$(if $(filter-out $(shell cat $@ 2>/dev/null),$(shell md5sum $*)),md5sum $* > $@)
 
 FORCE:
 
