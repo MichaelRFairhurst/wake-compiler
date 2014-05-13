@@ -486,7 +486,19 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 		case NT_NUMBERLIT: file << tree->node_data.number; break;
 		case NT_BOOLLIT: file << (tree->node_data.number ? "1" : "0"); break;
-		case NT_STRINGLIT: file << '"'; file << tree->node_data.string; file << '"'; break;
+		case NT_STRINGLIT:
+			file << '"';
+			for(int i = 0; i < strlen(tree->node_data.string); i++) {
+				switch(tree->node_data.string[i]) {
+					case '\n': file << "\\n"; break;
+					case '"': file << "\\\""; break;
+					default:
+					file << tree->node_data.string[i];
+				}
+			}
+			file << '"';
+			break;
+
 		case NT_NOTHING: file << "null"; break;
 	}
 }

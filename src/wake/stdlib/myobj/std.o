@@ -1,4 +1,5 @@
 var$ b='';
+var$ fs = require("fs");
 
 ~Printer~ = function(){
 	this.`print(Text)` =
@@ -115,7 +116,7 @@ var$ b='';
 ~FileSystem~ = function() {
 
 	this.`getPath(Text)` = function(a) {
-		return$ new ~FilePath~(a);
+		return$ new$ ~FilePath~(a);
 	};
 
 	this.`listRoots()` = function() {
@@ -167,12 +168,12 @@ var$ b='';
 	};
 
 	this.`getChildren()` = function() {
-		return$ fs.readdirSync(a).map(function(a) { return$ new$ ~FilePath~(a); });
+		return$ fs.readdirSync(a).map(function(b) { return$ new$ ~FilePath~(a + '/' + b); });
 	};
 
 	this.`getParent()` = function() {
 		var$ b = new$ ~FilePath~(this.`getDirname`);
-		return$ b.`fileExists()` ? b : null;
+		return$ b.`fileExists()`() ? b : null;
 	};
 
 	this.`delete()` = function() {
@@ -182,14 +183,14 @@ var$ b='';
 };
 
 ~File~ = function(a) {
-	var$ b = 0, c = 1, d = fs.openSync(a.`getPath()`, 'a+');
+	var$ b = 0, c = 1, d = fs.openSync(a.`getPath()`(), 'a+');
 
 	this.`getPath()` = function() {
 		return$ a;
 	};
 
 	this.`read(Num)` = function(e) {
-		var$ f = new$ Buffer();
+		var$ f = new$ Buffer(e);
 		if(!c) { throw$ Error("File$ no$ longer$ open"); }
 		fs.readSync(d, f, 0, e, b);
 		b += e;
@@ -197,18 +198,18 @@ var$ b='';
 	};
 
 	this.`readUnsignedChar()` = function() {
-		var$ e = new$ Buffer();
+		var$ e = new$ Buffer(1);
 		if(!c) { throw$ Error("File$ no$ longer$ open"); }
 		fs.readSync(d, e, 0, 1, b);
 		b++;
-		return$ f.readUInt8(0);
+		return$ e.readUInt8(0);
 	};
 
 	this.`write(Text)` = function(e) {
 		if(!c) { throw$ Error("File$ no$ longer$ open"); }
 		var$ f = new$ Buffer(e, 'utf8');
 		b += e.length;
-		return$ d.writeSync(d, f, 0, e.length, b);
+		return$ fs.writeSync(d, f, 0, e.length, b);
 	};
 
 	this.`writeUnsignedChar(Num)` = function(e) {
@@ -216,7 +217,7 @@ var$ b='';
 		var$ f = new$ Buffer(1);
 		f.writeUInt8(e, 0);
 		b++;
-		return$ d.writeSync(d, f, 0, 1, b);
+		return$ fs.writeSync(d, f, 0, 1, b);
 	};
 
 	this.`close()` = function() {
