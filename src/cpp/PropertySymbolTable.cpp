@@ -85,6 +85,7 @@ boost::optional<SemanticError*> PropertySymbolTable::addProvision(Type* provided
 	prop->type = method;
 	prop->casing = name;
 	prop->address = name;
+	prop->flags = 0;
 
 	properties[name] = prop;
 	return boost::optional<SemanticError*>();
