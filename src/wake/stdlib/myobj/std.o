@@ -93,7 +93,11 @@ var$ b='';
 
 	this.`getSize()` = function()  {
 		return$ a.length;
-	}
+	};
+
+	this.`substr(Num)` = this.`substr(Num,Num)` = function(b, c) {
+		return$ a.substr(b, c);
+	};
 
 };
 

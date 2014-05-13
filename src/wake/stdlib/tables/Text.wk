@@ -7,3 +7,5 @@ every Text is:
 	Text -- switchCase() { return "stub"; }
 	Text -- trim() { return "stub"; }
 	Num -- getSize() { return 0; }
+	Text -- substr(Num start) { return "stub"; }
+	Text -- substr(Num start, Num end) { return "stub"; }

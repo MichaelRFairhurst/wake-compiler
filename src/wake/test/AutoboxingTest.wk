@@ -126,3 +126,12 @@ every AutoboxingTest is:
 		Asserts.that("suuuuuuuuuuuuuuuuuupa coooooooooooooooooool".getSize())Equals(43);
 		return Asserts.allPassed();
 	}
+
+	Bool -- testTextSubstr(Asserts) {
+		Asserts.that("hello".substr(0))Equals("hello");
+		Asserts.that("hello".substr(0, 10))Equals("hello");
+		Asserts.that("hello".substr(1))Equals("ello");
+		Asserts.that("hello".substr(1, 10))Equals("ello");
+		Asserts.that("hello".substr(1, 3))Equals("ell");
+		return Asserts.allPassed();
+	}
