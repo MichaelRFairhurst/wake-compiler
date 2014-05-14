@@ -2,7 +2,7 @@ import Asserts;
 
 every AssignmentsTest is:
 
-	Bool -- testPlusEquals(Asserts) {
+	testPlusEquals(Asserts) {
 		var Num = 5;
 		Num += 0;
 		Asserts.that(Num)Equals(5);
@@ -10,10 +10,9 @@ every AssignmentsTest is:
 		Asserts.that(Num)Equals(6);
 		Num += 5;
 		Asserts.that(Num)Equals(11);
-		return Asserts.allPassed();
 	}
 
-	Bool -- testMinusEquals(Asserts) {
+	testMinusEquals(Asserts) {
 		var Num = 5;
 		Num -= 0;
 		Asserts.that(Num)Equals(5);
@@ -21,10 +20,9 @@ every AssignmentsTest is:
 		Asserts.that(Num)Equals(4);
 		Num -= 4;
 		Asserts.that(Num)Equals(0);
-		return Asserts.allPassed();
 	}
 
-	Bool -- testTimesEquals(Asserts) {
+	testTimesEquals(Asserts) {
 		var Num = 5;
 		Num *= 1;
 		Asserts.that(Num)Equals(5);
@@ -32,10 +30,9 @@ every AssignmentsTest is:
 		Asserts.that(Num)Equals(25);
 		Num *= 0;
 		Asserts.that(Num)Equals(0);
-		return Asserts.allPassed();
 	}
 
-	Bool -- testDivideEquals(Asserts) {
+	testDivideEquals(Asserts) {
 		var Num = 25;
 		Num /= 5;
 		Asserts.that(Num)Equals(5);
@@ -43,15 +40,14 @@ every AssignmentsTest is:
 		Asserts.that(Num)Equals(5);
 		Num /= 5;
 		Asserts.that(Num)Equals(1);
-		return Asserts.allPassed();
 	}
 
-	Bool -- testUsingAssigmentReturnValues(Asserts) {
+	testUsingAssigmentReturnValues(Asserts) {
 		var Num = 5;
 		if((Num := 1) != 1) {
-			return false;
+			Asserts.fail("Not equal to one after being set in a subexpression");
 		}
 
+		Asserts.that(Num)Equals(1);
 		Asserts.that(Num := 4)Equals(4);
-		return Asserts.allPassed();
 	}

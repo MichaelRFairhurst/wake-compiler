@@ -8,27 +8,25 @@ every GenericTest is:
 		textNum SimpleGeneric{Text, Num},
 		nested SimpleGeneric{SimpleGeneric{Num, Text}, SimpleGeneric{Text, Num}};
 
-	Bool -- ~[ test all start out as nothing in methods ]~ (Asserts) {
+	~[ test all start out as nothing in methods ]~ (Asserts) {
 		Asserts.that(numText.getT1Optional() == nothing);
 		Asserts.that(numText.getT2Optional() == nothing);
 		Asserts.that(textNum.getT1Optional() == nothing);
 		Asserts.that(textNum.getT2Optional() == nothing);
 		Asserts.that(nested.getT1Optional() == nothing);
 		Asserts.that(nested.getT2Optional() == nothing);
-		return Asserts.allPassed();
 	}
 
-	Bool -- ~[ test get otherwise in methods ]~ (Asserts) {
+	~[ test get otherwise in methods ]~ (Asserts) {
 		Asserts.that(numText.getT1Otherwise(5) == 5);
 		Asserts.that(numText.getT2Otherwise("hello") == "hello");
 		Asserts.that(textNum.getT1Otherwise("hello") == "hello");
 		Asserts.that(textNum.getT2Otherwise(5) == 5);
 		Asserts.that(nested.getT1Otherwise(numText) == numText);
 		Asserts.that(nested.getT2Otherwise(textNum) == textNum);
-		return Asserts.allPassed();
 	}
 
-	Bool -- ~[ test set and then get in methods ]~ (Asserts) {
+	~[ test set and then get in methods ]~ (Asserts) {
 		numText.setT1(4); numText.setT2("hi");
 		textNum.setT1("hey"); textNum.setT2(6);
 		nested.setT1(numText); nested.setT2(textNum);
@@ -38,10 +36,9 @@ every GenericTest is:
 		Asserts.that(textNum.getT2Optional() == 6);
 		Asserts.that(nested.getT1Optional() == numText);
 		Asserts.that(nested.getT2Optional() == textNum);
-		return Asserts.allPassed();
 	}
 
-	Bool -- ~[ test unset and then all is nothing ]~ (Asserts) {
+	~[ test unset and then all is nothing ]~ (Asserts) {
 		numText.unsetT1();
 		Asserts.that(numText.getT1Optional() == nothing);
 		numText.unsetT2();
@@ -54,11 +51,10 @@ every GenericTest is:
 		Asserts.that(nested.getT1Optional() == nothing);
 		nested.unsetT2();
 		Asserts.that(nested.getT2Optional() == nothing);
-		return Asserts.allPassed();
 	}
 
 	#>
-	Bool -- ~[ test all start out as nothing in properties]~ (Asserts) {
+	~[ test all start out as nothing in properties]~ (Asserts) {
 		Asserts.that(numText.getT1Optional() == nothing);
 		Asserts.that(numText.getT2Optional() == nothing);
 		Asserts.that(textNum.getT1Optional() == nothing);

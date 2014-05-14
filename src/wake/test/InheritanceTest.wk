@@ -20,80 +20,67 @@ every InheritanceTest is:
 
 	needs Printer;
 
-	Bool -- ~[test parent gets parent class name]~(Asserts) {
+	~[test parent gets parent class name]~(Asserts) {
 		var InheritanceTestParent <- this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestParent");
-		return Asserts.allPassed();
 	}
 
-	Bool -- ~[test override child gets child class name]~(Asserts) {
+	~[test override child gets child class name]~(Asserts) {
 		var InheritanceTestOverride <- this;
 		Asserts.that(InheritanceTestOverride.getClassName())Equals("InheritanceTestOverride");
-		return Asserts.allPassed();
 	}
 
-	Bool -- ~[test override child from provider gets child class name]~(Asserts) {
+	~[test override child from provider gets child class name]~(Asserts) {
 		var InheritanceTestParent = InheritanceTestParent:Override <- this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestOverride");
-		return Asserts.allPassed();
 	}
 
-	Bool -- ~[test override child after cast gets child class name]~(Asserts) {
+	~[test override child after cast gets child class name]~(Asserts) {
 		var InheritanceTestParent = InheritanceTestOverride <- this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestOverride");
-		return Asserts.allPassed();
 	}
 
-	Bool -- ~[test fallthrough child gets child class name]~(Asserts) {
+	~[test fallthrough child gets child class name]~(Asserts) {
 		var InheritanceTestFallthrough <- this;
 		Asserts.that(InheritanceTestFallthrough.getClassName())Equals("InheritanceTestParent");
-		return Asserts.allPassed();
 	}
 
-	Bool -- ~[test fallthrough child from provider gets child class name]~(Asserts) {
+	~[test fallthrough child from provider gets child class name]~(Asserts) {
 		var InheritanceTestParent = InheritanceTestParent:Fallthrough <- this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestParent");
-		return Asserts.allPassed();
 	}
 
-	Bool -- ~[test fallthrough child after cast gets child class name]~(Asserts) {
+	~[test fallthrough child after cast gets child class name]~(Asserts) {
 		var InheritanceTestParent = InheritanceTestFallthrough <- this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestParent");
-		return Asserts.allPassed();
 	}
 
-	Bool -- ~[test implementing child gets child class name]~(Asserts) {
+	~[test implementing child gets child class name]~(Asserts) {
 		var InheritanceTestInterface <- this;
 		Asserts.that(InheritanceTestInterface.getClassName())Equals("InheritanceTestInterface");
-		return Asserts.allPassed();
 	}
 
-	Bool -- ~[test implementing child from provider gets child class name]~(Asserts) {
+	~[test implementing child from provider gets child class name]~(Asserts) {
 		var InheritanceTestParent = InheritanceTestParent:Interface <- this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestInterface");
-		return Asserts.allPassed();
 	}
 
-	Bool -- ~[test implementing child after cast gets child class name]~(Asserts) {
+	~[test implementing child after cast gets child class name]~(Asserts) {
 		var InheritanceTestParent = InheritanceTestInterface <- this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestInterface");
-		return Asserts.allPassed();
 	}
 
-	Bool -- ~[test parent has need fulfilled]~ (Asserts) {
+	~[test parent has need fulfilled]~ (Asserts) {
 		var InheritanceTestParent <- this;
 		Asserts.that(InheritanceTestParent.Text)Equals("public need");
-		return Asserts.allPassed();
 	}
 
-	Bool -- ~[test fallthrough has need fulfilled]~ (Asserts) {
+	~[test fallthrough has need fulfilled]~ (Asserts) {
 		var InheritanceTestFallthrough <- this;
 		Asserts.that(InheritanceTestFallthrough.Text)Equals("public need");
-		return Asserts.allPassed();
 	}
 
-	Bool -- ~[test interface has need redefined]~ (Asserts) {
+	~[test interface has need redefined]~ (Asserts) {
 		var InheritanceTestInterface <- this;
 		Asserts.that(InheritanceTestInterface.Text)Equals("not injected");
-		return Asserts.allPassed();
 	}

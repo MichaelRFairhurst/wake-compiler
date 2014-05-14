@@ -2,39 +2,35 @@ import Asserts;
 
 every ArrayTest is:
 
-	Bool -- ~[test set array index]~(Asserts) {
+	~[test set array index]~(Asserts) {
 		var Num[] = [];
 		Num[0] = 5;
 		Asserts.that(Num[0])Equals(5);
-		return Asserts.allPassed();
 	}
 
-	Bool -- ~[test reset array index]~(Asserts) {
+	~[test reset array index]~(Asserts) {
 		var Num[] = [];
 		Num[0] = 5;
 		Num[0] = 3;
 		Asserts.that(Num[0])Equals(3);
-		return Asserts.allPassed();
 	}
 
-	Bool -- ~[test set array array index index]~(Asserts) {
+	~[test set array array index index]~(Asserts) {
 		var Num[][] = [];
 		Num[0] = [];
 		Num[0][0] = 3;
 		Asserts.that(Num[0][0])Equals(3);
-		return Asserts.allPassed();
 	}
 
-	Bool -- ~[test reset array array index index]~(Asserts) {
+	~[test reset array array index index]~(Asserts) {
 		var Num[][] = [];
 		Num[0] = [];
 		Num[0][0] = 3;
 		Num[0][0] = 5;
 		Asserts.that(Num[0][0])Equals(5);
-		return Asserts.allPassed();
 	}
 
-	Bool -- ~[test set multiple array indices]~(Asserts) {
+	~[test set multiple array indices]~(Asserts) {
 		var Num[] = [];
 		Num[0] = 5;
 		Num[1] = 6;
@@ -44,10 +40,9 @@ every ArrayTest is:
 		Asserts.that(Num[1])Equals(6);
 		Asserts.that(Num[2])Equals(7);
 		Asserts.that(Num[3])Equals(8);
-		return Asserts.allPassed();
 	}
 
-	Bool -- ~[test set multiple array array indices indices]~(Asserts) {
+	~[test set multiple array array indices indices]~(Asserts) {
 		var Num[][] = [];
 		Num[0] = [];
 		Num[1] = [];
@@ -67,5 +62,4 @@ every ArrayTest is:
 		Asserts.that(Num[2][0])Equals(6);
 		Asserts.that(Num[2][1])Equals(7);
 		Asserts.that(Num[2][2])Equals(8);
-		return Asserts.allPassed();
 	}

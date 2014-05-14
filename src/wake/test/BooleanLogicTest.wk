@@ -2,29 +2,26 @@ import Asserts;
 
 every BooleanLogicTest is:
 
-	Bool -- testNot(Asserts) {
+	testNot(Asserts) {
 		Asserts.that(!true)Equals(false);
 		Asserts.that(!false)Equals(true);
-		return Asserts.allPassed();
 	}
 
-	Bool -- testOr(Asserts) {
+	testOr(Asserts) {
 		Asserts.that(true  || true)Equals(true);
 		Asserts.that(false || true)Equals(true);
 		Asserts.that(true  || false)Equals(true);
 		Asserts.that(false || false)Equals(false);
-		return Asserts.allPassed();
 	}
 
-	Bool -- testAnd(Asserts) {
+	testAnd(Asserts) {
 		Asserts.that(true  && true)Equals(true);
 		Asserts.that(false && true)Equals(false);
 		Asserts.that(true  && false)Equals(false);
 		Asserts.that(false && false)Equals(false);
-		return Asserts.allPassed();
 	}
 
-	Bool -- testOrderOfOperations(Asserts) {
+	testOrderOfOperations(Asserts) {
 		Asserts.that(true  && true  || false)Equals(true);
 		Asserts.that(true  && false || false)Equals(false);
 		Asserts.that(false && true  || false)Equals(false);
@@ -57,5 +54,4 @@ every BooleanLogicTest is:
 		Asserts.that(false  || !true )Equals(false);
 		Asserts.that(!false || false )Equals(true);
 		Asserts.that(false  || !false)Equals(true);
-		return Asserts.allPassed();
 	}

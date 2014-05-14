@@ -2,27 +2,24 @@ import Asserts;
 
 every AutoboxingTest is:
 
-	Bool -- testNumSquared(Asserts) {
+	testNumSquared(Asserts) {
 		Asserts.that(5.squared())Equals(25);
-		return Asserts.allPassed();
 	}
 
-	Bool -- testAbsoluteValue(Asserts) {
+	testAbsoluteValue(Asserts) {
 		Asserts.that(5.abs())Equals(5);
 		Asserts.that(0.abs())Equals(0);
 		Asserts.that(-3.abs())Equals(3);
 		// TODO...NEGATIVES
-		return Asserts.allPassed();
 	}
 
-	Bool -- testMaxOfNum(Asserts) {
+	testMaxOfNum(Asserts) {
 		Asserts.that(5.orMaxOf(5))Equals(5);
 		Asserts.that(5.orMaxOf(4))Equals(5);
 		Asserts.that(5.orMaxOf(6))Equals(6);
-		return Asserts.allPassed();
 	}
 
-	Bool -- testMaxOfNums(Asserts) {
+	testMaxOfNums(Asserts) {
 		var Num[] = [];
 		Num[0] = 5;
 		Asserts.that(5.orMaxOf(Num))Equals(5);
@@ -30,17 +27,15 @@ every AutoboxingTest is:
 		Asserts.that(5.orMaxOf(Num))Equals(5);
 		Num[2] = 6;
 		Asserts.that(5.orMaxOf(Num))Equals(6);
-		return Asserts.allPassed();
 	}
 
-	Bool -- testMinOfNum(Asserts) {
+	testMinOfNum(Asserts) {
 		Asserts.that(5.orMinOf(5))Equals(5);
 		Asserts.that(5.orMinOf(4))Equals(4);
 		Asserts.that(5.orMinOf(6))Equals(5);
-		return Asserts.allPassed();
 	}
 
-	Bool -- testMinOfNums(Asserts) {
+	testMinOfNums(Asserts) {
 		var Num[] = [];
 		Num[0] = 5;
 		Asserts.that(5.orMinOf(Num))Equals(5);
@@ -48,34 +43,29 @@ every AutoboxingTest is:
 		Asserts.that(5.orMinOf(Num))Equals(4);
 		Num[2] = 6;
 		Asserts.that(5.orMinOf(Num))Equals(4);
-		return Asserts.allPassed();
 	}
 
-	Bool -- testNumberOfDigits(Asserts) {
+	testNumberOfDigits(Asserts) {
 		Asserts.that(123.numberOfDigits())Equals(3);
 		Asserts.that(1234.numberOfDigits())Equals(4);
 		Asserts.that(12.numberOfDigits())Equals(2);
 		Asserts.that(1.numberOfDigits())Equals(1);
 		Asserts.that(0.numberOfDigits())Equals(1);
-		return Asserts.allPassed();
 	}
 
-	Bool -- testToUpper(Asserts) {
+	testToUpper(Asserts) {
 		Asserts.that("blah".toUpper())Equals("BLAH");
-		return Asserts.allPassed();
 	}
 
-	Bool -- testToLower(Asserts) {
+	testToLower(Asserts) {
 		Asserts.that("BLAH".toLower())Equals("blah");
-		return Asserts.allPassed();
 	}
 
-	Bool -- testSwitchCase(Asserts) {
+	testSwitchCase(Asserts) {
 		Asserts.that("BlAh".switchCase())Equals("bLaH");
-		return Asserts.allPassed();
 	}
 
-	Bool -- testTrim(Asserts) {
+	testTrim(Asserts) {
 		Asserts.that("    	 blah".trim())Equals("blah");
 		Asserts.that(" blah".trim())Equals("blah");
 		Asserts.that("blah ".trim())Equals("blah");
@@ -85,20 +75,18 @@ every AutoboxingTest is:
 		Asserts.that("blah".trim())Equals("blah");
 		Asserts.that(" blah blah ".trim())Equals("blah blah");
 		Asserts.that("blah blah".trim())Equals("blah blah");
-		return Asserts.allPassed();
 	}
 
-	Bool -- testArraySize(Asserts) {
+	testArraySize(Asserts) {
 		var Num[] = [];
 		Asserts.that(Num.getSize())Equals(0);
 		Num[0] = 1;
 		Asserts.that(Num.getSize())Equals(1);
 		Num[1] = 1;
 		Asserts.that(Num.getSize())Equals(2);
-		return Asserts.allPassed();
 	}
 
-	Bool -- testArrayContains(Asserts) {
+	testArrayContains(Asserts) {
 		var Num[] = [];
 		var Text[] = [];
 		var AutoboxingTest[] = [];
@@ -116,22 +104,19 @@ every AutoboxingTest is:
 		Asserts.isTrue(Num.contains(5));
 		Asserts.isTrue(Text.contains("test"));
 		Asserts.isTrue(AutoboxingTest.contains(this));
-		return Asserts.allPassed();
 	}
 
-	Bool -- testTextLength(Asserts) {
+	testTextLength(Asserts) {
 		Asserts.that("hello".getSize())Equals(5);
 		Asserts.that("h".getSize())Equals(1);
 		Asserts.that("".getSize())Equals(0);
 		Asserts.that("suuuuuuuuuuuuuuuuuupa coooooooooooooooooool".getSize())Equals(43);
-		return Asserts.allPassed();
 	}
 
-	Bool -- testTextSubstr(Asserts) {
+	testTextSubstr(Asserts) {
 		Asserts.that("hello".substr(0))Equals("hello");
 		Asserts.that("hello".substr(0, 10))Equals("hello");
 		Asserts.that("hello".substr(1))Equals("ello");
 		Asserts.that("hello".substr(1, 10))Equals("ello");
 		Asserts.that("hello".substr(1, 3))Equals("ell");
-		return Asserts.allPassed();
 	}

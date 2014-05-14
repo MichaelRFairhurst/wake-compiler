@@ -7,7 +7,7 @@ every PropertyTest is:
 	with public Num = 5;
 	with public Num six = 6;
 
-	Bool -- ~[test own properties]~(Asserts) {
+	~[test own properties]~(Asserts) {
 		Asserts.that(Num)Equals(5);
 		Asserts.that(six)Equals(6);
 		Asserts.that(this.Num)Equals(5);
@@ -24,10 +24,9 @@ every PropertyTest is:
 		Asserts.that(six)Equals(4);
 		Asserts.that(this.Num)Equals(3);
 		Asserts.that(this.six)Equals(4);
-		return Asserts.allPassed();
 	}
 
-	Bool -- ~[test others properties]~(Asserts) {
+	~[test others properties]~(Asserts) {
 		var PropertyTest <- this;
 		Asserts.that(PropertyTest.Num)Equals(5);
 		Asserts.that(PropertyTest.six)Equals(6);
@@ -43,5 +42,4 @@ every PropertyTest is:
 		$PropertyTest.six = 3;
 		Asserts.that($PropertyTest.Num)Equals(2);
 		Asserts.that($PropertyTest.six)Equals(3);
-		return Asserts.allPassed();
 	}

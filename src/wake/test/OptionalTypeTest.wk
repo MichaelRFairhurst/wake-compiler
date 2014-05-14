@@ -1,33 +1,32 @@
 every OptionalTypeTest is:
 
-	Bool -- ~[test optional int never set]~() {
+	~[test optional int never set]~(Asserts) {
 		var Num? = nothing;
 		if Num exists {
-			return false;
+			Asserts.fail("Num doesn't exist");
 		}
-		return true;
 	}
 
-	Bool -- ~[test optional int set]~() {
+	~[test optional int set]~(Asserts) {
 		var Num? = 5;
 		if Num exists {
-			return Num == 5;
+			Asserts.that(Num)Equals(5);
+			return;
 		}
-		return false;
+		Asserts.fail("Num should have existed");
 	}
 
-	Bool -- ~[test optional int not set will hit else]~() {
+	~[test optional int not set will hit else]~(Asserts) {
 		var Num? = nothing;
 		if Num exists {} else {
-			return true;
+			return;
 		}
-		return false;
+		Asserts.fail("We didn't hit the else block");
 	}
 
-	Bool -- ~[test optional int set wont hit else]~() {
+	~[test optional int set wont hit else]~(Asserts) {
 		var Num? = 5;
 		if Num exists {} else {
-			return false;
+			Asserts.fail("Should not have hit else block");
 		}
-		return true;
 	}
