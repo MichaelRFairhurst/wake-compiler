@@ -1,3 +1,5 @@
+import Asserts;
+
 every OptionalTypeTest is:
 
 	~[test optional int never set]~(Asserts) {
@@ -29,4 +31,5 @@ every OptionalTypeTest is:
 		if Num exists {} else {
 			Asserts.fail("Should not have hit else block");
 		}
+
 	}

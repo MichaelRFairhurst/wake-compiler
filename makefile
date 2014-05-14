@@ -1,9 +1,5 @@
 SHELL=/bin/bash
 
-all: chatup
-
-include wmake.mk
-
 OPT=-O3
 #OPT=-O0 -g
 FLAGS=-Iinclude -Igen
@@ -41,10 +37,6 @@ CPPNAMES= \
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
 
-WAKENAMES=Asserts.wk
-
-WAKEOBJS=$(addprefix bin/wakeobj/, $(WAKENAMES:.wk=.o))
-
 WAKETABLENAMES=Printer.wk System.wk Num.wk Text.wk Bool.wk List.wk File.wk FilePath.wk FileSystem.wk
 WAKETABLEOBJS=$(addprefix bin/waketable/, $(WAKETABLENAMES:.wk=.table))
 WAKETABLEINCLUDES=$(addprefix gen/, $(WAKETABLENAMES:.wk=.table.h))
@@ -70,18 +62,12 @@ TESTNAMES=CompilerTests.cpp \
 
 TESTOBJS=$(addprefix bin/tests/, $(TESTNAMES:.cpp=.o))
 
+all: tests $(WAKETABLEOBJS)
+
+include wmake.mk
+
 windowsbuildready: $(GENOBJS) $(WAKETABLEINCLUDES) bin/wakeobj/std.o
 	zip windowsbuildready -r .
-
-chatup: bin/finaltest.js
-	@echo
-	@echo -- CHAT UP THE BIN
-	@echo -- add TEST=false to skip
-	@echo
-	if $(TEST) ; then time node bin/finaltest.js ; fi
-	@echo
-	@echo -- BLINDING BUILD, MATE
-	@echo
 
 chivvy: bin/test
 	@echo
@@ -115,18 +101,11 @@ bin/wakeobj/std.o: src/wake/stdlib/myobj/std.o js_to_wakeobj.sh
 
 $(OBJECTFILES) : bin/wake
 $(TABLEFILES) : bin/wake
-bin/finaltest.js: bin/wakeobj/Asserts.o
 
 bin/waketable/FilePath.table: bin/waketable/File.table bin/waketable/Text.table bin/waketable/Num.table bin/waketable/Bool.table
 	echo this overrides the wildcard that doesnt work
 
 bin/waketable/FileSystem.table: bin/waketable/File.table bin/waketable/Text.table bin/waketable/Num.table
-
-bin/wakeobj/Asserts.o: src/wake/stdlib/Asserts.wk bin/wake $(WAKETABLEOBJS)
-	./bin/wake -d bin/waketable $< -o $@
-
-bin/waketable/Asserts.table: src/wake/stdlib/Asserts.wk bin/wake $(WAKETABLEOBJS)
-	./bin/wake -t -d bin/waketable $<
 
 bin/waketable/%.table: src/wake/stdlib/tables/%.wk bin/wake-nolib
 	./bin/wake-nolib -d bin/waketable -t $< -d bin/waketable
