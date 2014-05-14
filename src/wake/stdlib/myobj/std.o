@@ -1,6 +1,6 @@
 var$ b='';
 var$ fs = require("fs");
-var$ fs.existsSync = require("path").existsSync;
+fs.existsSync = require("path").existsSync;
 
 ~Printer~ = function(){
 	this.`print(Text)` =
