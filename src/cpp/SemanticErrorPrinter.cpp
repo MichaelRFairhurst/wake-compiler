@@ -3,7 +3,7 @@
 
 void SemanticErrorPrinter::print(SemanticError* e) {
 
-	cout << "[ ERROR on line " << e->token->line << ", column " << e->token->col << " ]" << endl;
+	if(e->token != NULL) cout << "[ ERROR on line " << e->token->line << ", column " << e->token->col << " ]" << endl;
 
 	if(e->context != "") cout << "[ -CONTEXT: " << e->context << " ]" << endl;
 

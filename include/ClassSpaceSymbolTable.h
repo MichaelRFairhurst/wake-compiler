@@ -31,6 +31,7 @@ class ClassSpaceSymbolTable {
 		ReadOnlyPropertySymbolTable* find(Type* type);
 		ReadOnlyPropertySymbolTable* find(string name);
 		void assertTypeIsValid(Type* type);
+		void assertNoNeedsAreCircular();
 		TypeAnalyzer* getAnalyzer();
 		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);
 

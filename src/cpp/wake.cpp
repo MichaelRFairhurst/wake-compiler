@@ -138,6 +138,16 @@ int main(int argc, char** argv) {
 
 		linker.loadTables(options->tabledir, table);
 
+		try {
+			table.assertNoNeedsAreCircular();
+		} catch(SemanticError* e) {
+			e->token = NULL;
+			SemanticErrorPrinter printer;
+			printer.print(e);
+			delete e;
+			return 1;
+		}
+
 		fstream file;
 		file.open(options->outFilename.c_str(), ios::out);
 

@@ -1212,6 +1212,7 @@ PTT_TEST_CASE(
 	PTT_VALID
 )
 
+/*
 PTT_TEST_CASE(
 	CircularDependenciesAreError,
 	"every CircularA is: needs CircularB;	\n\
@@ -1225,6 +1226,7 @@ PTT_TEST_CASE(
 	"every Circular is: needs Circular;",
 	PTT_EXPECT(CIRCULAR_DEPENDENCIES)
 );
+*/
 
 PTT_TEST_CASE(
 	DeclareArraysInvalidValues,

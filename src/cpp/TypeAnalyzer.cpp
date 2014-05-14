@@ -130,7 +130,7 @@ bool TypeAnalyzer::isAExactlyB(Type* a, Type* b) {
 }
 
 void TypeAnalyzer::assertNeedIsNotCircular(string classname, Type* need) {
-	if(need->type != TYPE_CLASS) return; // @TODO detect circular generics...wow.
+	if(need->type != TYPE_CLASS) return;
 	if(need->typedata._class.classname == classname)
 		throw new SemanticError(CIRCULAR_DEPENDENCIES, "Created by the need for class " + getNameForType(need));
 

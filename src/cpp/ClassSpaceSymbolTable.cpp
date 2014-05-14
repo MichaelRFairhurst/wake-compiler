@@ -194,3 +194,11 @@ void ClassSpaceSymbolTable::printEntryPoints(EntryPointAnalyzer* entryanalyzer) 
 TypeAnalyzer* ClassSpaceSymbolTable::getAnalyzer() {
 	return &analyzer;
 }
+
+void ClassSpaceSymbolTable::assertNoNeedsAreCircular() {
+	for(map<string, pair<PropertySymbolTable*, bool> >::iterator it = classes.begin(); it != classes.end(); ++it) {
+		for(auto needit = it->second.first->getNeeds()->begin(); needit != it->second.first->getNeeds()->end(); ++needit) {
+			analyzer.assertNeedIsNotCircular(it->first, *needit);
+		}
+	}
+}
