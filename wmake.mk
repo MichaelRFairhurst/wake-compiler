@@ -7,8 +7,10 @@ DEPFILES := ${SOURCEFILES:.wk=.d}
 OBJECTFILES := $(subst $(SRCDIR),$(OBJECTDIR),${SOURCEFILES:.wk=.o})
 TABLEFILES := $(subst $(SRCDIR),$(TABLEDIR),${SOURCEFILES:.wk=.table})
 LIBRARYFILES := bin/wakeobj/std.o
-TESTLIBRARYFILES := ../wUnit/bin/wakeobj/TestResultReporter.o ../wUnit/bin/wakeobj/Asserts.o
-LIBRARYTABLES := ../wUnit/bin/waketable/Asserts.table ../wUnit/bin/waketable/TestResultReporter.table
+WUNITLIBRARYROOT := ../wUnit/bin/wakeobj
+WUNITTABLEROOT := ../wUnit/bin/waketable
+TESTLIBRARYFILES := $(WUNITLIBRARYROOT)/TestResultReporter.o $(WUNITLIBRARYROOT)/Asserts.o
+LIBRARYTABLES := $(WUNITTABLEROOT)/Asserts.table $(WUNITTABLEROOT)/TestResultReporter.table
 
 bin/$(PROGRAM): $(OBJECTFILES) $(TABLEFILES) $(LIBRARYFILES) tests
 	bin/wake -l -d $(TABLEDIR) -o bin/$(PROGRAM) $(OBJECTFILES) $(LIBRARYFILES)
