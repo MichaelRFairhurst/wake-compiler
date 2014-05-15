@@ -67,7 +67,7 @@ boost::optional<SemanticError*> PropertySymbolTable::addProperty(Type* property,
 	return boost::optional<SemanticError*>();
 }
 
-boost::optional<SemanticError*> PropertySymbolTable::addProvision(Type* provided) {
+boost::optional<SemanticError*> PropertySymbolTable::addProvision(Type* provided, int flags) {
 	string name = analyzer->getNameForType(provided) + "<-";
 	if(provided->specialty != NULL) name += provided->specialty;
 
@@ -85,7 +85,7 @@ boost::optional<SemanticError*> PropertySymbolTable::addProvision(Type* provided
 	prop->type = method;
 	prop->casing = name;
 	prop->address = name;
-	prop->flags = 0;
+	prop->flags = flags;
 
 	properties[name] = prop;
 	return boost::optional<SemanticError*>();
@@ -248,4 +248,8 @@ Type* PropertySymbolTable::getAsType() {
 	}
 
 	return ret;
+}
+
+bool PropertySymbolTable::isBehavioralProvision(string name) {
+	return properties.find(name)->second->flags & PROPERTY_BLOCKPROVISION;
 }

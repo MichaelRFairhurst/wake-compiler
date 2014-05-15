@@ -46,7 +46,9 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 
 		case NT_PROVISION:
 			try {
-				boost::optional<SemanticError*> error = propertysymtable->addProvision(tree->node_data.nodes[0]->node_data.type);
+				int flags = 0;
+				if(tree->subnodes > 1 && tree->node_data.nodes[1]->node_type == NT_BLOCK) flags |= PROPERTY_BLOCKPROVISION;
+				boost::optional<SemanticError*> error = propertysymtable->addProvision(tree->node_data.nodes[0]->node_data.type, flags);
 				if(error) {
 					(*error)->token = tree;
 					errors->addError(*error);

@@ -140,6 +140,10 @@ fs.existsSync = fs.existsSync || require("path").existsSync;
 		return$ new$ ~File~(this);
 	};
 
+	this.`FilePath<-` = function() {
+		return this;
+	};
+
 	this.`getPath()` = function() {
 		return$ a;
 	};

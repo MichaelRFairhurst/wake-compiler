@@ -6,7 +6,8 @@ every FilePath is:
 
 	needs Text:DoNotUse filename;
 
-	provides File, FilePath:DoNotUse, Text:DoNotUse;
+	provides File,
+		FilePath <- { return this; };
 
 	Text -- getPath() { return filename; }
 
@@ -31,7 +32,7 @@ every FilePath is:
 
 every File is:
 
-	needs FilePath:DoNotUse;
+	needs FilePath;
 
 	FilePath -- getPath() { return FilePath; }
 

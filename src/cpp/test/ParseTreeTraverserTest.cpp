@@ -2212,4 +2212,12 @@ PTT_TEST_CASE(
 	PTT_VALID
 );
 
+PTT_TEST_CASE(
+	TestProvidesBlockDoesntNeedTransitiveDeps,
+	"every MyClass is:							\n\
+		needs Text:SomeNeed;					\n\
+		provides MyClass <- { return this; };",
+	PTT_VALID
+);
+
 BOOST_AUTO_TEST_SUITE_END()

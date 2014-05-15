@@ -156,6 +156,8 @@ void TypeAnalyzer::assertClassCanProvide(string provider, Type* binding) {
 	if(!reference->find(provider)->find(symname))
 		throw new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, symname + "not found on class" + provider);
 
+	if(reference->findModifiable(provider)->isBehavioralProvision(symname)) return;
+
 	vector<Type*>* recurse = reference->find(binding->typedata._class.classname)->getNeeds();
 	for(vector<Type*>::iterator it = recurse->begin(); it != recurse->end(); ++it)
 	try {

@@ -16,6 +16,7 @@ extern "C" {
 #define PROPERTY_PUBLIC 1
 #define PROPERTY_ABSTRACT 2
 #define PROPERTY_NEED 4
+#define PROPERTY_BLOCKPROVISION 8
 
 using namespace std;
 
