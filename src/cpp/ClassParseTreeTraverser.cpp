@@ -207,8 +207,24 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 				Node* served = tree->node_data.nodes[1];
 				switch(served->node_type) {
 					case NT_BLOCK:
-						errors->addError(new SemanticError(TYPE_ERROR, "Not implemented", tree));
-						return;
+						errors->pushContext("In declaration of 'every " + classname + "' provision " + propertysymtable->getProvisionSymbol(provision));
+
+						// Begin Method Scope For Type Analysis
+						scopesymtable->pushScope();
+
+						try {
+							// Run Type Analysis
+							typechecker->setReturnType(provision);
+							typechecker->check(served);
+						} catch(SemanticError* e) {
+							e->token = tree;
+							errors->addError(e);
+						}
+
+						// Pop Method Scope
+						scopesymtable->popScope();
+						errors->popContext();
+						break;
 
 					case NT_STRINGLIT:
 						if(!classestable->getAnalyzer()->isPrimitiveTypeText(provision))

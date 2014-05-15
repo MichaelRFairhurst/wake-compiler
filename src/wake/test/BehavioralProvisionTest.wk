@@ -1,0 +1,64 @@
+import Asserts;
+
+every BehavioralProvisionTest is:
+
+	with Num provideme = 0;
+	with Text providemetext = "";
+
+	provides
+		Num:ProvideMe <- { return provideme; },
+		Text:ProvideMe <- { return providemetext; },
+		Num:changeProperties <- { provideme = 2; providemetext = "hello"; return 4; },
+		Num:ProvideProvideMe <- { return Num:ProvideMe <- this; },
+		Text:ProvideProvideMe <- { return Text:ProvideMe <- this; };
+
+	~[ test get property via provision/declaration after set ]~(Asserts) {
+		provideme = 10;
+		var Num:ProvideMe <- this;
+		Asserts.that(Num)Equals(10);
+	}
+
+	~[ test get property via provision (no declaration) after set ]~(Asserts) {
+		provideme = 7;
+		Asserts.that(Num:ProvideMe <- this)Equals(7);
+	}
+
+	~[ test get text property via provision/declaration after set ]~(Asserts) {
+		providemetext = "Heey";
+		var Text:ProvideMe <- this;
+		Asserts.that(Text)Equals("Heey");
+	}
+
+	~[ test get text property via provision (no declaration) after set ]~(Asserts) {
+		providemetext = "Yo";
+		Asserts.that(Text:ProvideMe <- this)Equals("Yo");
+	}
+
+	~[ test get property via provision/declaration calls other provision after set ]~(Asserts) {
+		provideme = 10;
+		var Num:ProvideProvideMe <- this;
+		Asserts.that(Num)Equals(10);
+	}
+
+	~[ test get property via provision (no declaration) calls other provision after set ]~(Asserts) {
+		provideme = 7;
+		Asserts.that(Num:ProvideProvideMe <- this)Equals(7);
+	}
+
+	~[ test get text property via provision/declaration calls other provision after set ]~(Asserts) {
+		providemetext = "Heey";
+		var Text:ProvideProvideMe <- this;
+		Asserts.that(Text)Equals("Heey");
+	}
+
+	~[ test get text property via provision (no declaration) calls other provision after set ]~(Asserts) {
+		providemetext = "Yo";
+		Asserts.that(Text:ProvideProvideMe <- this)Equals("Yo");
+	}
+
+	~[ test set properties in a provision ]~(Asserts) {
+		Num:changeProperties <- this;
+		var Num:ProvideMe <- this;
+		Asserts.that(provideme)Equals(2);
+		Asserts.that(providemetext)Equals("hello");
+	}

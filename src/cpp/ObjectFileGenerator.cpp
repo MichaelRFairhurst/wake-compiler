@@ -106,7 +106,6 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_PROVISION:
 			file << "this.";
 			header->addPropertyUsage(file.tellp(), classes->find(classname)->getProvisionSymbol(tree->node_data.nodes[0]->node_data.type));
-			file << "/*" <<  classes->find(classname)->getProvisionSymbol(tree->node_data.nodes[0]->node_data.type) << "*/";
 			file << "=function(){";
 			if(tree->subnodes == 1) {
 				string provisionname = tree->node_data.nodes[0]->node_data.type->typedata._class.classname;
@@ -128,6 +127,8 @@ void ObjectFileGenerator::generate(Node* tree) {
 					file << "();";
 				} else if(tree->node_data.nodes[1]->node_type == NT_STRINGLIT || tree->node_data.nodes[1]->node_type == NT_NUMBERLIT || tree->node_data.nodes[1]->node_type == NT_BOOLLIT) {
 					file << "return ";
+					generate(tree->node_data.nodes[1]);
+				} else {
 					generate(tree->node_data.nodes[1]);
 				}
 			}

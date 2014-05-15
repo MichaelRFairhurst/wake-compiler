@@ -2166,4 +2166,50 @@ PTT_TEST_CASE(
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 );
 
+PTT_TEST_CASE(
+	TestGetWithSpecialtyInMethod,
+	"every MyClass is:							\n\
+		provides MyClass:Specialized;			\n\
+		method() {								\n\
+			var MyClass:Specialized <- this;	\n\
+			MyClass:Specialized <- this;		\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestGetWithoutSpecialtyInMethod,
+	"every MyClass is:						\n\
+		provides MyClass:Specialized;		\n\
+		method() {							\n\
+			var MyClass <- this;			\n\
+		}									\n\
+		methodTwo() {						\n\
+			MyClass <- this;				\n\
+		}",
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+);
+
+PTT_TEST_CASE(
+	TestBehavioralProvisions,
+	"every MyClass is:					\n\
+		provides Num:Test <- { return 5; };",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestInvalidBehavioralProvision,
+	"every MyClass is:							\n\
+		provides Num:Test <- { return 'not int'; };",
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	TestUseThisInBehavioralProvisions,
+	"every MyClass is:							\n\
+		provides MyClass <- { return this; };",
+	PTT_VALID
+);
+
 BOOST_AUTO_TEST_SUITE_END()
