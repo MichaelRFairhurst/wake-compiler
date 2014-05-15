@@ -378,6 +378,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 		case NT_FOR:
 			file << "for(";
+			table.pushScope();
 			generate(tree->node_data.nodes[0]);
 			file << ";";
 			generate(tree->node_data.nodes[1]);
@@ -385,6 +386,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 			generate(tree->node_data.nodes[2]);
 			file << "){";
 			generate(tree->node_data.nodes[3]);
+			table.popScope();
 			file << "}";
 			break;
 

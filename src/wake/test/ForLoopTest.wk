@@ -1,0 +1,76 @@
+import Asserts;
+
+every ForLoopTest is:
+
+	~[test first statement executes when condition is false]~(Asserts) {
+		var Num = 0;
+		for(Num = 1; false; 0) { }
+		Asserts.that(Num)Equals(1);
+	}
+
+	~[test first statement executes when condition is true]~(Asserts) {
+		var Num = 0;
+		var Bool = true;
+		for(Num = 1; Bool; Bool = false) { }
+		Asserts.that(Num)Equals(1);
+	}
+
+	~[test loop body never executes when condition is false]~(Asserts) {
+		for(0; false; 0) {
+			Asserts.fail("The loop body shouldn't have executed");
+		}
+	}
+
+	~[test third statement never executes when condition is false]~(Asserts) {
+		for(0; false; Asserts.fail("The third statement should not have executed")) { }
+	}
+
+	~[test third statement never executes when loop breaks]~(Asserts) {
+		for(0; true; Asserts.fail("The third statement should not have executed")) {
+			break;
+		}
+	}
+
+	~[test third statement executes when loop continues]~(Asserts) {
+		var Bool = false;
+		var loop Bool = true;
+		for(0; loop; Bool = true) {
+			loop = false;
+			continue;
+		}
+	}
+
+	~[test second statement executes once per loop try]~(Asserts) {
+		var Num loops = 0;
+		var Num counter = 10;
+		for(0; (counter -= 1) != 0; 0) {
+			loops += 1;
+		}
+
+		Asserts.that(loops)Equals(9);
+	}
+
+	~[test third statement executes once per loop]~(Asserts) {
+		var Num loops = 0;
+		var Num counter = 10;
+		for(0; (counter -= 1) != 0; loops += 1) {}
+
+		Asserts.that(loops)Equals(9);
+	}
+
+	~[test first statement executes only once despite loops]~(Asserts) {
+		var Num loops = 10;
+		var Num counter = 0;
+		for(counter += 1; (loops -= 1) != 0; 0) {}
+
+		Asserts.that(counter)Equals(1);
+	}
+
+	~[test after continue never executes]~(Asserts) {
+		var loop Bool = true;
+		for(0; loop; 0) {
+			loop = false;
+			continue;
+			Asserts.fail("Shouldn't have reached here...");
+		}
+	}
