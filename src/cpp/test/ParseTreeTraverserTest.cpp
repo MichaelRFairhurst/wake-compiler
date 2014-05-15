@@ -2220,4 +2220,13 @@ PTT_TEST_CASE(
 	PTT_VALID
 );
 
+PTT_TEST_CASE(
+	TestVarDeclarationInForLoopIsTemporary,
+	"every MyClass is: method() {		\n\
+		for(var Num = 0; true; 0) { } 	\n\
+		Num += 1;						\n\
+	}",
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
+);
+
 BOOST_AUTO_TEST_SUITE_END()

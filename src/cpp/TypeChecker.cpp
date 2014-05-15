@@ -393,10 +393,12 @@ Type* TypeChecker::typeCheck(Node* tree) {
 
 			case NT_FOR:
 				{
+					scopesymtable->pushScope();
 					freeType(typeCheck(tree->node_data.nodes[0]));
 					ret = typeCheckUsable(tree->node_data.nodes[1]);
 					freeType(typeCheck(tree->node_data.nodes[2]));
 					freeType(typeCheck(tree->node_data.nodes[3]));
+					scopesymtable->popScope();
 
 					if(!analyzer->isPrimitiveTypeBool(ret)) {
 						expectedstring = "Bool"; freeType(ret);
