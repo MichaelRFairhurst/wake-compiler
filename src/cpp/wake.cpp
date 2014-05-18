@@ -21,6 +21,7 @@ extern "C" {
 #include "ObjectFileGenerator.h"
 #include "ObjectFileHeaderData.h"
 #include "ObjectFileHeaderRenderer.h"
+#include "CompilationExceptions.h"
 #include "OptionsParser.h"
 #include "EntryPointAnalyzer.h"
 #include "AddressAllocator.h"
@@ -126,45 +127,50 @@ int main(int argc, char** argv) {
 
 	if(!options->link) compileFile(options);
 	else {
-		AddressAllocator classAllocator;
-		AddressAllocator propAllocator;
-		ClassSpaceSymbolTable table;
-		SimpleAddressTable classTable(classAllocator);
-		SimpleAddressTable propTable(propAllocator);
-		Linker linker(classTable, propTable);
-		for(std::vector<std::string>::iterator it = options->linkFilenames.begin(); it != options->linkFilenames.end(); ++it) {
-			linker.loadObject(*it);
-		}
-
-		linker.loadTables(options->tabledir, table);
-
 		try {
-			table.assertNoNeedsAreCircular();
-		} catch(SemanticError* e) {
-			e->token = NULL;
-			SemanticErrorPrinter printer;
-			printer.print(e);
-			delete e;
-			return 1;
-		}
-
-		fstream file;
-		file.open(options->outFilename.c_str(), ios::out);
-
-		linker.write(file);
-
-		EntryPointAnalyzer entrypointanalyzer;
-		if(options->listMains) {
-			table.printEntryPoints(&entrypointanalyzer);
-			exit(0);
-		} else {
-			if(!entrypointanalyzer.checkMethodCanBeMain(options->mainclass, options->mainmethod, &table)) {
-				printf("Entry point %s.%s in not valid, cannot continue.\nTry wake yourfile --listmains to get entry points\n", options->mainclass.c_str(), options->mainmethod.c_str());
-				exit(5);
+			AddressAllocator classAllocator;
+			AddressAllocator propAllocator;
+			ClassSpaceSymbolTable table;
+			SimpleAddressTable classTable(classAllocator);
+			SimpleAddressTable propTable(propAllocator);
+			Linker linker(classTable, propTable);
+			for(std::vector<std::string>::iterator it = options->linkFilenames.begin(); it != options->linkFilenames.end(); ++it) {
+				linker.loadObject(*it);
 			}
-		}
 
-		linker.setMain(file, options->mainclass, options->mainmethod, table);
+			linker.loadTables(options->tabledir, table);
+
+			try {
+				table.assertNoNeedsAreCircular();
+			} catch(SemanticError* e) {
+				e->token = NULL;
+				SemanticErrorPrinter printer;
+				printer.print(e);
+				delete e;
+				return 1;
+			}
+
+			fstream file;
+			file.open(options->outFilename.c_str(), ios::out);
+
+			linker.write(file);
+
+			EntryPointAnalyzer entrypointanalyzer;
+			if(options->listMains) {
+				table.printEntryPoints(&entrypointanalyzer);
+				exit(0);
+			} else {
+				if(!entrypointanalyzer.checkMethodCanBeMain(options->mainclass, options->mainmethod, &table)) {
+					printf("Entry point %s.%s in not valid, cannot continue.\nTry wake yourfile --listmains to get entry points\n", options->mainclass.c_str(), options->mainmethod.c_str());
+					exit(5);
+				}
+			}
+
+			linker.setMain(file, options->mainclass, options->mainmethod, table);
+		} catch(SymbolNotFoundException* e) {
+			cout << "Missing symbol in object files at link time: " << e->errormsg << endl;
+			delete e;
+		}
 
 	}
 
