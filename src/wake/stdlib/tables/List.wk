@@ -5,3 +5,4 @@ every List{T} is:
 
 	Num -- getSize() { return 0; }
 	Bool -- contains(T) { return false; }
+	T[] -- intersect(T[]) { return T; }

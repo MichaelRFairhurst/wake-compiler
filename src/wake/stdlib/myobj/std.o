@@ -112,6 +112,14 @@ fs.existsSync = fs.existsSync || require("path").existsSync;
 		return$ a.indexOf(b) > -1;
 	};
 
+	this.`intersect(T[])` = function(b) {
+		var$ d = [];
+		for(var$ c = 0; c < a.length; c++) {
+			if(b.indexOf(a[c]) > -1) d[d.length] = a[c];
+		}
+		return$ d;
+	}
+
 };
 
 ~FileSystem~ = function() {
