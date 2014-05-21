@@ -33,3 +33,12 @@ every OptionalTypeTest is:
 		}
 
 	}
+
+	~[test zero and empty string are not nothing]~(Asserts) {
+		var Num? = 0;
+		var Text? = "";
+		if Num exists { } else { Asserts.fail("0 is read as nothing"); }
+		if Text exists { } else { Asserts.fail("\"\" is read as nothing"); }
+		Asserts.that(Num != nothing);
+		Asserts.that(Text != nothing);
+	}
