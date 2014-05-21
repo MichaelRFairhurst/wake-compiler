@@ -655,10 +655,23 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					Type* real = copyType(ret);
 					real->optional = 0;
 
-					scopesymtable->addOverwriting(real);
+					if(tree->node_data.nodes[0]->node_type == NT_MEMBER_ACCESS) {
+						scopesymtable->pushScope();
+						scopesymtable->add(real);
+					} else {
+						scopesymtable->addOverwriting(real);
+					}
+
 					freeType(typeCheck(tree->node_data.nodes[1]));
-					scopesymtable->addOverwriting(ret);
+
+					if(tree->node_data.nodes[0]->node_type == NT_MEMBER_ACCESS) {
+						scopesymtable->popScope();
+					} else {
+						scopesymtable->addOverwriting(ret);
+					}
+
 					freeType(real);
+
 					if(tree->subnodes > 2) {
 						freeType(typeCheck(tree->node_data.nodes[2]));
 					}

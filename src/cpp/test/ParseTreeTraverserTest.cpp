@@ -2247,4 +2247,16 @@ PTT_TEST_CASE(
 	PTT_EXPECT(EXISTS_ON_NONOPTIONAL_TYPE)
 );
 
+PTT_TEST_CASE(
+	TestEndOfExistsScopeDoesntRemoveVariableFromTable,
+	"every MyClass is: method() {			\n\
+		var Num? = nothing;					\n\
+		if(true) {							\n\
+			if Num exists { }				\n\
+		}									\n\
+		Num = nothing;						\n\
+	}",
+	PTT_VALID
+);
+
 BOOST_AUTO_TEST_SUITE_END()

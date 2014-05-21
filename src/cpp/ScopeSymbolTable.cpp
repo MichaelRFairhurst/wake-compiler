@@ -17,7 +17,7 @@ void ScopeSymbolTable::add(Type* type) {
 
 void ScopeSymbolTable::addOverwriting(string name, Type* type) {
 	table[name] = pair<Type*, string>(type, allocator.allocate());
-	scopes.back().push_back(name);
+	//scopes.back().push_back(name);
 }
 
 void ScopeSymbolTable::addOverwriting(Type* type) {
