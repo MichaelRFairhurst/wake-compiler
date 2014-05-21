@@ -1,4 +1,17 @@
-import Num;
+every Bool is:
+
+every Num is:
+
+	Num -- squared() { return 0; }
+	Num -- abs() { return 0; }
+
+	Num -- orMaxOf(Num) { return 0; }
+	Num -- orMaxOf(Num[]) { return 0; }
+
+	Num -- orMinOf(Num) { return 0; }
+	Num -- orMinOf(Num[]) { return 0; }
+
+	Num -- numberOfDigits() { return 0; }
 
 every Text is:
 
