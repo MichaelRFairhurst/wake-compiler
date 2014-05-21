@@ -298,9 +298,9 @@ labelstatement:
 
 existsstatement:
 	IF shadowabletype EXISTS statement											{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromType($2), $4); }
-	| IF LIDENTIFIER EXISTS statement											{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromType($2), $4); }
+	| IF LIDENTIFIER EXISTS statement											{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromString(NT_ALIAS, $2), $4); }
 	| IF shadowabletype EXISTS statement ELSE statement							{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromType($2), $4); AddSubNode($$, $6); }
-	| IF LIDENTIFIER EXISTS statement ELSE statement							{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromType($2), $4); AddSubNode($$, $6); }
+	| IF LIDENTIFIER EXISTS statement ELSE statement							{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromString(NT_ALIAS, $2), $4); AddSubNode($$, $6); }
 	;
 
 selectionstatement:

@@ -2229,4 +2229,22 @@ PTT_TEST_CASE(
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 );
 
+PTT_TEST_CASE(
+	TestExistsClauseOnAlias,
+	"every MyClass is: method() {		\n\
+		var Num? aliased = nothing;		\n\
+		if aliased exists { }			\n\
+	}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestExistsInvalidClauseOnAlias,
+	"every MyClass is: method() {		\n\
+		var Num aliased = 4;			\n\
+		if aliased exists { }			\n\
+	}",
+	PTT_EXPECT(EXISTS_ON_NONOPTIONAL_TYPE)
+);
+
 BOOST_AUTO_TEST_SUITE_END()
