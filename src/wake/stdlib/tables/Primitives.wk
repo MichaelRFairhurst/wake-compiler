@@ -1,7 +1,13 @@
 every Bool is:
 
+	Text -- toString() { return ""; }
+
 every Num is:
 
+	Num -- modulo(Num) { return 0; }
+	Num -- floor() { return 0; }
+	Num -- ceil() { return 0; }
+	Num -- round() { return 0; }
 	Num -- squared() { return 0; }
 	Num -- abs() { return 0; }
 
@@ -13,6 +19,10 @@ every Num is:
 
 	Num -- numberOfDigits() { return 0; }
 
+	Text -- toString() { return ""; }
+
+	Num[] -- range(Num) { var $Num[] = []; return $Num; }
+
 every Text is:
 
 	Text -- toUpper() { return "stub"; }
@@ -22,3 +32,4 @@ every Text is:
 	Num -- getSize() { return 0; }
 	Text -- substr(Num start) { return "stub"; }
 	Text -- substr(Num start, Num end) { return "stub"; }
+	Num? -- parseNum() { return 0; }

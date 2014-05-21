@@ -69,6 +69,26 @@ fs.existsSync = fs.existsSync || require("path").existsSync;
 		return$ b;
 	};
 
+	this.`floor()` = function() {
+		return$ Math.floor(a);
+	};
+
+	this.`ceil()` = function() {
+		return$ Math.ceil(a);
+	};
+
+	this.`round()` = function() {
+		return$ Math.round(a);
+	};
+
+	this.`toString()` = function() {
+		return$ a+"";
+	};
+
+	this.`modulo(Num)` = function(b) {
+		return$ a % b;
+	};
+
 };
 
 ~Text~ = function(a) {
@@ -100,6 +120,10 @@ fs.existsSync = fs.existsSync || require("path").existsSync;
 	this.`substr(Num)` = this.`substr(Num,Num)` = function(b, c) {
 		return$ a.substr(b, c);
 	};
+
+	this.`parseNum()` = function() {
+		return$ /^(\-|\+)?([0-9]+(\.[0-9]+)?)$$/.test(a) ? parseFloat(a) : null;
+	}
 
 };
 
@@ -247,6 +271,14 @@ fs.existsSync = fs.existsSync || require("path").existsSync;
 	this.`seek(Num)` = function(e) {
 		if(!c) { throw$ Error("File$ no$ longer$ open"); }
 		b = e;
+	};
+
+};
+
+~Bool~ = function(a) {
+
+	this.`toString()` = function() {
+		return$ a?"true":"false";
 	};
 
 };

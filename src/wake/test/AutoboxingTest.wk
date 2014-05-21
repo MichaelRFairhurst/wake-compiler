@@ -120,3 +120,77 @@ every AutoboxingTest is:
 		Asserts.that("hello".substr(1, 10))Equals("ello");
 		Asserts.that("hello".substr(1, 3))Equals("ell");
 	}
+
+	testNumToString(Asserts) {
+		Asserts.that(5.toString())Equals("5");
+		Asserts.that(0.toString())Equals("0");
+		Asserts.that(2020.toString())Equals("2020");
+		Asserts.that(-2020.toString())Equals("-2020");
+	}
+
+	testBoolToString(Asserts) {
+		Asserts.that(true.toString())Equals("true");
+		Asserts.that(false.toString())Equals("false");
+	}
+
+	testFloor(Asserts) {
+		Asserts.that(5.5.floor())Equals(5);
+		Asserts.that(5.1.floor())Equals(5);
+		Asserts.that(5.9.floor())Equals(5);
+		Asserts.that(5.0.floor())Equals(5);
+		Asserts.that((0 - 5).floor())Equals(-5);
+		Asserts.that((0 - 5.1).floor())Equals(-6);
+		Asserts.that((0 - 5.5).floor())Equals(-6);
+		Asserts.that((0 - 5.9).floor())Equals(-6);
+	}
+
+	testCeil(Asserts) {
+		Asserts.that(5.5.ceil())Equals(6);
+		Asserts.that(5.1.ceil())Equals(6);
+		Asserts.that(5.9.ceil())Equals(6);
+		Asserts.that(5.0.ceil())Equals(5);
+		Asserts.that(-5.ceil())Equals(-5);
+		Asserts.that(-5.1.ceil())Equals(-5);
+		Asserts.that(-5.5.ceil())Equals(-5);
+		Asserts.that(-5.9.ceil())Equals(-5);
+	}
+
+	testRound(Asserts) {
+		Asserts.that(5.5.round())Equals(6);
+		Asserts.that(5.51.round())Equals(6);
+		Asserts.that(5.1.round())Equals(5);
+		Asserts.that(5.9.round())Equals(6);
+		Asserts.that(5.0.round())Equals(5);
+		Asserts.that(-5.round())Equals(-5);
+		Asserts.that(-5.1.round())Equals(-5);
+		Asserts.that(-5.5.round())Equals(-5);
+		Asserts.that(-5.51.round())Equals(-6);
+		Asserts.that(-5.9.round())Equals(-6);
+	}
+
+	testModulo(Asserts) {
+		Asserts.that(5.modulo(2))Equals(1);
+		Asserts.that(10.modulo(2))Equals(0);
+		Asserts.that(10.modulo(3))Equals(1);
+		Asserts.that(11.modulo(3))Equals(2);
+		Asserts.that(12.modulo(3))Equals(0);
+	}
+
+	testParseNum(Asserts) {
+		it(Asserts)That("5".parseNum())ExistsAndEquals(5);
+		it(Asserts)That("54".parseNum())ExistsAndEquals(54);
+		it(Asserts)That("54.5".parseNum())ExistsAndEquals(54.5);
+		it(Asserts)That("-54.5".parseNum())ExistsAndEquals(-54.5);
+		var Num? = "-5o".parseNum();
+		if Num exists {
+			Asserts.fail("-5o should not have parsed.");
+		}
+	}
+
+	it(Asserts)That(Num?)ExistsAndEquals($Num) {
+		if Num exists {
+			Asserts.that(Num)Equals($Num);
+		} else {
+			Asserts.fail("Num should have equaled" + $Num.toString() + ", but didn't exist.");
+		}
+	}

@@ -6,17 +6,26 @@ ClASSESOUT=
 PROPERTIESOUT=
 JSOUT=
 JSOUTLOC=0
+PRINTNEXT=false
 
 BUILDINGSYMBOL='%'
 
 while IFS= read -rn 1 i
 do
+  if $PRINTNEXT
+  then
+    JSOUT="$JSOUT""$i"
+    JSOUTLOC=$(( $JSOUTLOC + 1 ))
+	PRINTNEXT=false
+	continue
+  fi
+
   if [ "$i" == $'\0' ] ; then continue ; fi
   if [ "$i" == $'\r' ] ; then continue ; fi
   if [ "$i" == $'\n' ] ; then continue ; fi
   if [ "$i" == $'\t' ] ; then continue ; fi
   if [ "$i" == ' ' ] ; then continue ; fi
-  if [ "$i" == '$' ] ; then i=' '; fi
+  if [ "$i" == '$' ] ; then PRINTNEXT=true; continue ; fi
   if [ "$STATE" == js ]
   then
     if [ "$i" == '`' ]
