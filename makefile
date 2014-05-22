@@ -111,6 +111,7 @@ bin/waketable/%.table: src/wake/stdlib/tables/%.wk bin/wake-nolib
 bin/waketable/Printer.table: bin/waketable/Num.table bin/waketable/Text.table bin/wake-nolib src/wake/stdlib/tables/Printer.wk
 bin/waketable/System.table: bin/waketable/Num.table bin/wake-nolib src/wake/stdlib/tables/System.wk
 bin/waketable/File.table: src/wake/stdlib/tables/File.wk bin/waketable/Text.table bin/waketable/Num.table bin/waketable/Bool.table
+bin/waketable/List.table: src/wake/stdlib/tables/List.wk bin/waketable/Num.table bin/waketable/Bool.table
 
 bin/waketable/Text.table bin/waketable/Num.table bin/waketable/Bool.table: src/wake/stdlib/tables/Primitives.wk bin/wake-nolib
 	./bin/wake-nolib -d bin/waketable -t $< -d bin/waketable
