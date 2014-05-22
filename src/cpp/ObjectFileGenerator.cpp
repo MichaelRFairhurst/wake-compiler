@@ -51,7 +51,6 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_EXPRESSIONS:
 		case NT_INHERITANCESET:
 		case NT_PROVISIONS:
-		case NT_INTERFACE:
 		case NT_INJECTION:
 		case NT_INJECTION_ARGS:
 		case NT_INJECTION_ARG:
