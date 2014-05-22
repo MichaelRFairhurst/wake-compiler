@@ -22,11 +22,11 @@ every AutoboxingTest is:
 	testMaxOfNums(Asserts) {
 		var Num[] = [];
 		Num[0] = 5;
-		Asserts.that(5.orMaxOf(Num))Equals(5);
+		Asserts.that(5.orMaxOf(Num[]))Equals(5);
 		Num[1] = 4;
-		Asserts.that(5.orMaxOf(Num))Equals(5);
+		Asserts.that(5.orMaxOf(Num[]))Equals(5);
 		Num[2] = 6;
-		Asserts.that(5.orMaxOf(Num))Equals(6);
+		Asserts.that(5.orMaxOf(Num[]))Equals(6);
 	}
 
 	testMinOfNum(Asserts) {
@@ -38,11 +38,11 @@ every AutoboxingTest is:
 	testMinOfNums(Asserts) {
 		var Num[] = [];
 		Num[0] = 5;
-		Asserts.that(5.orMinOf(Num))Equals(5);
+		Asserts.that(5.orMinOf(Num[]))Equals(5);
 		Num[1] = 4;
-		Asserts.that(5.orMinOf(Num))Equals(4);
+		Asserts.that(5.orMinOf(Num[]))Equals(4);
 		Num[2] = 6;
-		Asserts.that(5.orMinOf(Num))Equals(4);
+		Asserts.that(5.orMinOf(Num[]))Equals(4);
 	}
 
 	testNumberOfDigits(Asserts) {
@@ -79,31 +79,31 @@ every AutoboxingTest is:
 
 	testArraySize(Asserts) {
 		var Num[] = [];
-		Asserts.that(Num.getSize())Equals(0);
+		Asserts.that(Num[].getSize())Equals(0);
 		Num[0] = 1;
-		Asserts.that(Num.getSize())Equals(1);
+		Asserts.that(Num[].getSize())Equals(1);
 		Num[1] = 1;
-		Asserts.that(Num.getSize())Equals(2);
+		Asserts.that(Num[].getSize())Equals(2);
 	}
 
 	testArrayContains(Asserts) {
 		var Num[] = [];
 		var Text[] = [];
 		var AutoboxingTest[] = [];
-		Asserts.isFalse(Num.contains(5));
-		Asserts.isFalse(Text.contains("test"));
-		Asserts.isFalse(AutoboxingTest.contains(this));
+		Asserts.isFalse(Num[].contains(5));
+		Asserts.isFalse(Text[].contains("test"));
+		Asserts.isFalse(AutoboxingTest[].contains(this));
 		Num[0] = 4;
 		Text[0] = "hey";
-		Asserts.isFalse(Num.contains(5));
-		Asserts.isFalse(Text.contains("test"));
-		Asserts.isFalse(AutoboxingTest.contains(this));
+		Asserts.isFalse(Num[].contains(5));
+		Asserts.isFalse(Text[].contains("test"));
+		Asserts.isFalse(AutoboxingTest[].contains(this));
 		Num[1] = 5;
 		Text[1] = "test";
 		AutoboxingTest[0] = this;
-		Asserts.isTrue(Num.contains(5));
-		Asserts.isTrue(Text.contains("test"));
-		Asserts.isTrue(AutoboxingTest.contains(this));
+		Asserts.isTrue(Num[].contains(5));
+		Asserts.isTrue(Text[].contains("test"));
+		Asserts.isTrue(AutoboxingTest[].contains(this));
 	}
 
 	testTextLength(Asserts) {
@@ -252,7 +252,7 @@ every AutoboxingTest is:
 
 	~[ test List.push(T) ]~(Asserts) {
 		var Text[] = [];
-		Text.push("hey");
-		Asserts.that(Text.getSize())Equals(1);
+		Text[].push("hey");
+		Asserts.that(Text[].getSize())Equals(1);
 		Asserts.that(Text[0])Equals("hey");
 	}

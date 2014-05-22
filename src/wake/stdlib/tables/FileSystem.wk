@@ -6,7 +6,7 @@ every FileSystem is:
 
 	FilePath -- getPath(Text) { var FilePath[] = []; return FilePath[0]; }
 
-	FilePath[] -- listRoots() { var FilePath[] = []; return FilePath; }
+	FilePath[] -- listRoots() { var FilePath[] = []; return FilePath[]; }
 
 	Text -- getPathSeparator() { return ""; }
 

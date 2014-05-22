@@ -21,7 +21,7 @@ every Num is:
 
 	Text -- toString() { return ""; }
 
-	Num[] -- range(Num) { var $Num[] = []; return $Num; }
+	Num[] -- range(Num) { var Num[] = []; return Num[]; }
 
 every Text is:
 
@@ -40,6 +40,6 @@ every Text is:
 
 	Text? -- charAt(Num) { return ""; }
 
-	Text[] -- split(Text) { var $Text[] = []; return $Text; }
+	Text[] -- split(Text) { var Text[] = []; return Text[]; }
 
 	Num? -- indexOf(Text) { return 0; }

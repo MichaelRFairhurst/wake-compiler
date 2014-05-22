@@ -299,6 +299,8 @@ string TypeAnalyzer::getNameForTypeAsProperty(Type* type) {
 		name = type->alias;
 	} else {
 		name = string(type->typedata._class.shadow, '$') + type->typedata._class.classname;
+
+		if(type->arrayed) name += "[]";
 	}
 
 	return name;

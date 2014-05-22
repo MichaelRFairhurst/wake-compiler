@@ -1,6 +1,10 @@
 #include "ObjectFileGenerator.h"
 
 void ObjectFileGenerator::generate(Node* tree) {
+	if(forceArrayIdentifier && tree->node_type != NT_TYPEDATA) {
+		forceArrayIdentifier = false;
+	}
+
 	switch(tree->node_type) {
 		case NT_IMPORT:
 		case NT_IMPORTSET:
@@ -310,7 +314,11 @@ void ObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_TYPEDATA:
-			file << table.getAddress(tree->node_data.type);
+			{
+				Type* type = copyType(tree->node_data.type);
+				if(forceArrayIdentifier) type->arrayed = 1;
+				file << table.getAddress(type);
+			}
 			break;
 
 		case NT_ALIAS:
@@ -335,7 +343,9 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 		case NT_ARRAY_ACCESS:
 			file << "(";
+			forceArrayIdentifier = true;
 			generate(tree->node_data.nodes[0]);
+			forceArrayIdentifier = false;
 			file << ")[";
 			generate(tree->node_data.nodes[1]);
 			file << "]";
@@ -472,7 +482,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_EQUALITY:
 			file << "(";
 			generate(tree->node_data.nodes[0]);
-			file << "===";
+			file << "==";
 			generate(tree->node_data.nodes[1]);
 			file << ")";
 			break;
@@ -480,7 +490,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_INEQUALITY:
 			file << "(";
 			generate(tree->node_data.nodes[0]);
-			file << "!==";
+			file << "!=";
 			generate(tree->node_data.nodes[1]);
 			file << ")";
 			break;

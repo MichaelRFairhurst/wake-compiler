@@ -32,6 +32,7 @@ class TypeChecker {
 		void flowAnalysis(Node* n, bool breakable, bool caseable, bool continuable);
 		bool isValidLValue(Node* N);
 
+		bool forceArrayIdentifier;
 		MethodSignatureParseTreeTraverser* methodanalyzer;
 		ErrorTracker* errors;
 		ClassSpaceSymbolTable* classestable;

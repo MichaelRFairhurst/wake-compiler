@@ -23,7 +23,7 @@ every FilePath is:
 
 	makeDirectory() { }
 
-	FilePath[] -- getChildren() { var FilePath[] = []; return FilePath; }
+	FilePath[] -- getChildren() { var FilePath[] = []; return FilePath[]; }
 
 	FilePath? -- getParent() { return nothing; }
 

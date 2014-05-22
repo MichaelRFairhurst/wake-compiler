@@ -201,8 +201,14 @@ PTT_TEST_CASE(
 )
 
 PTT_TEST_CASE(
-	MethodDefinedWithVariablesSameClassnameAlbeitArrayed,
+	MethodDefinedWithVariablesSameClassnameOneArrayedOK,
 	"every MyClass is: methodWithDualArgs( MyClass, MyClass[] ) {}",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	MethodDefinedWithVariablesSameClassnameDifferentArrayed,
+	"every MyClass is: methodWithDualArgs( MyClass[], MyClass[][] ) {}",
 	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)
 )
 
@@ -380,7 +386,11 @@ PTT_TEST_CASE(
 	"every MyClass is:											\n\
 		arrayAccessOnNum() { 9[1]; }							\n\
 		arrayAccessOnString() { 'abcd'[1]; }					\n\
-		arrayAccessOnClass(MyClass) { MyClass[1]; }				\n\
+		arrayAccessOnBool() { true[1]; }						\n\
+		arrayAccessOnNum(Num alias) { alias[1]; }				\n\
+		arrayAccessOnString(Text alias) { alias[1]; }			\n\
+		arrayAccessOnBool(Bool alias) { alias[1]; }				\n\
+		arrayAccessOnClass(MyClass my) { my[1]; }				\n\
 		arrayAccessWithClass(MyClass, Num[]) { Num[MyClass]; }	\n\
 		arrayAccessWithString(Num[]) { Num['test']; }			\n\
 	",
@@ -389,7 +399,25 @@ PTT_TEST_CASE(
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
 )
+
+PTT_TEST_CASE(
+	ArrayIndexSymbolNotFoundErrors,
+	"every MyClass is:									\n\
+		arrayAccessOnClass(Text) { Text[1]; }			\n\
+		arrayAccessOnClass(Num) { Num[1]; }				\n\
+		arrayAccessOnClass(Bool) { Bool[1]; }			\n\
+		arrayAccessOnClass(MyClass) { MyClass[1]; }		\n\
+	",
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
+);
 
 PTT_TEST_CASE(
 	ValidArrayIndexAccessAndReturningValidTypes,

@@ -18,10 +18,11 @@ using namespace std;
 class ObjectFileGenerator {
 
 	public:
-		ObjectFileGenerator(ostream& file, ClassSpaceSymbolTable* classes, ObjectFileHeaderData* header) : file(file) {this->classes = classes; this->header = header;}
+		ObjectFileGenerator(ostream& file, ClassSpaceSymbolTable* classes, ObjectFileHeaderData* header) : file(file) {this->classes = classes; this->header = header; forceArrayIdentifier = false; }
 		void generate(Node* tree);
 
 	private:
+		bool forceArrayIdentifier;
 		TypeAnalyzer typeanalyzer;
 		ObjectFileHeaderData* header;
 		ClassSpaceSymbolTable* classes;

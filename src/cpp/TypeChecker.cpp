@@ -8,6 +8,7 @@ TypeChecker::TypeChecker(ErrorTracker* errors, ClassSpaceSymbolTable* classestab
 	this->scopesymtable = scopesymtable;
 	this->methodanalyzer = methodanalyzer;
 	thiscontext = NULL;
+	forceArrayIdentifier = false;
 }
 
 void TypeChecker::check(Node* tree) {
@@ -109,6 +110,12 @@ Type* TypeChecker::typeCheck(Node* tree) {
 	string erroneousstring;
 	string expectedstring;
 
+	// read Printer as Printer[] from ARRAY_ACCESS nodes
+	// but not if there are ANY nodes before the next TYPEDATA
+	if(forceArrayIdentifier && tree->node_type != NT_TYPEDATA) {
+		forceArrayIdentifier = false;
+	}
+
 	try {
 		switch(tree->node_type) {
 			// Here is where the recursion ends
@@ -154,12 +161,16 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				{
 					TypeParameterizer parameterizer;
 					parameterizer.writeInParameterizations(&tree->node_data.type, parameterizedtypes);
-					boost::optional<Type*> variable = scopesymtable->find(tree->node_data.type);
+
+					Type* type = copyType(tree->node_data.type);
+					if(forceArrayIdentifier) type->arrayed = 1;
+
+					boost::optional<Type*> variable = scopesymtable->find(type);
 					if(!variable && thiscontext != NULL) {
 						PropertySymbolTable* proptable = classestable->findModifiable(thiscontext);
-						variable = proptable->find(scopesymtable->getNameForType(tree->node_data.type));
+						variable = proptable->find(scopesymtable->getNameForType(type));
 						if(variable) {
-							char* propname = strdup(tree->node_data.type->typedata._class.classname);
+							char* propname = strdup(type->typedata._class.classname);
 							tree->node_type = NT_MEMBER_ACCESS;
 							AddSubNode(tree, MakeEmptyNode(NT_THIS));
 							AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, propname));
@@ -167,8 +178,13 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					}
 					if(!variable) {
 						ret = MakeType(TYPE_MATCHALL);
-						errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Symbol by name of " + scopesymtable->getNameForType(tree->node_data.type) + " not found", tree));
+						errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Symbol by name of " + scopesymtable->getNameForType(type) + " not found", tree));
 					} else {
+						// detect if they wrote Printer[] instead of Printer[][]
+						// Either way Printer[x] would work, so if forceArrayIdentifier skip this step
+						if(!forceArrayIdentifier && type->arrayed != (*variable)->arrayed)
+							errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Accessed arrayed variable " + scopesymtable->getNameForType(type) + " with wrong number of [] brackets.", tree));
+
 						ret = copyType(*variable);
 					}
 				}
@@ -355,15 +371,17 @@ Type* TypeChecker::typeCheck(Node* tree) {
 
 			case NT_ARRAY_ACCESS:
 				{
+					forceArrayIdentifier = true;
 					ret = typeCheckUsable(tree->node_data.nodes[0]);
+					forceArrayIdentifier = false;
 					Type* index = typeCheckUsable(tree->node_data.nodes[1]);
 					--ret->arrayed;
 
-					if(!analyzer->isPrimitiveTypeNum(index)) {
+					if(!analyzer->isPrimitiveTypeNum(index) && index->type != TYPE_MATCHALL) {
 						erroneousstring = analyzer->getNameForType(index); freeType(index);
 						expectedstring = "Num";
 						throw string("Array indices must be numeric");
-					} else if(ret->arrayed < 0) {
+					} else if(ret->arrayed < 0 && ret->type != TYPE_MATCHALL) {
 						erroneousstring = analyzer->getNameForType(ret); freeType(index);
 						throw string("Getting index of non-array");
 					}
