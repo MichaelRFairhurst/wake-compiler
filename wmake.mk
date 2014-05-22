@@ -1,5 +1,7 @@
 PROGRAM := finaltest.js
 TABLEDIR := bin/waketable
+EXECUTABLE := false
+
 OBJECTDIR := bin/wakeobj
 SRCDIR := src/wake/test
 SOURCEFILES := $(wildcard $(SRCDIR)/*.wk)
@@ -13,7 +15,9 @@ TESTLIBRARYFILES := $(WUNITLIBRARYROOT)/TestResultReporter.o $(WUNITLIBRARYROOT)
 LIBRARYTABLES := $(WUNITTABLEROOT)/Asserts.table $(WUNITTABLEROOT)/TestResultReporter.table
 
 bin/$(PROGRAM): $(OBJECTFILES) $(TABLEFILES) $(LIBRARYFILES) tests
+ifeq ($(EXECUTABLE), true)
 	bin/wake -l -d $(TABLEDIR) -o bin/$(PROGRAM) $(OBJECTFILES) $(LIBRARYFILES)
+endif
 
 .PHONY:
 tests: bin/$(PROGRAM)-test

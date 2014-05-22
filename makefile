@@ -62,8 +62,6 @@ TESTNAMES=CompilerTests.cpp \
 
 TESTOBJS=$(addprefix bin/tests/, $(TESTNAMES:.cpp=.o))
 
-all: tests $(WAKETABLEOBJS)
-
 include wmake.mk
 
 windowsbuildready: $(GENOBJS) $(WAKETABLEINCLUDES) bin/wakeobj/std.o
