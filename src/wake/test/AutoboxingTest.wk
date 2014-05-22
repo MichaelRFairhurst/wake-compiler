@@ -194,3 +194,65 @@ every AutoboxingTest is:
 			Asserts.fail("Num should have equaled" + $Num.toString() + ", but didn't exist.");
 		}
 	}
+
+	it(Asserts)That(Text?)ExistsAndEquals($Text) {
+		if Text exists {
+			Asserts.that(Text)Equals($Text);
+		} else {
+			Asserts.fail("Text should have equaled" + $Text + ", but didn't exist.");
+		}
+	}
+
+	testCharAt(Asserts) {
+		it(Asserts)That("aoeu".charAt(0))ExistsAndEquals("a");
+		it(Asserts)That("aoeu".charAt(1))ExistsAndEquals("o");
+		it(Asserts)That("aoeu".charAt(2))ExistsAndEquals("e");
+		it(Asserts)That("aoeu".charAt(3))ExistsAndEquals("u");
+		var Text? = "aoeu".charAt(4);
+		if Text exists {
+			Asserts.fail('"aoeu".charAt(4) shouldn\'t exist');
+		}
+	}
+
+	testSplit(Asserts) {
+		Asserts.that("hello heyo".split(" ").getSize())Equals(2);
+		Asserts.that("hello heyo".split(" ")[0])Equals("hello");
+		Asserts.that("hello heyo".split(" ")[1])Equals("heyo");
+		Asserts.that("fair hair blair snare tear lair mare dairy".split("air").getSize())Equals(6);
+		Asserts.that("fair hair blair snare tear lair mare dairy".split("air")[0])Equals("f");
+		Asserts.that("fair hair blair snare tear lair mare dairy".split("air")[1])Equals(" h");
+		Asserts.that("fair hair blair snare tear lair mare dairy".split("air")[2])Equals(" bl");
+		Asserts.that("fair hair blair snare tear lair mare dairy".split("air")[3])Equals(" snare tear l");
+		Asserts.that("fair hair blair snare tear lair mare dairy".split("air")[4])Equals(" mare d");
+		Asserts.that("fair hair blair snare tear lair mare dairy".split("air")[5])Equals("y");
+		Asserts.that("hey man whatchoo doin".split("x").getSize())Equals(1);
+		Asserts.that("hey man whatchoo doin".split("x")[0])Equals("hey man whatchoo doin");
+	}
+
+	testIndexOf(Asserts) {
+		it(Asserts)That("aoeu".indexOf("a"))ExistsAndEquals(0);
+		it(Asserts)That("aoeu".indexOf("ao"))ExistsAndEquals(0);
+		it(Asserts)That("aoeu".indexOf("aoe"))ExistsAndEquals(0);
+		it(Asserts)That("aoeu".indexOf("aoeu"))ExistsAndEquals(0);
+		it(Asserts)That("aoeu".indexOf("o"))ExistsAndEquals(1);
+		it(Asserts)That("aoeu".indexOf("oe"))ExistsAndEquals(1);
+		it(Asserts)That("aoeu".indexOf("oeu"))ExistsAndEquals(1);
+		it(Asserts)That("aoeu".indexOf("e"))ExistsAndEquals(2);
+		it(Asserts)That("aoeu".indexOf("eu"))ExistsAndEquals(2);
+		it(Asserts)That("aoeu".indexOf("u"))ExistsAndEquals(3);
+		var Num? = "aoeu".indexOf("i");
+		if Num exists {
+			Asserts.fail('"aoeu".indexOf("i") shouldn\'t exist');
+		}
+		Num = "aoeu".indexOf("aoi");
+		if Num exists {
+			Asserts.fail('"aoeu".indexOf("aoi") shouldn\'t exist');
+		}
+	}
+
+	~[ test List.push(T) ]~(Asserts) {
+		var Text[] = [];
+		Text.push("hey");
+		Asserts.that(Text.getSize())Equals(1);
+		Asserts.that(Text[0])Equals("hey");
+	}

@@ -28,8 +28,18 @@ every Text is:
 	Text -- toUpper() { return "stub"; }
 	Text -- toLower() { return "stub"; }
 	Text -- switchCase() { return "stub"; }
+
 	Text -- trim() { return "stub"; }
+
 	Num -- getSize() { return 0; }
+
 	Text -- substr(Num start) { return "stub"; }
 	Text -- substr(Num start, Num end) { return "stub"; }
+
 	Num? -- parseNum() { return 0; }
+
+	Text? -- charAt(Num) { return ""; }
+
+	Text[] -- split(Text) { var $Text[] = []; return $Text; }
+
+	Num? -- indexOf(Text) { return 0; }

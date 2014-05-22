@@ -123,7 +123,20 @@ fs.existsSync = fs.existsSync || require("path").existsSync;
 
 	this.`parseNum()` = function() {
 		return$ /^(\-|\+)?([0-9]+(\.[0-9]+)?)$$/.test(a) ? parseFloat(a) : null;
-	}
+	};
+
+	this.`charAt(Num)` = function(b) {
+		return$ a[b];
+	};
+
+	this.`indexOf(Text)` = function(b) {
+		var$ c = a.indexOf(b);
+		return$ c === -1 ? null : c;
+	};
+
+	this.`split(Text)` = function(b) {
+		return$ a.split(b);
+	};
 
 };
 
@@ -142,6 +155,10 @@ fs.existsSync = fs.existsSync || require("path").existsSync;
 			if(b.indexOf(a[c]) > -1) d[d.length] = a[c];
 		}
 		return$ d;
+	};
+
+	this.`push(T)` = function(b) {
+		a.push(b);
 	}
 
 };

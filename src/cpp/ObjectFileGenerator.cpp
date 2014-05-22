@@ -473,7 +473,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_EQUALITY:
 			file << "(";
 			generate(tree->node_data.nodes[0]);
-			file << "==";
+			file << "===";
 			generate(tree->node_data.nodes[1]);
 			file << ")";
 			break;
@@ -481,7 +481,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_INEQUALITY:
 			file << "(";
 			generate(tree->node_data.nodes[0]);
-			file << "!=";
+			file << "!==";
 			generate(tree->node_data.nodes[1]);
 			file << ")";
 			break;
