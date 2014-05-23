@@ -2331,4 +2331,15 @@ PTT_TEST_CASE(
 	PTT_EXPECT(TYPE_ERROR)
 );
 
+PTT_TEST_CASE(
+	MemberAccessOnOptionalType,
+	"every MyClass is:						\n\
+		with public Text hello = '';		\n\
+		method() {							\n\
+		var MyClass? = nothing;				\n\
+		MyClass.hello;						\n\
+	}",
+	PTT_EXPECT(DIRECT_USE_OF_OPTIONAL_TYPE)
+);
+
 BOOST_AUTO_TEST_SUITE_END()

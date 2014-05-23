@@ -706,6 +706,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 						ret = subject;
 						break;
 					}
+
 					Type* boxedtype;
 					if(analyzer->isAutoboxedType(subject, &boxedtype)) {
 						Node* node = tree->node_data.nodes[0];
@@ -713,10 +714,18 @@ Type* TypeChecker::typeCheck(Node* tree) {
 						freeType(subject);
 						subject = boxedtype;
 					}
-					ReadOnlyPropertySymbolTable* proptable = classestable->find(subject);
+
 					string name = tree->node_data.nodes[1]->node_type == NT_ALIAS
 						? tree->node_data.nodes[1]->node_data.string
 						: scopesymtable->getNameForType(tree->node_data.nodes[1]->node_data.type);
+
+					if(subject->optional) {
+						errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Accessing member " + name + " on optional type " + subject->typedata._class.classname + ". You must first wrap object in an exists { } clause.", tree));
+						ret = MakeType(TYPE_MATCHALL);
+						break;
+					}
+
+					ReadOnlyPropertySymbolTable* proptable = classestable->find(subject);
 					boost::optional<Type*> variable = proptable->find(name);
 					if(!variable) {
 						ret = MakeType(TYPE_MATCHALL);
@@ -731,6 +740,13 @@ Type* TypeChecker::typeCheck(Node* tree) {
 			case NT_FOREACH:
 				{
 					ret = typeCheckUsable(tree->node_data.nodes[0]);
+
+					if(ret->optional) {
+						errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Iterating over optional type. You must first wrap object in an exists { } clause.", tree));
+						ret = MakeType(TYPE_MATCHALL);
+						break;
+					}
+
 					if(!ret->arrayed && ret->type != TYPE_MATCHALL) {
 						errors->addError(new SemanticError(TYPE_ERROR, "Calling foreach over something that is not a list", tree));
 					} else {
