@@ -402,6 +402,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 		case NT_FOREACH:
 			{
+				table.pushScope();
 				bool iterating_expression = tree->node_data.nodes[0]->node_type != NT_ALIAS && tree->node_data.nodes[0]->node_type != NT_TYPEDATA;
 				std::stringstream valuestorename;
 				if(iterating_expression) {
@@ -430,6 +431,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 				file << "[" << table.getAddress(indexername.str()) << "];";
 				generate(tree->node_data.nodes[1]);
 				file << "}";
+				table.popScope();
 			}
 			break;
 

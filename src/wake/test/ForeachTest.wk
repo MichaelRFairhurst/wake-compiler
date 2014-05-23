@@ -88,3 +88,9 @@ every ForeachTest is:
 		Num[].push(2);
 		return Num[];
 	}
+
+	~[ test can iterate over an array twice ]~(Asserts) {
+		var Num[] = [];
+		foreach(Num[]) { }
+		foreach(Num[]) { }
+	}
