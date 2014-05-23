@@ -720,7 +720,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					boost::optional<Type*> variable = proptable->find(name);
 					if(!variable) {
 						ret = MakeType(TYPE_MATCHALL);
-						errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Symbol by name of " + string(tree->node_data.string) + " not found", tree));
+						errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Symbol by name of " + name + " not found", tree));
 					} else {
 						ret = copyType(*variable);
 						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(name.c_str())));
