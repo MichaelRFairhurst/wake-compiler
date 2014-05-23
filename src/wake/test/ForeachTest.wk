@@ -66,3 +66,25 @@ every ForeachTest is:
 
 		Asserts.that(Num)Equals(8);
 	}
+
+	~[ test foreach over statement only happens once ]~(Asserts) {
+		var Num[] copy = [];
+		foreach(getNumArray()) {
+			copy.push(Num);
+		}
+
+		Asserts.that(counter)Equals(1);
+		Asserts.that(copy[0])Equals(0);
+		Asserts.that(copy[1])Equals(1);
+		Asserts.that(copy[2])Equals(2);
+	}
+
+	with Num counter = 0;
+	Num[] -- getNumArray() {
+		counter += 1;
+		var Num[] = [];
+		Num[].push(0);
+		Num[].push(1);
+		Num[].push(2);
+		return Num[];
+	}

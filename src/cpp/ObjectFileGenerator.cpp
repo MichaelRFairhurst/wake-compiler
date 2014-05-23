@@ -401,8 +401,18 @@ void ObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_FOREACH:
-			//if(tree->node_data.nodes[0]->node_type != NT_ALIAS && tree->node_data.nodes[0]->node_type != NT_TYPEDATA) {
 			{
+				bool iterating_expression = tree->node_data.nodes[0]->node_type != NT_ALIAS && tree->node_data.nodes[0]->node_type != NT_TYPEDATA;
+				std::stringstream valuestorename;
+				if(iterating_expression) {
+					Type* valuestore = MakeType(TYPE_MATCHALL);
+					valuestorename << valuestore;
+					table.add(valuestorename.str(), valuestore);
+					file << "var " << table.getAddress(valuestorename.str()) << "=";
+					generate(tree->node_data.nodes[0]);
+					file << ";";
+				}
+
 				Type* indexer = MakeType(TYPE_MATCHALL);
 				Type* lowered = MakeType(TYPE_MATCHALL);
 				std::stringstream indexername;
@@ -411,10 +421,12 @@ void ObjectFileGenerator::generate(Node* tree) {
 				table.add(tree->node_data.nodes[2]->node_data.string, lowered);
 				file << "for(var " << table.getAddress(indexername.str()) << "=0;";
 				file << table.getAddress(indexername.str()) << " < ";
-				generate(tree->node_data.nodes[0]);
+				if(iterating_expression) file << table.getAddress(valuestorename.str());
+				else generate(tree->node_data.nodes[0]);
 				file << ".length; " << table.getAddress(indexername.str()) << "++){";
 				file << "var " << table.getAddress(tree->node_data.nodes[2]->node_data.string) << "=";
-				generate(tree->node_data.nodes[0]);
+				if(iterating_expression) file << table.getAddress(valuestorename.str());
+				else generate(tree->node_data.nodes[0]);
 				file << "[" << table.getAddress(indexername.str()) << "];";
 				generate(tree->node_data.nodes[1]);
 				file << "}";
