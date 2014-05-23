@@ -728,6 +728,25 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				}
 				break;
 
+			case NT_FOREACH:
+				{
+					ret = typeCheckUsable(tree->node_data.nodes[0]);
+					if(!ret->arrayed && ret->type != TYPE_MATCHALL) {
+						errors->addError(new SemanticError(TYPE_ERROR, "Calling foreach over something that is not a list", tree));
+					} else {
+						Type* lowered = copyType(ret);
+						lowered->arrayed--;
+
+						scopesymtable->pushScope();
+						scopesymtable->add(lowered);
+						freeType(typeCheck(tree->node_data.nodes[1]));
+						scopesymtable->popScope();
+
+						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(scopesymtable->getNameForType(lowered).c_str())));
+					}
+				}
+				break;
+
 			// Ignoring these for now
 			case NT_SWITCH:
 			case NT_CURRIED:

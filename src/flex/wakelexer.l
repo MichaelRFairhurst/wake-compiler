@@ -61,6 +61,8 @@ nothing					count(); return NOTHING;
 cast					count(); return CAST;
 exists					count(); return EXISTS;
 var						count(); return VAR;
+foreach					count(); return FOREACH;
+in						count(); return IN;
 
 \<\(					count(); return SYM_PROVIDE_ARGS_OPEN;
 \+\+					count(); return SYM_INCREMENT;

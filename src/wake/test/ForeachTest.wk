@@ -1,0 +1,68 @@
+import Asserts;
+
+every ForeachTest is:
+
+	~[ test empty loop never enters foreach ]~(Asserts) {
+		var Num[] = [];
+		var Bool = false;
+
+		foreach(Num[]) {
+			Bool = true;
+		}
+
+		Asserts.that(Bool)Equals(false);
+	}
+
+	~[ test loop with values executes with each once ]~(Asserts) {
+		var Num[] = [];
+		var $Num[] = [];
+
+		Num[0] = 1;
+		Num[1] = 2;
+		Num[2] = 3;
+
+		foreach(Num[]) {
+			$Num[].push(Num);
+		}
+
+		Asserts.that($Num[].getSize())Equals(3);
+		Asserts.that($Num[0])Equals(1);
+		Asserts.that($Num[1])Equals(2);
+		Asserts.that($Num[2])Equals(3);
+	}
+
+	~[ test loop with values aren't references ]~(Asserts) {
+		var Num[] = [];
+
+		Num[0] = 0;
+		Num[1] = 1;
+		Num[2] = 2;
+
+		foreach(Num[]) {
+			Num += 2;
+		}
+
+		Asserts.that(Num[0])Equals(0);
+		Asserts.that(Num[1])Equals(1);
+		Asserts.that(Num[2])Equals(2);
+	}
+
+	~[ test loop that inserts still executes with all ]~(Asserts) {
+		var Num = 0;
+		var Bool[] = [];
+
+		Bool[0] = true;
+		Bool[1] = false;
+		Bool[2] = false;
+		Bool[3] = true;
+
+		foreach(Bool[]) {
+			if(Bool) {
+				Bool[].push(false);
+				Bool[].push(false);
+			}
+			Num += 1;
+		}
+
+		Asserts.that(Num)Equals(8);
+	}

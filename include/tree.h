@@ -76,6 +76,8 @@
 #define NT_SWITCH 50
 #define NT_WHILE 51
 #define NT_FOR 52
+#define NT_FOREACH 87
+#define NT_FOREACHIN 88
 #define NT_BREAK 53
 #define NT_CONTINUE 54
 #define NT_RETURN 55

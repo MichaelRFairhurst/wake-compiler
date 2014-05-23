@@ -2287,4 +2287,48 @@ PTT_TEST_CASE(
 	PTT_VALID
 );
 
+PTT_TEST_CASE(
+	TestForeachAddsLowerVariables,
+	"every MyClass is:						\n\
+		method() {							\n\
+			var Num[] = [];					\n\
+			foreach(Num[]) {				\n\
+				Num += Num[0];				\n\
+			}								\n\
+			var Text[] = [];				\n\
+			foreach(Text[]) {				\n\
+				Text += Text[0];			\n\
+			}								\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestForeachWontOverwriteLowerVariables,
+	"every MyClass is:						\n\
+		lowerArrayArray() {					\n\
+			var Num[][] = [];				\n\
+			foreach(Num[][]) { }			\n\
+		}									\n\
+		overwriteVar() {					\n\
+			var Num[] = [];					\n\
+			var Num = 3;					\n\
+			foreach(Num[]) { }				\n\
+		}",
+	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)
+	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)
+);
+
+PTT_TEST_CASE(
+	TestForeachOnNonArray,
+	"every MyClass is:						\n\
+		onThis() { foreach(this) { } }		\n\
+		on(Num) { foreach(Num) { } }		\n\
+		on(Text) { foreach(Text) { } }		\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+);
+
 BOOST_AUTO_TEST_SUITE_END()

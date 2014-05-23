@@ -1,4 +1,5 @@
 #include "ObjectFileGenerator.h"
+#include <sstream>
 
 void ObjectFileGenerator::generate(Node* tree) {
 	if(forceArrayIdentifier && tree->node_type != NT_TYPEDATA) {
@@ -397,6 +398,27 @@ void ObjectFileGenerator::generate(Node* tree) {
 			generate(tree->node_data.nodes[3]);
 			table.popScope();
 			file << "}";
+			break;
+
+		case NT_FOREACH:
+			//if(tree->node_data.nodes[0]->node_type != NT_ALIAS && tree->node_data.nodes[0]->node_type != NT_TYPEDATA) {
+			{
+				Type* indexer = MakeType(TYPE_MATCHALL);
+				Type* lowered = MakeType(TYPE_MATCHALL);
+				std::stringstream indexername;
+				indexername << indexer;
+				table.add(indexername.str(), indexer);
+				table.add(tree->node_data.nodes[2]->node_data.string, lowered);
+				file << "for(var " << table.getAddress(indexername.str()) << "=0;";
+				file << table.getAddress(indexername.str()) << " < ";
+				generate(tree->node_data.nodes[0]);
+				file << ".length; " << table.getAddress(indexername.str()) << "++){";
+				file << "var " << table.getAddress(tree->node_data.nodes[2]->node_data.string) << "=";
+				generate(tree->node_data.nodes[0]);
+				file << "[" << table.getAddress(indexername.str()) << "];";
+				generate(tree->node_data.nodes[1]);
+				file << "}";
+			}
 			break;
 
 		case NT_BREAK: file << "break;"; break;
