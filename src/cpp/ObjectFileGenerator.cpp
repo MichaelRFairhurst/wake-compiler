@@ -332,10 +332,10 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_SUBCLASS:
 			{
 			header->addClassUsage(file.tellp(), tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
-			file << ".call(this, ";
+			file << ".call(this";
 			PropertySymbolTable* proptable = classes->findModifiable(tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
 			for(auto it = proptable->getNeeds()->begin(); it != proptable->getNeeds()->end(); ++it) {
-				if(it != proptable->getNeeds()->begin()) cout << ",";
+				file << ",";
 				file << table.getAddress(*it);
 			}
 			file << ");";
