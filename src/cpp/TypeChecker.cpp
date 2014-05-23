@@ -170,7 +170,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 						PropertySymbolTable* proptable = classestable->findModifiable(thiscontext);
 						variable = proptable->find(scopesymtable->getNameForType(type));
 						if(variable) {
-							char* propname = strdup(type->typedata._class.classname);
+							char* propname = strdup(scopesymtable->getNameForType(type).c_str());
 							tree->node_type = NT_MEMBER_ACCESS;
 							AddSubNode(tree, MakeEmptyNode(NT_THIS));
 							AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, propname));
