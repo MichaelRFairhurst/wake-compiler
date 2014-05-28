@@ -62,7 +62,6 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_CTOR:
 		case NT_PARENT:
 		case NT_LAMBDA_INVOCATION:
-		case NT_CAST:
 			{
 				int i;
 				for(i = 0; i < tree->subnodes; i++)
@@ -76,6 +75,10 @@ void ObjectFileGenerator::generate(Node* tree) {
 			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << ")";
+			break;
+
+		case NT_CAST:
+			generate(tree->node_data.nodes[1]);
 			break;
 
 		case NT_CLASS:
