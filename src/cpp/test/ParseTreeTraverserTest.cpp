@@ -433,12 +433,12 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	CannotIfCondOrInvertWithAnythingButBools,
 	"every MyClass is:											\n\
-		ifConditionWithNum() { if 5 then 5; }						\n\
-		ifConditionWith( MyClass ) { if MyClass then 5; }			\n\
-		ifConditionWithText() { if 'test' then 5; }					\n\
-		whileConditionWithNum() { while 5 then 5; }					\n\
-		whileConditionWith( MyClass ) { while MyClass then 5; }		\n\
-		whileConditionWithText() { while 'test' then 5; }			\n\
+		ifConditionWithNum() { if(5) 5; }						\n\
+		ifConditionWith( MyClass ) { if(MyClass) 5; }			\n\
+		ifConditionWithText() { if('test') 5; }					\n\
+		whileConditionWithNum() { while(5) 5; }					\n\
+		whileConditionWith( MyClass ) { while(MyClass) 5; }		\n\
+		whileConditionWithText() { while('test') 5; }			\n\
 		forConditionWithNum() { for(5; 5; 5) 5; }				\n\
 		forConditionWith( MyClass ) { for(5; MyClass; 5) 5; }	\n\
 		forConditionWithText() { for(5; 'test'; 5) 5; }			\n\
@@ -463,12 +463,12 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	CatchesTypeErrorsWithinIfElseAndInvertWorks,
 	"every MyClass is:													\n\
-		failInIf() { if true then 5 + 'illegal'; }							\n\
-		failInElse() { if true then 5; else 5 + 'illegal'; }				\n\
-		failInIfInverted() { if !true then 5 + 'illegal'; }					\n\
-		failInElseInverted() { if !true then 5; else 5 + 'illegal'; }		\n\
-		failInWhile() { while !true then 5 + 'illegal'; }					\n\
-		failInWhileInverted() { while !true then 5 + 'illegal'; }			\n\
+		failInIf() { if(true) 5 + 'illegal'; }							\n\
+		failInElse() { if(true) 5; else 5 + 'illegal'; }				\n\
+		failInIfInverted() { if(!true) 5 + 'illegal'; }					\n\
+		failInElseInverted() { if(!true) 5; else 5 + 'illegal'; }		\n\
+		failInWhile() { while(!true) 5 + 'illegal'; }					\n\
+		failInWhileInverted() { while(!true) 5 + 'illegal'; }			\n\
 		failInFor() { for(5; !true; 5) 5 + 'illegal'; }					\n\
 		failInForInverted() { for(5; !true; 5) 5 + 'illegal'; }			\n\
 		failInForInit() { for(5 + 'illegal'; !true; 5) 5; }				\n\
@@ -493,12 +493,12 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ValidIfConditions,
 	"every MyClass is:											\n\
-		truthLiterals() { if true then 5; if false then 5; }			\n\
-		truthVariable(Bool) { if Bool then 5; }					\n\
-		truthAlias(Bool b) { if b then 5; }						\n\
-		truthLiteralsWhile() { while true then 5; while false then 5; }	\n\
-		truthVariableWhile(Bool) { while Bool then 5; }			\n\
-		truthAliasWhile(Bool b) { while b then 5; }				\n\
+		truthLiterals() { if(true) 5; if(false) 5; }			\n\
+		truthVariable(Bool) { if(Bool) 5; }					\n\
+		truthAlias(Bool b) { if(b) 5; }						\n\
+		truthLiteralsWhile() { while(true) 5; while(false) 5; }	\n\
+		truthVariableWhile(Bool) { while(Bool) 5; }			\n\
+		truthAliasWhile(Bool b) { while(b) 5; }				\n\
 	",
 	PTT_VALID
 )
@@ -877,31 +877,31 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	BreakAndContinueWithinForOrWhileIsOK,
-	"every MyClass is: afn() { while true { while true { break; continue; } for(5; true; 5) { break; continue; }; break; continue; } }",
+	"every MyClass is: afn() { while(true) { while(true) { break; continue; } for(5; true; 5) { break; continue; }; break; continue; } }",
 	PTT_VALID
 )
 
 PTT_TEST_CASE(
 	InexhaustiveReturnFromIfsWithoutElses,
-	"every MyClass is: Bool -- afn() { if true then return true; if true then return true; if true then return true; }",
+	"every MyClass is: Bool -- afn() { if(true) return true; if(true) return true; if(true) return true; }",
 	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
 )
 
 PTT_TEST_CASE(
 	InexhaustiveReturnFromIfsWithoutReturns,
-	"every MyClass is: Bool -- afn() { if true then 5; else return true; if true then 5; else return true; }",
+	"every MyClass is: Bool -- afn() { if(true) 5; else return true; if(true) 5; else return true; }",
 	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
 )
 
 PTT_TEST_CASE(
 	InexhaustiveReturnFromElsesWithoutReturns,
-	"every MyClass is: Bool -- afn() { if true then return true; else 5; if true then return true; else 5; }",
+	"every MyClass is: Bool -- afn() { if(true) return true; else 5; if(true) return true; else 5; }",
 	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
 )
 
 PTT_TEST_CASE(
 	InexhaustiveReturnFromReturningWithinLoopsOnly,
-	"every MyClass is: Bool -- afn() { while true then return true; for(1; true; 1) return true; }",
+	"every MyClass is: Bool -- afn() { while(true) return true; for(1; true; 1) return true; }",
 	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
 )
 
@@ -915,8 +915,8 @@ PTT_TEST_CASE(
 	InexhaustiveReturnComplicated,
 	"every MyClass is:				\n\
 		Bool -- afn() {			\n\
-			if true {				\n\
-				if true {			\n\
+			if(true) {				\n\
+				if(true) {			\n\
 					5 + 5;			\n\
 					6 + 6;			\n\
 					return true;	\n\
@@ -924,7 +924,7 @@ PTT_TEST_CASE(
 			} else {				\n\
 				5 + 6;				\n\
 				7 == 10;			\n\
-				while true {		\n\
+				while(true) {		\n\
 					return true;	\n\
 				}					\n\
 			}						\n\
@@ -937,8 +937,8 @@ PTT_TEST_CASE(
 	ExhaustiveReturnComplicated,
 	"every MyClass is:				\n\
 		Bool -- afn() {			\n\
-			if true {				\n\
-				if true {			\n\
+			if(true) {				\n\
+				if(true) {			\n\
 					5 + 5;			\n\
 					6 + 6;			\n\
 					return true;	\n\
@@ -982,7 +982,7 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	TestDeclareAnNumIsScoped,
-	"every MyClass is: Num -- myfn() { if true { var Num = 5; } return Num; }",
+	"every MyClass is: Num -- myfn() { if(true) { var Num = 5; } return Num; }",
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 )
 
@@ -1762,8 +1762,8 @@ PTT_TEST_CASE(
 		inEquivalence() { (Num = 5) == 5; }							\n\
 		inLT() { (Num = 5) <= 5; }									\n\
 		inGT() { (Num = 5) >= 5; }									\n\
-		inIfStmt() { if Bool = true {} }							\n\
-		inWhileStmt() { while Bool = true {} }						\n\
+		inIfStmt() { if(Bool = true) {} }							\n\
+		inWhileStmt() { while(Bool = true) {} }						\n\
 		inMethodArg($Num) { inMethodArg(Num = 5); }					\n\
 	",
 	PTT_EXPECT(USE_OF_ASSIGNMENT_VALUE)
@@ -1798,8 +1798,8 @@ PTT_TEST_CASE(
 		inEquivalence() { (Num := 5) == 5; }									\n\
 		inLT() { (Num := 5) <= 5; }												\n\
 		inGT() { (Num := 5) >= 5; }												\n\
-		inIfStmt() { if Bool := true {} }										\n\
-		inWhileStmt() { while Bool := true {} }								\n\
+		inIfStmt() { if(Bool := true) {} }										\n\
+		inWhileStmt() { while(Bool := true) {} }								\n\
 	",
 	PTT_VALID
 );
@@ -2279,7 +2279,7 @@ PTT_TEST_CASE(
 	TestEndOfExistsScopeDoesntRemoveVariableFromTable,
 	"every MyClass is: method() {			\n\
 		var Num? = nothing;					\n\
-		if true {							\n\
+		if(true) {							\n\
 			if Num exists { }				\n\
 		}									\n\
 		Num = nothing;						\n\
