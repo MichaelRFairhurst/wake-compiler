@@ -57,7 +57,7 @@ every ForeachTest is:
 		Bool[3] = true;
 
 		foreach(Bool[]) {
-			if Bool {
+			if(Bool) {
 				Bool[].push(false);
 				Bool[].push(false);
 			}
