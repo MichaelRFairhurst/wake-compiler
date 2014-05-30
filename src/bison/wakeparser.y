@@ -59,7 +59,7 @@ int wakewrap()
 %type <type_array> puretypes types unboundtypespecifications
 %start file
 
-%expect 3
+%expect 6
 %expect-rr 0
 %%
 
@@ -304,13 +304,16 @@ existsstatement:
 	;
 
 selectionstatement:
-	IF '(' expression ')' statement												{ $$ = MakeTwoBranchNode(NT_IF_ELSE, $3, $5); }
-	| IF '(' expression ')' statement ELSE statement							{ $$ = MakeTwoBranchNode(NT_IF_ELSE, $3, $5); AddSubNode($$, $7); }
+	IF expression THEN statement												{ $$ = MakeTwoBranchNode(NT_IF_ELSE, $2, $4); }
+	| IF expression block														{ $$ = MakeTwoBranchNode(NT_IF_ELSE, $2, $3); }
+	| IF expression THEN statement ELSE statement								{ $$ = MakeTwoBranchNode(NT_IF_ELSE, $2, $4); AddSubNode($$, $6); }
+	| IF expression block ELSE statement										{ $$ = MakeTwoBranchNode(NT_IF_ELSE, $2, $3); AddSubNode($$, $5); }
 	| SWITCH '(' expression ')' block											{ $$ = MakeTwoBranchNode(NT_SWITCH, $3, $5); }
 	;
 
 iterationstatement:
-	WHILE '(' expression ')' statement											{ $$ = MakeTwoBranchNode(NT_WHILE, $3, $5); }
+	WHILE expression THEN statement												{ $$ = MakeTwoBranchNode(NT_WHILE, $2, $4); }
+	| WHILE expression block													{ $$ = MakeTwoBranchNode(NT_WHILE, $2, $3); }
 	| FOR '(' forinit forcondition forincrement ')' statement					{ $$ = MakeTwoBranchNode(NT_FOR, $3, $4); AddSubNode($$, $5); AddSubNode($$, $7); }
 	| FOREACH '(' expression ')' statement										{ $$ = MakeTwoBranchNode(NT_FOREACH, $3, $5); }
 	| FOREACH '(' type IN expression ')' statement								{ $$ = MakeTwoBranchNode(NT_FOREACHIN, $3, $5); AddSubNode($$, $7); }
