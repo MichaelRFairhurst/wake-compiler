@@ -9,6 +9,10 @@ BOOST_AUTO_TEST_CASE(AddingNeedsAreGotten) {
 	PropertySymbolTable table(&analyzer);
 	Type* thefirsttype = MakeType(TYPE_CLASS);
 	Type* thesecondtype = MakeType(TYPE_CLASS);
+	thefirsttype->typedata._class.classname = strdup("");
+	thefirsttype->typedata._class.shadow = 0;
+	thesecondtype->typedata._class.classname = strdup("");
+	thesecondtype->typedata._class.shadow = 0;
 	table.addNeed(thefirsttype, 0);
 	table.addNeed(thesecondtype, 0);
 	BOOST_REQUIRE(table.getNeeds()->at(0) == thefirsttype);
@@ -87,6 +91,34 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesPropertyName) {
 
 	//freeType(methodtype);
 	freeType(parameter); freeType(parameterization);
+}
+
+BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesNeedName) {
+	TypeAnalyzer analyzer;
+	PropertySymbolTable table(&analyzer);
+	vector<Type*> parameters;
+	vector<Type*> parameterizations;
+	Type* parameter = MakeType(TYPE_PARAMETERIZED);
+	Type* parameterization = MakeType(TYPE_CLASS);
+
+	parameterization->typedata._class.classname = strdup("AClass");
+	parameter->typedata.parameterized.label = strdup("E");
+	parameters.push_back(parameter);
+	parameterizations.push_back(parameterization);
+	table.setParameters(&parameters);
+	table.addNeed(parameter, 0);
+
+	ReadOnlyPropertySymbolTable* derived = table.resolveParameters(parameterizations);
+
+	vector<Type*>* needs = derived->getNeeds();
+
+	BOOST_REQUIRE(needs->size() == 1);
+	BOOST_REQUIRE(needs->at(0)->type == TYPE_CLASS);
+	BOOST_REQUIRE(needs->at(0)->typedata._class.classname == string("AClass"));
+
+	//freeType(methodtype);
+	//freeType(parameter);
+	freeType(parameterization);
 }
 
 BOOST_AUTO_TEST_SUITE_END();

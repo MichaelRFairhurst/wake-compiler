@@ -40,7 +40,7 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 	segments_arguments.push_back(pair<string, TypeArray*>("print", arguments));
 	table.addMethod(NULL, &segments_arguments, PROPERTY_PUBLIC);
 	table.classname = "classname";
-	freeTypeArray(arguments);
+	//freeTypeArray(arguments);
 
 	writer.write(out, &table);
 

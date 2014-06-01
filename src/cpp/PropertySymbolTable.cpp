@@ -233,7 +233,15 @@ ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<Type*
 		newprop->casing = casing;
 		(*newprops)[casing] = newprop;
 	}
-	return new DerivedPropertySymbolTable(*analyzer, *needs, *newprops, parentage);
+
+	vector<Type*>* newneeds = new vector<Type*>();
+	for(auto it = needs->begin(); it != needs->end(); ++it) {
+		Type* newneed = copyType(*it);
+		parameterizer.applyParameterizations(&newneed, getParameters(), parameters);
+		newneeds->push_back(newneed);
+	}
+
+	return new DerivedPropertySymbolTable(*analyzer, *newneeds, *newprops, parentage);
 	return this;
 }
 
