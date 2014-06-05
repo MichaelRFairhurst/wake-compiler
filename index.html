@@ -38,6 +38,7 @@
 				<li><a href="#declarations">- Declaring Variables</a></li>
 				<li><a href="#optionals">- Optional Types</a></li>
 				<li><a href="#lists">- Using Lists</a></li>
+				<li><a href="#iterating">- Iterating over Lists</a></li>
 				<li><a href="#classes">Classes</a></li>
 				<li><a href="#dependencies">- Dependencies</a></li>
 				<li><a href="#properties">- Properties</a></li>
@@ -57,6 +58,8 @@
 		</div>
 		<div class="opennav"><button class="btn btn-inverse btn-small"><i class="icon-align-justify icon-white"></i></button></div>
 		<div class="content" data-spy="scroll" data-target=".mynavbar">
+			<div class="inner-content">
+
 			<div class="hero-unit" id="intro">
 				<h1>Wake The Language</h1>
 				<p>
@@ -78,7 +81,7 @@
 			<div class="row">
 				<div class="span6">
 					<h3>Wake</h3>
-<div class="alert alert-success">Code as concise as javascript, with inheritance and typesafety and more</div>
+					<div class="alert alert-success" immovable>Code as concise as javascript, with inheritance and typesafety and more</div>
 					<span class="label label-info">Wake</span>
 					<pre><code class="wake"
 >every FibGenerator is:
@@ -104,7 +107,7 @@
 				</div>
 				<div class="span6" id="javascript">
 					<h3>Javascript / <a onclick="$('#java').show();$('#javascript').hide();">Java</a></h3>
-<div class="alert alert-error">Elegant and concise, but unintiuitive, unsafe, with pitfalls all around</div>
+					<div class="alert alert-error" immovable>Elegant and concise, but unintiuitive, unsafe, with pitfalls all around</div>
 					<span class="label label-important">Javascript</span>
 					<pre><code class="javascript"
 >var <span class="badcode" title="Not clearly a class definition, and in fact, isnt always a class">FibGenerator</span> = function(<span class="badcode" title="You can ask for a console, but cannot guarantee you'll get one.">console</span>) {
@@ -130,7 +133,7 @@
 				</div>
 				<div class="span6" style="display:none" id="java">
 					<h3><a onclick="$('#java').hide();$('#javascript').show();">Javascript</a> / Java</h3>
-<div class="alert alert-error">Powerful and typesafe at the expense of clunky boilerplate</div>
+					<div class="alert alert-error" immovable>Powerful and typesafe at the expense of clunky boilerplate</div>
 					<span class="label label-important">Java</span>
 					<pre><code class="java"
 >class FibGenerator {
@@ -172,7 +175,7 @@
 					<br /><blockquote>Use provisions to keep a testable and extensible seam between every class.</blockquote>
 				</div>
 				<div class="span4">
-					<br /><div class="alert alert-success">This makes testability and flexibility a language feature.</div>
+					<br /><div class="alert alert-success" immovable>This makes testability and flexibility a language feature.</div>
 				</div>
 			</div>
 
@@ -184,7 +187,7 @@
 					<br /><blockquote>Keep the expressive, clean look of dynamic languages, with a safe type system.</blockquote>
 				</div>
 				<div class="span4">
-					<br /><div class="alert alert-success">This saves you time writing, reading, and refactoring code.</div>
+					<br /><div class="alert alert-success" immovable>This saves you time writing, reading, and refactoring code.</div>
 				</div>
 			</div>
 
@@ -196,7 +199,7 @@
 					<br /><blockquote>Reduce boiler-plate code by making constructor arguments exactly like properties.</blockquote>
 				</div>
 				<div class="span4">
-					<br /><div class="alert alert-success">This makes best practices like Aspect-Oriented-Programming intuitive.</div>
+					<br /><div class="alert alert-success" immovable>This makes best practices like Aspect-Oriented-Programming intuitive.</div>
 				</div>
 			</div>
 
@@ -208,7 +211,7 @@
 					<br /><blockquote>Eventually will add this.</blockquote>
 				</div>
 				<div class="span4">
-					<br /><div class="alert alert-success">This creates testable inheritance by increasing expressive object design.</div>
+					<br /><div class="alert alert-success" immovable>This creates testable inheritance by increasing expressive object design.</div>
 				</div>
 			</div>
 
@@ -220,7 +223,7 @@
 					<br /><blockquote>A goal of Wake is to compile into anything -- .net, java, javascript, and assembly</blockquote>
 				</div>
 				<div class="span4">
-					<br /><div class="alert alert-success">This makes Wake libraries usable in every one of your projects.</div>
+					<br /><div class="alert alert-success" immovable>This makes Wake libraries usable in every one of your projects.</div>
 				</div>
 			</div>
 
@@ -232,7 +235,7 @@
 					<br /><blockquote>Wake is part of a small class of strongly-typed, object oriented languages with functional coloring.</blockquote>
 				</div>
 				<div class="span4">
-					<br /><div class="alert alert-success">This adds concise, elegant, rapid-development to your scalable enterprise apps.</div>
+					<br /><div class="alert alert-success" immovable>This adds concise, elegant, rapid-development to your scalable enterprise apps.</div>
 				</div>
 			</div>
 
@@ -248,32 +251,32 @@
 				</tr>
 				<tr>
 					<td><b>Static methods</b></td>
-					<td><div class="alert alert-error">Using a static method from a procedure hard-codes implementation rather than interface, decreasing flexibility and testability</div></td>
+					<td><div class="alert alert-error" immovable>Using a static method from a procedure hard-codes implementation rather than interface, decreasing flexibility and testability</div></td>
 					<td><span class="label label-success">FIXED</span> You can (and usually should) now use exact type names as variable names, meaning more clarity and fewer keystrokes.</td>
 				</tr>
 				<tr>
 					<td><b>The <code>new</code> keyword</b></td>
-					<td><div class="alert alert-error"><code>new</code> mixes application APIs with implementations, and has been replaced with 'provisions.'</div></td>
+					<td><div class="alert alert-error" immovable><code>new</code> mixes application APIs with implementations, and has been replaced with 'provisions.'</div></td>
 					<td><span class="label label-success">FIXED</span> Constructors directly translate to properties since they are not functions.</td>
 				</tr>
 				<tr>
 					<td><b>Interface/extension distinction</b></td>
-					<td><div class="alert alert-error">A common best practice is to create an interface for every class, even before its used, resulting in junk code and extra boilerplate.</div></td>
+					<td><div class="alert alert-error" immovable>A common best practice is to create an interface for every class, even before its used, resulting in junk code and extra boilerplate.</div></td>
 					<td><span class="label label-success">FIXED</span> In Wake you can use any class as an interface, making everything driven by APIs without any additional code.</td>
 				</tr>
 				<tr>
 					<td><b>Abstract classes</b></td>
-					<td><div class="alert alert-error">Abstract classes are a combination of an interface and a class, or a means of locking a class to static methods.</div></td>
+					<td><div class="alert alert-error" immovable>Abstract classes are a combination of an interface and a class, or a means of locking a class to static methods.</div></td>
 					<td><span class="label label-success">FIXED</span> We let the compiler tell you if a class is incomplete, not vice versa, without any management on your part.</td>
 				</tr>
 				<tr>
 					<td><b>Primitive types</b></td>
-					<td><div class="alert alert-error">Primitive types are fast, but without methods they require external behavior to manipulate them.</div></td>
+					<td><div class="alert alert-error" immovable>Primitive types are fast, but without methods they require external behavior to manipulate them.</div></td>
 					<td><span class="label label-success">FIXED</span> The compiler handles autoboxing primitives into objects - <code>Num</code>, <code>Bool</code>, <code>Text</code>, etc - and lets you code without managing the conversion.</td>
 				</tr>
 				<tr>
 					<td><b>Cryptic keywords</b></td>
-					<td><div class="alert alert-error"><code>Abstract</code>, <code>virtual</code>, <code>volatile</code>, and other cryptic keywords from the 1970s convey very little about what they actually do.</div></td>
+					<td><div class="alert alert-error" immovable><code>Abstract</code>, <code>virtual</code>, <code>volatile</code>, and other cryptic keywords from the 1970s convey very little about what they actually do.</div></td>
 					<td><span class="label label-success">FIXED</span> New programmers will find every keyword to be simple, and meaningful, from <code>Truth</code> to <code>Text</code> to <code>capable</code>.</td>
 				</tr>
 			</table>
@@ -296,7 +299,7 @@
 					<pre><code class="wake"
 >every Person is:
 
-    needs <span class="goodcode" title="You can tell the compiler its an int called ID, or, when you want, simply call it an Num.">Num</span>;
+    needs <span class="goodcode" title="You can tell the compiler its an Num called ID, or, when you want, simply call it an Num.">Num</span>;
 
     Num -- getId() {
         return <span class="goodcode" title="Here we use our Num ID, that we simply chose to call 'Num.'">Num</span>;
@@ -402,6 +405,7 @@
 			<h3 id="optionals">Optional Types <span class="label label-inverse">typesafe</span></h3>
 			<p>Wake will guarantee the existence of most variables, arguments, and return types. This prevents rogue NullPointerExceptions, or segfaults, or fatal errors that large apps in other languages frequently succumb to.</p>
 			<p>The flip side to this is that when a value may not exist, it must be declared <i>optional</i> with <code>?</code>. Before using an optional type, the compiler ensures you have accounted for the possibility of it not existing with <code>exists</code> clauses.</p>
+			<span class="label label-info">Wake</span>
 			<pre><code class="wake"
 >every OptionalTypeUsage is:
 
@@ -420,6 +424,7 @@
 				Until further releases, reading an unassigned list index results in undefined behavior, like in C/C++. Later on it will throw exceptions.
 			</div>
 			<p>Lists (called Arrays in many other languages) are a way of storing sets of a particular type. They are incredibly useful.</p>
+			<span class="label label-info">Wake</span>
 			<pre><code class="wake"
 >every ListUsage is:
 
@@ -427,9 +432,35 @@
         <span class="goodcode" title="Set the first Num in the list.">Num[0] = 5;</span>
         <span class="goodcode" title="Declare an empty list of Nums again.">var $Num[] = [];</span>
         <span class="goodcode" title="Declare a list of Nums again, except with three starting values.">var $$Num[] = [1, 2, 3];</span>
-        <span class="goodcode" title="Declare a list lists of Nums, containing our lists of ints.">var combined $Num[][] = [Num[], $Num[], $$Num[]];</span>
+        <span class="goodcode" title="Declare a list lists of Nums, containing our lists of Nums.">var combined Num[][] = [Num[], $Num[], $$Num[]];</span>
     }</code></pre>
+			<div class="alert alert-warning">You will get an error if you try to declare <code>Num[]</code> in the same scope as <code>Num[][]</code>, and for good reason.</div>
+			<p>Unless lists of lists in wake to look like <code>Num[][0]</code> or <code>Num[0][]</code>, we must face an ambiguity problem when <code>Num[]</code> and <code>Num[][]</code> share a scope. Since <code>Num[0]</code> is the correct syntax for both of these variables, the compiler forces you to rename one or the other. This is not the case for <code>Num[]</code> and <code>Num</code>.</p>
 			<hr />
+
+			<h3 id="iterating">Iterating over Lists <span class="label label-inverse">concise</span> <span class="label label-inverse">readable</span> <span class="label label-inverse">typesafe</span></h3>
+			<p>Since Wake blurs the line between variables and types, we can boast the smallest foreach loop of any language.</p>
+			<span class="label label-info">Wake</span>
+			<pre><code class="wake"
+>every PersonDatabase is:
+
+    delete(Person[]) {
+        foreach(<span class="goodcode" title="The compiler reduces Person[] to Person, and performs the following code for each person in our list.">Person[]</span>) Person.delete();
+    }</code></pre>
+			<div class="alert alert-success">This works as you would expect for shadowed variables, where <code>$Person[]</code> becomes <code>$Person</code>. And it also works for expressions, where <code>foreach(db.getPeople())</code> lets you iterate over <code>Person</code>, since the compiler knows your db returns <code>Person[]</code>.</div>
+			<p>Wake also plans to support other foreach constructs, such as:</p>
+			<span class="label label-info">Wake</span>
+			<pre><code class="wake"
+>every PersonDatabase is:
+
+    delete(Person[]) {
+        foreach(<span class="goodcode" title="Explicitly name the variable you're iterating over.">$Person</span> in Person[]) $Person.delete();
+        foreach(person in Person[]) person.delete();
+        foreach(Person[] <span class="goodcode" title="Sometimes its important to know the index of which Person you're iterating over.">at Num</span>) <span class="goodcode" title="Make each person greet themselves - Person and Person[Num] are equivalent.">Person.greet(Person[Num]);</span>
+        foreach(person in Person[] at Num) person.greet(Person[Num]);
+    }</code></pre>
+			<br />
+
 			<h1 id="classes">Classes in Wake <span class="label label-inverse">concise</span> <span class="label label-inverse">readable</span></h1>
 			<p>Wake is a truly Object Oriented language, and should come with few surprises here.</p>
 			<p>In Wake, everything is an object. A class declaration begins with the keyword <code>every</code> as seen below. Within that definition can be properties, dependencies, a constructor, methods, and provisions.</p>
@@ -450,6 +481,7 @@
     }</code></pre>
 			<h3 id="dependencies">Dependencies <span class="label label-inverse">concise</span> <span class="label label-inverse">testable</span></h3>
 			<p>When an object is constructed, first the dependencies are all resolved by means of provisions. This means that you can simply say your object <code>needs Printer</code>, and you will always have one.</p>
+			<span class="label label-info">Wake</span>
 			<pre><code class="wake"
 >every FileStream is:
     needs Text filename, <span class="goodcode" title="needs can be public properties, too.">public OutStream;</span></code></pre>
@@ -505,6 +537,7 @@ every SubClass (<span class="goodcode" title="Subclass extends BaseClass, meanin
     methodWith(Num)ArgumentAnd(Text)Argument() {}</code></pre>
 			<h3 id="invoking">Invoking Methods <span class="label label-inverse">readable</span></h3>
 			<p>Invoking methods (that is, calling a method's code on a particular object and argument set) looks almost exactly like defining one.</p>
+			<span class="label label-info">Wake</span>
 			<pre><code class="wake"
 >every MethodInvoker is:
 
@@ -512,8 +545,9 @@ every SubClass (<span class="goodcode" title="Subclass extends BaseClass, meanin
         <span class="goodcode" title="Now that we've defined methodWithArgument(Truth), we invoke it inside a Wake statement.">methodWithArgument(!Truth);</span>
     }</code></pre>
 		<h3 id="overloading">Method Overloading <span class="label label-inverse">readable</span> <span class="label label-inverse">concise</span></h3>
-		<div class="alert alert-error">Method overloading can create more confusion than it prevents. It may be removed from Wake in the future.</div>
+		<div class="alert alert-warning">Method overloading can create more confusion than it prevents. As a general rule, avoid using overloading and aliases together for the clearest code.</div>
 		<p>Method overloading exists in C++ and java. A method can accept differently typed objects, and have different behaviors for each. Used properly, it creates shorter method names that focus on behavior rather than implementation.</p>
+			<span class="label label-info">Wake</span>
 		<pre><code class="wake"
 >every CrossTypeComparator is:
     Truth -- compare( Text )And( $Text ) {
@@ -527,6 +561,7 @@ every SubClass (<span class="goodcode" title="Subclass extends BaseClass, meanin
 		<h1 id="provisions">Provisions <span class="label label-inverse">flexible</span> <span class="label label-inverse">testable</span> <span class="label label-inverse">typesafe</span></h1>
 		<p>Testability was a huge goal of Wake's design. We were inspired by dependency injection frameworks to make a faster, typesafe means of binding dependencies to behavior. What we came up with is provisions.</p>
 		<p>What in other languages may be a static method, or a call to <code>new</code> another object, or a helper function call, instead is fetched from a provider. Here we look at how.</p>
+			<span class="label label-info">Wake</span>
 		<pre><code class="wake"
 >every UsesProvider is:
 
@@ -539,6 +574,7 @@ every SubClass (<span class="goodcode" title="Subclass extends BaseClass, meanin
 		<div class="alert alert-info">Generics are required for a powerful static type system. Unlike wake, Java and C# did not have generics in early versions. As such, the type safety and performance of arrays in these languages was thrown out to accomodate missing flexibility. Wake had generics from version one and does not suffer these drawbacks.</div>
 		<div class="alert alert-info">The wake syntax uses curly braces instead of angle brackets for generics. This simple difference speeds up compilation and makes parsing easier for independent programs, as it is a 100% context-free grammar.</div>
 		<div class="alert alert-error">These examples use function types that are not yet implemented.</div>
+			<span class="label label-info">Wake</span>
 		<pre><code class="wake"
 >every CalculationCache<span class="goodcode" title="A calculation cache holds a value of any type T.">{T}</span> is:
     with <span class="goodcode" title="This may hold an integer, text, a class, or even yet another calculation cache. Calling code decides.">T?</span> = <span class="goodcode" title="Begin the cache as empty">nothing</span>;
@@ -550,6 +586,7 @@ every SubClass (<span class="goodcode" title="Subclass extends BaseClass, meanin
         return T;
     }</code></pre>
 	<p>The type information of a generic is deffered until the moment where its used. For those unfamiliar with generics, using one would look like this.</p>
+			<span class="label label-info">Wake</span>
 		<pre><code class="wake"
 >every Squarer is:
     needs Num;
@@ -560,6 +597,7 @@ every SubClass (<span class="goodcode" title="Subclass extends BaseClass, meanin
     }</code></pre>
 		<h3 id="plainprovisions">Defining Plain Provisions <span class="label label-inverse">concise</span> <span class="label label-inverse">typesafe</span></h3>
 		<p>A plain provision simply marks that your class can provide a type. The compiler will ensure that you can provide all of that type's dependencies as well.</p>
+			<span class="label label-info">Wake</span>
 		<pre><code class="wake"
 >every Provider is:
 
@@ -567,6 +605,7 @@ every SubClass (<span class="goodcode" title="Subclass extends BaseClass, meanin
 
 		<h3 id="subtypeprovisions">Providing Subtypes <span class="label label-inverse">flexible</span> <span class="label label-inverse">testable</span> <span class="label label-inverse">typesafe</span></h3>
 		<p>The point of provisions is to make all dependencies or created objects be replacable with subtypes, at the creator's discretion. This is called Inversion Of Control. You can provide mock objects for testing, easily swap logging methods, and more.</p>
+			<span class="label label-info">Wake</span>
 		<pre><code class="wake"
 >every Provider is:
 
@@ -574,6 +613,7 @@ every SubClass (<span class="goodcode" title="Subclass extends BaseClass, meanin
 
 		<h3 id="specializedprovisions">Specialized Provisions <span class="label label-inverse">typesafe</span> <span class="label label-inverse">flexible</span></h3>
 		<p>Sometimes a classname is not detailed enough to know your dependencies will be properly provided. Using what we call Specialties, you can provide and require specific objects.</p>
+			<span class="label label-info">Wake</span>
 		<pre><code class="wake"
 >every DBProvider is:
 
@@ -586,6 +626,7 @@ every User is:
     needs <span class="goodcode" title="Here we require the Default DBConnection.">DBConnection:Default</span>;</code></pre>
 		<h3 id="primitiveprovisions">Primitive Provisions <span class="label label-inverse">typesafe</span></h3>
 		<p>Primitive provisions cannot be plain, since the compiler can't tell you what Num to provide. Additionally, they must be specified, to ensure you get the right value. These are the equivalent of constants in Wake, and bind directly to a primitive value.</p>
+			<span class="label label-info">Wake</span>
 		<pre><code class="wake"
 >every PrimitiveProvider is:
 
@@ -593,6 +634,7 @@ every User is:
 
 		<h3 id="ctorprovisions">Constructor Provisions <span class="label label-inverse">flexible</span></h3>
 		<p>We call this constructor provision since it most closely resembles constructors in languages like Java. However, it is merely a way of matching provisions to specific dependencies.</p>
+			<span class="label label-info">Wake</span>
 		<pre><code class="wake"
 >every Provider is:
     provides
@@ -602,8 +644,8 @@ every User is:
 		<p>If a class with needs extends another class with needs, constructor provisions require that you supply all of these. When doing this, supply the childclass needs first, and then the parent class needs, in that order. And don't worry, the compiler will make sure you don't mess up.</p>
         <span class="goodcode" title="Constructor provisions do not require specialization.">User</span> &lt;- <span class="goodcode" title="Constructor provisions can be used with subtype provision simultaneously.">TestUser</span>(DBConnection:Test);</code></pre>
 		<h3 id="behavioralprovisions">Behavioral Provisions <span class="label label-inverse">flexible</span></h3>
-		<div class="alert alert-error">These are not supported quite just yet.</div>
 		<p>Provisions can be treated as a code body with a return type where necessary. Note that the end result must be a provision; however it can be used to configure objects or provide different objects conditionally, or create a singleton.</p>
+			<span class="label label-info">Wake</span>
 		<pre><code class="wake"
 >every Provider is:
 
@@ -614,7 +656,7 @@ every User is:
     provides
         Text:SessionFile,
         Session &lt;- <span class="goodcode" title="This, together with our constructor, guarantees that we only distribute one session, and that its been properly loaded.">{ return Session; }</span>;</code></pre>
-		</div>
+		</div></div>
 		<script src="bootstrap/js/bootstrap.min.js"></script>
 	</body>
 </html>

@@ -1,3 +1,9 @@
+.inner-content {
+	max-width: 1100px;
+	margin: auto;
+	padding: 5px;
+}
+
 @media only screen and (max-width: 800px) {
 
 	/* Force table to not be like tables anymore */
@@ -84,12 +90,10 @@
 	background: url(/bg.png);
 	overflow-x: hidden;
 	overflow-y: auto;
-	max-width: 100%;
 	left: 270px;
 	right: 0px;
 	top: 0px;
 	bottom: 0px;
-	padding: 10px;
 	position: fixed;
 }
 
@@ -123,7 +127,12 @@ span.goodcode {
 	border-radius: 4px;
 }
 
+pre {
+	margin-bottom: 45px;
+}
+
 .label-info, .label-important {
+	margin-top: 20px;
 	padding-bottom: 8px;
 	margin-bottom: -5px;
 	display: block;
