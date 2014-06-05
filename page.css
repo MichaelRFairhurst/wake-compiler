@@ -138,3 +138,11 @@ pre {
 	display: block;
 	padding-top: 3px;
 }
+
+code {
+	overflow: hidden;
+}
+
+.span6 {
+	max-width: 95%;
+}
