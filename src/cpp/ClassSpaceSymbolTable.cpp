@@ -89,10 +89,16 @@ void ClassSpaceSymbolTable::propagateInheritance() {
 }
 
 void ClassSpaceSymbolTable::propagateInheritanceToParent(string childname) {
+	cout << childname << endl;
+	bool defined = classes.find(childname)->second.second;
+	if(!defined) return;
+	cout << "wasn't skipped" << endl;
+
 	pair<PropertySymbolTable*, bool>* current = &inheritances_gathered.find(childname)->second;
 	if(current->second) return; // Already propagated
 
 	for(map<string, bool>::iterator it = current->first->parentage.begin(); it != current->first->parentage.end(); ++it) {
+		cout << "propagate to " << childname << " from " << it->first << endl;
 		propagateInheritanceToParent(it->first);
 		propagateInheritanceTables(current->first, findModifiable(it->first), it->second);
 	}

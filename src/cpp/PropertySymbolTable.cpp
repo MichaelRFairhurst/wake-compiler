@@ -185,16 +185,15 @@ void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable*
 				child->abstract = true;
 			}
 			child->properties[it->first] = propagate;
+
+			if(extend && propagate->flags & PROPERTY_NEED) {
+				child->analyzer->assertNeedIsNotCircular(child->classname, propagate->type);
+				child->getNeeds()->push_back(propagate->type);
+			}
+
 		} else {
 			searcher->second->address = it->second->address;
 		}
-	}
-
-	if(!extend) return;
-
-	for(auto it = parent->getNeeds()->begin(); it != parent->getNeeds()->end(); ++it) {
-		child->analyzer->assertNeedIsNotCircular(child->classname, *it);
-		child->getNeeds()->push_back(*it);
 	}
 }
 
