@@ -91,6 +91,7 @@
 	overflow-x: hidden;
 	overflow-y: auto;
 	left: 270px;
+	right: 0px;
 	top: 0px;
 	bottom: 0px;
 	position: fixed;
@@ -136,9 +137,4 @@ pre {
 	margin-bottom: -5px;
 	display: block;
 	padding-top: 3px;
-}
-
-code {
-	max-width: 100%;
-	overflow: elipsis;
 }

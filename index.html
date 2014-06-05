@@ -524,7 +524,11 @@ every SubClass (<span class="goodcode" title="Subclass extends BaseClass, meanin
 			<div class="alert alert-info">
 				Methods in Wake can look strange at first. The changes are simple and make your APIs read like sentences.
 			</div>
-			<p>In java, a detailed method signature may look like <code>addExaminerToContractWithMedicalCompany(Examiner examiner, MedicalCompany company)</code>. We decided we can do better. In Wake you could rewrite that method as <code>add( Examiner )ToContractWith( MedicalCompany )</code>. Here are some examples:</p>
+			<p>In java, a detailed method signature may look like:</p>
+			<code style="display: block">addExaminerToContractWithMedicalCompany(Examiner examiner, MedicalCompany company)</code>
+			<p>We decided we can do better. In Wake you could rewrite that method as:</p>
+			<code style="display: block">add(Examiner)ToContractWith(MedicalCompany)</code>
+			<p>Here are some examples:</p>
 			<span class="label label-info">Wake</span>
 			<pre><code class="wake"
 >every MethodExample is:
