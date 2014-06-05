@@ -137,3 +137,8 @@ pre {
 	display: block;
 	padding-top: 3px;
 }
+
+code {
+	max-width: 100%;
+	overflow: elipsis;
+}
