@@ -2342,4 +2342,10 @@ PTT_TEST_CASE(
 	PTT_EXPECT(DIRECT_USE_OF_OPTIONAL_TYPE)
 );
 
+PTT_TEST_CASE(
+	TestDuplicatePropertiesThrowsAlreadyDefined,
+	"every MyClass is: needs Num one, Num one;",
+	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)
+);
+
 BOOST_AUTO_TEST_SUITE_END()
