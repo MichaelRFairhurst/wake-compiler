@@ -299,3 +299,11 @@ fs.existsSync = fs.existsSync || require("path").existsSync;
 	};
 
 };
+
+~Argv~ = function() {
+
+	this.`getArgv()` = function() {
+		return process.argv;
+	};
+
+};

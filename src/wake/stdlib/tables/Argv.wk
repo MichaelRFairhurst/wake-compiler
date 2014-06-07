@@ -1,0 +1,5 @@
+import Text;
+
+every Argv is:
+
+	Text[] -- getArgv() { var Text[] = []; return Text[]; }
