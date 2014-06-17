@@ -1,4 +1,5 @@
 var$ b='';
+var$ require = require || function() { return {}; };
 var$ fs = require("fs");
 fs.existsSync = fs.existsSync || require("path").existsSync;
 
