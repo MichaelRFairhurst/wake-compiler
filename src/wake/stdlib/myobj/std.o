@@ -287,9 +287,15 @@ fs.existsSync = fs.existsSync || require("path").existsSync;
 	};
 
 	this.`seek(Num)` = function(e) {
-		if(!c) { throw$ Error("File$ no$ longer$ open"); }
+		if(!c) {
+			throw$ Error("File$ no$ longer$ open");
+		}
 		b = e;
 	};
+
+	this.`eof()` = function() {
+		return a.atEndOfStream;
+	}
 
 };
 

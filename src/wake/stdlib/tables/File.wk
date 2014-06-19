@@ -49,3 +49,5 @@ every File is:
 	Num -- tell() { return 0; }
 
 	seek(Num) { }
+
+	Bool -- eof() { return true; }
