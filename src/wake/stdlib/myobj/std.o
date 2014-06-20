@@ -294,7 +294,7 @@ fs.existsSync = fs.existsSync || require("path").existsSync;
 	};
 
 	this.`eof()` = function() {
-		var$ f = new$ Buffer(e),
+		var$ f = new$ Buffer(1),
 			g = fs.readSync(d, e, 0, 1, b) === 1;
 
 		this.`seek(Num)`(this.`tell()`() - 1);
