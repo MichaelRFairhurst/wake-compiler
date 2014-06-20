@@ -119,7 +119,7 @@ fs.existsSync = fs.existsSync || require("path").existsSync;
 	};
 
 	this.`substr(Num)` = this.`substr(Num,Num)` = function(b, c) {
-		return$ a.substr(b, c);
+		return$ a.slice(b, c);
 	};
 
 	this.`parseNum()` = function() {
@@ -294,7 +294,12 @@ fs.existsSync = fs.existsSync || require("path").existsSync;
 	};
 
 	this.`eof()` = function() {
-		return a.atEndOfStream;
+		var$ b = this.`read(Num)`(1),
+			c = b === undefined;
+		console.log(b);
+
+		this.`seek(Num)`(this.`tell()`() - 1);
+		return$ c;
 	}
 
 };

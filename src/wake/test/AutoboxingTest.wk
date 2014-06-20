@@ -118,7 +118,7 @@ every AutoboxingTest is:
 		Asserts.that("hello".substr(0, 10))Equals("hello");
 		Asserts.that("hello".substr(1))Equals("ello");
 		Asserts.that("hello".substr(1, 10))Equals("ello");
-		Asserts.that("hello".substr(1, 3))Equals("ell");
+		Asserts.that("hello".substr(1, 3))Equals("el");
 	}
 
 	testNumToString(Asserts) {

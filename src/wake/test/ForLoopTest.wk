@@ -74,3 +74,11 @@ every ForLoopTest is:
 			Asserts.fail("Shouldn't have reached here...");
 		}
 	}
+
+	~[ test break stops loop ]~(Asserts) {
+		while(true) {
+			break;
+			Asserts.fail("Didn't break in loop");
+			return;
+		}
+	}
