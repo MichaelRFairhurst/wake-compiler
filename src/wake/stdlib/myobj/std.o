@@ -199,11 +199,11 @@ fs.existsSync = fs.existsSync || require("path").existsSync;
 	};
 
 	this.`getBasename()` = function() {
-		return$ require('Path').basename(a);
+		return$ require('path').basename(a);
 	};
 
 	this.`getDirname()` = function() {
-		return$ require('Path').dirname(a);
+		return$ require('path').dirname(a);
 	};
 
 	this.`isFile()` = function() {
@@ -294,12 +294,11 @@ fs.existsSync = fs.existsSync || require("path").existsSync;
 	};
 
 	this.`eof()` = function() {
-		var$ b = this.`read(Num)`(1),
-			c = b === undefined;
-		console.log(b);
+		var$ f = new$ Buffer(e),
+			g = fs.readSync(d, e, 0, 1, b) === 1;
 
 		this.`seek(Num)`(this.`tell()`() - 1);
-		return$ c;
+		return$ g;
 	}
 
 };
