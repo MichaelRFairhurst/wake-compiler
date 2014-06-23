@@ -60,7 +60,7 @@ every Main is:
 	needs Printer;
 
 	main() {
-		Printer.print('Hello World!');
+		Printer.printLine('Hello World!');
 	}
 				<?php endif; ?></textarea>
 			</div>
