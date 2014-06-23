@@ -1,5 +1,11 @@
-var$ b='';
-if(require === undefined) var require = function() { return {}; };
+var$ b='', r;
+
+if(typeof$ require === 'undefined')
+	r = function() { return {}; };
+else r = require;
+
+var$ require = r;
+
 var$ fs = require("fs");
 fs.existsSync = fs.existsSync || require("path").existsSync;
 
