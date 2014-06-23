@@ -10,7 +10,7 @@ $binroot = $root . '/wake-compiler/bin';
 
 $command1 = '';
 $command2 = '';
-$output = '';
+$compiler_output = '';
 
 if($code) {
 	putenv("LD_LIBRARY_PATH=" . getenv("LD_LIBRARY_PATH") . ":$root/boostpackage/libs");
@@ -96,13 +96,15 @@ every Main is:
 		<pre><?php echo $compiler_output; ?></pre>
 <?php endif; ?>
 
-<?php if(file_exists(@$filename . '.js')): ?>
+<?php if($code): ?>
+	<?php if(file_exists(@$filename . '.js')): ?>
 		<h3>Compilation Result:</h3>
 
 		<pre><?php echo htmlentities(file_get_contents($filename . '.js')); ?></pre>
-<?php else: ?>
+	<?php else: ?>
 		<h3>No compilation result.</h3>
-<?php endif; ?>
+	<?php endif; ?>
+<?php endif;?>
 		</form>
 		<?php if(file_exists(@$filename . '.js')): ?>
 		<input type="button" onclick="eval(document.getElementById('result').value);" value="Eval it"/>
