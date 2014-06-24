@@ -674,8 +674,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					real->optional = 0;
 
 					if(tree->node_data.nodes[0]->node_type == NT_MEMBER_ACCESS) {
-						scopesymtable->pushScope();
-						scopesymtable->add(real);
+						errors->addError(new SemanticError(TYPE_ERROR, "Calling exists { } on a property is illegal as it is a shared reference and therefore might be unset amid the scope"));
 					} else {
 						scopesymtable->addOverwriting(real);
 					}

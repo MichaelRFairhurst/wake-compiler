@@ -24,8 +24,9 @@ every SimpleGeneric{T1, T2} is:
 	}
 
 	T1 -- getT1Otherwise($T1) {
-		if T1 exists {
-			return T1;
+		var $$T1? = T1;
+		if $$T1 exists {
+			return $$T1;
 		}
 		return $T1;
 	}
@@ -35,8 +36,9 @@ every SimpleGeneric{T1, T2} is:
 	}
 
 	T2 -- getT2Otherwise($T2) {
-		if T2 exists {
-			return T2;
+		var $$T2? = T2;
+		if $$T2 exists {
+			return $$T2;
 		}
 		return $T2;
 	}

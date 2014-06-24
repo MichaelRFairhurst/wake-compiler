@@ -2348,4 +2348,14 @@ PTT_TEST_CASE(
 	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)
 );
 
+PTT_TEST_CASE(
+	TestExistsOnAPropertyIsDisallowed,
+	"every MyClass is:						\n\
+		with Num? = nothing;				\n\
+		callExistsOnProperty() {			\n\
+			if Num exists {}				\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+);
+
 BOOST_AUTO_TEST_SUITE_END()
