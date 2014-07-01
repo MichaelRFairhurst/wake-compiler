@@ -64,6 +64,18 @@ TESTOBJS=$(addprefix bin/tests/, $(TESTNAMES:.cpp=.o))
 
 include wmake.mk
 
+prefix=/usr/local
+
+install: bin/wake
+	mkdir -p $(prefix)/bin
+	mkdir -p $(prefix)/share/wake/stdtable
+	mkdir -p $(prefix)/share/wake/stdobj
+	install -m 0755 bin/wake $(prefix)/bin
+	install -m 0644 $(WAKETABLEOBJS) $(prefix)/share/wake/stdtable
+	install -m 0644 bin/wakeobj/std.o $(prefix)/share/wake/stdobj
+
+.PHONY: install
+
 windowsbuildready: $(GENOBJS) $(WAKETABLEINCLUDES) bin/wakeobj/std.o
 	zip windowsbuildready -r .
 
