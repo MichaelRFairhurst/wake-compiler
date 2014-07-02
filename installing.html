@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Wake The Language</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<!-- Bootstrap -->
+		<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+		<link rel="stylesheet" href="/highlight.js/styles/tomorrow.css">
+		<script src="/highlight.js/highlight.pack.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script type="text/javascript" src="page.js"></script>
+		<link rel="stylesheet" type="text/css" href="page.css">
+	</head>
+	<body>
+		<div class="mynavbar">
+			<ul class="nav nav-tabs nav-stacked">
+				<li><a href="index.html">Wake Home</a></li>
+				<li><a href="howto.htmtl">Getting Started Guide</a></li>
+			</ul>
+		</div>
+		<div class="opennav"><button class="btn btn-inverse btn-small"><i class="icon-align-justify icon-white"></i></button></div>
+		<div class="content" data-spy="scroll" data-target=".mynavbar">
+			<div class="inner-content">
+			<div class="hero-unit" id="intro">
+				<h1>Wake The Language</h1>
+				<p>
+					Wake is a fast, expressive, typesafe language that gives you testability from the ground up.
+				</p>
+			</div>
+
+			<h1 id="installing">Installing</h1>
+
+			<h3>On Mac OS X</h3>
+
+			<p>Mac is the easiest place to begin wake developmment. Simply install node, brew, and xcode, and then run <code>brew install wake.</code></p>
+			<p>Clone the wake project seed and follow the other steps in the <a href="howto.html">getting started guide</a> once that is successful.</p>
+
+			<h3>On Windows</h3>
+			<p>Coming soon!</p>
+
+			<h3>On Linux</h3>
+			<p>Install boost, flex, and bison developer libraries compiled with C++11 ABIs, and then clone the wake source repository. Using gcc-4.8 or newer (maaaybe 4.7), run <code>make bin/wake TEST=false</code> and then <code>sudo make install</code>. Of course, you'll need node to run the code.</p>
+			<p>Any help making packages for ubuntu, centos, arch, etc would be appreciated!</p>
+
+		</div>
+		</div>
+
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+	</body>
+</html>

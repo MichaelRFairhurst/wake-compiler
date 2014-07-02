@@ -59,25 +59,10 @@
 			</div>
 
 			<h1 id="installing">Installing</h1>
-			<p>I still need to build for windows, so somebody help me out with this. I've done it before, you just need gnu for windows and then some common libraries like yacc and lexx</p>
-			<p>On linux, clone the github repo, run <code>yum install bison-devel flex-devel libboost-devel</code> and then <code>make TEST=false</code> to get bin/wake and bin/wakeobj/libstd.o and bin/waketables/.</p>
-			<p>Once built, you simply need wake.exe in your PATH.</p>
-			<p>You should also choose a place for where the standard library will live. This consists of two parts: stdlib.o and a directory of .table files. At the moment, the compiler can only use one directory of .table files, so you'll have to copy these files into every project.</p>
-			<p>At the moment wake only compiles into javascript, so install node too, if you want to run anything!</p>
-			<p>I recommend something like this, in ~/wake</p>
-			<pre>
-~/wake
-  ├──installation/
-  │  ├──wake.exe
-  │  ├──stdlib.o
-  │  └──tables/
-  │     └──{table files here}
-  └──projects/
-     └──{project folders here}
-</pre>
-<br/>
+			<p>first you need to <a href="installing.html">install wake</a>.</p>
+
 			<h1 id="firstprogram">A first program</h1>
-			<p>Create the following directory structure wherever you'd like your project to live</p>
+			<p>Begin by cloning the git project seed with the command <code>git clone http://github.com/MichaelRFairhurst/wake-project-seed.git</code>. It will create a project with the following directory structure:</p>
 			<pre>
 ~/projects
   └──YourFirstProject/
@@ -86,12 +71,15 @@
      │  │  └──{compiled files here}
      │  └──tables/
      │     └──{stlib tables and your tables here}
-     └──src/
-        ├──Main.wk
-        └──Hello.wk
+     ├──lib/
+     │  ├──obj/
+     │  │  └──{3rd party library objects here}
+     │  └──tables/
+     │     └──{3rd party library tables here}
+     ├──src/
+     └──test/
 </pre>
-			<p>Copy all the table files from ~/wake/installation/tables/ into ~/projects/YourFirstProject/bin/obj/tables. This step won't always be necessary! :)</p>
-			<p>Then put this source code in these files. This program doesn't need two files, but its a good introduction to provisions.</p>
+			<p>All you need to do is run <code>make</code> from this directory to build and test your code. Test files go in the test directory and source files go in src. So lets start writing code!</p>
 			<span class="label label-info">Main.wk</span>
 			<pre><code class="wake"
 >import Printer;
@@ -128,6 +116,7 @@ every Hello is:
 		<Br/>
 
 		<h1 id="compiling">Compiling</h1>
+		<div class="alert-warning">Note: this section is no longer necessary to read. Simply running <code>make</code> will rebuild and retest all out-of-date files if you cloned the wake project seed.</div>
 		<p>To compile a wake program, we have to compile each file separately and then link them all together in the end. Additionally, at the moment, we have to be careful about the order we compile things in. Each file you compile needs to know the table directory to read & write from. The linker stage needs to know where your program begins, requiring the table directory, and where to find the standard library.</p>
 		<p>In the wake compiler source code, we automatically compile the standard library and some test files. It uses the program <code>make</code> to manage compilation order and rebuilding stale files. If you know make, it pairs well with wake.</p>
 		<p>If you don't know or don't want to use make, then either run these commands by hand or put them in a script.</p>
@@ -139,7 +128,7 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
 		<p>You can use <code>-c</code> instead of <code>--mainclass</code>, and <code>-m</code> instead of <code>--mainmethod</code> if you'd like, and if you start at <code>Main.main()</code> you can skip these options entirely. Eventually most all of these command switches will have default values like this.</p>
 
 				<h1 id="stdlib">Standard Library</h1>
-				<p>stub</p>
+				<p>There isn't much development on the standard library yet.</p>
 				<br/>
 				<h3 id="ints">Num</h3>
 				<p>stub</p>
@@ -251,8 +240,11 @@ every Person is:
 			<pre><code class="wake"
 >every ParentClass is:
 
-    myMethod() { } // this is inaccessible from Childclass.myMethod() !!
-    parent_myMethod() { } // but this IS accessible
+    myMethod() {
+        // this is inaccessible from Childclass.myMethod() !!
+        // call parent_myMethod from here
+	}
+    parent_myMethod() { } // since this method IS accessible from both classes
 
 every ChildClass is:
 
