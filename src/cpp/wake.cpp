@@ -34,7 +34,7 @@ void writeTableFiles(std::string dirname, ClassSpaceSymbolTable& table) {
 	vector<PropertySymbolTable*> tables = table.getDefinedClasses();
 	for(auto it = tables.begin(); it != tables.end(); ++it) {
 		fstream file;
-		file.open((dirname + "/" + (*it)->classname + ".table").c_str(), ios::out);
+		file.open((dirname + "/" + (*it)->classname + ".table").c_str(), ios::out | ios::binary);
 		TableFileWriter writer;
 		writer.write(file, *it);
 		file.close();
