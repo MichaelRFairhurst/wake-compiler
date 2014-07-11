@@ -278,7 +278,7 @@
 				<tr>
 					<td><b>Cryptic keywords</b></td>
 					<td><div class="alert alert-error" immovable><code>Abstract</code>, <code>virtual</code>, <code>volatile</code>, and other cryptic keywords from the 1970s convey very little about what they actually do.</div></td>
-					<td><span class="label label-success">FIXED</span> New programmers will find every keyword to be simple, and meaningful, from <code>Truth</code> to <code>Text</code> to <code>capable</code>.</td>
+					<td><span class="label label-success">FIXED</span> New programmers will find every keyword to be simple, and meaningful, from <code>Text</code> to <code>capable</code> to <code>needs</code>.</td>
 				</tr>
 			</table>
 
@@ -300,13 +300,13 @@
 					<pre><code class="wake"
 >every Person is:
 
-    needs <span class="goodcode" title="You can tell the compiler its an Num called ID, or, when you want, simply call it an Num.">Num</span>;
+    needs <span class="goodcode" title="You can tell the compiler its a Num called ID, or, when you want, simply call it a Num.">Num</span>;
 
     Num -- getId() {
         return <span class="goodcode" title="Here we use our Num ID, that we simply chose to call 'Num.'">Num</span>;
     }
 
-    Truth -- isSameAs(<span class="goodcode" title="Save yourself writing 'Person' twice, and you get the benefit of <i>knowing</i> that Person is a Person.">Person</span>) {
+    Bool -- isSameAs(<span class="goodcode" title="Save yourself writing 'Person' twice, and you get the benefit of knowing that Person is a Person.">Person</span>) {
         return getId() == <span class="goodcode" title="Clear, concise, and the programmer knows the type as well as the compiler.">Person</span>.getId();
     }</code></pre>
 				</div>
@@ -346,7 +346,7 @@
         return <span class="goodcode" title="Here we use our Num by its alias, id. We know that it is not a typename.">id</span>
     }
 
-    setIdThenSave(<span class="goodcode" title="You can precede variables with aliases.">newid Num</span>, <span class="goodcode" title="You can also precede variables by their type.">Truth recursively</span>) {
+    setIdThenSave(<span class="goodcode" title="You can precede variables with aliases.">newid Num</span>, <span class="goodcode" title="You can also precede variables by their type.">Bool recursively</span>) {
         ...
     }</code></pre>
 				</div>
@@ -546,8 +546,8 @@ every SubClass (<span class="goodcode" title="Subclass extends BaseClass, meanin
 			<pre><code class="wake"
 >every MethodInvoker is:
 
-    methodWithArgument(Truth) {
-        <span class="goodcode" title="Now that we've defined methodWithArgument(Truth), we invoke it inside a Wake statement.">methodWithArgument(!Truth);</span>
+    methodWithArgument(Bool) {
+        <span class="goodcode" title="Now that we've defined methodWithArgument(Bool), we invoke it inside a Wake statement.">methodWithArgument(!Bool);</span>
     }</code></pre>
 		<h3 id="overloading">Method Overloading <span class="label label-inverse">readable</span> <span class="label label-inverse">concise</span></h3>
 		<div class="alert alert-warning">Method overloading can create more confusion than it prevents. As a general rule, avoid using overloading and aliases together for the clearest code.</div>
@@ -555,12 +555,12 @@ every SubClass (<span class="goodcode" title="Subclass extends BaseClass, meanin
 			<span class="label label-info">Wake</span>
 		<pre><code class="wake"
 >every CrossTypeComparator is:
-    Truth -- compare( Text )And( $Text ) {
+    Bool -- compare( Text )And( $Text ) {
         <span class="goodcode" title="Here we can write code that returns if a Text comes alphabetically before another.">//...</span>
     }
 
-    Truth -- compare( Num )And( $Num ) {
-        <span class="goodcode" title="Here we can write code that returns if an Num is less than the other.">return Num &lt; $Num;</span>
+    Bool -- compare( Num )And( $Num ) {
+        <span class="goodcode" title="Here we can write code that returns if a Num is less than the other.">return Num &lt; $Num;</span>
     }</code></pre>
 		<hr />
 		<h1 id="provisions">Provisions <span class="label label-inverse">flexible</span> <span class="label label-inverse">testable</span> <span class="label label-inverse">typesafe</span></h1>

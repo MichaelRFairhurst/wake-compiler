@@ -1,18 +1,14 @@
 hljs.LANGUAGES.wake = {
   case_insensitive: true, // language is case-insensitive
   k: {
-    keyword: 'every if while for is a an capable with public else switch case continue default break provides needs return this',
-    type: 'Text Int Truth Printer'
+    keyword: 'every if while for is a an capable with public else switch case continue default break provides needs return this var foreach import nothing exists',
+    type: 'Text Num Bool Printer'
   },
 
   c: [
     {
       cN: 'decorator',
       b: ':[a-zA-Z]+'
-    },
-    {
-      cN: 'decorator',
-      b: '@[a-zA-Z]+'
     },
     {
       cN: 'decorator',

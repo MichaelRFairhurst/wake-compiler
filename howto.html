@@ -18,10 +18,17 @@
 				<li><a href="#firstprogram">A First Program</a></li>
 				<li><a href="#compiling">Compiling</a></li>
 				<li><a href="#stdlib">Standard Library</a></li>
-				<li><a href="#ints">- Num</a></li>
+				<li><a href="#num">- Num</a></li>
 				<li><a href="#text">- Text</a></li>
 				<li><a href="#bool">- Bool</a></li>
-				<li><a href="#array">- Array</a></li>
+				<li><a href="#list">- List</a></li>
+				<li><a href="#Map">- Map{K,V}</a></li>
+				<li><a href="#printer">- Printer</a></li>
+				<li><a href="#FileSystem">- FileSystem</a></li>
+				<li><a href="#FilePath">- FilePath</a></li>
+				<li><a href="#File">- File</a></li>
+				<li><a href="#Argv">- Argv</a></li>
+				<li><a href="#System">- System</a></li>
 				<li><a href="#knownisssues">Known Issues</a></li>
 				<li><a href="#optionalarrays">- Optional Arrays</a></li>
 				<li><a href="#nestedoptionals">- Nested Optionals</a></li>
@@ -35,7 +42,7 @@
 				<li><a href="#lvaluesexist">- Exists on some L-Values</a></li>
 				<li><a href="#namespaces">- Namespaces</a></li>
 				<li><a href="#nothingargs">- "Nothing" as an Argument</a></li>
-				<li><a href="#arrayliterals">- Array Literals</a></li>
+				<li><a href="#arrayliterals">- List Literals</a></li>
 				<li><a href="#genericprovs">- Generic Provisions</a></li>
 				<li><a href="#genericinheritance">- Generic Inheritance</a></li>
 				<li><a href="#genericmethods">- Generic Methods</a></li>
@@ -51,6 +58,7 @@
 		</div>
 		<div class="opennav"><button class="btn btn-inverse btn-small"><i class="icon-align-justify icon-white"></i></button></div>
 		<div class="content" data-spy="scroll" data-target=".mynavbar">
+		<div class="inner-content">
 			<div class="hero-unit" id="intro">
 				<h1>Wake The Language</h1>
 				<p>
@@ -130,25 +138,101 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
 				<h1 id="stdlib">Standard Library</h1>
 				<p>There isn't much development on the standard library yet.</p>
 				<br/>
-				<h3 id="ints">Num</h3>
-				<p>stub</p>
+				<h3 id="num">Num</h3>
+				<p><code>Text -- toString()</code></p>
+				<p>&nbsp;&nbsp; Convert a number into its Text equivalet. Example: <code>5.toString(); // "5"</code></p>
+				<p><code>Num -- modulo(Num)</code></p>
+				<p>&nbsp;&nbsp; Get the remainder from division. Example: <code>5.modulo(2); // 1</code></p>
+				<p><code>Num -- floor()</code></p>
+				<p>&nbsp;&nbsp; Round down to the nearest integer. Example: <code>5.9.floor(); // 5</code></p>
+				<p><code>Num -- round()</code></p>
+				<p>&nbsp;&nbsp; Round to the nearest integer. Example: <code>5.5.round(); // 6</code></p>
+				<p><code>Num -- ceil()</code></p>
+				<p>&nbsp;&nbsp; Round up to the nearest integer. Example: <code>5.1.ceil(); // 6</code></p>
+				<p><code>Num -- squared()</code></p>
+				<p>&nbsp;&nbsp; Take the number to the second power. Example: <code>4.squared(); // 16</code></p>
+				<p><code>Num -- abs()</code></p>
+				<p>&nbsp;&nbsp; Get the absolute value of the number. Example: <code>-4.abs(); // 4</code></p>
+				<p><code>Num -- orMaxOf(Num)</code></p>
+				<p>&nbsp;&nbsp; Return the argument Num if greater than the target number, otherwise return the target number. Example: <code>5.orMaxOf(8); // 8</code></p>
+				<p><code>Num -- orMaxOf(Num[])</code></p>
+				<p>&nbsp;&nbsp; Return the largest number in the list, or the number itself if it is larger than each element in the list. Example: <code>5.orMaxOf([2, 5, 8]); // 8</code></p>
+				<p><code>Num -- orMinOf(Num)</code></p>
+				<p>&nbsp;&nbsp; Return the argument Num if less than the target number, otherwise return the target number. Example: <code>5.orMinf(8); // 5</code></p>
+				<p><code>Num -- orMinOf(Num[])</code></p>
+				<p>&nbsp;&nbsp; Return the smallest number in the list, or the number itself if it is smaller than each element in the list. Example: <code>5.orMinOf([2, 5, 8]); // 2</code></p>
+				<p><code>Num -- numberOfDigits()</code></p>
+				<p>&nbsp;&nbsp; Count how many digits are in the number. Example: <code>123.numberOfDigits(); // 3</code></p>
+				<p><code>Num -- range(Num)</code></p>
+				<p>&nbsp;&nbsp; Return a list of each number including and up to the argument, beginning at the target number. Example: <code>5.range(8); // [5, 6, 7, 8]</code></p>
 				<br/>
 				<h3 id="text">Text</h3>
-				<p>stub</p>
+				<p><code>Text -- toUpper()</code></p>
+				<p>&nbsp;&nbsp; Get the all uppercase equivalent of the target text. Example: <code>"Hello".toUpper(); // "HELLO"</code></p>
+				<p><code>Text -- toLower()</code></p>
+				<p>&nbsp;&nbsp; Get the all lowercase equivalent of the target text. Example: <code>"Hello".toLower(); // "hello"</code></p>
+				<p><code>Text -- switchCase()</code></p>
+				<p>&nbsp;&nbsp; Swap the casing of each charecter in the target text. Example: <code>"Hello".switchCase(); // "hELLO"</code></p>
+				<p><code>Text -- trim()</code></p>
+				<p>&nbsp;&nbsp; Remove whitespace (tabs, newlines, spaces, etc) from  the beginning and ending of the Text. Example: <code>"  Hello  ".trim(); // "Hello"</code></p>
+				<p><code>Num -- getSize()</code></p>
+				<p>&nbsp;&nbsp; Get the number of characters in a Text. Example: <code>"Hello".getSize(); // 5</code></p>
+				<p><code>Text -- substr(Num start)</code></p>
+				<p>&nbsp;&nbsp; Cut from the character at the starting index until the end of the Text. A negative start index counts from the end of the Text. Example: <code>"Hello".substr(1); // "ello"</code></p>
+				<p><code>Text -- substr(Num start, Num end)</code></p>
+				<p>&nbsp;&nbsp; Cut from the character at the starting index until the ending index of the Text. A negative start or ending index counts from the end of the Text. Example: <code>"Hello".substr(1, 3); // "ell"</code></p>
+				<p><code>Num? -- parseNum()</code></p>
+				<p>&nbsp;&nbsp; Read the Text as if it were a Num. If parsing fails, it will return nothing. Example: <code>"5.5".parseNum(); // 5.5</code></p>
+				<p><code>Text? -- charAt(Num)</code></p>
+				<p>&nbsp;&nbsp; Get the character at a particular index of the Text, or nothing if the index is longer than the Text. Example: <code>"Hello".charAt(2); // "e"</code></p>
+				<p><code>Text[] -- split(Text)</code></p>
+				<p>&nbsp;&nbsp; Find each occurence of Text within the target Text, and return the content that separates them in a List. Example: <code>"Foo bar baz".split(" "); // ["Foo", "bar", "baz"]</code></p>
+				<p><code>Num? -- indexOf(Text)</code></p>
+				<p>&nbsp;&nbsp; Return the index of the first occurence of Text. If it never occurs, return nothing. Example: <code>"Hello".indexOf("l"); // 2</code></p>
 				<br/>
 				<h3 id="bool">Bool</h3>
-				<p>stub</p>
+				<p><code>Text -- toString()</code></p>
+				<p>&nbsp;&nbsp; Convert a Bool into its Text equivalet. Example: <code>true.toString(); // "true"</code></p>
 				<br/>
-				<h3 id="array">Array</h3>
+				<h3 id="list">List{T}</h3>
+				<p><code>Num -- getSize()</code></p>
+				<p>&nbsp;&nbsp; Count the elements in the list. Example: <code>[1, 2].getSize(); // 2</code></p>
+				<p><code>Bool -- contains(T)</code></p>
+				<p>&nbsp;&nbsp; Check if a particular element exists within a List. Example: <code>[1, 2].contains(2); // true</code></p>
+				<p><code>T[] -- intersect(T[])</code></p>
+				<p>&nbsp;&nbsp; Keep all elements that exist in both the target List and T[]. Example: <code>[1, 2, 3].intersect([2, 3, 4]); // [2, 3]</code></p>
+				<p><code>push(T)</code></p>
+				<p>&nbsp;&nbsp; Add an item to the end of a List. Example: <code>Num[].push(2);</code></p>
+				<br />
+				<h3 id="#Map">- Map{K,V}</h3>
 				<p>stub</p>
+				<br />
+				<h3 id="#printer">- Printer</h3>
+				<p>stub</p>
+				<br />
+				<h3 id="#FileSystem">- FileSystem</h3>
+				<p>stub</p>
+				<br />
+				<h3 id="#FilePath">- FilePath</h3>
+				<p>stub</p>
+				<br />
+				<h3 id="#File">- File</h3>
+				<p>stub</p>
+				<br />
+				<h3 id="#Argv">- Argv</h3>
+				<p>stub</p>
+				<br />
+				<h3 id="#System">- System</h3>
+				<p>stub</p>
+				<br />
 				<br/>
 				<h1 id="knownisssues">Known Issues</h1>
 				<p>These issues have the potential to crash/corrupt a running program. Some are pretty standard use cases - sorry! And others are pretty obscure/obviously wrong at compile-time.</p>
 				<br/>
 				<h3 id="optionalarrays">Optional Arrays</h3>
-				<p>Before I had optional types, I had array types. When adding optional types I did not consider that they could be combined. Num?[] and Num[]? were parse errors and all was well, albeit incomplete.</p>
+				<p>Before I had optional types, I had list types. When adding optional types I did not consider that they could be combined. Num?[] and Num[]? were parse errors and all was well, albeit incomplete.</p>
 				<p>Now I think Num?[] and Num[]? are still parse errors, but at the very least its possible that these types will appear out in the wild through generics, since a class which returns T[] can be instantiated like Class{Num?}.</p>
-				<p>Anyways, the end result of this is that a type which is both optional and an array, acts as both an optional type, and an array. So depending on how it was used and when you call exists {}, its possible to access an index off of nothing, which makes your program explode.</p>
+				<p>Anyways, the end result of this is that a type which is both optional and a lst, acts as both an optional type, and a list. So depending on how it was used and when you call exists {}, its possible to access an index off of nothing, which makes your program explode.</p>
 			<span class="label label-info">wake</span>
 			<pre><code class="wake"
 >every Main is:
@@ -157,7 +241,7 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
         var Num?[] = nothing;
         var Num? yourProgramExplodesHere = Num[0];
     }</code></pre>
-				<p>This fix is important but also requires essentially rewriting all array or all optional code. So it may be quite a while.</p>
+				<p>This fix is important but also requires essentially rewriting all list or all optional code. So it may be quite a while.</p>
 				<br/>
 				<h3 id="nestedoptionals">Nested Optionals</h3>
 				<p>Another thing I had not considered when implementing optionals is that "null" is an idequate runtime representation of a true optional type system. What can optional types do that nulls can't? Nest, that's what!</p>
@@ -170,7 +254,7 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
         if Num exists { } // this check will fail as it should
         if nested exists { } // this check should succeed, and won't!
     }</code></pre>
-				<p>Basically, if you consider a language without optional types, if you had a function that searched through a list and returned either the last item or null, this API is inadequate for an array where the last element <i>is</i> null. The fix isn't too difficult, but optional types need to be stored in recursive wrappers, and unboxed when used within an "exists" check.</p>
+				<p>Basically, if you consider a language without optional types, if you had a function that searched through a list and returned either the last item or null, this API is inadequate for a list where the last element <i>is</i> null. The fix isn't too difficult, but optional types need to be stored in recursive wrappers, and unboxed when used within an "exists" check.</p>
 				<br/>
 				<h3 id="genericprops">Generic Properties</h3>
 				<p>When a generic class has a generic type served as a public property, it isn't paramterized the way methods are. The name doesn't change and the type doesn't change either.</p>
@@ -298,8 +382,8 @@ every ChildClass is:
     }</code></pre>
 				<p>Any big O and little O geeks out there should lend me hand on this one to create a fast binary tree or something. The only way that comes to mind for truly solving this problem would be O of n to the n, I think.</p>
 				<br/>
-				<h3 id="arrayliterals">Array Literals</h3>
-				<p>Array literals requires Lowest-Common-Ancestor logic to be implemented, which isn't the easiest analysis to implement unfortunately. The only supported array literal is an empty array literal. This gets you far enough but I'll add this later.</p>
+				<h3 id="arrayliterals">List Literals</h3>
+				<p>List literals requires Lowest-Common-Ancestor logic to be implemented, which isn't the easiest analysis to implement unfortunately. The only supported list literal is an empty list literal. This gets you far enough but I'll add this later.</p>
 
 			<span class="label label-info">wake</span>
 			<pre><code class="wake"
@@ -408,6 +492,8 @@ every ChildClass is:
 				<h3 id="recursiveimports">Recursive Imports</h3>
 				<p>If two classes use each other, just stick them in one file and you're good. If you split them up into two different files you're screwed!</p>
 				<br/>
+				</div>
+			</div>
 
 		<script src="bootstrap/js/bootstrap.min.js"></script>
 	</body>
