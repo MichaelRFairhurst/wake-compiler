@@ -22,8 +22,8 @@
 				<li><a href="#text">- Text</a></li>
 				<li><a href="#bool">- Bool</a></li>
 				<li><a href="#list">- List</a></li>
-				<li><a href="#Map">- Map{K,V}</a></li>
-				<li><a href="#printer">- Printer</a></li>
+				<li><a href="#map">- Map{K,V}</a></li>
+				<li><a href="#Printer">- Printer</a></li>
 				<li><a href="#FileSystem">- FileSystem</a></li>
 				<li><a href="#FilePath">- FilePath</a></li>
 				<li><a href="#File">- File</a></li>
@@ -139,6 +139,7 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
 				<p>There isn't much development on the standard library yet.</p>
 				<br/>
 				<h3 id="num">Num</h3>
+				<p>needs: <code>nothing</code>.</p>
 				<p><code>Text -- toString()</code></p>
 				<p>&nbsp;&nbsp; Convert a number into its Text equivalet. Example: <code>5.toString(); // "5"</code></p>
 				<p><code>Num -- modulo(Num)</code></p>
@@ -167,6 +168,7 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
 				<p>&nbsp;&nbsp; Return a list of each number including and up to the argument, beginning at the target number. Example: <code>5.range(8); // [5, 6, 7, 8]</code></p>
 				<br/>
 				<h3 id="text">Text</h3>
+				<p>needs: <code>nothing</code>.</p>
 				<p><code>Text -- toUpper()</code></p>
 				<p>&nbsp;&nbsp; Get the all uppercase equivalent of the target text. Example: <code>"Hello".toUpper(); // "HELLO"</code></p>
 				<p><code>Text -- toLower()</code></p>
@@ -191,10 +193,13 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
 				<p>&nbsp;&nbsp; Return the index of the first occurence of Text. If it never occurs, return nothing. Example: <code>"Hello".indexOf("l"); // 2</code></p>
 				<br/>
 				<h3 id="bool">Bool</h3>
+				<p>needs: <code>nothing</code>.</p>
 				<p><code>Text -- toString()</code></p>
 				<p>&nbsp;&nbsp; Convert a Bool into its Text equivalet. Example: <code>true.toString(); // "true"</code></p>
 				<br/>
 				<h3 id="list">List{T}</h3>
+				<p>needs: <code>nothing</code>.</p>
+				<p>List{T} is the autoboxed form of with T[]. Due to special semantics the other autoboxed classes don't have, you should for the moment avoid using List{T} and stick with T[] instead.</p>
 				<p><code>Num -- getSize()</code></p>
 				<p>&nbsp;&nbsp; Count the elements in the list. Example: <code>[1, 2].getSize(); // 2</code></p>
 				<p><code>Bool -- contains(T)</code></p>
@@ -204,26 +209,89 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
 				<p><code>push(T)</code></p>
 				<p>&nbsp;&nbsp; Add an item to the end of a List. Example: <code>Num[].push(2);</code></p>
 				<br />
-				<h3 id="#Map">- Map{K,V}</h3>
-				<p>stub</p>
+				<h3 id="Map">Map{K,V}</h3>
+				<p>needs: <code>nothing</code>.</p>
+				<p>Map variables of type K to variables of type V. Bad performance at the moment.</code>
+				<p><code>put(K, V)</code></p>
+				<p>&nbsp;&nbsp; Add value V at key K. Example: <code>Map.put(Person.getName(), Person);</code></p>
+				<p><code>V? -- get(K)</code></p>
+				<p>&nbsp;&nbsp; Extract a value by index from the map, or get Nothing if there is no value for that key. Example: <code>var Person? = Map.get('Johnny');</code></p>
+				<p><code>K[] -- getKeys()</code></p>
+				<p>&nbsp;&nbsp; Get all the defined keys in a map. Example: <code>var Text[] names = Map.getKeys();</code></p>
 				<br />
-				<h3 id="#printer">- Printer</h3>
-				<p>stub</p>
+				<h3 id="Printer">Printer</h3>
+				<p>needs: <code>nothing</code>.</p>
+				<p><code>print(Text)</code></p>
+				<p>&nbsp;&nbsp; Print the text and no newline afterwards. Example: <code>Printer.print("hello");</code></p>
+				<p><code>printLine(Text)</code></p>
+				<p>&nbsp;&nbsp; Print the text and a newline afterwards. Example: <code>Printer.printLine("hello");</code></p>
+				<p><code>print(Num)</code></p>
+				<p>&nbsp;&nbsp; Print the number and no newline afterwards. Example: <code>Printer.print(5);</code></p>
+				<p><code>printLine(Num)</code></p>
+				<p>&nbsp;&nbsp; Print the number and a newline afterwards. Example: <code>Printer.printLine(5);</code></p>
 				<br />
-				<h3 id="#FileSystem">- FileSystem</h3>
-				<p>stub</p>
+				<h3 id="FileSystem">FileSystem</h3>
+				<p><code>FilePath -- getPath(Text)</code></p>
+				<p>&nbsp;&nbsp; Get the object representation of a path in the filesystem. Example: <code>var FilePath = FileSystem.getPath("/usr/local/bin")</code></p>
+				<p><code>FilePath[] -- listRoots()</code></p>
+				<p>&nbsp;&nbsp; Return all root points in the filesystem. Unix variants will return /, while windows variants will return C:/, D:/, etc.</p>
+				<p><code>Text -- getPathSeparator()</code></p>
+				<p>&nbsp;&nbsp; Get the character required to separate entries in the PATH variable for the current operating system.</p>
+				<p><code>FilePath -- getTempFile(Text prefix, Text suffix, FilePath)</code></p>
+				<p>&nbsp;&nbsp; Using the prefix and suffix, open a file with a unique name within the directory FilePath. Actually, this needs to return File so that its atomic....</p>
 				<br />
-				<h3 id="#FilePath">- FilePath</h3>
-				<p>stub</p>
+				<h3 id="FilePath">FilePath</h3>
+				<p><code>provides File</code></p>
+				<p>&nbsp;&nbsp; Open a readable/writable file at this path. Example: <code>var File &lt;- FilePath;</code></p>
+				<p><code>Text -- getPath()</code></p>
+				<p>&nbsp;&nbsp; Get the full text path of the file. Example: <code>Printer.printLine(FilePath.getPath())</code></p>
+				<p><code>Text -- getBasename()</code></p>
+				<p>&nbsp;&nbsp; Return the name of the file without the directory preceding it. Example: <code>FileSystem.path("../File.txt").getBasename(); // "File.txt"</code></p>
+				<p><code>Text -- getDirname()</code></p>
+				<p>&nbsp;&nbsp; Return the name of the directory containing the directory or file that may exist at this path. Example: <code>FileSystem.path("docs/File.txt").getPath(); // "docs"</code></p>
+				<p><code>Text -- isFile()</code></p>
+				<p>&nbsp;&nbsp; Check if a file exists at the location, which is not a directory. Example: <code>FileSystem.path("docs/File.txt").isFile(); // true</code></p>
+				<p><code>Text -- isDirectory()</code></p>
+				<p>&nbsp;&nbsp; Check if a directory exists at the location. Example: <code>FileSystem.path("docs/File.txt").isDirectory(); // false</code></p>
+				<p><code>Text -- fileExists()</code></p>
+				<p>&nbsp;&nbsp; Check if a file or directory exists at the location. Example: <code>FileSystem.path("docs/File.txt").fileExists(); // true</code></p>
+				<p><code>makeDirectory()</code></p>
+				<p>&nbsp;&nbsp; Create a new directory at the location. Example: <code>FileSystem.path("docs/").makeDirectory();</code></p>
+				<p><code>FilePath[] -- getChildren()</code></p>
+				<p>&nbsp;&nbsp; List the contents of the directory at the location. Example: <code>var FilePath[] = FileSystem.path("docs").getChildren();</code></p>
+				<p><code>FilePath? -- getParent()</code></p>
+				<p>&nbsp;&nbsp; Get the containing folder of the file or folder that exists at this location. Returns nothing if there is no parent. Example: <code>var FilePath? = FileSystem.path("docs").getParent();</code></p>
+				<p><code>delete()</code></p>
+				<p>&nbsp;&nbsp; Delete any folder or file that exists at this location. Example: <code>FileSystem.path("docs/File.txt").delete();</code></p>
 				<br />
-				<h3 id="#File">- File</h3>
-				<p>stub</p>
+				<h3 id="File">File</h3>
+				<p>needs: <code>FilePath</code>.</p>
+				<p><code>FilePath -- getPath()</code></p>
+				<p>&nbsp;&nbsp; Get the object representation of the path to this file. Example: <code>File.getPath().getBasename();</code></p>
+				<p><code>Text -- read(Num)</code></p>
+				<p>&nbsp;&nbsp; Read Num characters from the file at the current point of the cursor. </p>
+				<p><code>Text -- readUnsignedChar()</code></p>
+				<p>&nbsp;&nbsp; Read a byte of the file as a binary, from value 0-255. </p>
+				<p><code>write(Text)</code></p>
+				<p>&nbsp;&nbsp; Write a string into a file at the current point of the cursor. </p>
+				<p><code>close()</code></p>
+				<p>&nbsp;&nbsp; Close the file. At the moment subsequent writes or reads will crash your program. Later it will throw an exception. </p>
+				<p><code>Num -- tell()</code></p>
+				<p>&nbsp;&nbsp; Get the current position of the read/write cursor position in the file. </p>
+				<p><code>seek(Num)</code></p>
+				<p>&nbsp;&nbsp; Set the current position of the read/write cursor position in the file. </p>
+				<p><code>Bool -- eof()</code></p>
+				<p>&nbsp;&nbsp; Check if the cursor position is at the end of the file. </p>
 				<br />
-				<h3 id="#Argv">- Argv</h3>
-				<p>stub</p>
+				<h3 id="Argv">Argv</h3>
+				<p>needs: <code>nothing</code>.</p>
+				<p><code>Text[] -- getArgv()</code></p>
+				<p>&nbsp;&nbsp; Get the arguments supplied to running the executable. Will likely be renamed or maybe encapsulated elsewhere. Example: <code>needs Argv, Printer then { Printer.print(Argv.getArgv()[0]); }</code></p>
 				<br />
-				<h3 id="#System">- System</h3>
-				<p>stub</p>
+				<h3 id="System">System</h3>
+				<p>needs: <code>nothing</code>.</p>
+				<p><code>exit(Num)</code></p>
+				<p>&nbsp;&nbsp; Exit program with a return code. By convention, a non-zero exit value is considered an error. Example: <code>System.exit(0);</code></p>
 				<br />
 				<br/>
 				<h1 id="knownisssues">Known Issues</h1>
