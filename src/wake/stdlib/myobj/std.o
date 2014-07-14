@@ -269,8 +269,8 @@ fs.existsSync = fs.existsSync || require("path").existsSync;
 	this.`write(Text)` = function(e) {
 		if(!c) { throw$ Error("File$ no$ longer$ open"); }
 		var$ f = new$ Buffer(e, 'utf8');
+		fs.writeSync(d, f, 0, e.length, b);
 		b += e.length;
-		return$ fs.writeSync(d, f, 0, e.length, b);
 	};
 
 	this.`writeUnsignedChar(Num)` = function(e) {
@@ -278,7 +278,6 @@ fs.existsSync = fs.existsSync || require("path").existsSync;
 		var$ f = new$ Buffer(1);
 		f.writeUInt8(e, 0);
 		b++;
-		return$ fs.writeSync(d, f, 0, 1, b);
 	};
 
 	this.`close()` = function() {
