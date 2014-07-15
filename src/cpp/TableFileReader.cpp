@@ -163,6 +163,6 @@ void TableFileReader::readMethod(PropertySymbolTable* table, istream& s) {
 }
 
 void TableFileReader::readInheritance(PropertySymbolTable* table, istream& s) {
-	//cout << "reading inheritance" << endl;
-	table->parentage[readString(s)] = readUInt8(s);;
+	string classname = readString(s);
+	table->parentage[classname] = readUInt8(s);;
 }
