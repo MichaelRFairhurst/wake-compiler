@@ -1,322 +1,316 @@
-var$ b='', r;
+(function(require) {
+	var$ b='', fs = require('fs');
+	fs.existsSync = fs.existsSync || require("path").existsSync;
 
-if(typeof$ require === 'undefined')
-	r = function() { return {}; };
-else r = require;
+	~Printer~ = function(){
+		this.`print(Text)` =
+		this.`print(Num)` = function(a) {
+			if(typeof$ process != 'undefined'
+					&& typeof$ process.stdout != 'undefined'
+					&& typeof$ process.stdout.write != 'undefined')
+				process.stdout.write(''+a);
 
-var$ require = r;
+			else$ b += '' + a;
+		};
 
-var$ fs = require("fs");
-fs.existsSync = fs.existsSync || require("path").existsSync;
-
-~Printer~ = function(){
-	this.`print(Text)` =
-	this.`print(Num)` = function(a) {
-		if(typeof$ process != 'undefined'
-				&& typeof$ process.stdout != 'undefined'
-				&& typeof$ process.stdout.write != 'undefined')
-			process.stdout.write(''+a);
-
-		else$ b += '' + a;
+		this.`printLine(Text)` =
+		this.`printLine(Num)` = function(a) {
+			if(typeof$ process != 'undefined'
+					&& typeof$ process.stdout != 'undefined'
+					&& typeof$ process.stdout.write != 'undefined') return$ this.`print(Text)`(a + '\n');
+			console.log(b + a);
+			b = '';
+		};
 	};
 
-	this.`printLine(Text)` =
-	this.`printLine(Num)` = function(a) {
-		if(typeof$ process != 'undefined'
-				&& typeof$ process.stdout != 'undefined'
-				&& typeof$ process.stdout.write != 'undefined') return$ this.`print(Text)`(a + '\n');
-		console.log(b + a);
-		b = '';
-	};
-};
-
-~System~ = function() {
-	this.`exit(Num)` = function(a) {
-		if(typeof$ process!='undefined' && typeof$ process.exit!='undefined')
-			process.exit(a);
-	};
-};
-
-~Num~ = function(a) {
-	this.`squared()` = function() {
-		return$ a * a;
+	~System~ = function() {
+		this.`exit(Num)` = function(a) {
+			if(typeof$ process!='undefined' && typeof$ process.exit!='undefined')
+				process.exit(a);
+		};
 	};
 
-	this.`abs()` = function() {
-		return$ a < 0 ? a * -1 : a;
-	};
+	~Num~ = function(a) {
+		this.`squared()` = function() {
+			return$ a * a;
+		};
 
-	this.`orMaxOf(Num)` = function(b) {
-		return$ a < b ? b : a;
-	};
+		this.`abs()` = function() {
+			return$ a < 0 ? a * -1 : a;
+		};
 
-	this.`orMaxOf(Num[])` = function(b) {
-		var$ c = 0, d;
-		for(d = a; c < b.length; c++) {
-			if(a < b[c]) d = b[c];
-		}
-		return$ d;
-	};
+		this.`orMaxOf(Num)` = function(b) {
+			return$ a < b ? b : a;
+		};
 
-	this.`orMinOf(Num)` = function(b) {
-		return$ a > b ? b : a;
-	};
-
-	this.`orMinOf(Num[])` = function(b) {
-		var$ c = 0, d;
-		for(d = a; c < b.length; c++) {
-			if(a > b[c]) d = b[c];
-		}
-		return$ d;
-	};
-
-	this.`numberOfDigits()` = function(b) {
-		var$ b = 1, c = this.`abs()`();
-		while((c /= 10) > 1) b++;
-		return$ b;
-	};
-
-	this.`floor()` = function() {
-		return$ Math.floor(a);
-	};
-
-	this.`ceil()` = function() {
-		return$ Math.ceil(a);
-	};
-
-	this.`round()` = function() {
-		return$ Math.round(a);
-	};
-
-	this.`toString()` = function() {
-		return$ a+"";
-	};
-
-	this.`modulo(Num)` = function(b) {
-		return$ a % b;
-	};
-
-};
-
-~Text~ = function(a) {
-
-	this.`toUpper()` = function() {
-		return$ a.toUpperCase();
-	};
-
-	this.`toLower()` = function() {
-		return$ a.toLowerCase();
-	};
-
-	this.`switchCase()` = function() {
-		return$ a.replace(/([a-z])|([A-Z])/g,
-			function(b,c){
-					return (c) ? b.toUpperCase() : b.toLowerCase()
+		this.`orMaxOf(Num[])` = function(b) {
+			var$ c = 0, d;
+			for(d = a; c < b.length; c++) {
+				if(a < b[c]) d = b[c];
 			}
-		);
+			return$ d;
+		};
+
+		this.`orMinOf(Num)` = function(b) {
+			return$ a > b ? b : a;
+		};
+
+		this.`orMinOf(Num[])` = function(b) {
+			var$ c = 0, d;
+			for(d = a; c < b.length; c++) {
+				if(a > b[c]) d = b[c];
+			}
+			return$ d;
+		};
+
+		this.`numberOfDigits()` = function(b) {
+			var$ b = 1, c = this.`abs()`();
+			while((c /= 10) > 1) b++;
+			return$ b;
+		};
+
+		this.`floor()` = function() {
+			return$ Math.floor(a);
+		};
+
+		this.`ceil()` = function() {
+			return$ Math.ceil(a);
+		};
+
+		this.`round()` = function() {
+			return$ Math.round(a);
+		};
+
+		this.`toString()` = function() {
+			return$ a+"";
+		};
+
+		this.`modulo(Num)` = function(b) {
+			return$ a % b;
+		};
+
 	};
 
-	this.`trim()` = function() {
-		return$ a.trim();
+	~Text~ = function(a) {
+
+		this.`toUpper()` = function() {
+			return$ a.toUpperCase();
+		};
+
+		this.`toLower()` = function() {
+			return$ a.toLowerCase();
+		};
+
+		this.`switchCase()` = function() {
+			return$ a.replace(/([a-z])|([A-Z])/g,
+				function(b,c){
+						return (c) ? b.toUpperCase() : b.toLowerCase()
+				}
+			);
+		};
+
+		this.`trim()` = function() {
+			return$ a.trim();
+		};
+
+		this.`getSize()` = function()  {
+			return$ a.length;
+		};
+
+		this.`substr(Num)` = this.`substr(Num,Num)` = function(b, c) {
+			return$ a.slice(b, c);
+		};
+
+		this.`parseNum()` = function() {
+			return$ /^(\-|\+)?([0-9]+(\.[0-9]+)?)$$/.test(a) ? parseFloat(a) : null;
+		};
+
+		this.`charAt(Num)` = function(b) {
+			return$ a[b];
+		};
+
+		this.`indexOf(Text)` = function(b) {
+			var$ c = a.indexOf(b);
+			return$ c === -1 ? null : c;
+		};
+
+		this.`split(Text)` = function(b) {
+			return$ a.split(b);
+		};
+
 	};
 
-	this.`getSize()` = function()  {
-		return$ a.length;
-	};
+	~List~ = function(a) {
+		this.`getSize()` = function() {
+			return$ a.length;
+		};
 
-	this.`substr(Num)` = this.`substr(Num,Num)` = function(b, c) {
-		return$ a.slice(b, c);
-	};
+		this.`contains(T)` = function(b) {
+			return$ a.indexOf(b) > -1;
+		};
 
-	this.`parseNum()` = function() {
-		return$ /^(\-|\+)?([0-9]+(\.[0-9]+)?)$$/.test(a) ? parseFloat(a) : null;
-	};
+		this.`intersect(T[])` = function(b) {
+			var$ d = [];
+			for(var$ c = 0; c < a.length; c++) {
+				if(b.indexOf(a[c]) > -1) d[d.length] = a[c];
+			}
+			return$ d;
+		};
 
-	this.`charAt(Num)` = function(b) {
-		return$ a[b];
-	};
-
-	this.`indexOf(Text)` = function(b) {
-		var$ c = a.indexOf(b);
-		return$ c === -1 ? null : c;
-	};
-
-	this.`split(Text)` = function(b) {
-		return$ a.split(b);
-	};
-
-};
-
-~List~ = function(a) {
-    this.`getSize()` = function() {
-		return$ a.length;
-	};
-
-	this.`contains(T)` = function(b) {
-		return$ a.indexOf(b) > -1;
-	};
-
-	this.`intersect(T[])` = function(b) {
-		var$ d = [];
-		for(var$ c = 0; c < a.length; c++) {
-			if(b.indexOf(a[c]) > -1) d[d.length] = a[c];
+		this.`push(T)` = function(b) {
+			a.push(b);
 		}
-		return$ d;
+
 	};
 
-	this.`push(T)` = function(b) {
-		a.push(b);
-	}
+	~FileSystem~ = function() {
 
-};
+		this.`getPath(Text)` = function(a) {
+			return$ new$ ~FilePath~(a);
+		};
 
-~FileSystem~ = function() {
+		this.`listRoots()` = function() {
+			throw$ Error("listRoots$ is$ not$ implemented$ yet.$ Help$ a$ fella$ out!");
+		};
 
-	this.`getPath(Text)` = function(a) {
-		return$ new$ ~FilePath~(a);
+		this.`getPathSeparator()` = function() {
+			return$ '/';
+		};
+
+		this.`getTempFile(Text prefix, Text suffix, FilePath)` = function(a, b, c) {
+			return$ this.`getPath(Text)`(c.`getPath()` + this.`getPathSeparator()`() + a + (+new$ Date()) + Math.rand() + b);
+		};
+
 	};
 
-	this.`listRoots()` = function() {
-		throw$ Error("listRoots$ is$ not$ implemented$ yet.$ Help$ a$ fella$ out!");
+	~FilePath~ = function(a) {
+
+		this.`File<-` = function() {
+			return$ new$ ~File~(this);
+		};
+
+		this.`FilePath<-` = function() {
+			return this;
+		};
+
+		this.`getPath()` = function() {
+			return$ a;
+		};
+
+		this.`getBasename()` = function() {
+			return$ require('path').basename(a);
+		};
+
+		this.`getDirname()` = function() {
+			return$ require('path').dirname(a);
+		};
+
+		this.`isFile()` = function() {
+			return$ this.`fileExists()`() && !this.`isDirectory()`();
+		};
+
+		this.`isDirectory()` = function() {
+			return$ fs.statSync(a).isDirectory()
+		};
+
+		this.`fileExists()` = function() {
+			return$ fs.existsSync(a);
+		};
+
+		this.`makeDirectory()` = function() {
+			fs.mkdirSync(a);
+		};
+
+		this.`getChildren()` = function() {
+			return$ fs.readdirSync(a).map(function(b) { return$ new$ ~FilePath~(a + '/' + b); });
+		};
+
+		this.`getParent()` = function() {
+			var$ b = new$ ~FilePath~(this.`getDirname`);
+			return$ b.`fileExists()`() ? b : null;
+		};
+
+		this.`delete()` = function() {
+			fs.unlinkSync(a);
+		};
+
 	};
 
-	this.`getPathSeparator()` = function() {
-		return$ '/';
-	};
+	~File~ = function(a) {
+		var$ b = 0, c = 1, d = fs.openSync(a.`getPath()`(), 'a+');
 
-	this.`getTempFile(Text prefix, Text suffix, FilePath)` = function(a, b, c) {
-		return$ this.`getPath(Text)`(c.`getPath()` + this.`getPathSeparator()`() + a + (+new$ Date()) + Math.rand() + b);
-	};
+		this.`getPath()` = function() {
+			return$ a;
+		};
 
-};
+		this.`read(Num)` = function(e) {
+			var$ f = new$ Buffer(e);
+			if(!c) { throw$ Error("File$ no$ longer$ open"); }
+			fs.readSync(d, f, 0, e, b);
+			b += e;
+			return$ f.toString('utf8', 0, e);
+		};
 
-~FilePath~ = function(a) {
+		this.`readUnsignedChar()` = function() {
+			var$ e = new$ Buffer(1);
+			if(!c) { throw$ Error("File$ no$ longer$ open"); }
+			fs.readSync(d, e, 0, 1, b);
+			b++;
+			return$ e.readUInt8(0);
+		};
 
-	this.`File<-` = function() {
-		return$ new$ ~File~(this);
-	};
+		this.`write(Text)` = function(e) {
+			if(!c) { throw$ Error("File$ no$ longer$ open"); }
+			var$ f = new$ Buffer(e, 'utf8');
+			fs.writeSync(d, f, 0, e.length, b);
+			b += e.length;
+		};
 
-	this.`FilePath<-` = function() {
-		return this;
-	};
+		this.`writeUnsignedChar(Num)` = function(e) {
+			if(!c) { throw$ Error("File$ no$ longer$ open"); }
+			var$ f = new$ Buffer(1);
+			f.writeUInt8(e, 0);
+			b++;
+		};
 
-	this.`getPath()` = function() {
-		return$ a;
-	};
+		this.`close()` = function() {
+			if(!c) { throw$ Error("File$ no$ longer$ open"); }
+			fs.close(d);
+			c = 0;
+		};
 
-	this.`getBasename()` = function() {
-		return$ require('path').basename(a);
-	};
+		this.`tell()` = function() {
+			if(!c) { throw$ Error("File$ no$ longer$ open"); }
+			return$ b;
+		};
 
-	this.`getDirname()` = function() {
-		return$ require('path').dirname(a);
-	};
+		this.`seek(Num)` = function(e) {
+			if(!c) {
+				throw$ Error("File$ no$ longer$ open");
+			}
+			b = e;
+		};
 
-	this.`isFile()` = function() {
-		return$ this.`fileExists()`() && !this.`isDirectory()`();
-	};
-
-	this.`isDirectory()` = function() {
-		return$ fs.statSync(a).isDirectory()
-	};
-
-	this.`fileExists()` = function() {
-		return$ fs.existsSync(a);
-	};
-
-	this.`makeDirectory()` = function() {
-		fs.mkdirSync(a);
-	};
-
-	this.`getChildren()` = function() {
-		return$ fs.readdirSync(a).map(function(b) { return$ new$ ~FilePath~(a + '/' + b); });
-	};
-
-	this.`getParent()` = function() {
-		var$ b = new$ ~FilePath~(this.`getDirname`);
-		return$ b.`fileExists()`() ? b : null;
-	};
-
-	this.`delete()` = function() {
-		fs.unlinkSync(a);
-	};
-
-};
-
-~File~ = function(a) {
-	var$ b = 0, c = 1, d = fs.openSync(a.`getPath()`(), 'a+');
-
-	this.`getPath()` = function() {
-		return$ a;
-	};
-
-	this.`read(Num)` = function(e) {
-		var$ f = new$ Buffer(e);
-		if(!c) { throw$ Error("File$ no$ longer$ open"); }
-		fs.readSync(d, f, 0, e, b);
-		b += e;
-		return$ f.toString('utf8', 0, e);
-	};
-
-	this.`readUnsignedChar()` = function() {
-		var$ e = new$ Buffer(1);
-		if(!c) { throw$ Error("File$ no$ longer$ open"); }
-		fs.readSync(d, e, 0, 1, b);
-		b++;
-		return$ e.readUInt8(0);
-	};
-
-	this.`write(Text)` = function(e) {
-		if(!c) { throw$ Error("File$ no$ longer$ open"); }
-		var$ f = new$ Buffer(e, 'utf8');
-		fs.writeSync(d, f, 0, e.length, b);
-		b += e.length;
-	};
-
-	this.`writeUnsignedChar(Num)` = function(e) {
-		if(!c) { throw$ Error("File$ no$ longer$ open"); }
-		var$ f = new$ Buffer(1);
-		f.writeUInt8(e, 0);
-		b++;
-	};
-
-	this.`close()` = function() {
-		if(!c) { throw$ Error("File$ no$ longer$ open"); }
-		fs.close(d);
-		c = 0;
-	};
-
-	this.`tell()` = function() {
-		if(!c) { throw$ Error("File$ no$ longer$ open"); }
-		return$ b;
-	};
-
-	this.`seek(Num)` = function(e) {
-		if(!c) {
-			throw$ Error("File$ no$ longer$ open");
+		this.`eof()` = function() {
+			var$ f = new$ Buffer(1);
+			return$ fs.readSync(d, f, 0, 1, b) === 0;
 		}
-		b = e;
+
 	};
 
-	this.`eof()` = function() {
-		var$ f = new$ Buffer(1);
-		return$ fs.readSync(d, f, 0, 1, b) === 0;
-	}
+	~Bool~ = function(a) {
 
-};
+		this.`toString()` = function() {
+			return$ a?"true":"false";
+		};
 
-~Bool~ = function(a) {
-
-	this.`toString()` = function() {
-		return$ a?"true":"false";
 	};
 
-};
+	~Argv~ = function() {
 
-~Argv~ = function() {
+		this.`getArgv()` = function() {
+			return$ process.argv;
+		};
 
-	this.`getArgv()` = function() {
-		return$ process.argv;
 	};
-
-};
+})(typeof$ require === 'undefined' ? function() {} : require);
