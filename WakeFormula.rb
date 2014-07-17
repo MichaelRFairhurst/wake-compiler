@@ -1,9 +1,9 @@
 require "formula"
 
 class Wake < Formula
-  url "https://github.com/MichaelRFairhurst/wake-compiler/archive/v0.0.2.tar.gz"
+  url "https://github.com/MichaelRFairhurst/wake-compiler/archive/v0.0.3.tar.gz"
   homepage "http://www.wakelang.com"
-  sha1 "6322af40e819eccfa40fcf49d1b403d377d4c45b"
+  sha1 "e221d97b3e4627a32e5be954ed8985a1e53c2958"
 
   depends_on "boost" => 'c++11'
   depends_on "flex"
