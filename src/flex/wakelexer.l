@@ -63,6 +63,7 @@ exists					count(); return EXISTS;
 var						count(); return VAR;
 foreach					count(); return FOREACH;
 in						count(); return IN;
+from					count(); return FROM;
 
 \<\(					count(); return SYM_PROVIDE_ARGS_OPEN;
 \+\+					count(); return SYM_INCREMENT;
