@@ -100,12 +100,12 @@ every Main is:
         Text:HelloText &lt;- "dependency injection!";
 
     theMainMethod() {
-        var Hello &lt;- this;
+        var Hello from this;
         Hello.hello();
     }</code></pre>
 			<p>First of all, we use standard importing to get both the standard library's Printer, and secondly we import our own file Hello.wk (which we haven't written yet)</p>
 			<p><code>every Main is:</code> is a basic class definition. We define a class named Main, and then in it we say our Main can construct our class <code>Hello</code>. The other stuff we provide here is stuff needed by the class Hello. If we forgot to include it, the compiler would tell us to.</pre>
-			<p>In <code>theMainMethod()</code> we say <code>var Hello &lt;- this;</code>, which creates a Hello using our Main object, and assigns it to a variable named <code>Hello</code>. Then we can say <code>Hello.hello()</code> to call methods on it.</p>
+			<p>In <code>theMainMethod()</code> we say <code>var Hello from this;</code>, which creates a Hello using our Main object, and assigns it to a variable named <code>Hello</code>. Then we can say <code>Hello.hello()</code> to call methods on it.</p>
 			<span class="label label-info">Hello.wk</span>
 			<pre><code class="wake"
 >import Printer;
@@ -242,7 +242,7 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
 				<br />
 				<h3 id="FilePath">FilePath</h3>
 				<p><code>provides File</code></p>
-				<p>&nbsp;&nbsp; Open a readable/writable file at this path. Example: <code>var File &lt;- FilePath;</code></p>
+				<p>&nbsp;&nbsp; Open a readable/writable file at this path. Example: <code>var File from FilePath;</code></p>
 				<p><code>Text -- getPath()</code></p>
 				<p>&nbsp;&nbsp; Get the full text path of the file. Example: <code>Printer.printLine(FilePath.getPath())</code></p>
 				<p><code>Text -- getBasename()</code></p>
@@ -372,7 +372,7 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
 
     provides Person, Gender; // must provide gender since its a class!
     Person -- getPerson(Text firstname, Text lastname, Num age, Gender) {
-        var Person &lt;- this;
+        var Person from this;
         Person.firstname = firstname;
         Person.lastname = lastname;
         Person.age = age;
@@ -473,7 +473,7 @@ every ChildClass is:
          GenericProvider{Num} &lt;- SomeSubclassOfGenericProvider; // It should be possible to do this too, not sure how best to make this happen.
 
     useAProvider() {
-        T &lt;- SomeProvider; // Won't compile, for the same reason as java won't let you do "new T()". Likely will never fix this...its broken for very good reasons.
+        T from SomeProvider; // Won't compile, for the same reason as java won't let you do "new T()". Likely will never fix this...its broken for very good reasons.
     }</code></pre>
 
 				<br/>
@@ -543,7 +543,7 @@ every ChildClass is:
     needs ErrorProvider;
 
     Error{User, Text} -- findUser() {
-        var Error{User, Text} &lt;- ErrorProvider;
+        var Error{User, Text} from ErrorProvider;
         // do the lookup
         if User exists {
             Error.setSuccess(User);
