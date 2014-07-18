@@ -571,8 +571,8 @@ every SubClass (<span class="goodcode" title="Subclass extends BaseClass, meanin
 >every UsesProvider is:
 
     needs <span class="goodcode" title="This dependency will be provided by whatever provision made our UsesProvider object.">Provider</span>, <span class="goodcode" title="We can mark provisions with labels matched at compile time.">DependentClass:Special</span> then {
-        <span class="goodcode" title="This is just syntactic sugar, it takes a Printer from our provider and assigns it to the variable Printer.">var Printer &lt;- Provider;</span>
-        <span class="goodcode" title="Here a printer is fetched from our Provider object, but not assigned to a variable.">(Printer &lt;- Provider)</span>.print(Text);
+        <span class="goodcode" title="This is just syntactic sugar, it takes a Printer from our provider and assigns it to the variable Printer.">var Printer from Provider;</span>
+        <span class="goodcode" title="Here a printer is fetched from our Provider object, but not assigned to a variable.">(Printer from Provider)</span>.print(Text);
     }</code></pre>
 		<h3 id="generics">Generics <span class="label label-inverse">flexible</span> <span class="label label-inverse">typesafe</span></h3>
 		<p>Like Java, C#, and other languages, wake supports generic types.</p>
