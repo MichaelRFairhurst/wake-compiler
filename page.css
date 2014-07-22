@@ -146,3 +146,41 @@ code {
 .span6 {
 	max-width: 95%;
 }
+
+#intro {
+    height: 140px;
+    margin-left: -50%;
+    margin-right: -50%;
+    margin-top: -54px;
+    padding-left: 50%;
+    width: 200%;
+	margin-bottom: 25px;
+background: #529eea; /* Old browsers */
+
+background: -moz-linear-gradient(top,  #529eea 0%, #7ebaf7 56%, #96caff 100%); /* FF3.6+ */
+
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#529eea), color-stop(56%,#7ebaf7), color-stop(100%,#96caff)); /* Chrome,Safari4+ */
+
+background: -webkit-linear-gradient(top,  #529eea 0%,#7ebaf7 56%,#96caff 100%); /* Chrome10+,Safari5.1+ */
+
+background: -o-linear-gradient(top,  #529eea 0%,#7ebaf7 56%,#96caff 100%); /* Opera 11.10+ */
+
+background: -ms-linear-gradient(top,  #529eea 0%,#7ebaf7 56%,#96caff 100%); /* IE10+ */
+
+background: linear-gradient(to bottom,  #529eea 0%,#7ebaf7 56%,#96caff 100%); /* W3C */
+
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#529eea', endColorstr='#96caff',GradientType=0 ); /* IE6-9 */
+
+
+}
+
+#logo {
+    background-image: url("/wake_logo.png");
+    background-position: 0 -16px;
+    background-repeat: no-repeat;
+    background-size: 260px 264px;
+    display: inline-block;
+    float: left;
+    height: 140px;
+    width: 261px;
+}
