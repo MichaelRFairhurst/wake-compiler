@@ -148,13 +148,11 @@ code {
 }
 
 #intro {
-    height: 140px;
-    margin-left: -50%;
-    margin-right: -50%;
-    margin-top: -54px;
+    border-bottom: 5px solid #808080;
+    height: 97px;
+    margin: -10px -50% 25px;
     padding-left: 50%;
     width: 200%;
-	margin-bottom: 25px;
 background: #529eea; /* Old browsers */
 
 background: -moz-linear-gradient(top,  #529eea 0%, #7ebaf7 56%, #96caff 100%); /* FF3.6+ */
@@ -176,11 +174,30 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#529eea', end
 
 #logo {
     background-image: url("/wake_logo.png");
-    background-position: 0 -16px;
+    background-position: 0 -85px;
     background-repeat: no-repeat;
-    background-size: 260px 264px;
+    background-size: 300px 317px;
     display: inline-block;
     float: left;
-    height: 140px;
-    width: 261px;
+    height: 102px;
+    width: 300px;
+}
+
+.logo-label {
+	    color: #FFFFFF;
+    display: block;
+    float: left;
+    font-family: cursive;
+    font-size: 62px;
+    font-weight: 100;
+    margin-left: 23px;
+    margin-top: 60px;
+}
+
+.logo-label-label {
+    color: #666666;
+    float: left;
+    margin-left: 40px;
+    margin-top: 52px;
+    width: 274px;
 }
