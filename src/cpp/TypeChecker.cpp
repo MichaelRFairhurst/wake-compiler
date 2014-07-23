@@ -784,6 +784,30 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				}
 				break;
 
+			case NT_CATCH:
+				{
+					TypeParameterizer parameterizer;
+					parameterizer.writeInParameterizations(&tree->node_data.nodes[0]->node_data.type, parameterizedtypes);
+					try {
+						Type* exception = tree->node_data.nodes[0]->node_data.type;
+						classestable->assertTypeIsValid(exception);
+						if(!analyzer->isException(exception)) {
+							expectedstring = "exception subclass";
+							erroneousstring = analyzer->getNameForType(exception);
+							throw string("Only exceptions can be thrown");
+						}
+						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(exception->typedata._class.classname)));
+						scopesymtable->pushScope();
+						scopesymtable->add(exception);
+						freeType(typeCheck(tree->node_data.nodes[1]));
+						scopesymtable->popScope();
+					} catch(SymbolNotFoundException* e) {
+						errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
+						delete e;
+					}
+				}
+				break;
+
 			// Ignoring these for now
 			case NT_SWITCH:
 			case NT_CURRIED:
@@ -804,7 +828,6 @@ Type* TypeChecker::typeCheck(Node* tree) {
 			// these don't have types
 			case NT_BLOCK:
 			case NT_TRY:
-			case NT_CATCH:
 				scopesymtable->pushScope();
 				// FALL THROUGH!
 			case NT_EXPRESSIONS:
