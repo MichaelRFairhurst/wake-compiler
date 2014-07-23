@@ -55,6 +55,13 @@
 	Label the data
 	*/
 	td:before { content: attr(data-title); }
+
+	.logo-label-label {
+		display: none;
+	}
+	h2.logo-label {
+		font-size: 25px;
+	}
 }
 .mynavbar {
 	position: fixed;
@@ -148,7 +155,7 @@ code {
 }
 
 #intro {
-    border-bottom: 5px solid #808080;
+    border-bottom: 4px solid #A6A6A6;
     height: 97px;
     margin: -10px -50% 25px;
     padding-left: 50%;
@@ -181,23 +188,30 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#529eea', end
     float: left;
     height: 102px;
     width: 300px;
+	margin-left: -40px;
 }
 
 .logo-label {
 	    color: #FFFFFF;
     display: block;
     float: left;
-    font-family: cursive;
+    font-family: 'Roboto';
     font-size: 62px;
     font-weight: 100;
     margin-left: 23px;
-    margin-top: 60px;
+    margin-top: 53px;
 }
 
 .logo-label-label {
     color: #666666;
     float: left;
     margin-left: 40px;
-    margin-top: 52px;
+    margin-top: 47px;
     width: 274px;
+	line-height: 25px;
+}
+
+.logo-label-label .accent {
+    color: #4C4C4C;
+    font-style: italic;
 }
