@@ -750,6 +750,8 @@ Type* TypeChecker::typeCheck(Node* tree) {
 						errors->addError(new SemanticError(TYPE_ERROR, "Calling foreach over something that is not a list", tree));
 					} else {
 						Type* lowered = copyType(ret);
+						free(lowered->alias);
+						lowered->alias = NULL;
 						lowered->arrayed--;
 
 						scopesymtable->pushScope();

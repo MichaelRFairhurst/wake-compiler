@@ -2358,4 +2358,25 @@ PTT_TEST_CASE(
 	PTT_EXPECT(TYPE_ERROR)
 );
 
+PTT_TEST_CASE(
+	TestForeachOnAnAliasNoNamespaceClash,
+	"every MyClass is:						\n\
+		myMethod() {						\n\
+			var aliased Num[] = [];			\n\
+			foreach(aliased) { Num + 5; }	\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestForeachOnAnAliasNamespaceClash,
+	"every MyClass is:						\n\
+		myMethod() {						\n\
+			var aliased Num[] = [];			\n\
+			var Num = 5;					\n\
+			foreach(aliased) { }			\n\
+		}",
+	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)
+);
+
 BOOST_AUTO_TEST_SUITE_END()
