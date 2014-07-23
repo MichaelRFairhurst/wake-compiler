@@ -103,9 +103,9 @@ void Linker::write(ostream& outfile) {
 void Linker::writeDebugSymbols(ostream& outfile) {
 	// Write a string like "Printer|b|Champion|c||getName()|b|getParent()|c|write(Num)|d"
 	// where || delimits when class symbols become property symbols
-	outfile << "var $DBGS='";
+	outfile << "var $DBGS=\"";
 	const std::map<std::string, std::string> classaddresses = classTable.getAddresses();
-	const std::map<std::string, std::string> propaddresses = classTable.getAddresses();
+	const std::map<std::string, std::string> propaddresses = propertyTable.getAddresses();
 
 	for(std::map<std::string, std::string>::const_iterator it = classaddresses.begin(); it != classaddresses.end(); ++it) {
 		outfile << it->first << "|" << it->second << "|";
@@ -115,7 +115,7 @@ void Linker::writeDebugSymbols(ostream& outfile) {
 		outfile << "|" << it->first << "|" << it->second;
 	}
 
-	outfile << "';";
+	outfile << "\";";
 }
 
 void Linker::setMain(ostream& file, string classname, string methodname, ClassSpaceSymbolTable& table) {

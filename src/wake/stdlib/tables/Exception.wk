@@ -1,0 +1,7 @@
+import Text;
+
+every Exception is:
+
+	Text -- getStacktrace() { return ""; }
+
+	preThrow() {}

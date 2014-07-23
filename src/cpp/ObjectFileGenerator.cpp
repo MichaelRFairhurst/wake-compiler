@@ -83,10 +83,11 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 		case NT_CLASS:
 			{
+				file << "function ";
 				table.pushScope();
 				classname = tree->node_data.nodes[0]->node_data.type->typedata._class.classname;
 				header->addClassUsage(file.tellp(), classname);
-				file << "=function(";
+				file << "(";
 
 				vector<Type*>* needs = classes->find(classname)->getNeeds();
 				for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
