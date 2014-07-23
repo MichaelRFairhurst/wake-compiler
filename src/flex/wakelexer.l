@@ -66,6 +66,7 @@ in						count(); return IN;
 throw					count(); return THROW;
 catch					count(); return CATCH;
 try						count(); return TRY;
+from					count(); return FROM;
 
 \<\(					count(); return SYM_PROVIDE_ARGS_OPEN;
 \+\+					count(); return SYM_INCREMENT;

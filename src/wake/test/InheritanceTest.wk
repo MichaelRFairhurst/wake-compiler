@@ -21,66 +21,66 @@ every InheritanceTest is:
 	needs Printer;
 
 	~[test parent gets parent class name]~(Asserts) {
-		var InheritanceTestParent <- this;
+		var InheritanceTestParent from this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestParent");
 	}
 
 	~[test override child gets child class name]~(Asserts) {
-		var InheritanceTestOverride <- this;
+		var InheritanceTestOverride from this;
 		Asserts.that(InheritanceTestOverride.getClassName())Equals("InheritanceTestOverride");
 	}
 
 	~[test override child from provider gets child class name]~(Asserts) {
-		var InheritanceTestParent = InheritanceTestParent:Override <- this;
+		var InheritanceTestParent = InheritanceTestParent:Override from this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestOverride");
 	}
 
 	~[test override child after cast gets child class name]~(Asserts) {
-		var InheritanceTestParent = InheritanceTestOverride <- this;
+		var InheritanceTestParent = InheritanceTestOverride from this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestOverride");
 	}
 
 	~[test fallthrough child gets child class name]~(Asserts) {
-		var InheritanceTestFallthrough <- this;
+		var InheritanceTestFallthrough from this;
 		Asserts.that(InheritanceTestFallthrough.getClassName())Equals("InheritanceTestParent");
 	}
 
 	~[test fallthrough child from provider gets child class name]~(Asserts) {
-		var InheritanceTestParent = InheritanceTestParent:Fallthrough <- this;
+		var InheritanceTestParent = InheritanceTestParent:Fallthrough from this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestParent");
 	}
 
 	~[test fallthrough child after cast gets child class name]~(Asserts) {
-		var InheritanceTestParent = InheritanceTestFallthrough <- this;
+		var InheritanceTestParent = InheritanceTestFallthrough from this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestParent");
 	}
 
 	~[test implementing child gets child class name]~(Asserts) {
-		var InheritanceTestInterface <- this;
+		var InheritanceTestInterface from this;
 		Asserts.that(InheritanceTestInterface.getClassName())Equals("InheritanceTestInterface");
 	}
 
 	~[test implementing child from provider gets child class name]~(Asserts) {
-		var InheritanceTestParent = InheritanceTestParent:Interface <- this;
+		var InheritanceTestParent = InheritanceTestParent:Interface from this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestInterface");
 	}
 
 	~[test implementing child after cast gets child class name]~(Asserts) {
-		var InheritanceTestParent = InheritanceTestInterface <- this;
+		var InheritanceTestParent = InheritanceTestInterface from this;
 		Asserts.that(InheritanceTestParent.getClassName())Equals("InheritanceTestInterface");
 	}
 
 	~[test parent has need fulfilled]~ (Asserts) {
-		var InheritanceTestParent <- this;
+		var InheritanceTestParent from this;
 		Asserts.that(InheritanceTestParent.Text)Equals("public need");
 	}
 
 	~[test fallthrough has need fulfilled]~ (Asserts) {
-		var InheritanceTestFallthrough <- this;
+		var InheritanceTestFallthrough from this;
 		Asserts.that(InheritanceTestFallthrough.Text)Equals("public need");
 	}
 
 	~[test interface has need redefined]~ (Asserts) {
-		var InheritanceTestInterface <- this;
+		var InheritanceTestInterface from this;
 		Asserts.that(InheritanceTestInterface.Text)Equals("not injected");
 	}

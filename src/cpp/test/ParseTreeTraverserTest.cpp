@@ -1164,13 +1164,13 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	RetrieveFromClassValid,
-	"every MyClass is: provides MyClass; MyClass -- method() { return MyClass <- this; }",
+	"every MyClass is: provides MyClass; MyClass -- method() { return MyClass from this; }",
 	PTT_VALID
 )
 
 PTT_TEST_CASE(
 	RetrieveFromClassInvalid,
-	"every MyClass is: MyClass -- method() { return MyClass <- this; }",
+	"every MyClass is: MyClass -- method() { return MyClass from this; }",
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 )
 
@@ -1192,7 +1192,7 @@ PTT_TEST_CASE(
 			MyDB <- MyDB(Num:Port, Text:Username);	\n\
 														\n\
 		MyDB -- cloneMe() {								\n\
-			return MyDB <- this;						\n\
+			return MyDB from this;						\n\
 		}												\n\
 	",
 	PTT_VALID
@@ -1378,7 +1378,7 @@ PTT_TEST_CASE(
 			this = 5;						\n\
 			invalidAssignments() = 5;		\n\
 			this.invalidAssignments() = 5;	\n\
-			(MyClass <- this) = 5;			\n\
+			(MyClass from this) = 5;			\n\
 		}",
 	PTT_EXPECT(INVALID_ASSIGNMENT)
 	PTT_EXPECT(INVALID_ASSIGNMENT)
@@ -2107,21 +2107,21 @@ PTT_TEST_CASE(
 			MyClass{MyClass{Text[]}},			\n\
 			MyClass{MyClass{Bool[]}};			\n\
 		useProvisions() {						\n\
-			MyClass{Num} <- this;				\n\
-			MyClass{Text} <- this;				\n\
-			MyClass{Bool} <- this;				\n\
-			MyClass{Num?} <- this;				\n\
-			MyClass{Text?} <- this;				\n\
-			MyClass{Bool?} <- this;				\n\
-			MyClass{Num[]} <- this;				\n\
-			MyClass{Text[]} <- this;			\n\
-			MyClass{Bool[]} <- this;			\n\
-			MyClass{MyClass{Num}} <- this;		\n\
-			MyClass{MyClass{Text}} <- this;		\n\
-			MyClass{MyClass{Bool}} <- this;		\n\
-			MyClass{MyClass{Num?}} <- this;		\n\
-			MyClass{MyClass{Text?}} <- this;	\n\
-			MyClass{MyClass{Bool?}} <- this;	\n\
+			MyClass{Num} from this;				\n\
+			MyClass{Text} from this;				\n\
+			MyClass{Bool} from this;				\n\
+			MyClass{Num?} from this;				\n\
+			MyClass{Text?} from this;				\n\
+			MyClass{Bool?} from this;				\n\
+			MyClass{Num[]} from this;				\n\
+			MyClass{Text[]} from this;			\n\
+			MyClass{Bool[]} from this;			\n\
+			MyClass{MyClass{Num}} from this;		\n\
+			MyClass{MyClass{Text}} from this;		\n\
+			MyClass{MyClass{Bool}} from this;		\n\
+			MyClass{MyClass{Num?}} from this;		\n\
+			MyClass{MyClass{Text?}} from this;	\n\
+			MyClass{MyClass{Bool?}} from this;	\n\
 		}",
 	PTT_VALID
 );
@@ -2199,8 +2199,8 @@ PTT_TEST_CASE(
 	"every MyClass is:							\n\
 		provides MyClass:Specialized;			\n\
 		method() {								\n\
-			var MyClass:Specialized <- this;	\n\
-			MyClass:Specialized <- this;		\n\
+			var MyClass:Specialized from this;	\n\
+			MyClass:Specialized from this;		\n\
 		}",
 	PTT_VALID
 );
@@ -2210,10 +2210,10 @@ PTT_TEST_CASE(
 	"every MyClass is:						\n\
 		provides MyClass:Specialized;		\n\
 		method() {							\n\
-			var MyClass <- this;			\n\
+			var MyClass from this;			\n\
 		}									\n\
 		methodTwo() {						\n\
-			MyClass <- this;				\n\
+			MyClass from this;				\n\
 		}",
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
@@ -2441,15 +2441,24 @@ PTT_TEST_CASE(
 );
 
 PTT_TEST_CASE(
+	TestForeachOnAnAliasNoNamespaceClash,
+	"every MyClass is:						\n\
+		myMethod() {						\n\
+			var aliased Num[] = [];			\n\
+			foreach(aliased) { Num + 5; }	\n\
+		}",
+);
+
+PTT_TEST_CASE(
 	TestThrowExceptionIsNotTypeError,
 	"every MyException (an Exception) is:	\n\
 	every MyClass is:						\n\
 		provides Exception, MyException;	\n\
 		throwException() {					\n\
-			throw Exception <- this;		\n\
+			throw Exception from this;		\n\
 		}									\n\
 		throwMyException() {				\n\
-			throw MyException <- this;		\n\
+			throw MyException from this;		\n\
 		}",
 	PTT_VALID
 );
@@ -2459,7 +2468,7 @@ PTT_TEST_CASE(
 	"every MyClass is:						\n\
 		provides Exception;					\n\
 		Num -- throwInsteadOfReturn() {		\n\
-			throw Exception <- this;		\n\
+			throw Exception from this;		\n\
 		}",
 	PTT_VALID
 );
@@ -2470,7 +2479,7 @@ PTT_TEST_CASE(
 		catchBlah() {						\n\
 			try { } catch(Blah) { }			\n\
 		}",
-	PTT_EXPECT(SYMBOL_NOT_DEFINED)
+	PTT_EXPECT(CLASSNAME_NOT_FOUND)
 );
 
 PTT_TEST_CASE(
@@ -2569,6 +2578,17 @@ PTT_TEST_CASE(
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
+);
+
+PTT_TEST_CASE(
+	TestForeachOnAnAliasNamespaceClash,
+	"every MyClass is:						\n\
+		myMethod() {						\n\
+			var aliased Num[] = [];			\n\
+			var Num = 5;					\n\
+			foreach(aliased) { }			\n\
+		}",
+	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)
 );
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -28,7 +28,7 @@ int wakewrap()
 %}
 
 /* keywords */
-%token EVERY CAPABLE A_OR_AN IS RETURN WITH PUBLIC IF ELSE WHILE IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE EXISTS VAR FOREACH IN THROW TRY CATCH
+%token EVERY CAPABLE A_OR_AN IS RETURN WITH PUBLIC IF ELSE WHILE IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE EXISTS VAR FOREACH IN THROW TRY CATCH FROM
 /* symbols */
 %token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT SYM_PLUSEQ SYM_VALEQ SYM_MULTEQ SYM_SUBEQ SYM_DIVEQ SYM_PROVIDE_ARGS_OPEN
 /* this too */
@@ -273,7 +273,7 @@ declaration:
 	;
 
 retrievalargs:
-	SYM_PROVIDE																	{ $$ = MakeEmptyNode(NT_EMPTY); }
+	FROM																		{ $$ = MakeEmptyNode(NT_EMPTY); }
 	| SYM_PROVIDE_ARGS_OPEN expressions ')'										{ $$ = $2; }
 
 statement:
@@ -353,7 +353,7 @@ trystatement:
 	;
 
 catchstatement:
-	CATCH '(' type ')' block													{ $$ = MakeTwoBranchNode(NT_CATCH, $3, $5); }
+	CATCH '(' type ')' block													{ $$ = MakeTwoBranchNode(NT_CATCH, MakeNodeFromType($3), $5); }
 	;
 
 expression_unary:
