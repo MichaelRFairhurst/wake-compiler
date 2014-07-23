@@ -2,6 +2,7 @@
 	max-width: 1100px;
 	margin: auto;
 	padding: 5px;
+	overflow-x: hidden;
 }
 
 @media only screen and (max-width: 800px) {
@@ -102,6 +103,8 @@
 	top: 0px;
 	bottom: 0px;
 	position: fixed;
+	padding-top: 0px;
+	margin-top: 0px;
 }
 
 span.bold {
