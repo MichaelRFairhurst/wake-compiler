@@ -2,7 +2,6 @@
 	max-width: 1100px;
 	margin: auto;
 	padding: 5px;
-	overflow-x: hidden;
 }
 
 @media only screen and (max-width: 800px) {
@@ -62,6 +61,10 @@
 	}
 	h2.logo-label {
 		font-size: 25px;
+	}
+
+	.inner-content {
+		overflow-x: hidden;
 	}
 }
 .mynavbar {
