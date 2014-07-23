@@ -154,6 +154,7 @@ int main(int argc, char** argv) {
 			file.open(options->outFilename.c_str(), ios::out);
 
 			linker.write(file);
+			linker.writeDebugSymbols(file); // @todo make this optional
 
 			EntryPointAnalyzer entrypointanalyzer;
 			if(options->listMains) {

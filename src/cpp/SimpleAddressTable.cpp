@@ -12,3 +12,7 @@ std::string SimpleAddressTable::getAddress(std::string symbol) {
 void SimpleAddressTable::addSymbol(std::string symbol) {
 	addresses[symbol] = allocator.allocate();
 }
+
+const std::map<std::string, std::string> SimpleAddressTable::getAddresses() {
+	return addresses;
+}
