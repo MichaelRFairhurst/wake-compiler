@@ -46,7 +46,7 @@ void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 	dataptr[0] = 0x00; // End Inheritances
 	out.write(dataptr, 1);
 
-	for(auto it = table->getParameters().begin(); it != table->getParameters().end(); ++it) {
+	for(vector<Type*>::const_iterator it = table->getParameters().begin(); it != table->getParameters().end(); ++it) {
 		writeType(out, *it);
 	}
 	free(dataptr);
