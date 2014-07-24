@@ -43,7 +43,7 @@ string DerivedPropertySymbolTable::getSymbolNameOf(vector<pair<string, TypeArray
 
 bool DerivedPropertySymbolTable::isAbstract() {
 	//@TODO cache this result or something
-	for(auto it = properties.begin(); it != properties.end(); ++it) {
+	for(map<string, ObjectProperty*>::iterator it = properties.begin(); it != properties.end(); ++it) {
 		if(it->second->flags & PROPERTY_ABSTRACT) return true;
 	}
 

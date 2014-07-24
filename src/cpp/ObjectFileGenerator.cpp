@@ -338,7 +338,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 			header->addClassUsage(file.tellp(), tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
 			file << ".call(this";
 			PropertySymbolTable* proptable = classes->findModifiable(tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
-			for(auto it = proptable->getNeeds()->begin(); it != proptable->getNeeds()->end(); ++it) {
+			for(vector<Type*>::iterator it = proptable->getNeeds()->begin(); it != proptable->getNeeds()->end(); ++it) {
 				file << ",";
 				file << table.getAddress(*it);
 			}

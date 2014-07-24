@@ -5,7 +5,7 @@
 
 bool LibraryLoader::loadImport(string importname, string importpath, ClassSpaceSymbolTable& objtable) {
 	fstream importfile;
-	importfile.open(importpath + "/" + importname + ".table");
+	importfile.open((importpath + "/" + importname + ".table").c_str(), fstream::binary | fstream::in);
 	if(!importfile.is_open()) {
 		return false;
 	}

@@ -200,7 +200,7 @@ TypeAnalyzer* ClassSpaceSymbolTable::getAnalyzer() {
 
 void ClassSpaceSymbolTable::assertNoNeedsAreCircular() {
 	for(map<string, pair<PropertySymbolTable*, bool> >::iterator it = classes.begin(); it != classes.end(); ++it) {
-		for(auto needit = it->second.first->getNeeds()->begin(); needit != it->second.first->getNeeds()->end(); ++needit) {
+		for(vector<Type*>::iterator needit = it->second.first->getNeeds()->begin(); needit != it->second.first->getNeeds()->end(); ++needit) {
 			analyzer.assertNeedIsNotCircular(it->first, *needit);
 		}
 	}

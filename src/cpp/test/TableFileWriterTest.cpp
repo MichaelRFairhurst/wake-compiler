@@ -4,7 +4,7 @@
 #include <string>
 #include "type.h"
 
-#define ASSERTCHAR(v) BOOST_CHECK_MESSAGE(dataptr[i++] == v, "Expected " #v " in stream at pos " + std::to_string(i) + " got " + std::to_string((unsigned char) dataptr[i]));
+#define ASSERTCHAR(v) BOOST_CHECK_MESSAGE(dataptr[i++] == v, "Expected " #v " in stream at pos " + string(1, i) + " got " + string(1, (unsigned char) dataptr[i]));
 #define ASSERTLENGTH(l) char* dataptr = (char*) malloc(l); out.read(dataptr, l); BOOST_CHECK_MESSAGE(!out.eof(), "too short"); out.peek(); BOOST_CHECK_MESSAGE(out.eof(), "too long"); int i = 0;
 
 BOOST_AUTO_TEST_SUITE(TableFileWriterTest)

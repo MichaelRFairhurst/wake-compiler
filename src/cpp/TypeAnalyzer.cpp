@@ -9,7 +9,7 @@ bool TypeAnalyzer::isASubtypeOfB(string a, string b) {
 
 		ReadOnlyPropertySymbolTable* a_data = reference->find(a);
 
-		for(auto it = a_data->getParentage().begin(); it != a_data->getParentage().end(); ++it) {
+		for(map<string, bool>::const_iterator it = a_data->getParentage().begin(); it != a_data->getParentage().end(); ++it) {
 			if(isASubtypeOfB(it->first, b)) return true;
 		}
 
@@ -78,7 +78,7 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 
 			ReadOnlyPropertySymbolTable* a_data = reference->find(a->typedata._class.classname);
 
-			for(auto it = a_data->getParentage().begin(); it != a_data->getParentage().end(); ++it) {
+			for(map<string, bool>::const_iterator it = a_data->getParentage().begin(); it != a_data->getParentage().end(); ++it) {
 				if(isASubtypeOfB(it->first, b->typedata._class.classname)) return true;
 			}
 

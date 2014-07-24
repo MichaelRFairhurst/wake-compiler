@@ -103,7 +103,7 @@ void ClassParseTreeTraverser::secondPass(Node* tree) {
 		case NT_CLASSBODY:
 			{
 				scopesymtable->pushScope();
-				for(auto it = propertysymtable->getNeeds()->begin(); it != propertysymtable->getNeeds()->end(); ++it) {
+				for(vector<Type*>::iterator it = propertysymtable->getNeeds()->begin(); it != propertysymtable->getNeeds()->end(); ++it) {
 					try {
 						scopesymtable->add(*it);
 					} catch(SemanticError* e) {

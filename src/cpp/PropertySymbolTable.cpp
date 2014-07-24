@@ -234,7 +234,7 @@ ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<Type*
 	}
 
 	vector<Type*>* newneeds = new vector<Type*>();
-	for(auto it = needs->begin(); it != needs->end(); ++it) {
+	for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
 		Type* newneed = copyType(*it);
 		parameterizer.applyParameterizations(&newneed, getParameters(), parameters);
 		newneeds->push_back(newneed);
@@ -249,7 +249,7 @@ Type* PropertySymbolTable::getAsType() {
 	ret->typedata._class.classname = strdup(classname.c_str());
 	if(getParameters().size()) {
 		ret->typedata._class.parameters = MakeTypeArray();
-		for(auto it = getParameters().begin(); it != getParameters().end(); ++it) {
+		for(vector<Type*>::const_iterator it = getParameters().begin(); it != getParameters().end(); ++it) {
 			AddTypeToTypeArray(*it, ret->typedata._class.parameters);
 		}
 	}

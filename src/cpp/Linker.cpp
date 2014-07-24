@@ -31,7 +31,7 @@ void Linker::loadTables(string dirname, ClassSpaceSymbolTable& table) {
 	if(!is_directory(itr->status())) {
 		string fname = itr->path().string();
 		if(fname.substr(fname.size() - 6) != ".table") continue;
-		file.open(fname);
+		file.open(fname.c_str(), fstream::in | fstream::binary);
 		PropertySymbolTable* ptable = table.getEmptyPropertySymbolTable();
 		reader.read(ptable, file);
 		table.importClass(ptable);
