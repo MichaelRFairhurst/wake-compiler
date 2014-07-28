@@ -400,7 +400,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 						freeType(typeCheck(tree->node_data.nodes[2]));
 					}
 
-					if(!analyzer->isPrimitiveTypeBool(ret) && !analyzer->isPrimitiveTypeNum(ret)) {
+					if(!analyzer->isPrimitiveTypeNum(ret) && !analyzer->isPrimitiveTypeBool(ret)) {
 						expectedstring = "Bool"; freeType(ret);
 						ret = MakeType(TYPE_CLASS);
 						ret->typedata._class.classname = strdup("Bool");
