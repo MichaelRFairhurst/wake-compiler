@@ -433,10 +433,8 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	CannotIfCondOrInvertWithAnythingButBools,
 	"every MyClass is:											\n\
-		ifConditionWithNum() { if(5) 5; }						\n\
 		ifConditionWith( MyClass ) { if(MyClass) 5; }			\n\
 		ifConditionWithText() { if('test') 5; }					\n\
-		whileConditionWithNum() { while(5) 5; }					\n\
 		whileConditionWith( MyClass ) { while(MyClass) 5; }		\n\
 		whileConditionWithText() { while('test') 5; }			\n\
 		forConditionWithNum() { for(5; 5; 5) 5; }				\n\
@@ -446,8 +444,6 @@ PTT_TEST_CASE(
 		invertText() { !'test'; }								\n\
 		invert( MyClass ) { !MyClass; }							\n\
 	",
-	PTT_EXPECT(TYPE_ERROR)
-	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -494,11 +490,17 @@ PTT_TEST_CASE(
 	ValidIfConditions,
 	"every MyClass is:											\n\
 		truthLiterals() { if(true) 5; if(false) 5; }			\n\
+		truthNumLiteral() { if(1) 5; }			\n\
 		truthVariable(Bool) { if(Bool) 5; }					\n\
+		numVariable(Num) { if(Num) 5; }					\n\
 		truthAlias(Bool b) { if(b) 5; }						\n\
+		numAlias(Num n) { if(n) 5; }						\n\
 		truthLiteralsWhile() { while(true) 5; while(false) 5; }	\n\
 		truthVariableWhile(Bool) { while(Bool) 5; }			\n\
 		truthAliasWhile(Bool b) { while(b) 5; }				\n\
+		numLiteralWhile() { while(5) 5; }	\n\
+		numVariableWhile(Num) { while(Num) 5; }			\n\
+		numAliasWhile(Num n) { while(n) 5; }				\n\
 	",
 	PTT_VALID
 )
