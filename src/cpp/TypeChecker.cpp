@@ -400,11 +400,11 @@ Type* TypeChecker::typeCheck(Node* tree) {
 						freeType(typeCheck(tree->node_data.nodes[2]));
 					}
 
-					if(!analyzer->isPrimitiveTypeBool(ret)) {
+					if(!analyzer->isPrimitiveTypeBool(ret) && !analyzer->isPrimitiveTypeNum(ret)) {
 						expectedstring = "Bool"; freeType(ret);
 						ret = MakeType(TYPE_CLASS);
 						ret->typedata._class.classname = strdup("Bool");
-						throw string("If/While conditions must be Bool");
+						throw string("If/While conditions must be Bool or Num");
 					}
 				}
 				break;
