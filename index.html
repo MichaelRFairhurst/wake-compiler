@@ -568,17 +568,6 @@ every SubClass (<span class="goodcode" title="Subclass extends BaseClass, meanin
         <span class="goodcode" title="Here we can write code that returns if a Num is less than the other.">return Num &lt; $Num;</span>
     }</code></pre>
 		<hr />
-		<h1 id="provisions">Provisions <span class="label label-inverse">flexible</span> <span class="label label-inverse">testable</span> <span class="label label-inverse">typesafe</span></h1>
-		<p>Testability was a huge goal of Wake's design. We were inspired by dependency injection frameworks to make a faster, typesafe means of binding dependencies to behavior. What we came up with is provisions.</p>
-		<p>What in other languages may be a static method, or a call to <code>new</code> another object, or a helper function call, instead is fetched from a provider. Here we look at how.</p>
-			<span class="label label-info">Wake</span>
-		<pre><code class="wake"
->every UsesProvider is:
-
-    needs <span class="goodcode" title="This dependency will be provided by whatever provision made our UsesProvider object.">Provider</span>, <span class="goodcode" title="We can mark provisions with labels matched at compile time.">DependentClass:Special</span> then {
-        <span class="goodcode" title="This is just syntactic sugar, it takes a Printer from our provider and assigns it to the variable Printer.">var Printer from Provider;</span>
-        <span class="goodcode" title="Here a printer is fetched from our Provider object, but not assigned to a variable.">(Printer from Provider)</span>.print(Text);
-    }</code></pre>
 		<h3 id="generics">Generics <span class="label label-inverse">flexible</span> <span class="label label-inverse">typesafe</span></h3>
 		<p>Like Java, C#, and other languages, wake supports generic types.</p>
 		<div class="alert alert-info">Generics are required for a powerful static type system. Unlike wake, Java and C# did not have generics in early versions. As such, the type safety and performance of arrays in these languages was thrown out to accomodate missing flexibility. Wake had generics from version one and does not suffer these drawbacks.</div>
@@ -604,6 +593,18 @@ every SubClass (<span class="goodcode" title="Subclass extends BaseClass, meanin
     with CalculationCache{Num} <span class="goodcode" title="Create a calculation cache that squares Num">&lt;(Num -- fn() { return Num * Num; }) this;</span>
     Num -- get() {
         return CalculationCache.getValue();
+    }</code></pre>
+		<hr />
+		<h1 id="provisions">Provisions <span class="label label-inverse">flexible</span> <span class="label label-inverse">testable</span> <span class="label label-inverse">typesafe</span></h1>
+		<p>Testability was a huge goal of Wake's design. We were inspired by dependency injection frameworks to make a faster, typesafe means of binding dependencies to behavior. What we came up with is provisions.</p>
+		<p>What in other languages may be a static method, or a call to <code>new</code> another object, or a helper function call, instead is fetched from a provider. Here we look at how.</p>
+			<span class="label label-info">Wake</span>
+		<pre><code class="wake"
+>every UsesProvider is:
+
+    needs <span class="goodcode" title="This dependency will be provided by whatever provision made our UsesProvider object.">Provider</span>, <span class="goodcode" title="We can mark provisions with labels matched at compile time.">DependentClass:Special</span> then {
+        <span class="goodcode" title="This is just syntactic sugar, it takes a Printer from our provider and assigns it to the variable Printer.">var Printer from Provider;</span>
+        <span class="goodcode" title="Here a printer is fetched from our Provider object, but not assigned to a variable.">(Printer from Provider)</span>.print(Text);
     }</code></pre>
 		<h3 id="plainprovisions">Defining Plain Provisions <span class="label label-inverse">concise</span> <span class="label label-inverse">typesafe</span></h3>
 		<p>A plain provision simply marks that your class can provide a type. The compiler will ensure that you can provide all of that type's dependencies as well.</p>
@@ -651,8 +652,8 @@ every User is:
         Num:Port &lt;- 3307,
         Text:Username &lt;- "Test",
         DBConnection:Test &lt;- DBConnection(<span class="goodcode" title="If a DBConnection accepts any Text username, we can create specialized connections by letting the provider find the right Username and Port.">Text:Username, Num:Port</span>),
-		<p>If a class with needs extends another class with needs, constructor provisions require that you supply all of these. When doing this, supply the childclass needs first, and then the parent class needs, in that order. And don't worry, the compiler will make sure you don't mess up.</p>
         <span class="goodcode" title="Constructor provisions do not require specialization.">User</span> &lt;- <span class="goodcode" title="Constructor provisions can be used with subtype provision simultaneously.">TestUser</span>(DBConnection:Test);</code></pre>
+		<p>If a class with needs extends another class with needs, constructor provisions require that you supply all of these. When doing this, supply the childclass needs first, and then the parent class needs, in that order. And don't worry, the compiler will make sure you don't mess up.</p>
 		<h3 id="behavioralprovisions">Behavioral Provisions <span class="label label-inverse">flexible</span></h3>
 		<p>Provisions can be treated as a code body with a return type where necessary. Note that the end result must be a provision; however it can be used to configure objects or provide different objects conditionally, or create a singleton.</p>
 			<span class="label label-info">Wake</span>
