@@ -1,4 +1,4 @@
-wake-compiler [![Build Status](https://secure.travis-ci.org/michhaelrfairhurst/wake-compiler.png?branch=master)](http://travis-ci.org/michhaelrfairhurst/wake-compiler)
+wake-compiler [![Build Status](https://secure.travis-ci.org/michhaelrfairhurst/wake-compiler.png?branch=master)](http://travis-ci.org/michaelrfairhurst/wake-compiler)
 ==============================
 This is the compiler for the [Wake](http://wakelang.com) language.
 
