@@ -111,6 +111,27 @@ void ObjectFileGenerator::generate(Node* tree) {
 			}
 			break;
 
+		case NT_TRY:
+			file << "try{";
+			generate(tree->node_data.nodes[0]);
+			file << "}";
+			if(tree->subnodes == 2) generate(tree->node_data.nodes[1]);
+			break;
+
+		case NT_CATCH:
+			table.pushScope();
+			table.add(tree->node_data.nodes[0]->node_data.type);
+			file << "catch(" << table.getAddress(tree->node_data.nodes[0]->node_data.type) << "){";
+			generate(tree->node_data.nodes[1]);
+			table.popScope();
+			file << "}";
+			break;
+
+		case NT_THROW:
+			file << "throw ";
+			generate(tree->node_data.nodes[0]);
+			break;
+
 		case NT_PROVISION:
 			file << "this.";
 			header->addPropertyUsage(file.tellp(), classes->find(classname)->getProvisionSymbol(tree->node_data.nodes[0]->node_data.type));
