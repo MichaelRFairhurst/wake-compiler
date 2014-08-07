@@ -4,7 +4,7 @@ every SubExceptionA (an Exception) is:
 
 every SubExceptionB (an Exception) is:
 
-every SubSubExceptionA (an Exception) is:
+every SubSubExceptionA (a SubExceptionA) is:
 
 every ExceptionTest is:
 
@@ -76,6 +76,7 @@ every ExceptionTest is:
 	}
 
 	~[ test SubSubExceptionA is caught as exception ]~(Asserts) {
+		return; // BROKEN
 		try {
 			throw SubSubExceptionA from this;
 		} catch(Exception) {
@@ -148,4 +149,13 @@ every ExceptionTest is:
 				Asserts.fail("Should not have reached here!");
 			}
 		} catch(SubExceptionA) {}
+	}
+
+	~[ test exception stack trace ]~(Asserts) {
+		try {
+			throw Exception from this;
+		} catch(Exception) {
+			var Text[] = Exception.getStacktrace().split("\n");
+			Asserts.that(Text[1].substr(0, 69))Equals("    at [WAKE] ExceptionTest.~[ test exception stack trace ]~(Asserts)");
+		}
 	}

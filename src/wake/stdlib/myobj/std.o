@@ -337,8 +337,15 @@
 			try {
 				throw$ new$ Error();
 			} catch(E) {
-				e = E;
+				e = E; var$ f = e.stack,
+				f = f.split('\n');
+				f.splice(1, 1);
+				e.stack = f.join('\n');
 			}
+		};
+
+		this.`isExceptionType(Text)` = function(t) {
+			return$ t === "~Exception~";
 		};
 	};
 

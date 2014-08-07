@@ -106,6 +106,26 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 				generate(tree->node_data.nodes[1]);
 				if(tree->subnodes > 2) generate(tree->node_data.nodes[2]);
+
+				// Generate the exception runtime class checking
+				// @Todo not generate this when not an exception
+				// and either don't allow this to be overridden or don't declare it
+				// when its defined
+				file << "this.";
+				header->addPropertyUsage(file.tellp(), "isExceptionType(Text)");
+				file << "=function(a){return [";
+				const map<string, bool> parentage = classes->find(classname)->getParentage();
+				// @Todo only print exception classes
+				for(map<string, bool>::const_iterator it = parentage.begin(); it != parentage.end(); ++it) {
+					file << "'";
+					header->addClassUsage(file.tellp(), it->first);
+					file << "',";
+				}
+				file << "'";
+				header->addClassUsage(file.tellp(), classname);
+				file << "'].indexOf(a)!==-1;};";
+
+				// End exception class type checking
 				file << "};";
 				table.popScope();
 			}
@@ -122,14 +142,31 @@ void ObjectFileGenerator::generate(Node* tree) {
 			table.pushScope();
 			table.add(tree->node_data.nodes[0]->node_data.type);
 			file << "catch(" << table.getAddress(tree->node_data.nodes[0]->node_data.type) << "){";
+			file << "if(" << table.getAddress(tree->node_data.nodes[0]->node_data.type) << ".";
+			header->addPropertyUsage(file.tellp(), "isExceptionType(Text)");
+			file << "('";
+			header->addClassUsage(file.tellp(), tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
+			file << "')){";
 			generate(tree->node_data.nodes[1]);
+			file << "}else{throw " << table.getAddress(tree->node_data.nodes[0]->node_data.type) << ";}}";
 			table.popScope();
-			file << "}";
 			break;
 
 		case NT_THROW:
-			file << "throw ";
-			generate(tree->node_data.nodes[0]);
+			{
+				table.pushScope();
+				Type* exception = MakeType(TYPE_MATCHALL);
+				std::stringstream exceptionname;
+				exceptionname << exception;
+				table.add(exceptionname.str(), exception);
+				file << "var " << table.getAddress(exceptionname.str()) << "=";
+				generate(tree->node_data.nodes[0]);
+				file << ";" << table.getAddress(exceptionname.str()) << ".";
+				header->addPropertyUsage(file.tellp(), "preThrow()");
+				file << "();";
+				file << "throw " << table.getAddress(exceptionname.str());
+				table.popScope();
+			}
 			break;
 
 		case NT_PROVISION:
