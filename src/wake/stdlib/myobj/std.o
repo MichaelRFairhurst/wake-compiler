@@ -2,7 +2,7 @@
 	var$ b='', fs = require('fs');
 	fs.existsSync = fs.existsSync || require("path").existsSync;
 
-	~Printer~ = function(){
+	~Printer~ = function$ ~Printer~(){
 		this.`print(Text)` =
 		this.`print(Num)` = function(a) {
 			if(typeof$ process != 'undefined'
@@ -23,14 +23,14 @@
 		};
 	};
 
-	~System~ = function() {
+	~System~ = function$ ~System~() {
 		this.`exit(Num)` = function(a) {
 			if(typeof$ process!='undefined' && typeof$ process.exit!='undefined')
 				process.exit(a);
 		};
 	};
 
-	~Num~ = function(a) {
+	~Num~ = function$ ~Num~(a) {
 		this.`squared()` = function() {
 			return$ a * a;
 		};
@@ -91,7 +91,7 @@
 
 	};
 
-	~Text~ = function(a) {
+	~Text~ = function$ ~Text~(a) {
 
 		this.`toUpper()` = function() {
 			return$ a.toUpperCase();
@@ -140,7 +140,7 @@
 
 	};
 
-	~List~ = function(a) {
+	~List~ = function$ ~List~(a) {
 		this.`getSize()` = function() {
 			return$ a.length;
 		};
@@ -163,7 +163,7 @@
 
 	};
 
-	~FileSystem~ = function() {
+	~FileSystem~ = function$ ~FileSystem~() {
 
 		this.`getPath(Text)` = function(a) {
 			return$ new$ ~FilePath~(a);
@@ -183,7 +183,7 @@
 
 	};
 
-	~FilePath~ = function(a) {
+	~FilePath~ = function$ ~FilePath~(a) {
 
 		this.`File<-` = function() {
 			return$ new$ ~File~(this);
@@ -236,7 +236,7 @@
 
 	};
 
-	~File~ = function(a) {
+	~File~ = function$ ~File~(a) {
 		var$ b = 0, c = 1, d = fs.openSync(a.`getPath()`(), 'a+');
 
 		this.`getPath()` = function() {
@@ -298,7 +298,7 @@
 
 	};
 
-	~Bool~ = function(a) {
+	~Bool~ = function$ ~Bool~(a) {
 
 		this.`toString()` = function() {
 			return$ a?"true":"false";
@@ -306,11 +306,47 @@
 
 	};
 
-	~Argv~ = function() {
+	~Argv~ = function$ ~Argv~() {
 
 		this.`getArgv()` = function() {
 			return$ process.argv;
 		};
 
 	};
+
+	~Exception~ = function$ ~Exception~() {
+		var$ e;
+
+		this.`getStacktrace()` = function() {
+			var$ a = $$DBGS.split('||'),
+				b = a[0].split('|'),
+				c = a[1].split('|'),
+				d,
+				f = e.stack;
+
+			for(d = 0; d < b.length; d += 2)
+				f = f.replace('_' + b[d+1] + '.', '[WAKE]$ ' + b[d] + '.');
+
+			for(d = 0; d < c.length; d += 2)
+				f = f.replace('.' + c[d+1] + '$ ', '.' + c[d] + '$ ');
+
+			return$ f;
+		};
+
+		this.`preThrow()` = function() {
+			try {
+				throw$ new$ Error();
+			} catch(E) {
+				e = E; var$ f = e.stack,
+				f = f.split('\n');
+				f.splice(1, 1);
+				e.stack = f.join('\n');
+			}
+		};
+
+		this.`isExceptionType(Text)` = function(t) {
+			return$ t === "~Exception~";
+		};
+	};
+
 })(typeof$ require === 'undefined' ? function() {} : require);

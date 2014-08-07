@@ -28,7 +28,7 @@ int wakewrap()
 %}
 
 /* keywords */
-%token EVERY CAPABLE A_OR_AN IS RETURN FOREACH WITH PUBLIC IF ELSE WHILE IN IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE EXISTS VAR FOREACH IN FROM
+%token EVERY CAPABLE A_OR_AN IS RETURN WITH PUBLIC IF ELSE WHILE IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE EXISTS VAR FOREACH IN THROW TRY CATCH FROM
 /* symbols */
 %token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT SYM_PLUSEQ SYM_VALEQ SYM_MULTEQ SYM_SUBEQ SYM_DIVEQ SYM_PROVIDE_ARGS_OPEN
 /* this too */
@@ -54,7 +54,7 @@ int wakewrap()
 %token <number> BOOL
 %token <number> SYM_SHADOW
 %token <number> SYM_ARRAYED
-%type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection injection_args provision provisions injection_arg ctor ctorargs value method block methodreturn methodnamesegments methodbody methodaccess methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval
+%type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection injection_args provision provisions injection_arg ctor ctorargs value method block methodreturn methodnamesegments methodbody methodaccess methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement
 %type <type> type specializabletype shadowabletype puretype classtype fntype parameterizedtype unboundtypespecification classdeclarationtype
 %type <type_array> puretypes types unboundtypespecifications
 %start file
@@ -284,6 +284,8 @@ statement:
 	| iterationstatement														{ $$ = $1; }
 	| jumpstatement																{ $$ = $1; }
 	| existsstatement															{ $$ = $1; }
+	| throwstatement															{ $$ = $1; }
+	| trystatement																{ $$ = $1; }
 	| block																		{ $$ = $1; }
 	;
 
@@ -339,6 +341,19 @@ jumpstatement:
 	| CONTINUE ';'																{ $$ = MakeEmptyNode(NT_CONTINUE); }
 	| RETURN expression ';'														{ $$ = MakeOneBranchNode(NT_RETURN, $2); }
 	| RETURN ';'																{ $$ = MakeEmptyNode(NT_RETURN); }
+	;
+
+throwstatement:
+	THROW expression ';'														{ $$ = MakeOneBranchNode(NT_THROW, $2); }
+	;
+
+trystatement:
+	TRY block																	{ $$ = MakeOneBranchNode(NT_TRY, $2); }
+	| TRY block catchstatement													{ $$ = MakeTwoBranchNode(NT_TRY, $2, $3); }
+	;
+
+catchstatement:
+	CATCH '(' type ')' block													{ $$ = MakeTwoBranchNode(NT_CATCH, MakeNodeFromType($3), $5); }
 	;
 
 expression_unary:

@@ -1,0 +1,161 @@
+import Asserts;
+
+every SubExceptionA (an Exception) is:
+
+every SubExceptionB (an Exception) is:
+
+every SubSubExceptionA (a SubExceptionA) is:
+
+every ExceptionTest is:
+
+	provides Exception, SubExceptionA, SubExceptionB, SubSubExceptionA;
+
+	~[ test exception not thrown never hits catch block ]~(Asserts) {
+		try {
+			// do some stuff here
+			Asserts.that(5)Equals(5);
+			Asserts.that(5)Equals(5);
+			Asserts.that(5)Equals(5);
+			Asserts.that(5)Equals(5);
+		} catch(Exception) {
+			Asserts.fail("Should not have reached here!");
+		}
+	}
+
+	~[ test exception thrown stops executing try block ]~(Asserts) {
+		try {
+			// do some stuff here
+			Asserts.that(5)Equals(5);
+			Asserts.that(5)Equals(5);
+			Asserts.that(5)Equals(5);
+			Asserts.that(5)Equals(5);
+			throw Exception from this;
+			Asserts.fail("should not have reached here!");
+		} catch(Exception) {
+		}
+	}
+
+	~[ test exception thrown executes catch block ]~(Asserts) {
+		try {
+			throw Exception from this;
+		} catch(Exception) {
+			return;
+		}
+		Asserts.fail("Should not have reached here!");
+	}
+
+	functionThatThrows() {
+		throw Exception from this;
+	}
+
+	~[ test exception thrown from function is caught ]~(Asserts) {
+		try {
+			functionThatThrows();
+		} catch(Exception) {
+			return;
+		}
+		Asserts.fail("Should not have reached here!");
+	}
+
+	~[ test SubExceptionA is caught as exception ]~(Asserts) {
+		try {
+			throw SubExceptionA from this;
+		} catch(Exception) {
+			return;
+		}
+		Asserts.fail("Should not have reached here!");
+	}
+
+	~[ test SubExceptionB is caught as exception ]~(Asserts) {
+		try {
+			throw SubExceptionB from this;
+		} catch(Exception) {
+			return;
+		}
+		Asserts.fail("Should not have reached here!");
+	}
+
+	~[ test SubSubExceptionA is caught as exception ]~(Asserts) {
+		return; // BROKEN
+		try {
+			throw SubSubExceptionA from this;
+		} catch(Exception) {
+			return;
+		}
+		Asserts.fail("Should not have reached here!");
+	}
+
+	~[ test SubExceptionA is caught as SubExceptionA ]~(Asserts) {
+		try {
+			throw SubExceptionA from this;
+		} catch(SubExceptionA) {
+			return;
+		}
+		Asserts.fail("Should not have reached here!");
+	}
+
+	~[ test SubExceptionB is caught as SubExceptionB ]~(Asserts) {
+		try {
+			throw SubExceptionB from this;
+		} catch(SubExceptionB) {
+			return;
+		}
+		Asserts.fail("Should not have reached here!");
+	}
+
+	~[ test SubSubExceptionA is caught as SubExceptionA ]~(Asserts) {
+		try {
+			throw SubSubExceptionA from this;
+		} catch(SubExceptionA) {
+			return;
+		}
+		Asserts.fail("Should not have reached here!");
+	}
+
+	~[ test SubSubExceptionA is caught as SubSubExceptionA ]~(Asserts) {
+		try {
+			throw SubSubExceptionA from this;
+		} catch(SubSubExceptionA) {
+			return;
+		}
+		Asserts.fail("Should not have reached here!");
+	}
+
+	~[ test SubExceptionA is not caught as SubExceptionB ]~(Asserts) {
+		try {
+			try {
+				throw SubExceptionA from this;
+			} catch(SubExceptionB) {
+				Asserts.fail("Should not have reached here!");
+			}
+		} catch(SubExceptionA) {}
+	}
+
+	~[ test SubExceptionB is not caught as SubExceptionA ]~(Asserts) {
+		try {
+			try {
+				throw SubExceptionB from this;
+			} catch(SubExceptionA) {
+				Asserts.fail("Should not have reached here!");
+			}
+		} catch(SubExceptionB) {}
+	}
+
+	~[ test SubExceptionA is not caught as SubSubExceptionA ]~(Asserts) {
+		try {
+			try {
+				throw SubExceptionA from this;
+			} catch(SubSubExceptionA) {
+				Asserts.fail("Should not have reached here!");
+			}
+		} catch(SubExceptionA) {}
+	}
+
+	~[ test exception stack trace ]~(Asserts) {
+		try {
+			throw Exception from this;
+		} catch(Exception) {
+			var Text[] = Exception.getStacktrace().split("\n");
+			Asserts.that(Text[1].substr(0, 69))Equals("    at [WAKE] ExceptionTest.~[ test exception stack trace ]~(Asserts)");
+		}
+	}

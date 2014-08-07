@@ -37,9 +37,17 @@ bool TypeChecker::exhaustiveReturns(Node* tree) {
 			// Returns are exhaustive if both the if and else statements are exhaustive
 			return exhaustiveReturns(tree->node_data.nodes[1]) && exhaustiveReturns(tree->node_data.nodes[2]);
 
+		case NT_TRY:
+			// If no breok, then not exhaustive
+			if(tree->subnodes == 1) return false;
+			// Returns are exhaustive if both the try and catch statements are exhaustive
+			return exhaustiveReturns(tree->node_data.nodes[0]) && exhaustiveReturns(tree->node_data.nodes[1]);
+
 		case NT_RETURN:
+		case NT_THROW:
 			return true;
 
+		case NT_CATCH:
 		case NT_BLOCK:
 		case NT_RETRIEVALS_STATEMENTS:
 			{
@@ -390,6 +398,17 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				}
 				break;
 
+			case NT_THROW:
+				{
+					ret = typeCheckUsable(tree->node_data.nodes[0]);
+					if(!analyzer->isException(ret)) {
+						expectedstring = "Exception";
+						erroneousstring = analyzer->getNameForType(ret);
+						throw string("Can only throw subclasses of exception");
+					}
+				}
+				break;
+
 			case NT_IF_ELSE:
 			case NT_WHILE:
 				{
@@ -401,6 +420,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 					}
 
 					if(!analyzer->isPrimitiveTypeNum(ret) && !analyzer->isPrimitiveTypeBool(ret)) {
+						erroneousstring = analyzer->getNameForType(ret);
 						expectedstring = "Bool"; freeType(ret);
 						ret = MakeType(TYPE_CLASS);
 						ret->typedata._class.classname = strdup("Bool");
@@ -764,6 +784,30 @@ Type* TypeChecker::typeCheck(Node* tree) {
 				}
 				break;
 
+			case NT_CATCH:
+				{
+					TypeParameterizer parameterizer;
+					parameterizer.writeInParameterizations(&tree->node_data.nodes[0]->node_data.type, parameterizedtypes);
+					try {
+						Type* exception = tree->node_data.nodes[0]->node_data.type;
+						classestable->assertTypeIsValid(exception);
+						if(!analyzer->isException(exception)) {
+							expectedstring = "exception subclass";
+							erroneousstring = analyzer->getNameForType(exception);
+							throw string("Only exceptions can be thrown");
+						}
+						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(exception->typedata._class.classname)));
+						scopesymtable->pushScope();
+						scopesymtable->add(exception);
+						freeType(typeCheck(tree->node_data.nodes[1]));
+						scopesymtable->popScope();
+					} catch(SymbolNotFoundException* e) {
+						errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
+						delete e;
+					}
+				}
+				break;
+
 			// Ignoring these for now
 			case NT_SWITCH:
 			case NT_CURRIED:
@@ -783,6 +827,7 @@ Type* TypeChecker::typeCheck(Node* tree) {
 
 			// these don't have types
 			case NT_BLOCK:
+			case NT_TRY:
 				scopesymtable->pushScope();
 				// FALL THROUGH!
 			case NT_EXPRESSIONS:
@@ -796,9 +841,9 @@ Type* TypeChecker::typeCheck(Node* tree) {
 						ret = typeCheck(tree->node_data.nodes[i]);
 						i++;
 					}
-					if(tree->node_type == NT_BLOCK) scopesymtable->popScope();
+					if(tree->node_type == NT_BLOCK || tree->node_type == NT_CATCH || tree->node_type == NT_TRY) scopesymtable->popScope();
 				} catch(SemanticError *e) {
-					if(tree->node_type == NT_BLOCK) scopesymtable->popScope();
+					if(tree->node_type == NT_BLOCK || tree->node_type == NT_CATCH || tree->node_type == NT_TRY) scopesymtable->popScope();
 					throw e;
 				}
 		}

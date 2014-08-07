@@ -19,7 +19,7 @@ elseif exists("b:current_syntax")
 endif
 
 setlocal iskeyword+=:
-syn keyword	basickeyword	with public new return if else while foreach in import provides needs then nothing var exists true false foreach in from
+syn keyword	basickeyword	with public new return if else while foreach in import provides needs then nothing var exists true false foreach in from try catch throw
 syn region	classdecl	start="every" end="is:" contains=inheritancekeyword,interfacekeyword,ancestrysymbols,withinregionkeyword transparent keepend
 syn match	fulltextident	"\~\[[^\]]\+\]\~"
 syn match	hashcomment	"#\<[a-zA-Z]\+\>\?"
@@ -27,7 +27,7 @@ syn region	blockcomment	start="#>" end="##"
 syn match	blockcomment	"##"
 syn keyword	inheritancekeyword	a an contained
 syn keyword	interfacekeyword	capable
-syn keyword	mytype	Num Bool Text Char
+syn keyword	mytype	Num Bool Text Char Exception
 syn match	alias	"\<[a-z][a-zA-Z0-9]*\>"
 syn match	withinregionkeyword	"\(every\|is:\)"
 syn match	shadow	"\$"

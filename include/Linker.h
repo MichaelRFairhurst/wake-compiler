@@ -22,6 +22,7 @@ class Linker {
 		void loadObject(std::string filename);
 		void write(std::ostream& objectfile);
 		void setMain(ostream& outfile, string classname, string methodname, ClassSpaceSymbolTable& table);
+		void writeDebugSymbols(ostream& outfile);
 		void generateRecursiveConstructors(ostream& outfile, string ctedclass, ClassSpaceSymbolTable& table);
 
 	private:

@@ -239,6 +239,14 @@ bool TypeAnalyzer::isAutoboxedType(Type* type, Type** boxed) {
 	return false;
 }
 
+bool TypeAnalyzer::isException(Type* type) {
+	Type* exception = MakeType(TYPE_CLASS);
+	exception->typedata._class.classname = strdup("Exception");
+	bool ret = isASubtypeOfB(type, exception);
+	freeType(exception);
+	return ret;
+}
+
 string TypeAnalyzer::getNameForType(Type* type) {
 	string name;
 

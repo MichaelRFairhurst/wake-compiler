@@ -79,6 +79,9 @@
 #define NT_FOREACH 87
 #define NT_FOREACHIN 88
 #define NT_BREAK 53
+#define NT_THROW 89
+#define NT_TRY 90
+#define NT_CATCH 91
 #define NT_CONTINUE 54
 #define NT_RETURN 55
 #define NT_IF_THEN_ELSE 56

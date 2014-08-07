@@ -1,0 +1,10 @@
+import Bool;
+import Text;
+
+every Exception is:
+
+	Text -- getStacktrace() { return ""; }
+
+	preThrow() {}
+
+	Bool -- isExceptionType(Text) { return true; }

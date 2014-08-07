@@ -12,6 +12,7 @@ class SimpleAddressTable {
 		bool symbolExists(std::string symbol);
 		std::string getAddress(std::string symbol);
 		void addSymbol(std::string symbol);
+		const std::map<std::string, std::string> getAddresses();
 
 	private:
 		AddressAllocator& allocator;
