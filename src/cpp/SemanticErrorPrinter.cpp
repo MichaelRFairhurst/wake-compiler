@@ -60,8 +60,8 @@ void SemanticErrorPrinter::print(SemanticError* e) {
 		case MISMATCHED_INJECTION:
 			cout << "Invalid injection mapping";
 			break;
-		case MULTIPLE_PROVISION_DEFINITION:
-			cout << "This class already provides this";
+		case DUPLICATE_PROPERTY_DEFINITION:
+			cout << "This class already has a property, method, or provision by the same name";
 			break;
 		case CIRCULAR_DEPENDENCIES:
 			cout << "Circular dependency formation";
