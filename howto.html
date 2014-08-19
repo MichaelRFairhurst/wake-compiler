@@ -509,16 +509,6 @@ every ChildClass is:
 				<h3 id="switchcase">Switch/Case</h3>
 				<p>Actually, even though it currently parses switch/case like java, I want to revamp it. I have some good ideas but I'm a bit afraid of them, so they're on hold.</p>
 				<br/>
-				<h3 id="behavioralprovisions">Behavioral Provisions</h3>
-				<p>I'm just really not sure how necessary this is! I went years before seeing DI such as this, however, that's partly because of all the "new" spamming. Anyways, its possible, and should be done soon.</p>
-			<span class="label label-info">wake</span>
-			<pre><code class="wake"
->every MyProvider is:
-
-    needs App;
-
-    provides User &lt;- { return App.getUser(); }</code></pre>
-				<br/>
 				<h3 id="abstractprovisions">Abstract Provisions</h3>
 				<p>I wasn't entirely sure how typing for providers was going to work. There's still room for a great idea to make providers feel more dynamic. However, in the meantime, this uncertainty clouded my eyes so I didn't think of abstract provisions.</p>
 				<p>Essentially, since all classes are interfaces, and pure interface classes simply make all their methods abstract, there needs to be a way to say a class "provides SomeClass" without actually providing anything.</p>
@@ -533,26 +523,6 @@ every ChildClass is:
 				<br />
 				<h3 id="reflection">Reflection</h3>
 				<p>Actually shouldn't be too bad to implement. But its not done yet, and its a big undertaking.</p>
-				<br/>
-				<h3 id="exceptions">Exceptions</h3>
-				<p>Similarly, not too bad to implement actually. However, I am curious about how best to do this. In the meantime, use an Error{V, E} to wrap potential errors and their errortype.</p>
-			<span class="label label-info">wake</span>
-			<pre><code class="wake"
->every MightBeAnError is:
-
-    needs ErrorProvider;
-
-    Error{User, Text} -- findUser() {
-        var Error{User, Text} from ErrorProvider;
-        // do the lookup
-        if User exists {
-            Error.setSuccess(User);
-        } else {
-            Error.setError("Could not find user in db");
-        }
-        return Error;
-    }</code></pre>
-				<p>This solution runs out when you try to get a User out of an Error that doesn't have one, though!</p>
 				<br/>
 				<h3 id="enums">Enums</h3>
 				<p>Somebody who loves the feature-rich enums of java, and who understands Enum&lt;E extends Enum&lt;E&gt;&gt; should tell me all of the things I need do and not do to make powerful enums.</p>
