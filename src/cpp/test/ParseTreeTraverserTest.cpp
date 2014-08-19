@@ -23,7 +23,7 @@ BOOST_AUTO_TEST_SUITE( ParseTreeTraverserTest )
 		loader.loadStdLibToTable(&table); \
 		ParseTreeTraverser t(&table, errors); \
 		MockSemanticErrorPrinter e; \
-		p.parse( "every Num is: every Bool is: every Text is: every Exception is: Text[] -- getStackTrace() { var Text[] = []; return Text[]; }" CODE ); \
+		p.parse( "every Num is: every Bool is: every Text is: every List{T} is: every Exception is: Text[] -- getStackTrace() { var Text[] = []; return Text[]; }" CODE ); \
 		if(PTT_PRINT_TREE) p.print(); \
 		{ EXPECTATIONS } \
 		t.traverse(p.getParseTree()); \
@@ -2591,6 +2591,99 @@ PTT_TEST_CASE(
 			foreach(aliased) { }			\n\
 		}",
 	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)
+);
+
+PTT_TEST_CASE(
+	TestAccessArrayedClassMember,
+	"every MyClass is:							\n\
+		with public Text[] = [];				\n\
+		myMethod(MyClass) {						\n\
+			MyClass.Text[2] + 'mustbetext';		\n\
+			var Text[] = MyClass.Text[];		\n\
+			this.Text[2] + 'mustbetext';		\n\
+			Text[] = this.Text[];				\n\
+			(MyClass).Text[2] + 'mustbetext';	\n\
+			Text[] = (MyClass).Text[]; 			\n\
+			(this).Text[2] + 'mustbetext';		\n\
+			Text[] = (this).Text[]; 			\n\
+			(MyClass.Text[2]) + 'mustbetext';	\n\
+			Text[] = (MyClass.Text[]); 			\n\
+			(this.Text[2]) + 'mustbetext';		\n\
+			Text[] = (this.Text[]); 			\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestAccessArrayedMemberAsNonArrayedIsException,
+	"every MyClass is:						\n\
+		with public Text[] = [];			\n\
+		myMethod(MyClass) {					\n\
+			MyClass.Text.getSize(); 		\n\
+			this.Text.getSize(); 			\n\
+			MyClass.Text + 'doesntexist';	\n\
+			this.Text + 'doesntexist';		\n\
+		}",
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+);
+
+PTT_TEST_CASE(
+	TestAccessNonArrayedMemberAsArrayedIsException,
+	"every MyClass is:							\n\
+		with public Text = '';					\n\
+		myMethod(MyClass) {						\n\
+			MyClass.Text[].getSize();			\n\
+			this.Text[].getSize();				\n\
+			MyClass.Text[2] + 'doesntexist';	\n\
+			this.Text[2] + 'doesntexist';		\n\
+			(MyClass).Text[].getSize(); 		\n\
+			(this).Text[].getSize(); 			\n\
+			(MyClass).Text[2] + 'doesntexist';	\n\
+			(this).Text[2] + 'doesntexist';		\n\
+			(MyClass.Text[]).getSize(); 		\n\
+			(this.Text[]).getSize(); 			\n\
+			(MyClass.Text[2]) + 'doesntexist';	\n\
+			(this.Text[2]) + 'doesntexist';		\n\
+		}",
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+);
+
+PTT_TEST_CASE(
+	TestMemberAccessNotMatchingArrayCountIsException,
+	"every MyClass is:						\n\
+		with public Text[][] = [];			\n\
+		myMethod(MyClass) {					\n\
+			MyClass.Text[]; 				\n\
+		}",
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
+);
+
+PTT_TEST_CASE(
+	TestMemberAccessChainPositiveTestCase,
+	"every MyClass is:															\n\
+		with public MyClass[] = [];												\n\
+		MyClass[] -- getMyClassList(Num) {										\n\
+			return MyClass[];													\n\
+		}																		\n\
+		myMethod() {															\n\
+			var Num = 0;														\n\
+			MyClass[2].MyClass[2].getMyClassList(Num)[2].MyClass[0].MyClass[0]; \n\
+		}",
+	PTT_VALID
 );
 
 BOOST_AUTO_TEST_SUITE_END()
