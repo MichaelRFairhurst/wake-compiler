@@ -1145,7 +1145,7 @@ PTT_TEST_CASE(
 	"every ClassA is:				\n\
 		provides ClassA, ClassA;	\n\
 	",
-	PTT_EXPECT(MULTIPLE_PROVISION_DEFINITION)
+	PTT_EXPECT(DUPLICATE_PROPERTY_DEFINITION)
 )
 
 PTT_TEST_CASE(
@@ -1153,7 +1153,7 @@ PTT_TEST_CASE(
 	"every ClassA is:							\n\
 		provides ClassA:Poop, ClassA:Poop;	\n\
 	",
-	PTT_EXPECT(MULTIPLE_PROVISION_DEFINITION)
+	PTT_EXPECT(DUPLICATE_PROPERTY_DEFINITION)
 )
 
 PTT_TEST_CASE(
@@ -2684,6 +2684,49 @@ PTT_TEST_CASE(
 			MyClass[2].MyClass[2].getMyClassList(Num)[2].MyClass[0].MyClass[0]; \n\
 		}",
 	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestMemberAccessMultipleArrayedLevelPositive,
+	"every MyClass is:						\n\
+		with public Text[][] = [];			\n\
+		myMethod(MyClass) {					\n\
+			var $Text[][] = Text[][];		\n\
+			var $$Text[] = Text[0];			\n\
+			$Text[][] = MyClass.Text[][];	\n\
+			$$Text[] = MyClass.Text[0];		\n\
+			$Text[][] = this.Text[][];		\n\
+			$$Text[] = this.Text[0];		\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestMemberAccessMultipleArrayedLevelNegative,
+	"every MyClass is:						\n\
+		with public Text[][] = [];			\n\
+		myMethod(MyClass) {					\n\
+			var $Text[][] = Text[];			\n\
+			var $$Text[] = Text;			\n\
+			$Text[][] = MyClass.Text[];		\n\
+			$$Text[] = MyClass.Text;		\n\
+			$Text[][] = this.Text[];		\n\
+			$$Text[] = this.Text;			\n\
+		}",
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
+);
+
+PTT_TEST_CASE(
+	TestDeclareMultipleArrayedMembersNamespaceConflict,
+	"every MyClass is:					\n\
+		with public Text[] = [];		\n\
+		with public Text[][] = [];",
+	PTT_EXPECT(DUPLICATE_PROPERTY_DEFINITION)
 );
 
 BOOST_AUTO_TEST_SUITE_END()

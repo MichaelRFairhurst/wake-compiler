@@ -54,7 +54,7 @@ boost::optional<SemanticError*> PropertySymbolTable::addProperty(Type* property,
 
 	if(properties.count(name)) {
 		string temp = "duplicate property name is " + name;
-		return boost::optional<SemanticError*>(new SemanticError(MULTIPLE_PROVISION_DEFINITION, temp));
+		return boost::optional<SemanticError*>(new SemanticError(DUPLICATE_PROPERTY_DEFINITION, temp));
 	}
 
 	ObjectProperty* prop = new ObjectProperty;
@@ -73,7 +73,7 @@ boost::optional<SemanticError*> PropertySymbolTable::addProvision(Type* provided
 
 	if(properties.count(name)) {
 		string temp = "duplicate provisoning is " + name;
-		return boost::optional<SemanticError*>(new SemanticError(MULTIPLE_PROVISION_DEFINITION, temp));
+		return boost::optional<SemanticError*>(new SemanticError(DUPLICATE_PROPERTY_DEFINITION, temp));
 	}
 
 	Type* method = MakeType(TYPE_LAMBDA);
