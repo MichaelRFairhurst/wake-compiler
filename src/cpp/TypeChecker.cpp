@@ -1,3 +1,17 @@
+/**************************************************
+ * Source Code for the Original Compiler for the
+ * Programming Language Wake
+ *
+ * TypeChecker.cpp
+ *
+ * Licensed under the MIT license
+ * See LICENSE.TXT for details
+ *
+ * Author: Michael Fairhurst
+ * Revised By: Coleridge Williamson
+ *
+ **************************************************/
+
 #include "TypeChecker.h"
 #include "CompilationExceptions.h"
 #include "TypeParameterizer.h"

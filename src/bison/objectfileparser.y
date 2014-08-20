@@ -1,4 +1,18 @@
 %{
+/**************************************************
+ * Source Code for the Original Compiler for the
+ * Programming Language Wake
+ *
+ * objectfileparser.y
+ *
+ * Licensed under the MIT license
+ * See LICENSE.TXT for details
+ *
+ * Author: Michael Fairhurst
+ * Revised By:
+ *
+ **************************************************/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

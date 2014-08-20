@@ -1,5 +1,19 @@
 #!/bin/bash
 
+################################################
+# Source Code for the Original Compiler for the
+# Programming Language Wake
+#
+# %filename
+#
+# Licensed under the MIT license
+# See LICENSE.TXT for details
+#
+# Author: Michael Fairhurst
+# Revised By:
+#
+#################################################
+
 STATE=js
 
 ClASSESOUT=

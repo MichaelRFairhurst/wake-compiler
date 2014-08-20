@@ -1,3 +1,17 @@
+/**************************************************
+ * Source Code for the Original Compiler for the
+ * Programming Language Wake
+ *
+ * DerivedPropertySymbolTable.h
+ *
+ * Licensed under the MIT license
+ * See LICENSE.TXT for details
+ *
+ * Author: Michael Fairhurst
+ * Revised By:
+ *
+ **************************************************/
+
 #ifndef HEADER_DERIVED_PROPERTY_SYMBOL
 #define HEADER_DERIVED_PROPERTY_SYMBOL
 #include <map>

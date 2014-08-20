@@ -1,3 +1,17 @@
+#>
+# Source Code for the Original Compiler for the
+# Programming Language Wake
+#
+# SimpleGeneric.wk
+#
+# Licensed under the MIT license
+# See LICENSE.TXT for details
+#
+# Author: Michael Fairhurst
+# Revised By:
+#
+##
+
 every SimpleGeneric{T1, T2} is:
 
 	with public T1? = nothing;
