@@ -2743,4 +2743,11 @@ PTT_TEST_CASE(
 	PTT_EXPECT(DUPLICATE_PROPERTY_DEFINITION)
 );
 
+PTT_TEST_CASE(
+	TestAbstractMethodsDontComplainAboutExhaustiveReturns,
+	"every MyClass is:		\n\
+		Text -- method();",
+	PTT_VALID
+);
+
 BOOST_AUTO_TEST_SUITE_END()

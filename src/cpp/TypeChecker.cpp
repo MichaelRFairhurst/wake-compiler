@@ -71,6 +71,9 @@ bool TypeChecker::exhaustiveReturns(Node* tree) {
 				return false;
 			}
 
+		case NT_ABSTRACT_METHOD:
+			return true;
+
 		default:
 			return false;
 	}
