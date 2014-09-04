@@ -329,7 +329,7 @@ iterationstatement:
 	WHILE '(' expression ')' statement											{ $$ = MakeTwoBranchNode(NT_WHILE, $3, $5); }
 	| FOR '(' forinit forcondition forincrement ')' statement					{ $$ = MakeTwoBranchNode(NT_FOR, $3, $4); AddSubNode($$, $5); AddSubNode($$, $7); }
 	| FOREACH '(' expression ')' statement										{ $$ = MakeTwoBranchNode(NT_FOREACH, $3, $5); }
-	| FOREACH '(' type IN expression ')' statement								{ $$ = MakeTwoBranchNode(NT_FOREACHIN, $3, $5); AddSubNode($$, $7); }
+	| FOREACH '(' member IN expression ')' statement							{ $$ = MakeTwoBranchNode(NT_FOREACHIN, $3, $5); AddSubNode($$, $7); }
 	;
 
 forinit:

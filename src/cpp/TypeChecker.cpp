@@ -794,8 +794,11 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 				break;
 
 			case NT_FOREACH:
+			case NT_FOREACHIN:
 				{
-					ret = typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier);
+					Node** nodebase = tree->node_type == NT_FOREACH ? tree->node_data.nodes : tree->node_data.nodes + 1;
+
+					ret = typeCheckUsable(nodebase[0], forceArrayIdentifier);
 
 					if(ret->optional) {
 						errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Iterating over optional type. You must first wrap object in an exists { } clause.", tree));
@@ -807,19 +810,39 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						errors->addError(new SemanticError(TYPE_ERROR, "Calling foreach over something that is not a list", tree));
 					} else {
 						Type* lowered = copyType(ret);
-						free(lowered->alias);
-						lowered->alias = NULL;
 						lowered->arrayed--;
+						free(lowered->alias);
+
+						if(tree->node_type == NT_FOREACH) {
+							lowered->alias = NULL;
+						} else {
+							if(tree->node_data.nodes[0]->node_type == NT_ALIAS) {
+								lowered->alias = strdup(tree->node_data.nodes[0]->node_data.string);
+							} else {
+								Type* actual = tree->node_data.nodes[0]->node_data.type;
+								lowered->alias = NULL;
+								if(!analyzer->isASubtypeOfB(actual, lowered)) {
+									expectedstring = analyzer->getNameForType(lowered);
+									erroneousstring = analyzer->getNameForType(actual);
+									free(lowered);
+									throw string("Declaration of item within foreach does not match the item's type");
+								}
+
+								freeType(lowered);
+								lowered = copyType(actual); // preserve shadow and other goodies
+							}
+						}
 
 						scopesymtable->pushScope();
 						scopesymtable->add(lowered);
-						freeType(typeCheck(tree->node_data.nodes[1], forceArrayIdentifier));
+						freeType(typeCheck(nodebase[1], forceArrayIdentifier));
 						scopesymtable->popScope();
 
 						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(scopesymtable->getNameForType(lowered).c_str())));
 					}
 				}
 				break;
+
 
 			case NT_CATCH:
 				{
