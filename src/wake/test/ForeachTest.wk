@@ -108,3 +108,39 @@ every ForeachTest is:
 		foreach(Num[]) { }
 		foreach(Num[]) { }
 	}
+
+	~[ test foreach as alias sets value properly in var ]~(Asserts) {
+		var Num[] copy = [];
+		var Num[] = []; Num[].push(0); Num[].push(1); Num[].push(2);
+		foreach(num in Num[]) {
+			copy.push(num);
+		}
+
+		Asserts.that(copy[0])Equals(0);
+		Asserts.that(copy[1])Equals(1);
+		Asserts.that(copy[2])Equals(2);
+	}
+
+	~[ test foreach as class sets value properly in var ]~(Asserts) {
+		var Num[] copy = [];
+		var Num[] = []; Num[].push(0); Num[].push(1); Num[].push(2);
+		foreach(Num in Num[]) {
+			copy.push(Num);
+		}
+
+		Asserts.that(copy[0])Equals(0);
+		Asserts.that(copy[1])Equals(1);
+		Asserts.that(copy[2])Equals(2);
+	}
+
+	~[ test foreach as shadow sets value properly in var ]~(Asserts) {
+		var Num[] copy = [];
+		var Num[] = []; Num[].push(0); Num[].push(1); Num[].push(2);
+		foreach($Num in Num[]) {
+			copy.push($Num);
+		}
+
+		Asserts.that(copy[0])Equals(0);
+		Asserts.that(copy[1])Equals(1);
+		Asserts.that(copy[2])Equals(2);
+	}
