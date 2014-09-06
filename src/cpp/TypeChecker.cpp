@@ -839,6 +839,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						scopesymtable->popScope();
 
 						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(scopesymtable->getNameForType(lowered).c_str())));
+						freeType(lowered);
 					}
 				}
 				break;

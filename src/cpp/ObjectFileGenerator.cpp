@@ -477,16 +477,18 @@ void ObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_FOREACH:
+		case NT_FOREACHIN:
 			{
 				table.pushScope();
-				bool iterating_expression = tree->node_data.nodes[0]->node_type != NT_ALIAS && tree->node_data.nodes[0]->node_type != NT_TYPEDATA;
+				Node** nodebase = tree->node_type == NT_FOREACHIN ? tree->node_data.nodes + 1: tree->node_data.nodes;
+				bool iterating_expression = nodebase[0]->node_type != NT_ALIAS && nodebase[0]->node_type != NT_TYPEDATA;
 				std::stringstream valuestorename;
 				if(iterating_expression) {
 					Type* valuestore = MakeType(TYPE_MATCHALL);
 					valuestorename << valuestore;
 					table.add(valuestorename.str(), valuestore);
 					file << "var " << table.getAddress(valuestorename.str()) << "=";
-					generate(tree->node_data.nodes[0]);
+					generate(nodebase[0]);
 					file << ";";
 				}
 
@@ -495,17 +497,17 @@ void ObjectFileGenerator::generate(Node* tree) {
 				std::stringstream indexername;
 				indexername << indexer;
 				table.add(indexername.str(), indexer);
-				table.add(tree->node_data.nodes[2]->node_data.string, lowered);
+				table.add(nodebase[2]->node_data.string, lowered);
 				file << "for(var " << table.getAddress(indexername.str()) << "=0;";
 				file << table.getAddress(indexername.str()) << " < ";
 				if(iterating_expression) file << table.getAddress(valuestorename.str());
-				else generate(tree->node_data.nodes[0]);
+				else generate(nodebase[0]);
 				file << ".length; " << table.getAddress(indexername.str()) << "++){";
-				file << "var " << table.getAddress(tree->node_data.nodes[2]->node_data.string) << "=";
+				file << "var " << table.getAddress(nodebase[2]->node_data.string) << "=";
 				if(iterating_expression) file << table.getAddress(valuestorename.str());
-				else generate(tree->node_data.nodes[0]);
+				else generate(nodebase[0]);
 				file << "[" << table.getAddress(indexername.str()) << "];";
-				generate(tree->node_data.nodes[1]);
+				generate(nodebase[1]);
 				file << "}";
 				table.popScope();
 			}
