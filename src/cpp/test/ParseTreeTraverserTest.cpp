@@ -2802,4 +2802,62 @@ PTT_TEST_CASE(
 	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)
 );
 
+PTT_TEST_CASE(
+	TestMethodCannotBeExtendedAsVoid,
+	"every ParentClass is:					\n\
+		Text -- method() { return ""; }		\n\
+	every ChildClass (a ParentClass) is:	\n\
+		method() {}							\n\
+	",
+	PTT_EXPECT(INVALID_CHILD_RETURN_TYPE)
+);
+
+PTT_TEST_CASE(
+	TestMethodCannotBeExtendedOrthogonally,
+	"every ParentClass is:					\n\
+		Text -- method() { return ""; }		\n\
+	every ChildClass (a ParentClass) is:	\n\
+		Num -- method() { return 2; }		\n\
+	",
+	PTT_EXPECT(INVALID_CHILD_RETURN_TYPE)
+);
+
+PTT_TEST_CASE(
+	TestVoidMethodCannotBeExtendedToReturn,
+	"every ParentClass is:					\n\
+		method() { }						\n\
+	every ChildClass (a ParentClass) is:	\n\
+		Num -- method() { return 2; }		\n\
+	",
+	PTT_EXPECT(INVALID_CHILD_RETURN_TYPE)
+);
+
+PTT_TEST_CASE(
+	TestMethodCannotBeExtendedToReturnCovariantType,
+	"every ParentClass is:												\n\
+		ChildClass -- method(ChildClass, ParentClass) {					\n\
+			return ChildClass;											\n\
+		}																\n\
+	every ChildClass (a ParentClass) is:								\n\
+		ParentClass -- method(ChildClass, ParentClass) {				\n\
+			return ParentClass;											\n\
+		}																\n\
+	",
+	PTT_EXPECT(INVALID_CHILD_RETURN_TYPE)
+);
+
+PTT_TEST_CASE(
+	TestMethodCanBeExtendedToReturnContravariantType,
+	"every ParentClass is:												\n\
+		ParentClass -- method(ChildClass, ParentClass) {				\n\
+			return ParentClass;											\n\
+		}																\n\
+	every ChildClass (a ParentClass) is:								\n\
+		ChildClass -- method(ChildClass, ParentClass) {					\n\
+			return ChildClass;											\n\
+		}																\n\
+	",
+	PTT_VALID
+);
+
 BOOST_AUTO_TEST_SUITE_END()
