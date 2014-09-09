@@ -2809,13 +2809,14 @@ PTT_TEST_CASE(
 	every ChildClass (a ParentClass) is:	\n\
 		method() {}							\n\
 	",
+	PTT_EXPECT(TYPE_ERROR) // it complains about the return type once like this
 	PTT_EXPECT(INVALID_CHILD_RETURN_TYPE)
 );
 
 PTT_TEST_CASE(
 	TestMethodCannotBeExtendedOrthogonally,
 	"every ParentClass is:					\n\
-		Text -- method() { return ""; }		\n\
+		Text -- method() { return ''; }		\n\
 	every ChildClass (a ParentClass) is:	\n\
 		Num -- method() { return 2; }		\n\
 	",
@@ -2823,13 +2824,13 @@ PTT_TEST_CASE(
 );
 
 PTT_TEST_CASE(
-	TestVoidMethodCannotBeExtendedToReturn,
+	TestVoidMethodCanBeExtendedToReturn,
 	"every ParentClass is:					\n\
 		method() { }						\n\
 	every ChildClass (a ParentClass) is:	\n\
 		Num -- method() { return 2; }		\n\
 	",
-	PTT_EXPECT(INVALID_CHILD_RETURN_TYPE)
+	PTT_VALID
 );
 
 PTT_TEST_CASE(

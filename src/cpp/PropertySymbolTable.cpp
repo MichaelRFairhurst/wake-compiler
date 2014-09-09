@@ -207,6 +207,16 @@ void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable*
 
 		} else {
 			searcher->second->address = it->second->address;
+			if(searcher->second->type->type == TYPE_LAMBDA)
+			if(it->second->type->typedata.lambda.returntype != NULL)
+			if(searcher->second->type->typedata.lambda.returntype == NULL
+				|| !child->analyzer->isASubtypeOfB(
+					searcher->second->type->typedata.lambda.returntype,	// this is contravariance
+					it->second->type->typedata.lambda.returntype 		// Check parent return is a subtype of child return
+				)
+			) {
+				errors.addError(new SemanticError(INVALID_CHILD_RETURN_TYPE, "method " + searcher->second->address + " on class " + child->classname, NULL, ""));
+			}
 		}
 	}
 }
