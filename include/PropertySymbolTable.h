@@ -29,6 +29,7 @@ extern "C" {
 #include "ObjectProperty.h"
 #include "TypeAnalyzer.h"
 #include "SemanticError.h"
+#include "ErrorTracker.h"
 #include "EntryPointAnalyzer.h"
 
 using namespace std;
@@ -62,7 +63,7 @@ class PropertySymbolTable : public ReadOnlyPropertySymbolTable {
 
 		ReadOnlyPropertySymbolTable* resolveParameters(vector<Type*>& parameters);
 
-		friend void propagateInheritanceTables(PropertySymbolTable* parent, PropertySymbolTable* child, bool extend);
+		friend void propagateInheritanceTables(PropertySymbolTable* parent, PropertySymbolTable* child, bool extend, ErrorTracker& errors);
 
 	private:
 		TypeAnalyzer* analyzer;

@@ -182,7 +182,7 @@ PropertySymbolTable::~PropertySymbolTable() {
 	}
 }
 
-void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable* parent, bool extend) {
+void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable* parent, bool extend, ErrorTracker& errors) {
 	for(map<string, ObjectProperty*>::iterator it = parent->properties.begin(); it != parent->properties.end(); ++it) {
 		if(!extend && !(it->second->flags & PROPERTY_PUBLIC)) continue;
 		map<string, ObjectProperty*>::iterator searcher = child->properties.find(it->first);

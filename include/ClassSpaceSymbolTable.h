@@ -25,6 +25,7 @@
 #include "TypeAnalyzer.h"
 #include "EntryPointAnalyzer.h"
 #include "AddressAllocator.h"
+#include "ErrorTracker.h"
 
 using namespace std;
 
@@ -40,8 +41,8 @@ class ClassSpaceSymbolTable {
 		boost::optional<SemanticError*> importClass(PropertySymbolTable* table);
 		vector<PropertySymbolTable*> getDefinedClasses();
 
-		void propagateInheritance();
-		void propagateInheritanceToParent(string childname);
+		void propagateInheritance(ErrorTracker& errors);
+		void propagateInheritanceToParent(string childname, ErrorTracker& errors);
 		ReadOnlyPropertySymbolTable* find(Type* type);
 		ReadOnlyPropertySymbolTable* find(string name);
 		void assertTypeIsValid(Type* type);

@@ -87,14 +87,14 @@ boost::optional<SemanticError*> ClassSpaceSymbolTable::addInheritance(string chi
 	return boost::optional<SemanticError*>();
 }
 
-void ClassSpaceSymbolTable::propagateInheritance() {
+void ClassSpaceSymbolTable::propagateInheritance(ErrorTracker& errors) {
 	map<string, pair<PropertySymbolTable*, bool> > passed;
 	for(map<string, pair<PropertySymbolTable*, bool> >::iterator it = classes.begin(); it != classes.end(); ++it) {
 		inheritances_gathered[it->first] = pair<PropertySymbolTable*, bool>(it->second.first, false);
 	}
 
 	for(map<string, pair<PropertySymbolTable*, bool> >::iterator it = inheritances_gathered.begin(); it != inheritances_gathered.end(); ++it) {
-		propagateInheritanceToParent(it->first);
+		propagateInheritanceToParent(it->first, errors);
 	}
 
 	//for(map<string, pair<PropertySymbolTable*, bool> >::iterator it = inheritances_gathered.begin(); it != inheritances_gathered.end(); ++it) {
@@ -102,7 +102,7 @@ void ClassSpaceSymbolTable::propagateInheritance() {
 	//}
 }
 
-void ClassSpaceSymbolTable::propagateInheritanceToParent(string childname) {
+void ClassSpaceSymbolTable::propagateInheritanceToParent(string childname, ErrorTracker& errors) {
 	bool defined = classes.find(childname)->second.second;
 	if(!defined) return;
 
@@ -110,8 +110,8 @@ void ClassSpaceSymbolTable::propagateInheritanceToParent(string childname) {
 	if(current->second) return; // Already propagated
 
 	for(map<string, bool>::iterator it = current->first->parentage.begin(); it != current->first->parentage.end(); ++it) {
-		propagateInheritanceToParent(it->first);
-		propagateInheritanceTables(current->first, findModifiable(it->first), it->second);
+		propagateInheritanceToParent(it->first, errors);
+		propagateInheritanceTables(current->first, findModifiable(it->first), it->second, errors);
 	}
 
 	current->second = true;

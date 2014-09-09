@@ -29,7 +29,7 @@ void ParseTreeTraverser::traverse(Node* tree) {
 
 			if(!passesForCompilation()) return;
 			try {
-				objectsymtable->propagateInheritance();
+				objectsymtable->propagateInheritance(errors);
 			} catch(SemanticError* e) {
 				e->token = tree;
 				errors.addError(e);
