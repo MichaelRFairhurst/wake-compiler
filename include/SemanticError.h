@@ -50,6 +50,7 @@ enum SemanticErrorCode {
 	USE_OF_ASSIGNMENT_VALUE,		// a = b = c; --- should be a = b := c;
 	INVALID_GENERIC_TYPE,			// Printer{Int} or List or List{String, String} etc
 	BAD_IMPORT,						// Import sanhutohesuntho;
+	INVALID_CHILD_RETURN_TYPE,		// Child class overrides/implements a method without a contravariant return type
 };
 
 class SemanticError {

@@ -100,6 +100,10 @@ void SemanticErrorPrinter::print(SemanticError* e) {
 			break;
 		case BAD_IMPORT:
 			cout << "Import could not be found within the table directory. Has the file been compiled yet, or was the import misspelled?";
+			break;
+		case INVALID_CHILD_RETURN_TYPE:
+			cout << "Child class must return the same type or a supertype as their parent classes";
+			break;
 		default:
 			cout << "bad error code provided";
 	}
