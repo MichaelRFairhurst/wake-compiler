@@ -20,7 +20,8 @@
 bool EntryPointAnalyzer::checkClassNeedsCanBeMain(vector<Type*>* needs) {
 	for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
 		if((*it)->type == TYPE_LAMBDA) return false;
-		if((*it)->arrayed) return false;
+		if((*it)->type == TYPE_OPTIONAL) return false;
+		if((*it)->type == TYPE_LIST) return false;
 		if((*it)->typedata._class.classname == string("Int")) return false;
 		if((*it)->typedata._class.classname == string("Text")) return false;
 		if((*it)->typedata._class.classname == string("Truth")) return false;

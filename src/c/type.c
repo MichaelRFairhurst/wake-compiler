@@ -37,6 +37,14 @@ Type* MakeType(int type) {
 			thetype->typedata.parameterized.upperbound = NULL;
 			thetype->typedata.parameterized.lowerbound = NULL;
 			break;
+		case TYPE_LIST:
+			thetype->typedata.list.levels = 0;
+			thetype->typedata.list.contained = NULL;
+			break;
+		case TYPE_OPTIONAL:
+			thetype->typedata.optional.levels = 0;
+			thetype->typedata.optional.contained = NULL;
+			break;
 	}
 	return thetype;
 }

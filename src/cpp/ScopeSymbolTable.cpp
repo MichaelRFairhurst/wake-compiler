@@ -75,6 +75,10 @@ string ScopeSymbolTable::getAddress(string name) {
 string ScopeSymbolTable::getNameForType(Type* type) {
 	string name;
 
+	if(type->type == TYPE_LIST) {
+		return getNameForType(type->typedata.list.contained) + "[]";
+	}
+
 	if(type->alias != NULL) {
 		name = type->alias;
 	} else {
@@ -83,8 +87,6 @@ string ScopeSymbolTable::getNameForType(Type* type) {
 		} else {
 			name = string(type->typedata._class.shadow, '$') + type->typedata._class.classname;
 		}
-
-		if(type->arrayed) name += "[]";
 	}
 
 	return name;

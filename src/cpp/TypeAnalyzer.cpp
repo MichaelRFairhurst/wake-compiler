@@ -37,8 +37,7 @@ bool TypeAnalyzer::isASubtypeOfB(string a, string b) {
 bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 	//if(a == NULL || b == NULL) return false;
 	if(a->type == TYPE_MATCHALL || b->type == TYPE_MATCHALL) return true;
-	if(a->type == TYPE_NOTHING) return b->optional;
-	if(a->arrayed != b->arrayed) return false;
+	if(a->type == TYPE_NOTHING) return b->type == TYPE_OPTIONAL;
 	if(a->type != b->type) return false; // TODO: parameterized types don't always follow this logic!
 
 	if(a->type == TYPE_LAMBDA) {
@@ -85,7 +84,7 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 		}
 
 		if(string(a->typedata._class.classname) == b->typedata._class.classname) {
-			return a->optional <= b->optional;
+			return true;
 		}
 
 		try {
@@ -105,14 +104,18 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 		if(a->typedata.parameterized.label == string(b->typedata.parameterized.label)) return true;
 		// TODO: lower/upper bounds comparison
 		return false;
+	} else if(a->type == TYPE_LIST) {
+		if(a->typedata.list.levels != b->typedata.list.levels) return false;
+		return isAExactlyB(a->typedata.list.contained, b->typedata.list.contained);
+	} else if(a->type == TYPE_OPTIONAL) {
+		if(a->typedata.optional.levels != b->typedata.optional.levels) return false;
+		return isAExactlyB(a->typedata.optional.contained, b->typedata.optional.contained);
 	}
 
 }
 
 bool TypeAnalyzer::isAExactlyB(Type* a, Type* b) {
 	if(a->type != b->type) return false;
-	if(a->arrayed != b->arrayed) return false;
-	if(a->optional != b->optional) return false;
 	if(a->type == TYPE_CLASS) {
 		if(a->typedata._class.classname != string(b->typedata._class.classname)) return false;
 		if(!a->typedata._class.parameters != !b->typedata._class.parameters) return false; // tests both or neither are null. Tests back this up.
@@ -139,6 +142,10 @@ bool TypeAnalyzer::isAExactlyB(Type* a, Type* b) {
 			if(!isAExactlyB(a->typedata.lambda.arguments->types[i], b->typedata.lambda.arguments->types[i]))
 				return false;
 		}
+	} else if(a->type == TYPE_LIST) {
+		return a->typedata.list.levels == b->typedata.list.levels && isAExactlyB(a->typedata.list.contained, b->typedata.list.contained);
+	} else if(a->type == TYPE_OPTIONAL) {
+		return a->typedata.optional.levels == b->typedata.optional.levels && isAExactlyB(a->typedata.optional.contained, b->typedata.optional.contained);
 	}
 	return true;
 }
@@ -192,17 +199,17 @@ Type* TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
 
 bool TypeAnalyzer::isPrimitiveTypeNum(Type* type) {
 	if(type->type == TYPE_MATCHALL) return true;
-	return type->type != TYPE_LAMBDA && type->typedata._class.classname == string("Num") && type->arrayed == 0 && type->optional == 0;
+	return type->type == TYPE_CLASS && type->typedata._class.classname == string("Num");
 }
 
 bool TypeAnalyzer::isPrimitiveTypeText(Type* type) {
 	if(type->type == TYPE_MATCHALL) return true;
-	return type->type != TYPE_LAMBDA && type->typedata._class.classname == string("Text") && type->arrayed == 0 && type->optional == 0;
+	return type->type != TYPE_CLASS && type->typedata._class.classname == string("Text");
 }
 
 bool TypeAnalyzer::isPrimitiveTypeBool(Type* type) {
 	if(type->type == TYPE_MATCHALL) return true;
-	return type->type != TYPE_LAMBDA && type->typedata._class.classname == string("Bool") && type->arrayed == 0 && type->optional == 0;
+	return type->type != TYPE_CLASS && type->typedata._class.classname == string("Bool");
 }
 
 bool TypeAnalyzer::isAutoboxedType(Type* type, Type** boxed) {
@@ -212,10 +219,9 @@ bool TypeAnalyzer::isAutoboxedType(Type* type, Type** boxed) {
 	if(type->type == TYPE_UNUSABLE) return false;
 
 	// need to return a List<T>
-	if(type->arrayed) {
+	if(type->type == TYPE_LIST) {
 		*boxed = MakeType(TYPE_CLASS);
-		Type* loweredtype = copyType(type);
-		loweredtype->arrayed--;
+		Type* loweredtype = copyType(type->typedata.list.contained);
 		(*boxed)->typedata._class.classname = strdup("List");
 		(*boxed)->typedata._class.parameters = MakeTypeArray();
 		AddTypeToTypeArray(loweredtype, (*boxed)->typedata._class.parameters);
@@ -230,7 +236,7 @@ bool TypeAnalyzer::isAutoboxedType(Type* type, Type** boxed) {
 	}
 
 	// shouldn't ever get here,..unless I decide to make, say, T?.exists() and/or T?.applyIfExists(fn(T))
-	if(type->optional) return false;
+	if(type->type == TYPE_OPTIONAL) return false;
 
 	if(isPrimitiveTypeBool(type)) {
 		*boxed = MakeType(TYPE_CLASS);
@@ -306,24 +312,35 @@ string TypeAnalyzer::getNameForType(Type* type) {
 		name += ")";
 	}
 
-	int i;
-	for(i = 0; i < type->arrayed; i++)
-		name += "[]";
-	if(type->optional) name += "?";
+	if(type->type == TYPE_LIST) {
+		name = getNameForType(type->typedata.list.contained);
+		int i;
+		for(i = 0; i < type->typedata.list.levels; i++)
+			name += "[]";
+	}
+
+	if(type->type == TYPE_OPTIONAL) {
+		name = getNameForType(type->typedata.optional.contained);
+		int i;
+		for(i = 0; i < type->typedata.optional.levels; i++)
+			name += "[]";
+	}
 
 	return name;
 }
 
 string TypeAnalyzer::getNameForTypeAsProperty(Type* type) {
-	string name;
-
 	if(type->alias != NULL) {
-		name = type->alias;
+		return type->alias;
 	} else {
-		name = string(type->typedata._class.shadow, '$') + type->typedata._class.classname;
-
-		if(type->arrayed) name += "[]";
+		if(type->type == TYPE_CLASS) {
+			return string(type->typedata._class.shadow, '$') + type->typedata._class.classname;
+		} else if(type->type == TYPE_LIST) {
+			return getNameForTypeAsProperty(type->typedata.list.contained) + "[]";
+		} else if(type->type == TYPE_OPTIONAL) {
+			return getNameForTypeAsProperty(type->typedata.optional.contained);
+		} else if(type->type == TYPE_PARAMETERIZED) {
+			return string(type->typedata.parameterized.shadow, '$') + type->typedata.parameterized.label;
+		}
 	}
-
-	return name;
 }

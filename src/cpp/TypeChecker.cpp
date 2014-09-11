@@ -187,7 +187,11 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 					parameterizer.writeInParameterizations(&tree->node_data.type, parameterizedtypes);
 
 					Type* type = copyType(tree->node_data.type);
-					if(forceArrayIdentifier) type->arrayed = 1;
+					if(forceArrayIdentifier) {
+						Type* wrapped = type;
+						type = MakeType(TYPE_LIST);
+						type->typedata.list.contained = wrapped;
+					}
 
 					boost::optional<Type*> variable = scopesymtable->find(type);
 					if(!variable && thiscontext != NULL) {
@@ -206,11 +210,14 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 					} else {
 						// detect if they wrote Printer[] instead of Printer[][]
 						// Either way Printer[x] would work, so if forceArrayIdentifier skip this step
-						if(!forceArrayIdentifier && type->arrayed != (*variable)->arrayed)
+						if(!forceArrayIdentifier && type->type == TYPE_LIST && type->typedata.list.levels != (*variable)->typedata.list.levels)
 							errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Accessed arrayed variable " + scopesymtable->getNameForType(type) + " with wrong number of [] brackets.", tree));
 
 						ret = copyType(*variable);
+
 					}
+
+					freeType(type);
 				}
 				break;
 
@@ -396,26 +403,33 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 					freeType(ret);
 					ret = MakeType(TYPE_CLASS);
 					ret->typedata._class.classname = strdup("Bool");
-					ret->arrayed = 0;
 					throw string("If conditions must be Bool");
 				}
 				break;
 
 			case NT_ARRAY_ACCESS:
 				{
-					forceArrayIdentifier = true;
-					ret = typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier);
 					forceArrayIdentifier = false;
+					ret = typeCheckUsable(tree->node_data.nodes[0], true);
 					Type* index = typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier);
-					--ret->arrayed;
+					if(ret->type != TYPE_LIST && ret->type != TYPE_MATCHALL) {
+						erroneousstring = analyzer->getNameForType(ret); freeType(index);
+						throw string("Getting index of non-array");
+					} else if(ret->type == TYPE_LIST) { // Otherwise we're a matchall
+						if(ret->typedata.list.levels == 1) {
+							Type* cleanme = ret;
+							ret = cleanme->typedata.list.contained;
+							cleanme->typedata.list.contained = NULL;
+							freeType(cleanme);
+						} else {
+							--ret->typedata.list.levels;;
+						}
+					}
 
 					if(!analyzer->isPrimitiveTypeNum(index) && index->type != TYPE_MATCHALL) {
 						erroneousstring = analyzer->getNameForType(index); freeType(index);
 						expectedstring = "Num";
 						throw string("Array indices must be numeric");
-					} else if(ret->arrayed < 0 && ret->type != TYPE_MATCHALL) {
-						erroneousstring = analyzer->getNameForType(ret); freeType(index);
-						throw string("Getting index of non-array");
 					}
 
 					freeType(index);
@@ -505,7 +519,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						Type* subject = typeCheck(tree->node_data.nodes[0], forceArrayIdentifier);
 						ret = tree->node_type == NT_ASSIGNMENT ? MakeType(TYPE_UNUSABLE) : subject;
 						if(tree->node_data.nodes[1]->node_type == NT_ARRAY_DECLARATION && tree->node_data.nodes[1]->subnodes == 0) {
-							if(!subject->arrayed) {
+							if(subject->type != TYPE_LIST) {
 								expectedstring = analyzer->getNameForType(subject);
 								erroneousstring = "[]";
 								if(tree->node_type == NT_ASSIGNMENT) freeType(subject);
@@ -575,6 +589,13 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						break;
 					}
 
+					if(subject->type == TYPE_OPTIONAL) {
+						errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Calling method on optional type " + analyzer->getNameForType(subject) + ". You must first wrap object in an exists { } clause.", tree));
+						freeType(subject);
+						ret = MakeType(TYPE_MATCHALL);
+						break;
+					}
+
 					Type* boxedtype;
 					if(analyzer->isAutoboxedType(subject, &boxedtype)) {
 						Node* node = tree->node_data.nodes[0];
@@ -612,11 +633,6 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 
 					boost::optional<Type*> lambdatype = methodtable->find(methodtable->getSymbolNameOf(&method_segments));
 
-					if(subject->optional) {
-						errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Calling " + methodtable->getSymbolNameOf(&method_segments) + " on optional type" + subject->typedata._class.classname + ". You must first wrap object in an exists { } clause.", tree));
-						ret = MakeType(TYPE_MATCHALL);
-					}
-
 					if(lambdatype) {
 						ret = copyType((*lambdatype)->typedata.lambda.returntype);
 
@@ -639,7 +655,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 					parameterizer.writeInParameterizations(&tree->node_data.nodes[0]->node_data.type, parameterizedtypes);
 					Type* assignee = tree->node_data.nodes[0]->node_data.type;
 					classestable->assertTypeIsValid(assignee);
-					if(assignee->arrayed && tree->node_data.nodes[1]->subnodes == 0 && tree->node_data.nodes[1]->node_type == NT_ARRAY_DECLARATION) {
+					if(assignee->type == TYPE_LIST && tree->node_data.nodes[1]->subnodes == 0 && tree->node_data.nodes[1]->node_type == NT_ARRAY_DECLARATION) {
 						// Nothing to do here but relax.
 					} else {
 						Type* assignment = typeCheck(tree->node_data.nodes[1], forceArrayIdentifier);
@@ -717,13 +733,18 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 				try {
 					Type* ret = typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier);
 
-					if(!ret->optional) {
+					if(ret->type != TYPE_OPTIONAL) {
 						errors->addError(new SemanticError(EXISTS_ON_NONOPTIONAL_TYPE, "exists { } statement uses a nonoptional type", tree)); // @todo better error message!
 						break;
 					}
 
-					Type* real = copyType(ret);
-					real->optional = 0;
+					Type* real;
+					if(ret->typedata.optional.levels == 1) {
+						real = copyType(ret->typedata.optional.contained);
+					} else {
+						real = copyType(ret);
+						real->typedata.optional.levels--;
+					}
 
 					if(tree->node_data.nodes[0]->node_type == NT_MEMBER_ACCESS) {
 						errors->addError(new SemanticError(TYPE_ERROR, "Calling exists { } on a property is illegal as it is a shared reference and therefore might be unset amid the scope"));
@@ -772,8 +793,8 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 
 					if(forceArrayIdentifier) name += "[]";
 
-					if(subject->optional) {
-						errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Accessing member " + name + " on optional type " + subject->typedata._class.classname + ". You must first wrap object in an exists { } clause.", tree));
+					if(subject->type == TYPE_OPTIONAL) {
+						errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Accessing member " + name + " on optional type " + analyzer->getNameForType(subject) + ". You must first wrap object in an exists { } clause.", tree));
 						ret = MakeType(TYPE_MATCHALL);
 						break;
 					}
@@ -784,7 +805,8 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						ret = MakeType(TYPE_MATCHALL);
 						errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Symbol by name of " + name + " not found", tree));
 					} else {
-						if(!forceArrayIdentifier && tree->node_data.nodes[1]->node_type != NT_ALIAS && tree->node_data.nodes[1]->node_data.type->arrayed != (*variable)->arrayed)
+						Type* member = tree->node_data.nodes[1]->node_data.type;
+						if(!forceArrayIdentifier && tree->node_data.nodes[1]->node_type != NT_ALIAS && member->type == TYPE_LIST && member->typedata.list.levels != (*variable)->typedata.list.levels)
 							errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Accessed arrayed variable " + name + " with wrong number of [] brackets.", tree));
 
 						ret = copyType(*variable);
@@ -800,17 +822,25 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 
 					ret = typeCheckUsable(nodebase[0], forceArrayIdentifier);
 
-					if(ret->optional) {
+					if(ret->type == TYPE_OPTIONAL) {
 						errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Iterating over optional type. You must first wrap object in an exists { } clause.", tree));
 						ret = MakeType(TYPE_MATCHALL);
 						break;
 					}
 
-					if(!ret->arrayed && ret->type != TYPE_MATCHALL) {
+					// no sense checking the contents of the loop if we're missing a variable
+					if(ret->type == TYPE_MATCHALL) break;
+
+					if(ret->type != TYPE_LIST) {
 						errors->addError(new SemanticError(TYPE_ERROR, "Calling foreach over something that is not a list", tree));
 					} else {
-						Type* lowered = copyType(ret);
-						lowered->arrayed--;
+						Type* lowered;
+						if(ret->typedata.list.levels == 1) {
+							Type* lowered = copyType(ret->typedata.list.contained);
+						} else {
+							Type* lowered = copyType(ret);
+							lowered->typedata.list.levels--;
+						}
 						free(lowered->alias);
 
 						if(tree->node_type == NT_FOREACH) {
