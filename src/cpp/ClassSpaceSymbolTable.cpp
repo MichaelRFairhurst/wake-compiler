@@ -189,7 +189,7 @@ void ClassSpaceSymbolTable::assertTypeIsValid(Type* type) {
 		}
 
 		throw new SemanticError(CLASSNAME_NOT_FOUND, type->typedata._class.classname + string(" is not a valid type"));
-	} else {
+	} else if(type->type == TYPE_LAMBDA) {
 		if(type->typedata.lambda.returntype != NULL)
 			assertTypeIsValid(type->typedata.lambda.returntype);
 		if(type->typedata.lambda.arguments == NULL) return;
@@ -197,6 +197,10 @@ void ClassSpaceSymbolTable::assertTypeIsValid(Type* type) {
 		int i;
 		for(i = 0; i < type->typedata.lambda.arguments->typecount; i++)
 			assertTypeIsValid(type->typedata.lambda.arguments->types[i]);
+	} else if(type->type == TYPE_LIST) {
+		assertTypeIsValid(type->typedata.list.contained);
+	} else if(type->type == TYPE_OPTIONAL) {
+		assertTypeIsValid(type->typedata.optional.contained);
 	}
 }
 

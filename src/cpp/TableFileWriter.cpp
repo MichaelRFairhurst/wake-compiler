@@ -133,10 +133,19 @@ void TableFileWriter::writeType(ostream& out, Type* type) {
 
 		dataptr[0] = type->typedata.parameterized.shadow;
 		out.write(dataptr, 1);
+	} else if(type->type == TYPE_LIST) {
+		dataptr[0] = TYPE_LIST;
+		out.write(dataptr, 1);
+		writeType(out, type->typedata.list.contained);
+		dataptr[0] = (char) type->typedata.list.levels;
+		out.write(dataptr, 1);
+	} else if(type->type == TYPE_OPTIONAL) {
+		dataptr[0] = TYPE_OPTIONAL;
+		out.write(dataptr, 1);
+		writeType(out, type->typedata.optional.contained);
+		dataptr[0] = (char) type->typedata.optional.levels;
+		out.write(dataptr, 1);
 	}
-
-	dataptr[0] = (char) type->arrayed;
-	out.write(dataptr, 1);
 
 	if(type->alias != NULL) {
 		dataptr[0] = strlen(type->alias);
@@ -156,8 +165,6 @@ void TableFileWriter::writeType(ostream& out, Type* type) {
 		out.write(dataptr, 1);
 	}
 
-	dataptr[0] = type->optional;
-	out.write(dataptr, 1);
 	free(dataptr);
 }
 

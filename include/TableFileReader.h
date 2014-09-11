@@ -40,6 +40,8 @@ class TableFileReader {
 		Type* readClassType(istream& s);
 		Type* readLambdaType(istream& s);
 		Type* readParameterizedType(istream& s);
+		Type* readListType(istream& s);
+		Type* readOptionalType(istream& s);
 
 };
 

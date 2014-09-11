@@ -181,6 +181,7 @@ void printSubNodes(Node *n, int level, char* name) {
 }
 
 void printtype(Type* thetype, int level) {
+	/*
 	switch(thetype->type) {
 		case TYPE_LAMBDA:
 			printf("%*c lambda, []^%d, {%s}, @%s\n", level, ' ', thetype->arrayed, thetype->specialty, thetype->alias);
@@ -199,7 +200,7 @@ void printtype(Type* thetype, int level) {
 		case TYPE_CLASS:
 			printf("%*c class %s, $^%d, []^%d, {%s}, @%s\n", level, ' ', thetype->typedata._class.classname, thetype->typedata._class.shadow, thetype->arrayed, thetype->specialty, thetype->alias);
 			break;
-	}
+	}*/
 }
 
 void printtree (Node *n, int level) {

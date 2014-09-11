@@ -490,8 +490,8 @@ types:
 
 classtype:
 	parameterizedtype															{ $$ = $1; }
-	| parameterizedtype '?'														{ $$ = $1; $$->optional = 1; }
-	| parameterizedtype SYM_ARRAYED												{ $$ = $1; $$->arrayed += $2; }
+	| parameterizedtype '?'														{ $$ = MakeType(TYPE_OPTIONAL); $$->typedata.optional.levels = 1; $$->typedata.optional.contained = $1; }
+	| parameterizedtype SYM_ARRAYED												{ $$ = MakeType(TYPE_LIST); $$->typedata.list.levels = $2; $$->typedata.list.contained = $1; }
 	;
 
 parameterizedtype:
@@ -504,8 +504,8 @@ fntype:
 	| puretype SYM_RETURN_DECREMENT FN '(' ')'									{ $$ = MakeType(TYPE_LAMBDA); $$->typedata.lambda.returntype = $1; }
 	| FN '(' puretypes ')'														{ $$ = MakeType(TYPE_LAMBDA); $$->typedata.lambda.arguments = $3; }
 	| FN '(' ')'																{ $$ = MakeType(TYPE_LAMBDA); }
-	| fntype '?'																{ $$ = $1; $$->optional = 1; }
-	| fntype SYM_ARRAYED														{ $$ = $1; $$->arrayed += $2; }
+	| fntype '?'																{ $$ = MakeType(TYPE_OPTIONAL); $$->typedata.optional.levels = 1; $$->typedata.optional.contained = $1; }
+	| fntype SYM_ARRAYED														{ $$ = MakeType(TYPE_LIST); $$->typedata.list.levels = $2; $$->typedata.list.contained = $1; }
 	;
 
 unboundtypespecifications:

@@ -19,10 +19,8 @@
 Type* MakeType(int type) {
 	Type* thetype = malloc(sizeof(Type));
 	thetype->type = type;
-	thetype->arrayed = 0;
 	thetype->specialty = NULL;
 	thetype->alias = NULL;
-	thetype->optional = 0;
 	switch(type) {
 		case TYPE_CLASS:
 			thetype->typedata._class.shadow = 0;
@@ -82,6 +80,14 @@ void freeType(Type *t) {
 			if(t->typedata.parameterized.upperbound != NULL) free(t->typedata.parameterized.upperbound);
 			if(t->typedata.parameterized.lowerbound != NULL) free(t->typedata.parameterized.lowerbound);
 			break;
+
+		case TYPE_LIST:
+			if(t->typedata.list.contained != NULL) free(t->typedata.list.contained);
+			break;
+
+		case TYPE_OPTIONAL:
+			if(t->typedata.optional.contained != NULL) free(t->typedata.optional.contained);
+			break;
 	}
 
 	if(t->alias) free(t->alias);
@@ -103,7 +109,6 @@ Type* copyType(Type* t) {
 
 	Type* copy = malloc(sizeof(Type));
 	copy->type = t->type;
-	copy->optional = t->optional;
 	if(t->type == TYPE_LAMBDA) {
 		copy->typedata.lambda.arguments = copyTypeArray(t->typedata.lambda.arguments);
 		copy->typedata.lambda.returntype = copyType(t->typedata.lambda.returntype);
@@ -117,8 +122,13 @@ Type* copyType(Type* t) {
 		copy->typedata.parameterized.shadow = t->typedata.parameterized.shadow;					// number of $s
 		copy->typedata.parameterized.lowerbound = copyType(t->typedata.parameterized.lowerbound);
 		copy->typedata.parameterized.upperbound = copyType(t->typedata.parameterized.upperbound);
+	} else if(t->type == TYPE_LIST) {
+		copy->typedata.list.contained = copyType(t->typedata.list.contained);
+		copy->typedata.list.levels = t->typedata.list.levels;
+	} else if(t->type == TYPE_OPTIONAL) {
+		copy->typedata.optional.contained = copyType(t->typedata.optional.contained);
+		copy->typedata.optional.levels = t->typedata.optional.levels;
 	}
-	copy->arrayed = t->arrayed;
 	copy->alias = t->alias == NULL ? NULL : strdup(t->alias);
 	copy->specialty = t->specialty == NULL ? NULL : strdup(t->specialty);
 	return copy;

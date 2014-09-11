@@ -204,12 +204,12 @@ bool TypeAnalyzer::isPrimitiveTypeNum(Type* type) {
 
 bool TypeAnalyzer::isPrimitiveTypeText(Type* type) {
 	if(type->type == TYPE_MATCHALL) return true;
-	return type->type != TYPE_CLASS && type->typedata._class.classname == string("Text");
+	return type->type == TYPE_CLASS && type->typedata._class.classname == string("Text");
 }
 
 bool TypeAnalyzer::isPrimitiveTypeBool(Type* type) {
 	if(type->type == TYPE_MATCHALL) return true;
-	return type->type != TYPE_CLASS && type->typedata._class.classname == string("Bool");
+	return type->type == TYPE_CLASS && type->typedata._class.classname == string("Bool");
 }
 
 bool TypeAnalyzer::isAutoboxedType(Type* type, Type** boxed) {
