@@ -44,18 +44,20 @@ void TypeParameterizer::writeInParameterizations(Type** typeaddr, const std::vec
 	} else if(type->type == TYPE_LIST) {
 		writeInParameterizations(&type->typedata.list.contained, parameters);
 		if(type->typedata.list.contained->type == TYPE_LIST) {
-			type->typedata.list.levels += type->typedata.list.contained->typedata.list.levels;
-			type->typedata.list.contained = type->typedata.list.contained->typedata.list.contained;
-			type->typedata.list.contained->typedata.list.contained = NULL;
-			freeType(type->typedata.list.contained->typedata.list.contained);
+			Type* doublewrapper = type->typedata.list.contained;
+			type->typedata.list.levels += doublewrapper->typedata.list.levels;
+			type->typedata.list.contained = doublewrapper->typedata.list.contained;
+			doublewrapper->typedata.list.contained = NULL;
+			freeType(doublewrapper);
 		}
 	} else if(type->type == TYPE_OPTIONAL) {
 		writeInParameterizations(&type->typedata.optional.contained, parameters);
 		if(type->typedata.optional.contained->type == TYPE_OPTIONAL) {
-			type->typedata.optional.levels += type->typedata.optional.contained->typedata.optional.levels;
-			type->typedata.optional.contained = type->typedata.optional.contained->typedata.optional.contained;
-			type->typedata.optional.contained->typedata.optional.contained = NULL;
-			freeType(type->typedata.optional.contained->typedata.optional.contained);
+			Type* doublewrapper = type->typedata.optional.contained;
+			type->typedata.optional.levels += doublewrapper->typedata.optional.levels;
+			type->typedata.optional.contained = doublewrapper->typedata.optional.contained;
+			doublewrapper->typedata.optional.contained = NULL;
+			freeType(doublewrapper);
 		}
 	}
 }
@@ -92,18 +94,20 @@ void TypeParameterizer::applyParameterizations(Type** typeaddr, const std::vecto
 	} else if(type->type == TYPE_LIST) {
 		applyParameterizations(&type->typedata.list.contained, parameters, parameterizations);
 		if(type->typedata.list.contained->type == TYPE_LIST) {
-			type->typedata.list.levels += type->typedata.list.contained->typedata.list.levels;
-			type->typedata.list.contained = type->typedata.list.contained->typedata.list.contained;
-			type->typedata.list.contained->typedata.list.contained = NULL;
-			freeType(type->typedata.list.contained->typedata.list.contained);
+			Type* doublewrapper = type->typedata.list.contained;
+			type->typedata.list.levels += doublewrapper->typedata.list.levels;
+			type->typedata.list.contained = doublewrapper->typedata.list.contained;
+			doublewrapper->typedata.list.contained = NULL;
+			freeType(doublewrapper);
 		}
 	} else if(type->type == TYPE_OPTIONAL) {
 		applyParameterizations(&type->typedata.optional.contained, parameters, parameterizations);
 		if(type->typedata.optional.contained->type == TYPE_OPTIONAL) {
-			type->typedata.optional.levels += type->typedata.optional.contained->typedata.optional.levels;
-			type->typedata.optional.contained = type->typedata.optional.contained->typedata.optional.contained;
-			type->typedata.optional.contained->typedata.optional.contained = NULL;
-			freeType(type->typedata.optional.contained->typedata.optional.contained);
+			Type* doublewrapper = type->typedata.optional.contained;
+			type->typedata.optional.levels += doublewrapper->typedata.optional.levels;
+			type->typedata.optional.contained = doublewrapper->typedata.optional.contained;
+			doublewrapper->typedata.optional.contained = NULL;
+			freeType(doublewrapper);
 		}
 	}
 }

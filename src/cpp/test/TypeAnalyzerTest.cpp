@@ -34,12 +34,12 @@ BOOST_AUTO_TEST_CASE(RealTypeIsSubtypesOfOptionalType) {
 
 	Type realtype = *MakeType(TYPE_CLASS);
 	realtype.typedata._class.classname = "test";
-	Type wrappedtype = *MakeType(TYPE_CLASS);
 
+	Type wrappedtype = *MakeType(TYPE_CLASS);
 	wrappedtype.typedata._class.classname = "test";
 	Type optionaltype = *MakeType(TYPE_OPTIONAL);
-	realtype.typedata.optional.levels = 1;
-	realtype.typedata.optional.contained = &wrappedtype;
+	optionaltype.typedata.optional.levels = 1;
+	optionaltype.typedata.optional.contained = &wrappedtype;
 
 	BOOST_REQUIRE(analyzer.isASubtypeOfB(&realtype, &optionaltype));
 }

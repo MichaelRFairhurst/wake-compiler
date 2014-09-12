@@ -158,6 +158,7 @@ BOOST_AUTO_TEST_CASE( TestArrayedSymbolsAddedByType ) {
 	onecontained.type = TYPE_CLASS;
 	onecontained.typedata._class.shadow = 0;
 	onecontained.typedata._class.classname = "One";
+	onecontained.alias = NULL;
 	onearray.type = TYPE_LIST;
 	onearray.alias = NULL;
 	onearray.typedata.list.levels = 1;
@@ -167,7 +168,8 @@ BOOST_AUTO_TEST_CASE( TestArrayedSymbolsAddedByType ) {
 	twocontained.type = TYPE_CLASS;
 	twocontained.typedata._class.classname = "Two";
 	twocontained.typedata._class.shadow = 0;
-	onearray.type = TYPE_LIST;
+	twocontained.alias = NULL;
+	twoarray.type = TYPE_LIST;
 	twoarray.alias = NULL;
 	twoarray.typedata.list.levels = 2;
 	twoarray.typedata.list.contained = &twocontained;

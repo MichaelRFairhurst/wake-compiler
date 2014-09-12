@@ -836,12 +836,13 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 					} else {
 						Type* lowered;
 						if(ret->typedata.list.levels == 1) {
-							Type* lowered = copyType(ret->typedata.list.contained);
+							lowered = copyType(ret->typedata.list.contained);
 						} else {
-							Type* lowered = copyType(ret);
+							lowered = copyType(ret);
 							lowered->typedata.list.levels--;
 						}
-						free(lowered->alias);
+
+						if(lowered->alias != NULL) free(lowered->alias);
 
 						if(tree->node_type == NT_FOREACH) {
 							lowered->alias = NULL;

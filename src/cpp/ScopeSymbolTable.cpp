@@ -73,23 +73,19 @@ string ScopeSymbolTable::getAddress(string name) {
 }
 
 string ScopeSymbolTable::getNameForType(Type* type) {
-	string name;
-
-	if(type->type == TYPE_LIST) {
-		return getNameForType(type->typedata.list.contained) + "[]";
-	}
-
 	if(type->alias != NULL) {
-		name = type->alias;
+		return type->alias;
 	} else {
 		if(type->type == TYPE_PARAMETERIZED){
-			name = string(type->typedata.parameterized.shadow, '$') + type->typedata.parameterized.label;
-		} else {
-			name = string(type->typedata._class.shadow, '$') + type->typedata._class.classname;
+			return string(type->typedata.parameterized.shadow, '$') + type->typedata.parameterized.label;
+		} else if(type->type == TYPE_CLASS) {
+			return string(type->typedata._class.shadow, '$') + type->typedata._class.classname;
+		} else if(type->type == TYPE_LIST) {
+			return getNameForType(type->typedata.list.contained) + "[]";
+		} else if(type->type == TYPE_OPTIONAL) {
+			return getNameForType(type->typedata.optional.contained);
 		}
 	}
-
-	return name;
 }
 
 void ScopeSymbolTable::pushScope() {

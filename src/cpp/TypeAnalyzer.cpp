@@ -38,7 +38,13 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 	//if(a == NULL || b == NULL) return false;
 	if(a->type == TYPE_MATCHALL || b->type == TYPE_MATCHALL) return true;
 	if(a->type == TYPE_NOTHING) return b->type == TYPE_OPTIONAL;
-	if(a->type != b->type) return false; // TODO: parameterized types don't always follow this logic!
+	if(a->type != b->type) {
+		if(b->type == TYPE_OPTIONAL) {
+			return isASubtypeOfB(a, b->typedata.optional.contained);
+		}
+		 // TODO: parameterized types need logic here
+		return false;
+	}
 
 	if(a->type == TYPE_LAMBDA) {
 
@@ -109,7 +115,7 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 		return isAExactlyB(a->typedata.list.contained, b->typedata.list.contained);
 	} else if(a->type == TYPE_OPTIONAL) {
 		if(a->typedata.optional.levels != b->typedata.optional.levels) return false;
-		return isAExactlyB(a->typedata.optional.contained, b->typedata.optional.contained);
+		return isASubtypeOfB(a->typedata.optional.contained, b->typedata.optional.contained);
 	}
 
 }
@@ -323,7 +329,7 @@ string TypeAnalyzer::getNameForType(Type* type) {
 		name = getNameForType(type->typedata.optional.contained);
 		int i;
 		for(i = 0; i < type->typedata.optional.levels; i++)
-			name += "[]";
+			name += "?";
 	}
 
 	return name;

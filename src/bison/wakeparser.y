@@ -470,8 +470,10 @@ specializabletype:
 
 shadowabletype:
 	puretype																	{ $$ = $1; }
-	| SYM_SHADOW classtype														{ $$ = $2; $$->typedata._class.shadow = $1; }
-	;
+	| SYM_SHADOW classtype														{ $$ = $2;
+																					if($$->type == TYPE_CLASS) $$->typedata._class.shadow = $1;
+																					else if($$->type == TYPE_LIST) $$->typedata.list.contained->typedata._class.shadow = $1;
+																					else if($$->type == TYPE_OPTIONAL) $$->typedata.optional.contained->typedata._class.shadow = $1; }
 
 puretype:
 	classtype																	{ $$ = $1; }
