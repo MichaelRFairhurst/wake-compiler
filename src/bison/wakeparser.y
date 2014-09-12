@@ -20,6 +20,8 @@
 #include "tree.h"
 #include "type.h"
 
+#define YYERROR_VERBOSE
+
 int line = 1;
 int column = 1;
 extern char* waketext;
