@@ -59,20 +59,16 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 						"Text"
 						"\000" // parameters
 						"\000" // shadow
-						"\000" // arrayed
 						"\000" // alias length
 						"\000" // specialty length
-						"\000" // optionality
 					"\000" // end arguments
-					"\000" // arrayed
 					"\000" // alias length
 					"\000" // specialty length
-					"\000" // optionality
 					"\000" // begin inheritance
 					"\000"; // begin parameters
 
 	std::stringstream in;
-	in.write(dataptr, 54);
+	in.write(dataptr, 50);
 
 	TableFileReader reader;
 
@@ -94,14 +90,10 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 	BOOST_CHECK((*table.find("print(Text)"))->typedata.lambda.arguments->types[0]->typedata._class.classname == string("Text"));
 	BOOST_CHECK((*table.find("print(Text)"))->typedata.lambda.arguments->types[0]->typedata._class.parameters == NULL);
 	BOOST_CHECK((*table.find("print(Text)"))->typedata.lambda.arguments->types[0]->typedata._class.shadow == 0);
-	BOOST_CHECK((*table.find("print(Text)"))->typedata.lambda.arguments->types[0]->arrayed == 0);
 	BOOST_CHECK((*table.find("print(Text)"))->typedata.lambda.arguments->types[0]->alias == 0);
 	BOOST_CHECK((*table.find("print(Text)"))->typedata.lambda.arguments->types[0]->specialty == 0);
-	BOOST_CHECK((*table.find("print(Text)"))->typedata.lambda.arguments->types[0]->optional == 0);
-	BOOST_CHECK((*table.find("print(Text)"))->arrayed == 0);
 	BOOST_CHECK((*table.find("print(Text)"))->alias == NULL);
 	BOOST_CHECK((*table.find("print(Text)"))->specialty == NULL);
-	BOOST_CHECK((*table.find("print(Text)"))->optional == 0);
 }
 
 BOOST_AUTO_TEST_CASE(TestWritesNeed)
@@ -119,15 +111,13 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 					"Text"
 					"\000" // parameters
 					"\000" // shadow
-					"\000" // array
 					"\000" // alias length
 					"\000" // spec length
-					"\000" // optional
 					"\000" // begin inheritance
 					"\000"; // begin parameters
 
 	std::stringstream in;
-	in.write(dataptr, 36);
+	in.write(dataptr, 34);
 
 	TableFileReader reader;
 
@@ -142,10 +132,8 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 	BOOST_CHECK(table.getNeeds()->at(0)->typedata._class.classname == string("Text"));
 	BOOST_CHECK(table.getNeeds()->at(0)->typedata._class.parameters == NULL);
 	BOOST_CHECK(table.getNeeds()->at(0)->typedata._class.shadow == 0);
-	BOOST_CHECK(table.getNeeds()->at(0)->arrayed == 0);
 	BOOST_CHECK(table.getNeeds()->at(0)->alias == NULL);
 	BOOST_CHECK(table.getNeeds()->at(0)->specialty == NULL);
-	BOOST_CHECK(table.getNeeds()->at(0)->optional == NULL);
 	BOOST_CHECK(table.properties.size() == 1);
 	BOOST_CHECK(table.properties["Text"]->type == table.getNeeds()->at(0));
 	BOOST_CHECK(table.parentage.size() == 0);
@@ -167,10 +155,8 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 					"Text"
 					"\000" // parameters
 					"\000" // shadow
-					"\000" // array
 					"\000" // alias length
 					"\000" // spec length
-					"\000" // optional
 					"\007" // property length
 					"Printer"
 					"\007" // casing length
@@ -181,15 +167,13 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 					"Printer"
 					"\000" // parameters
 					"\000" // shadow
-					"\000" // array
 					"\000" // alias length
 					"\000" // spec length
-					"\000" // optional
 					"\000" // begin inheritance
 					"\000"; // begin parameters
 
 	std::stringstream in;
-	in.write(dataptr, 68);
+	in.write(dataptr, 64);
 
 	TableFileReader reader;
 
@@ -204,18 +188,14 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	BOOST_CHECK(table.getNeeds()->at(0)->typedata._class.classname == string("Text"));
 	BOOST_CHECK(table.getNeeds()->at(0)->typedata._class.parameters == NULL);
 	BOOST_CHECK(table.getNeeds()->at(0)->typedata._class.shadow == 0);
-	BOOST_CHECK(table.getNeeds()->at(0)->arrayed == 0);
 	BOOST_CHECK(table.getNeeds()->at(0)->alias == NULL);
 	BOOST_CHECK(table.getNeeds()->at(0)->specialty == NULL);
-	BOOST_CHECK(table.getNeeds()->at(0)->optional == NULL);
 	BOOST_CHECK(table.getNeeds()->at(1)->type == TYPE_CLASS);
 	BOOST_CHECK(table.getNeeds()->at(1)->typedata._class.classname == string("Printer"));
 	BOOST_CHECK(table.getNeeds()->at(1)->typedata._class.parameters == NULL);
 	BOOST_CHECK(table.getNeeds()->at(1)->typedata._class.shadow == 0);
-	BOOST_CHECK(table.getNeeds()->at(1)->arrayed == 0);
 	BOOST_CHECK(table.getNeeds()->at(1)->alias == NULL);
 	BOOST_CHECK(table.getNeeds()->at(1)->specialty == NULL);
-	BOOST_CHECK(table.getNeeds()->at(1)->optional == NULL);
 	BOOST_CHECK(table.properties.size() == 2);
 	BOOST_CHECK(table.properties["Text"]->type == table.getNeeds()->at(0));
 	BOOST_CHECK(table.properties["Printer"]->type == table.getNeeds()->at(1));
@@ -267,36 +247,28 @@ BOOST_AUTO_TEST_CASE(TestReadsParameters)
 					"\000" // no upper bound
 					"\000" // no lower bound
 					"\000" // shadow
-					"\000" // arrayed
 					"\000" // alias
 					"\000" // specialty
-					"\000" // optional
 					"\003" // parameterized type
 					"\001" "B"
 					"\002" // Type upper bound
 						"\004" "Text"
 						"\000" // parameters
 						"\000" // shadow
-						"\000" // arrayed
 						"\000" // alias
 						"\000" // specialty
-						"\000" // optional
 					"\002" // Type lower bound
 						"\004" "Bool"
 						"\000" // parameters
 						"\000" // shadow
-						"\000" // arrayed
 						"\000" // alias
 						"\000" // specialty
-						"\000" // optional
 					"\000" // shadow
-					"\000" // arrayed
 					"\000" // alias
-					"\000" // specialty
-					"\000"; // optional
+					"\000";// specialty
 
 	std::stringstream in;
-	in.write(dataptr, 55);
+	in.write(dataptr, 47);
 
 	TableFileReader reader;
 
@@ -315,10 +287,8 @@ BOOST_AUTO_TEST_CASE(TestReadsParameters)
 	BOOST_CHECK(table.getParameters()[0]->typedata.parameterized.upperbound == NULL);
 	BOOST_CHECK(table.getParameters()[0]->typedata.parameterized.lowerbound == NULL);
 	BOOST_CHECK(table.getParameters()[0]->typedata.parameterized.shadow == 0);
-	BOOST_CHECK(table.getParameters()[0]->arrayed == 0);
 	BOOST_CHECK(table.getParameters()[0]->alias == NULL);
 	BOOST_CHECK(table.getParameters()[0]->specialty == NULL);
-	BOOST_CHECK(table.getParameters()[0]->optional == 0);
 	BOOST_CHECK(table.getParameters()[1]->type == TYPE_PARAMETERIZED);
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.label == string("B"));
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.upperbound != NULL);
@@ -326,23 +296,17 @@ BOOST_AUTO_TEST_CASE(TestReadsParameters)
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.upperbound->typedata._class.classname == string("Text"));
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.upperbound->typedata._class.shadow == 0);
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.upperbound->typedata._class.parameters == NULL);
-	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.upperbound->arrayed == 0);
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.upperbound->alias == NULL);
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.upperbound->specialty == NULL);
-	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.upperbound->optional == 0);
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.lowerbound != NULL);
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.lowerbound->typedata._class.classname == string("Bool"));
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.lowerbound->typedata._class.shadow == 0);
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.lowerbound->typedata._class.parameters == NULL);
-	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.lowerbound->arrayed == 0);
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.lowerbound->alias == NULL);
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.lowerbound->specialty == NULL);
-	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.lowerbound->optional == 0);
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.shadow == 0);
-	BOOST_CHECK(table.getParameters()[1]->arrayed == 0);
 	BOOST_CHECK(table.getParameters()[1]->alias == NULL);
 	BOOST_CHECK(table.getParameters()[1]->specialty == NULL);
-	BOOST_CHECK(table.getParameters()[1]->optional == 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
