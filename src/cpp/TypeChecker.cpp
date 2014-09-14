@@ -791,7 +791,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						? tree->node_data.nodes[1]->node_data.string
 						: scopesymtable->getNameForType(tree->node_data.nodes[1]->node_data.type);
 
-					if(forceArrayIdentifier) name += "[]";
+					if(forceArrayIdentifier && tree->node_data.nodes[1]->node_type != NT_ALIAS) name += "[]";
 
 					if(subject->type == TYPE_OPTIONAL) {
 						errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Accessing member " + name + " on optional type " + analyzer->getNameForType(subject) + ". You must first wrap object in an exists { } clause.", tree));
