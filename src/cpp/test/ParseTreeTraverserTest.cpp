@@ -2861,4 +2861,16 @@ PTT_TEST_CASE(
 	PTT_VALID
 );
 
+PTT_TEST_CASE(
+	TestAccessAliasedPropertyArrayUsesAliasNoBrackets,
+	"every MyClass is:					\n\
+		with public Text[] arr = [];	\n\
+		myMethod() {					\n\
+			var Text[] = this.arr;		\n\
+			var Text = this.arr[0];		\n\
+		}",
+	PTT_VALID
+);
+
+
 BOOST_AUTO_TEST_SUITE_END()
