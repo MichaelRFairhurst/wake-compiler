@@ -741,6 +741,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 					Type* real;
 					if(ret->typedata.optional.levels == 1) {
 						real = copyType(ret->typedata.optional.contained);
+						if(ret->alias != NULL) real->alias = strdup(ret->alias);
 					} else {
 						real = copyType(ret);
 						real->typedata.optional.levels--;
