@@ -2277,7 +2277,9 @@ PTT_TEST_CASE(
 	TestExistsClauseOnAlias,
 	"every MyClass is: method() {		\n\
 		var Num? aliased = nothing;		\n\
-		if aliased exists { }			\n\
+		if aliased exists {				\n\
+			aliased + 2;				\n\
+		}								\n\
 	}",
 	PTT_VALID
 );
@@ -2871,6 +2873,5 @@ PTT_TEST_CASE(
 		}",
 	PTT_VALID
 );
-
 
 BOOST_AUTO_TEST_SUITE_END()
