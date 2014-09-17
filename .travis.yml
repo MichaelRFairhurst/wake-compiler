@@ -3,5 +3,5 @@ compiler: gcc
 before_script:
   - sudo apt-get -qq update
   - sudo apt-get install libboost-all-dev
-script: "make chivvy"
+script: "make chivvy TEST=true"
 

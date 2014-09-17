@@ -19,7 +19,7 @@ OPT=-O3
 FLAGS=-Iinclude -Igen
 CC=cc $(FLAGS)
 CPP=g++ $(FLAGS)
-TEST=true
+TEST=false
 
 CPPNAMES= \
 	ClassSpaceSymbolTable.cpp \
@@ -105,7 +105,7 @@ chivvy: bin/test
 	@echo
 
 bin/test: $(CPPOBJS) $(GENOBJS) $(COBJS) $(TESTOBJS) bin/cpp/LibraryLoader-nolib.o
-	@echo add TEST=false to skip
+	@echo remove TEST=true or set to false to disable tests
 	if $(TEST); then $(CPP) $(TESTOBJS) $(CPPOBJS) bin/cpp/LibraryLoader-nolib.o $(GENOBJS) $(COBJS) -o bin/test -lfl -lboost_unit_test_framework -lboost_filesystem -lboost_system ; fi
 
 bin/wake-nolib: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o chivvy bin/cpp/LibraryLoader-nolib.o
