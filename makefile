@@ -14,8 +14,8 @@
 
 SHELL=/bin/bash
 
-OPT=-O3
-#OPT=-O0 -g
+#OPT=-O3
+OPT=-O0 -g
 FLAGS=-Iinclude -Igen
 CC=cc $(FLAGS)
 CPP=g++ $(FLAGS)

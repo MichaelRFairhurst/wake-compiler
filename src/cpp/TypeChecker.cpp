@@ -748,7 +748,8 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 					}
 
 					if(tree->node_data.nodes[0]->node_type == NT_MEMBER_ACCESS) {
-						errors->addError(new SemanticError(TYPE_ERROR, "Calling exists { } on a property is illegal as it is a shared reference and therefore might be unset amid the scope"));
+						errors->addError(new SemanticError(TYPE_ERROR, "Calling exists { } on a property is illegal as it is a shared reference and therefore might be unset amid the scope", tree));
+						scopesymtable->pushScope();
 					} else {
 						scopesymtable->addOverwriting(real);
 					}

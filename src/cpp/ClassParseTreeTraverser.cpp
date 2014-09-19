@@ -307,7 +307,7 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 									classestable->getAnalyzer()->assertClassCanProvide(classname, actual);
 								}
 							} else {
-								errors->addError(new SemanticError(MISMATCHED_INJECTION, "Too many or too few injectioned depndencies", tree));
+								errors->addError(new SemanticError(MISMATCHED_INJECTION, "Too many or too few injected dependencies", tree));
 							}
 						} catch(SemanticError* e) {
 							e->token = tree;
