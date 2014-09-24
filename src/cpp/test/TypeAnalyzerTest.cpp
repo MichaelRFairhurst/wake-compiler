@@ -31,31 +31,39 @@ BOOST_AUTO_TEST_CASE(TypesAreTheirOwnSubtypes) {
 
 BOOST_AUTO_TEST_CASE(RealTypeIsSubtypesOfOptionalType) {
 	TypeAnalyzer analyzer;
-	Type optionaltype = *MakeType(TYPE_CLASS);
-	optionaltype.typedata._class.classname = "test";
-	optionaltype.optional = true;
+
 	Type realtype = *MakeType(TYPE_CLASS);
 	realtype.typedata._class.classname = "test";
-	realtype.optional = false;
+
+	Type wrappedtype = *MakeType(TYPE_CLASS);
+	wrappedtype.typedata._class.classname = "test";
+	Type optionaltype = *MakeType(TYPE_OPTIONAL);
+	optionaltype.typedata.optional.levels = 1;
+	optionaltype.typedata.optional.contained = &wrappedtype;
+
 	BOOST_REQUIRE(analyzer.isASubtypeOfB(&realtype, &optionaltype));
 }
 
 BOOST_AUTO_TEST_CASE(OptionalTypeIsNotSubtypeOfRealType) {
 	TypeAnalyzer analyzer;
-	Type optionaltype = *MakeType(TYPE_CLASS);
-	optionaltype.typedata._class.classname = "test";
-	optionaltype.optional = true;
+
+	Type wrappedtype = *MakeType(TYPE_CLASS);
+	wrappedtype.typedata._class.classname = "test";
+	Type optionaltype = *MakeType(TYPE_OPTIONAL);
+	optionaltype.typedata.optional.levels = 1;
+	optionaltype.typedata.optional.contained = &wrappedtype;
+
 	Type realtype = *MakeType(TYPE_CLASS);
 	realtype.typedata._class.classname = "test";
-	realtype.optional = false;
+
 	BOOST_REQUIRE(!analyzer.isASubtypeOfB(&optionaltype, &realtype));
 }
 
 BOOST_AUTO_TEST_CASE(NothingIsSubtypesOfOptionalType) {
 	TypeAnalyzer analyzer;
-	Type optionaltype = *MakeType(TYPE_CLASS);
-	optionaltype.typedata._class.classname = "test";
-	optionaltype.optional = true;
+	Type optionaltype = *MakeType(TYPE_OPTIONAL);
+	optionaltype.typedata.optional.levels = 1;
+	optionaltype.typedata.optional.contained = NULL;
 	Type nothing = *MakeType(TYPE_NOTHING);
 	BOOST_REQUIRE(analyzer.isASubtypeOfB(&nothing, &optionaltype));
 }
@@ -65,7 +73,6 @@ BOOST_AUTO_TEST_CASE(NothingIsNotSubtypeOfRealType) {
 	Type nothing = *MakeType(TYPE_NOTHING);
 	Type realtype = *MakeType(TYPE_CLASS);
 	realtype.typedata._class.classname = "test";
-	realtype.optional = false;
 	BOOST_REQUIRE(!analyzer.isASubtypeOfB(&nothing, &realtype));
 }
 
@@ -129,15 +136,20 @@ BOOST_AUTO_TEST_CASE(ParameterizedClassTypesArentCovariantOrContravariant) {
 	TypeAnalyzer analyzer;
 	ClassSpaceSymbolTable table;
 	analyzer.reference = &table;
+
 	Type* a = MakeType(TYPE_CLASS);
 	Type* b = MakeType(TYPE_CLASS);
-	Type* asub = MakeType(TYPE_CLASS);
+
+	Type* asubwrapped = MakeType(TYPE_CLASS);
+	Type* asub = MakeType(TYPE_OPTIONAL);
 	Type* bsub = MakeType(TYPE_CLASS);
+
 	a->typedata._class.classname = strdup("hello");
 	b->typedata._class.classname = strdup("hello");
-	asub->typedata._class.classname = strdup("hellosub");
+
+	asubwrapped->typedata._class.classname = strdup("hellosub");
 	bsub->typedata._class.classname = strdup("hellosub");
-	asub->optional = 1; // easiest way to make asub a subtype of bsub, and bsub a supertype of asub
+	asub->typedata.optional.contained = asubwrapped; // easiest way to make asub a subtype of bsub, and bsub a supertype of asub
 	a->typedata._class.parameters = MakeTypeArray();
 	b->typedata._class.parameters = MakeTypeArray();
 
@@ -164,14 +176,21 @@ BOOST_AUTO_TEST_CASE(TwoClassesAreExactTypes) {
 
 BOOST_AUTO_TEST_CASE(MismatchedArrayTypesArentExact) {
 	TypeAnalyzer analyzer;
-	Type* a = MakeType(TYPE_CLASS);
-	Type* b = MakeType(TYPE_CLASS);
-	a->typedata._class.classname = strdup("hello");
-	b->typedata._class.classname = strdup("hello");
-	b->arrayed = 1;
-	BOOST_REQUIRE(!analyzer.isAExactlyB(a, b));
-	BOOST_REQUIRE(!analyzer.isAExactlyB(b, a));
-	a->arrayed = 2;
+
+	Type* acontained = MakeType(TYPE_CLASS);
+	Type* bcontained = MakeType(TYPE_CLASS);
+	acontained->typedata._class.classname = strdup("hello");
+	bcontained->typedata._class.classname = strdup("hello");
+
+	Type* a = MakeType(TYPE_LIST);
+	Type* b = MakeType(TYPE_LIST);
+	a->typedata.list.contained = acontained;
+	b->typedata.list.contained = bcontained;
+	b->typedata.list.levels = 1;
+	a->typedata.list.levels = 2;
+
+	BOOST_REQUIRE(!analyzer.isAExactlyB(acontained, b));
+	BOOST_REQUIRE(!analyzer.isAExactlyB(b, acontained));
 	BOOST_REQUIRE(!analyzer.isAExactlyB(a, b));
 	BOOST_REQUIRE(!analyzer.isAExactlyB(b, a));
 	freeType(a); freeType(b);
@@ -179,14 +198,22 @@ BOOST_AUTO_TEST_CASE(MismatchedArrayTypesArentExact) {
 
 BOOST_AUTO_TEST_CASE(MismatchedOptionalTypesArentExact) {
 	TypeAnalyzer analyzer;
-	Type* a = MakeType(TYPE_CLASS);
-	Type* b = MakeType(TYPE_CLASS);
-	a->typedata._class.classname = strdup("hello");
-	b->typedata._class.classname = strdup("hello");
-	b->optional = 1;
-	BOOST_REQUIRE(!analyzer.isAExactlyB(a, b));
-	BOOST_REQUIRE(!analyzer.isAExactlyB(b, a));
-	a->optional = 2;
+	Type* awrapped = MakeType(TYPE_CLASS);
+	awrapped->typedata._class.classname = strdup("hello");
+
+	Type* bwrapped = MakeType(TYPE_CLASS);
+	bwrapped->typedata._class.classname = strdup("hello");
+
+	Type* a = MakeType(TYPE_OPTIONAL);
+	a->typedata.optional.levels = 2;
+	a->typedata.optional.contained = awrapped;
+
+	Type* b = MakeType(TYPE_OPTIONAL);
+	b->typedata.optional.levels = 1;
+	b->typedata.optional.contained = bwrapped;
+
+	BOOST_REQUIRE(!analyzer.isAExactlyB(awrapped, b));
+	BOOST_REQUIRE(!analyzer.isAExactlyB(b, awrapped));
 	BOOST_REQUIRE(!analyzer.isAExactlyB(a, b));
 	BOOST_REQUIRE(!analyzer.isAExactlyB(b, a));
 	freeType(a); freeType(b);

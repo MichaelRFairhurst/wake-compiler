@@ -1276,10 +1276,10 @@ PTT_TEST_CASE(
 	DeclareArraysInvalidValues,
 	"every MyClass is:					\n\
 		assignMeToArray() {				\n\
-			var MyClass[] = this;			\n\
+			var MyClass[] = this;		\n\
 		}								\n\
 		assignNumberToClassArray() {	\n\
-			var MyClass[] = 4;				\n\
+			var MyClass[] = 4;			\n\
 		}								\n\
 		assignTextToClassArray() {		\n\
 			var MyClass[] = 'test';		\n\
@@ -1294,14 +1294,14 @@ PTT_TEST_CASE(
 	"every MyClass is:								\n\
 		declareEmptyClassArrayAndArrayArray() {		\n\
 			var MyClass[] = [];						\n\
-			var $MyClass[][] = [];						\n\
+			var $MyClass[][] = [];					\n\
 		}											\n\
 		declareEmptyNumArrayAndArrayArray() {		\n\
 			var Num[] = [];							\n\
-			var $Num[][] = [];							\n\
+			var $Num[][] = [];						\n\
 		}											\n\
 		declareEmptyStringArrayAndArrayArray() {	\n\
-			var Text[] = [];							\n\
+			var Text[] = [];						\n\
 			var $Text[][] = [];						\n\
 		}",
 	PTT_VALID
@@ -1322,9 +1322,9 @@ PTT_TEST_CASE(
 		assignBoolToNums() { Num[1] = true; }				\n\
 		assignMyClassToTexts() { Text[1] = this; }			\n\
 		assignNumToTexts() { Text[1] = 4; }					\n\
-		assignBoolToTexts() { Text[1] = true; }			\n\
-		assignMyClassToBools() { Bool[1] = this; }		\n\
-		assignNumToBools() { Bool[1] = 4; }				\n\
+		assignBoolToTexts() { Text[1] = true; }				\n\
+		assignMyClassToBools() { Bool[1] = this; }			\n\
+		assignNumToBools() { Bool[1] = 4; }					\n\
 		assignTextToBools() { Bool[1] = 'test'; }			\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
@@ -1654,12 +1654,12 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	OptionalNumsBoolsAndTextsCantBeUsed,
-	"every MyClass is:											\n\
-		addOptionalNums(Num?, $Num?) { Num + $Num; }			\n\
-		subtractOptionalNums(Num?, $Num?) { Num - $Num; }		\n\
-		divideOptionalNums(Num?, $Num?) { Num / $Num; }			\n\
-		multiplyOptionalNums(Num?, $Num?) { Num * $Num; }		\n\
-		concatOptionalTexts(Text?, $Text?) { Text * Text; }		\n\
+	"every MyClass is:										\n\
+		addOptionalNums(Num?, $Num?) { Num + $Num; }		\n\
+		subtractOptionalNums(Num?, $Num?) { Num - $Num; }	\n\
+		divideOptionalNums(Num?, $Num?) { Num / $Num; }		\n\
+		multiplyOptionalNums(Num?, $Num?) { Num * $Num; }	\n\
+		concatOptionalTexts(Text?, $Text?) { Text * Text; }	\n\
 		notOptionalBool(Bool?) { !Bool; }					\n\
 		andOptionalBools(Bool?, $Bool?) { Bool && $Bool; }	\n\
 		orOptionalBools(Bool?, $Bool?) { Bool || $Bool; }	\n\
@@ -1678,7 +1678,7 @@ PTT_TEST_CASE(
 	ExistsElseStatementIsTypeChecked,
 	"every MyClass is:				\n\
 		myMethod() {				\n\
-			var Num? = 4;				\n\
+			var Num? = 4;			\n\
 			if Num exists {} else { \n\
 				Num + 4;			\n\
 			}						\n\
@@ -2277,7 +2277,9 @@ PTT_TEST_CASE(
 	TestExistsClauseOnAlias,
 	"every MyClass is: method() {		\n\
 		var Num? aliased = nothing;		\n\
-		if aliased exists { }			\n\
+		if aliased exists {				\n\
+			aliased + 2;				\n\
+		}								\n\
 	}",
 	PTT_VALID
 );
@@ -2858,6 +2860,17 @@ PTT_TEST_CASE(
 			return ChildClass;											\n\
 		}																\n\
 	",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestAccessAliasedPropertyArrayUsesAliasNoBrackets,
+	"every MyClass is:					\n\
+		with public Text[] arr = [];	\n\
+		myMethod() {					\n\
+			var Text[] = this.arr;		\n\
+			var Text = this.arr[0];		\n\
+		}",
 	PTT_VALID
 );
 

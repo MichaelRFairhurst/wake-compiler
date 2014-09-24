@@ -87,8 +87,12 @@ Type* TableFileReader::readTypeByTag(int tag, istream& s) {
 		return readClassType(s);
 	} else if(tag == TYPE_LAMBDA) {
 		return readLambdaType(s);
-	} else {
+	} else if(tag == TYPE_PARAMETERIZED) {
 		return readParameterizedType(s);
+	} else if(tag == TYPE_LIST) {
+		return readListType(s);
+	} else if(tag == TYPE_OPTIONAL) {
+		return readOptionalType(s);
 	}
 }
 
@@ -157,12 +161,28 @@ Type* TableFileReader::readParameterizedType(istream& s) {
 	return type;
 }
 
+Type* TableFileReader::readListType(istream& s) {
+	Type* type = MakeType(TYPE_LIST);
+	type->typedata.list.contained = readType(s);
+	type->typedata.list.levels = readUInt8(s);
+
+	readTypeCommon(type, s);
+	return type;
+}
+
+Type* TableFileReader::readOptionalType(istream& s) {
+	Type* type = MakeType(TYPE_OPTIONAL);
+	type->typedata.optional.contained = readType(s);
+	type->typedata.optional.levels = readUInt8(s);
+
+	readTypeCommon(type, s);
+	return type;
+}
+
 void TableFileReader::readTypeCommon(Type* type, istream& s) {
 	//cout << "reading type common" << endl;
-	type->arrayed = readUInt8(s);
 	type->alias = readCString(s);
 	type->specialty = readCString(s);
-	type->optional = readUInt8(s);
 }
 
 void TableFileReader::readMethod(PropertySymbolTable* table, istream& s) {

@@ -70,12 +70,10 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_EXPRESSIONS:
 		case NT_INHERITANCESET:
 		case NT_PROVISIONS:
-		case NT_INJECTION:
-		case NT_INJECTION_ARGS:
-		case NT_INJECTION_ARG:
 		case NT_CTOR:
 		case NT_PARENT:
 		case NT_LAMBDA_INVOCATION:
+		case NT_INJECTION:
 			{
 				int i;
 				for(i = 0; i < tree->subnodes; i++)
@@ -205,6 +203,13 @@ void ObjectFileGenerator::generate(Node* tree) {
 					file << "return this.";
 					header->addPropertyUsage(file.tellp(), classes->find(classname)->getProvisionSymbol(tree->node_data.nodes[1]->node_data.type));
 					file << "();";
+				} else if(tree->node_data.nodes[1]->node_type == NT_INJECTION) {
+					file << "return new ";
+					string provisionname = tree->node_data.nodes[0]->node_data.type->typedata._class.classname;
+					header->addClassUsage(file.tellp(), provisionname);
+					file << "(";
+					generate(tree->node_data.nodes[1]);
+					file << ");";
 				} else if(tree->node_data.nodes[1]->node_type == NT_STRINGLIT || tree->node_data.nodes[1]->node_type == NT_NUMBERLIT || tree->node_data.nodes[1]->node_type == NT_BOOLLIT) {
 					file << "return ";
 					generate(tree->node_data.nodes[1]);
@@ -213,6 +218,23 @@ void ObjectFileGenerator::generate(Node* tree) {
 				}
 			}
 			file << "};";
+			break;
+
+		case NT_INJECTION_ARGS:
+			{
+				bool first = true;
+				for(int i = 0; i < tree->subnodes; i++) {
+					if(first) {
+						first = false;
+					} else {
+						file << ",";
+					}
+
+					file << "this.";
+					header->addPropertyUsage(file.tellp(), classes->find(classname)->getProvisionSymbol(tree->node_data.nodes[i]->node_data.type));
+					file << "()";
+				}
+			}
 			break;
 
 		case NT_CTOR_ARGS:
@@ -393,8 +415,18 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_TYPEDATA:
 			{
 				Type* type = copyType(tree->node_data.type);
-				if(forceArrayIdentifier) type->arrayed = 1;
+				if(forceArrayIdentifier) {
+					if(type->type == TYPE_LIST) {
+						type->typedata.list.levels++;
+					} else {
+						Type* contained = type;
+						type = MakeType(TYPE_LIST);
+						type->typedata.list.levels = 1;
+						type->typedata.list.contained = contained;
+					}
+				}
 				file << table.getAddress(type);
+				freeType(type);
 			}
 			break;
 

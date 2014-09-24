@@ -21,6 +21,8 @@
 #define TYPE_MATCHALL 4
 #define TYPE_NOTHING 5
 #define TYPE_UNUSABLE 6
+#define TYPE_LIST 7
+#define TYPE_OPTIONAL 8
 
 struct TypeArray;
 
@@ -43,11 +45,17 @@ typedef struct Type {
 			struct Type* upperbound;	// Container{T from List}
 			struct Type* lowerbound;	// Container{T to List}
 		} parameterized;
+		struct {
+			struct Type* contained;
+			int levels;					// number of []
+		} list;
+		struct {
+			struct Type* contained;
+			int levels;					// number of ??
+		} optional;
 	} typedata;
-	int arrayed;						// number of []
 	char* alias;						// this should be moved....
 	char* specialty;					// {Alive}
-	int optional;
 } Type;
 
 typedef struct TypeArray {

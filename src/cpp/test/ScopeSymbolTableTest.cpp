@@ -106,17 +106,14 @@ BOOST_AUTO_TEST_CASE( TestSymbolsAddedByType ) {
 	simple.typedata._class.shadow = 0;
 	simple.alias = NULL;
 	simple.typedata._class.classname = "MyClass";
-	simple.arrayed = 0;
 	Type aliased;
 	aliased.type = TYPE_CLASS;
 	aliased.alias = "myClass";
-	aliased.arrayed = 0;
 	Type shadowed;
 	shadowed.type = TYPE_CLASS;
 	shadowed.alias = NULL;
 	shadowed.typedata._class.classname = "MyClass";
 	shadowed.typedata._class.shadow = 3;
-	shadowed.arrayed = 0;
 
 	table.add(&simple);
 	table.add(&aliased);
@@ -142,13 +139,11 @@ BOOST_AUTO_TEST_CASE( TestGetSymbolByType ) {
 	simple.alias = NULL;
 	simple.typedata._class.shadow = 0;
 	simple.typedata._class.classname = "MyClass";
-	simple.arrayed = 0;
 	Type shadowed;
 	shadowed.type = TYPE_CLASS;
 	shadowed.alias = NULL;
 	shadowed.typedata._class.classname = "MyClass";
 	shadowed.typedata._class.shadow = 3;
-	shadowed.arrayed = 0;
 
 	BOOST_CHECK(&simplep == table.find(&simple));
 	BOOST_CHECK(&shadowedp == table.find(&shadowed));
@@ -159,17 +154,25 @@ BOOST_AUTO_TEST_SUITE_END()
 BOOST_AUTO_TEST_CASE( TestArrayedSymbolsAddedByType ) {
 	ScopeSymbolTable table;
 	Type onearray;
-	onearray.type = TYPE_CLASS;
-	onearray.typedata._class.shadow = 0;
+	Type onecontained;
+	onecontained.type = TYPE_CLASS;
+	onecontained.typedata._class.shadow = 0;
+	onecontained.typedata._class.classname = "One";
+	onecontained.alias = NULL;
+	onearray.type = TYPE_LIST;
 	onearray.alias = NULL;
-	onearray.typedata._class.classname = "One";
-	onearray.arrayed = 1;
+	onearray.typedata.list.levels = 1;
+	onearray.typedata.list.contained = &onecontained;
 	Type twoarray;
-	twoarray.type = TYPE_CLASS;
+	Type twocontained;
+	twocontained.type = TYPE_CLASS;
+	twocontained.typedata._class.classname = "Two";
+	twocontained.typedata._class.shadow = 0;
+	twocontained.alias = NULL;
+	twoarray.type = TYPE_LIST;
 	twoarray.alias = NULL;
-	twoarray.typedata._class.classname = "Two";
-	twoarray.typedata._class.shadow = 0;
-	twoarray.arrayed = 2;
+	twoarray.typedata.list.levels = 2;
+	twoarray.typedata.list.contained = &twocontained;
 
 	table.add(&onearray);
 	table.add(&twoarray);
