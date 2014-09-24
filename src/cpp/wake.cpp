@@ -121,7 +121,7 @@ int main(int argc, char** argv) {
 	Options* options = optionsparser.parse(argc, argv);
 	if(options->showVersion) {
 		printf("[ Wake    ---- std compiler ]\n");
-		printf("[ v0.01   Michael Fairhurst ]\n");
+		printf("[ v0.0.4  Michael Fairhurst ]\n");
 		exit(0);
 	}
 
