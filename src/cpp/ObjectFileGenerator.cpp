@@ -154,12 +154,25 @@ void ObjectFileGenerator::generate(Node* tree) {
 			table.pushScope();
 			table.add(tree->node_data.nodes[0]->node_data.type);
 			file << "catch(" << table.getAddress(tree->node_data.nodes[0]->node_data.type) << "){";
+
+			// wrap in a wake exception if its not one
+			file << "if(!" << table.getAddress(tree->node_data.nodes[0]->node_data.type) << ".";
+			header->addPropertyUsage(file.tellp(), "isExceptionType(Text)");
+			file << ")" << table.getAddress(tree->node_data.nodes[0]->node_data.type) << "=new ";
+			header->addClassUsage(file.tellp(), "Exception");
+			file << "(" << table.getAddress(tree->node_data.nodes[0]->node_data.type) << ");";
+
+			// check its type
 			file << "if(" << table.getAddress(tree->node_data.nodes[0]->node_data.type) << ".";
 			header->addPropertyUsage(file.tellp(), "isExceptionType(Text)");
 			file << "('";
 			header->addClassUsage(file.tellp(), tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
 			file << "')){";
+
+			// run catch statement
 			generate(tree->node_data.nodes[1]);
+
+			// or rethrow it
 			file << "}else{throw " << table.getAddress(tree->node_data.nodes[0]->node_data.type) << ";}}";
 			table.popScope();
 			break;

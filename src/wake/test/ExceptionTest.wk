@@ -191,3 +191,15 @@ every ExceptionTest is:
 			Asserts.that(Text[2].substr(0, 58))Equals("    at [WAKE] ExceptionTest.recurseTilThrow(Exception,Num)");
 		}
 	}
+
+	~[ test throw and catch native exception ]~(Asserts) {
+		var $Text[] = [];
+		try {
+			$Text[0].getSize();
+		} catch(Exception) {
+			var Text[] = Exception.getStacktrace().split("\n");
+			Asserts.that(Text[0])Equals("TypeError: Cannot read property 'length' of undefined");
+			Asserts.that(Text[1].substr(0, 28))Equals("    at [WAKE] Text.getSize()");
+			Asserts.that(Text[2].substr(0, 80))Equals("    at [WAKE] ExceptionTest.~[ test throw and catch native exception ]~(Asserts)");
+		}
+	}

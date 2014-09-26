@@ -314,8 +314,7 @@
 
 	};
 
-	~Exception~ = function$ ~Exception~() {
-		var$ e;
+	~Exception~ = function$ ~Exception~(e) {
 
 		this.`getStacktrace()` = function() {
 			var$ a = $$DBGS.split('||'),
@@ -333,7 +332,8 @@
 			return$ f;
 		};
 
-		this.`preThrow()` = function() {
+		this.`preThrow()` = function(a) {
+			if(e) return;
 			try {
 				throw$ new$ Error();
 			} catch(E) {
