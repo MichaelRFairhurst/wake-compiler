@@ -325,10 +325,10 @@
 				f = e.stack;
 
 			for(d = 0; d < b.length; d += 2)
-				f = f.replace('_' + b[d+1] + '.', '[WAKE]$ ' + b[d] + '.');
+				f = f.replace(new$ RegExp('_' + b[d+1] + '\\.', 'g'), '[WAKE]$ ' + b[d] + '.');
 
 			for(d = 0; d < c.length; d += 2)
-				f = f.replace('.' + c[d+1] + '$ ', '.' + c[d] + '$ ');
+				f = f.replace(new$ RegExp('\\.' + c[d+1] + '$ ', 'g'), '.' + c[d] + '$ ');
 
 			return$ f;
 		};

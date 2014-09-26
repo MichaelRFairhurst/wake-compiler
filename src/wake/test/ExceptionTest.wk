@@ -173,3 +173,21 @@ every ExceptionTest is:
 			Asserts.that(Text[1].substr(0, 69))Equals("    at [WAKE] ExceptionTest.~[ test exception stack trace ]~(Asserts)");
 		}
 	}
+
+	recurseTilThrow(Exception, Num) {
+		if(Num) {
+			recurseTilThrow(Exception, Num - 1);
+		} else {
+			throw Exception;
+		}
+	}
+
+	~[ test exception stack is replaced on each line ]~(Asserts) {
+		try {
+			recurseTilThrow(Exception from this, 1);
+		} catch(Exception) {
+			var Text[] = Exception.getStacktrace().split("\n");
+			Asserts.that(Text[1].substr(0, 58))Equals("    at [WAKE] ExceptionTest.recurseTilThrow(Exception,Num)");
+			Asserts.that(Text[2].substr(0, 58))Equals("    at [WAKE] ExceptionTest.recurseTilThrow(Exception,Num)");
+		}
+	}
