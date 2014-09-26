@@ -17,6 +17,8 @@ import Text;
 
 every Exception is:
 
+	Text -- getMessage() { return ""; }
+
 	Text -- getStacktrace() { return ""; }
 
 	preThrow() {}

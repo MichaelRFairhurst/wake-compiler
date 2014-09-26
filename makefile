@@ -126,6 +126,12 @@ bin/wakeobj/std.o: src/wake/stdlib/myobj/std.o js_to_wakeobj.sh
 $(OBJECTFILES) : bin/wake
 $(TABLEFILES) : bin/wake
 
+bin/waketable/UndefinedIndexException.table: src/wake/stdlib/external/UndefinedIndexException.table
+	cp $< $@
+
+bin/wakeobj/UndefinedIndexException.o: src/wake/stdlib/external/UndefinedIndexException.o
+	cp $< $@
+
 bin/waketable/FilePath.table: bin/waketable/File.table bin/waketable/Text.table bin/waketable/Num.table bin/waketable/Bool.table
 	echo this overrides the wildcard that doesnt work
 

@@ -408,6 +408,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 				break;
 
 			case NT_ARRAY_ACCESS:
+			case NT_ARRAY_ACCESS_LVAL:
 				{
 					forceArrayIdentifier = false;
 					ret = typeCheckUsable(tree->node_data.nodes[0], true);
@@ -956,11 +957,18 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 
 bool TypeChecker::isValidLValue(Node* n) {
 	switch(n->node_type) {
-		case NT_ALIAS: return true;
-		case NT_TYPEDATA: return true;
-		case NT_MEMBER_ACCESS: return true;
+		case NT_ALIAS:
+		case NT_TYPEDATA:
+		case NT_MEMBER_ACCESS:
+		case NT_ARRAY_ACCESS_LVAL:
+			return true;
+
 		case NT_ARRAY_ACCESS:
-			return isValidLValue(n->node_data.nodes[0]);
+			if(isValidLValue(n->node_data.nodes[0])) {
+				n->node_type = NT_ARRAY_ACCESS_LVAL;
+				return true;
+			}
+			// fall through
 		default:
 			return false;
 	}

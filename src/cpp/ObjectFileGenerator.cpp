@@ -463,7 +463,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 			}
 			break;
 
-		case NT_ARRAY_ACCESS:
+		case NT_ARRAY_ACCESS_LVAL:
 			file << "(";
 			forceArrayIdentifier = true;
 			generate(tree->node_data.nodes[0]);
@@ -471,6 +471,16 @@ void ObjectFileGenerator::generate(Node* tree) {
 			file << ")[";
 			generate(tree->node_data.nodes[1]);
 			file << "]";
+			break;
+
+		case NT_ARRAY_ACCESS:
+			file << "$A(";
+			forceArrayIdentifier = true;
+			generate(tree->node_data.nodes[0]);
+			forceArrayIdentifier = false;
+			file << ",";
+			generate(tree->node_data.nodes[1]);
+			file << ")";
 			break;
 
 		case NT_EXISTS:

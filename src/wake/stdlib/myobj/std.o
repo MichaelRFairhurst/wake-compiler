@@ -1,3 +1,14 @@
+function$ $$A(a, b) {
+	var$ c = a[b];
+	if(typeof$ c === 'undefined') {
+		var$ d = new$ ~UndefinedIndexException~(b);
+		d.`preThrow()`();
+		throw$ d;
+	}
+
+	return$ c;
+}
+
 (function(require) {
 	var$ b='', fs = require('fs');
 	fs.existsSync = fs.existsSync || require("path").existsSync;
@@ -315,6 +326,7 @@
 	};
 
 	~Exception~ = function$ ~Exception~(e) {
+		var$ m;
 
 		this.`getStacktrace()` = function() {
 			var$ a = $$DBGS.split('||'),
@@ -329,19 +341,25 @@
 			for(d = 0; d < c.length; d += 2)
 				f = f.replace(new$ RegExp('\\.' + c[d+1] + '$ ', 'g'), '.' + c[d] + '$ ');
 
-			return$ f;
+			return$ this.`getMessage()`() + '\n' + f;
+		};
+
+		this.`getMessage()` = function() {
+			return$ m;
 		};
 
 		this.`preThrow()` = function(a) {
-			if(e) return;
-			try {
+			if(!e) try {
 				throw$ new$ Error();
 			} catch(E) {
-				e = E; var$ f = e.stack,
-				f = f.split('\n');
-				f.splice(1, 1);
-				e.stack = f.join('\n');
+				e = E;
 			}
+
+			var$ f = e.stack,
+			f = f.split('\n');
+			m = f[0];
+			f.splice(0, 2);
+			e.stack = f.join('\n');
 		};
 
 		this.`isExceptionType(Text)` = function(t) {
