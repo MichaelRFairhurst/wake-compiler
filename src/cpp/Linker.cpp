@@ -133,11 +133,20 @@ void Linker::writeDebugSymbols(ostream& outfile) {
 }
 
 void Linker::setMain(ostream& file, string classname, string methodname, ClassSpaceSymbolTable& table) {
+	file << "try{";
+
 	file << "(";
 	generateRecursiveConstructors(file, classname, table);
 	file << ").";
 	file << propertyTable.getAddress(methodname);
 	file << "();";
+
+	file << "}catch(e){";
+	file << "if(e.";
+	file << propertyTable.getAddress("getStacktrace()");
+	file << ")console.log(e.";
+	file << propertyTable.getAddress("getStacktrace()");
+	file << "());else throw e;}";
 
 	file << "})();";
 }
