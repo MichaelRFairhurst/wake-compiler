@@ -48,7 +48,7 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 			break;
 
 		case NT_PROVISIONS:
-		case NT_INJECTION_ARG:
+		case NT_SUBINJECTION:
 			{
 				int i = 0;
 				while(i < tree->subnodes) {
@@ -61,7 +61,7 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 		case NT_PROVISION:
 			try {
 				int flags = 0;
-				if(tree->subnodes > 1 && tree->node_data.nodes[1]->node_type == NT_BLOCK) flags |= PROPERTY_BLOCKPROVISION;
+				if(tree->subnodes > 1 && tree->node_data.nodes[1]->node_type == NT_PROVISION_BEHAVIOR) flags |= PROPERTY_BLOCKPROVISION;
 				boost::optional<SemanticError*> error = propertysymtable->addProvision(tree->node_data.nodes[0]->node_data.type, flags);
 				if(error) {
 					(*error)->token = tree;
@@ -226,24 +226,28 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 				Type* provision = tree->node_data.nodes[0]->node_data.type;
 				Node* served = tree->node_data.nodes[1];
 				switch(served->node_type) {
-					case NT_BLOCK:
-						errors->pushContext("In declaration of 'every " + classname + "' provision " + propertysymtable->getProvisionSymbol(provision));
+					case NT_PROVISION_BEHAVIOR:
+						{
+							errors->pushContext("In declaration of 'every " + classname + "' provision " + propertysymtable->getProvisionSymbol(provision));
 
-						// Begin Method Scope For Type Analysis
-						scopesymtable->pushScope();
+							Node* block = served->node_data.nodes[served->subnodes == 1 ? 0 : 1];
 
-						try {
-							// Run Type Analysis
-							typechecker->setReturnType(provision);
-							typechecker->check(served);
-						} catch(SemanticError* e) {
-							e->token = tree;
-							errors->addError(e);
+							// Begin Method Scope For Type Analysis
+							scopesymtable->pushScope();
+
+							try {
+								// Run Type Analysis
+								typechecker->setReturnType(provision);
+								typechecker->check(block);
+							} catch(SemanticError* e) {
+								e->token = tree;
+								errors->addError(e);
+							}
+
+							// Pop Method Scope
+							scopesymtable->popScope();
+							errors->popContext();
 						}
-
-						// Pop Method Scope
-						scopesymtable->popScope();
-						errors->popContext();
 						break;
 
 					case NT_STRINGLIT:

@@ -70,7 +70,7 @@ int wakewrap()
 %token <number> BOOL
 %token <number> SYM_SHADOW
 %token <number> SYM_ARRAYED
-%type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection injection_args provision provisions injection_arg ctor ctorargs value method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments lmethodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval
+%type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments lmethodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args
 %type <type> type specializabletype shadowabletype puretype classtype fntype parameterizedtype unboundtypespecification classdeclarationtype
 %type <type_array> puretypes types unboundtypespecifications
 %start file
@@ -155,33 +155,38 @@ provisions:
 
 provision:
 	type																		{ $$ = MakeOneBranchNode(NT_PROVISION, MakeNodeFromType($1)); }
-	| type SYM_PROVIDE injection_providable										{ $$ = MakeTwoBranchNode(NT_PROVISION, MakeNodeFromType($1), $3); }
+	| type SYM_PROVIDE providable												{ $$ = MakeTwoBranchNode(NT_PROVISION, MakeNodeFromType($1), $3); }
 	;
 
-injection_providable:
+providable:
 	type																		{ $$ = MakeNodeFromType($1); }
 	| injection																	{ $$ = $1; }
-	| block																		{ $$ = $1; }
+	| provision_args block														{ $$ = $1; AddSubNode($$, $2); }
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
 	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
 	| BOOL																		{ $$ = MakeNodeFromNumber(NT_BOOLLIT, $1); }
+	;
+
+provision_args:
+	/* empty */																	{ $$ = MakeEmptyNode(NT_PROVISION_BEHAVIOR); }
+	| '(' types ')'																{ $$ = MakeOneBranchNode(NT_PROVISION_BEHAVIOR, MakeNodeFromTypeArray($2)); }
 	;
 
 injection:
-	UIDENTIFIER '(' injection_args ')'											{ $$ = MakeTwoBranchNode(NT_INJECTION, MakeNodeFromString(NT_CLASSNAME, $1), $3); }
+	UIDENTIFIER '(' injection_subinjections ')'									{ $$ = MakeTwoBranchNode(NT_INJECTION, MakeNodeFromString(NT_CLASSNAME, $1), $3); }
 	;
 
-injection_args:
-	injection_args ',' injection_arg											{ $$ = $1; AddSubNode($$, $3); }
-	| injection_arg																{ $$ = MakeOneBranchNode(NT_INJECTION_ARGS, $1); }
+injection_subinjections:
+	injection_subinjections ',' injection_subinjection							{ $$ = $1; AddSubNode($$, $3); }
+	| injection_subinjection													{ $$ = MakeOneBranchNode(NT_SUBINJECTIONS, $1); }
 	;
 
-injection_arg:
+injection_subinjection:
 	type																		{ $$ = MakeNodeFromType($1); }
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
 	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
 	| BOOL																		{ $$ = MakeNodeFromNumber(NT_BOOLLIT, $1); }
-	| '?' type																	{ $$ = MakeOneBranchNode(NT_INJECTION_PARAM, MakeNodeFromType($2)); }
+	| '?' type																	{ $$ = MakeOneBranchNode(NT_INJECTION_ARG, MakeNodeFromType($2)); }
 	;
 
 ctor:

@@ -34,8 +34,8 @@ void initTreeTypes() {
 	nodenames[NT_PROVISIONS] = "NT_PROVISIONS";
 	nodenames[NT_PROVISION] = "NT_PROVISION";
 	nodenames[NT_INJECTION] = "NT_INJECTION";
-	nodenames[NT_INJECTION_ARGS] = "NT_INJECTION_ARGS";
-	nodenames[NT_INJECTION_ARG] = "NT_INJECTION_ARG";
+	nodenames[NT_SUBINJECTIONS] = "NT_SUBINJECTIONS";
+	nodenames[NT_SUBINJECTION] = "NT_SUBINJECTION";
 	nodenames[NT_CTOR] = "NT_CTOR";
 	nodenames[NT_EMPTY] = "NT_EMPTY";
 	nodenames[NT_INTERFACE] = "NT_INTERFACE";

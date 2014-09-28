@@ -226,14 +226,15 @@ void ObjectFileGenerator::generate(Node* tree) {
 				} else if(tree->node_data.nodes[1]->node_type == NT_STRINGLIT || tree->node_data.nodes[1]->node_type == NT_NUMBERLIT || tree->node_data.nodes[1]->node_type == NT_BOOLLIT) {
 					file << "return ";
 					generate(tree->node_data.nodes[1]);
-				} else {
-					generate(tree->node_data.nodes[1]);
+				} else if(tree->node_data.nodes[1]->node_type == NT_PROVISION_BEHAVIOR) {
+					int block_index = tree->node_data.nodes[1]->subnodes == 2 ? 1 : 0;
+					generate(tree->node_data.nodes[1]->node_data.nodes[block_index]);
 				}
 			}
 			file << "};";
 			break;
 
-		case NT_INJECTION_ARGS:
+		case NT_SUBINJECTIONS:
 			{
 				bool first = true;
 				for(int i = 0; i < tree->subnodes; i++) {
