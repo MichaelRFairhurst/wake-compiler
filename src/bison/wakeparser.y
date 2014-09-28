@@ -70,7 +70,7 @@ int wakewrap()
 %token <number> BOOL
 %token <number> SYM_SHADOW
 %token <number> SYM_ARRAYED
-%type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection injection_args provision provisions injection_arg ctor ctorargs value method block methodreturn methodnamesegments methodbody methodaccess methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement
+%type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop injection_providable injection injection_args provision provisions injection_arg ctor ctorargs value method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments lmethodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval
 %type <type> type specializabletype shadowabletype puretype classtype fntype parameterizedtype unboundtypespecification classdeclarationtype
 %type <type_array> puretypes types unboundtypespecifications
 %start file
@@ -181,18 +181,18 @@ injection_arg:
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
 	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
 	| BOOL																		{ $$ = MakeNodeFromNumber(NT_BOOLLIT, $1); }
-	| SYM_CURRIER																{ $$ = MakeEmptyNode(NT_CURRIED); }
+	| '?' type																	{ $$ = MakeOneBranchNode(NT_INJECTION_PARAM, MakeNodeFromType($2)); }
 	;
 
 ctor:
-	NEEDS ctorargs ';'											{ $$ = MakeOneBranchNode(NT_CTOR, $2); }
-	| NEEDS ctorargs THEN block								{ $$ = MakeTwoBranchNode(NT_CTOR, $2, $4);}
+	NEEDS ctorargs ';'															{ $$ = MakeOneBranchNode(NT_CTOR, $2); }
+	| NEEDS ctorargs THEN block													{ $$ = MakeTwoBranchNode(NT_CTOR, $2, $4);}
 	| NEEDS NOTHING THEN block													{ $$ = MakeTwoBranchNode(NT_CTOR, MakeEmptyNode(NT_EMPTY), $4);}
 	;
 
 ctorargs:
-	ctorargs ',' ctorarg						{ $$ = $1; AddSubNode($$, $3); }
-	| ctorarg													{ $$ = MakeOneBranchNode(NT_CTOR_ARGS, $1); }
+	ctorargs ',' ctorarg														{ $$ = $1; AddSubNode($$, $3); }
+	| ctorarg																	{ $$ = MakeOneBranchNode(NT_CTOR_ARGS, $1); }
 	;
 
 ctorarg:
@@ -201,8 +201,8 @@ ctorarg:
 	;
 
 method:
-	methodaccess methodreturn methodnamesegments methodbody						{ $$ = MakeTwoBranchNode(NT_METHOD_DECLARATION, $1, $2); AddSubNode($$, $3); AddSubNode($$, $4); }
-	| methodaccess methodnamesegments methodbody								{ $$ = MakeTwoBranchNode(NT_METHOD_DECLARATION, $1, $2); AddSubNode($$, $3); }
+	methodaccess methodreturn lmethodnamesegments methodbody					{ $$ = MakeTwoBranchNode(NT_METHOD_DECLARATION, $1, $2); AddSubNode($$, $3); AddSubNode($$, $4); }
+	| methodaccess lmethodnamesegments methodbody								{ $$ = MakeTwoBranchNode(NT_METHOD_DECLARATION, $1, $2); AddSubNode($$, $3); }
 	;
 
 methodaccess:
@@ -219,16 +219,28 @@ methodbody:
 	| block																		{ $$ = $1; }
 	;
 
-methodnamesegments:
-	identifier '(' ')'															{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
-	| identifier '(' types ')'													{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1), MakeNodeFromTypeArray($3)); }
-	| identifier '(' types ')' methodnamesegments								{ $$ = $5; PrependSubNode($5, MakeNodeFromTypeArray($3)); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
+lmethodnamesegments:
+	LIDENTIFIER '(' ')'															{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
+	| LIDENTIFIER '(' types ')'													{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1), MakeNodeFromTypeArray($3)); }
+	| LIDENTIFIER '(' types ')' lumethodnamesegments							{ $$ = $5; PrependSubNode($5, MakeNodeFromTypeArray($3)); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
 	;
 
-methodcallsegments:
+lumethodnamesegments:
 	identifier '(' ')'															{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
-	| identifier '(' curryableexpressions ')'													{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1), $3); }
-	| identifier '(' curryableexpressions ')' methodcallsegments								{ $$ = $5; PrependSubNode($5, $3); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
+	| identifier '(' types ')'													{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1), MakeNodeFromTypeArray($3)); }
+	| identifier '(' types ')' lumethodnamesegments								{ $$ = $5; PrependSubNode($5, MakeNodeFromTypeArray($3)); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
+	;
+
+lmethodcallsegments:
+	LIDENTIFIER '(' ')'															{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
+	| LIDENTIFIER '(' curryableexpressions ')'									{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1), $3); }
+	| LIDENTIFIER '(' curryableexpressions ')' lumethodcallsegments				{ $$ = $5; PrependSubNode($5, $3); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
+	;
+
+lumethodcallsegments:
+	identifier '(' ')'															{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
+	| identifier '(' curryableexpressions ')'									{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1), $3); }
+	| identifier '(' curryableexpressions ')' lumethodcallsegments				{ $$ = $5; PrependSubNode($5, $3); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1)); }
 	;
 
 member:
@@ -246,13 +258,11 @@ curryableexpressions:
 value:
 	LIDENTIFIER																	{ $$ = MakeNodeFromString(NT_ALIAS, $1); }
 	| shadowabletype															{ $$ = MakeNodeFromType($1); }
-	| methodcallsegments														{ $$ = MakeTwoBranchNode(NT_METHOD_INVOCATION, MakeEmptyNode(NT_THIS), $1); }
+	| lmethodcallsegments														{ $$ = MakeTwoBranchNode(NT_METHOD_INVOCATION, MakeEmptyNode(NT_THIS), $1); }
 	| THIS																		{ $$ = MakeEmptyNode(NT_THIS); }
 	| value '[' expression ']'													{ $$ = MakeTwoBranchNode(NT_ARRAY_ACCESS, $1, $3); }
 	| objectable '.' member														{ $$ = MakeTwoBranchNode(NT_MEMBER_ACCESS, $1, $3); }
-	| objectable '.' methodcallsegments											{ $$ = MakeTwoBranchNode(NT_METHOD_INVOCATION, $1, $3); }
-	/*| value '(' ')'															{ $$ = MakeOneBranchNode(NT_LAMBDA_INVOCATION, $1); }
-	| value '(' curryableexpressions ')'										{ $$ = MakeTwoBranchNode(NT_LAMBDA_INVOCATION, $1, $3); }*/
+	| objectable '.' lmethodcallsegments										{ $$ = MakeTwoBranchNode(NT_METHOD_INVOCATION, $1, $3); }
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1); }
 	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1); }
 	| BOOL																		{ $$ = MakeNodeFromNumber(NT_BOOLLIT, $1); }
@@ -290,7 +300,7 @@ declaration:
 
 retrievalargs:
 	FROM																		{ $$ = MakeEmptyNode(NT_EMPTY); }
-	| SYM_PROVIDE_ARGS_OPEN expressions ')'										{ $$ = $2; }
+	| '(' expressions_noretrieval ')' FROM											{ $$ = $2; }
 
 statement:
 	emptystatement																{ $$ = MakeEmptyNode(NT_EMPTY); }
@@ -449,9 +459,18 @@ expression:
 	| assignment																{ $$ = $1; }
 	;
 
+expression_noretrieval:
+	expression_conditional														{ $$ = $1; }
+	| assignment																{ $$ = $1; }
+
 expressions:
 	expression																	{ $$ = MakeOneBranchNode(NT_EXPRESSIONS, $1); }
 	| expression ',' expressions												{ $$ = $3; AddSubNode($$, $1); }
+	;
+
+expressions_noretrieval:
+	expression_noretrieval														{ $$ = MakeOneBranchNode(NT_EXPRESSIONS, $1); }
+	| expression_noretrieval ',' expressions_noretrieval						{ $$ = $3; AddSubNode($$, $1); }
 	;
 
 identifier:
@@ -514,7 +533,7 @@ fntype:
 
 unboundtypespecifications:
 	unboundtypespecification													{ $$ = MakeTypeArray(); AddTypeToTypeArray($1, $$); }
-	| unboundtypespecifications ',' unboundtypespecification						{ $$ = $1; AddTypeToTypeArray($3, $1); }
+	| unboundtypespecifications ',' unboundtypespecification					{ $$ = $1; AddTypeToTypeArray($3, $1); }
 	;
 
 unboundtypespecification:
