@@ -2504,7 +2504,7 @@ PTT_TEST_CASE(
 	TestThrowErroneousExpression,
 	"every MyClass is:						\n\
 		throwNonexistMethodCall() {			\n\
-			throw IDontExist();				\n\
+			throw iDontExist();				\n\
 		}",
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 	// and nothing else
