@@ -305,7 +305,7 @@ declaration:
 
 retrievalargs:
 	FROM																		{ $$ = MakeEmptyNode(NT_EMPTY); }
-	| '(' expressions_noretrieval ')' FROM											{ $$ = $2; }
+	| '(' expressions_noretrieval ')' FROM										{ $$ = $2; }
 
 statement:
 	emptystatement																{ $$ = MakeEmptyNode(NT_EMPTY); }

@@ -280,15 +280,15 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 							int i;
 							string otherclassname = served->node_data.nodes[0]->node_data.string;
 							vector<Type*>* needs = classestable->find(otherclassname)->getNeeds();
-							Node* arguments = served->node_data.nodes[1];
-							if(needs->size() == arguments->subnodes)
-							for(i = 0; i < arguments->subnodes; i++) {
+							Node* injections = served->node_data.nodes[1];
+							if(needs->size() == injections->subnodes)
+							for(i = 0; i < injections->subnodes; i++) {
 								Type* required = needs->at(i);
 								Type* actual;
-								switch(arguments->node_data.nodes[i]->node_type) {
+								switch(injections->node_data.nodes[i]->node_type) {
 									case NT_TYPEDATA:
 										{
-											actual = copyType(arguments->node_data.nodes[i]->node_data.type);
+											actual = copyType(injections->node_data.nodes[i]->node_data.type);
 											classestable->assertTypeIsValid(actual);
 										}
 										break;
@@ -300,6 +300,13 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 										actual = MakeType(TYPE_CLASS);
 										actual->typedata._class.classname = "Num";
 										break;
+
+									case NT_INJECTION_ARG:
+										{
+											actual = copyType(injections->node_data.nodes[i]->node_data.nodes[0]->node_data.type);
+											classestable->assertTypeIsValid(actual);
+										}
+										break;
 								}
 
 								if(required->specialty != NULL && (actual->specialty == NULL || string(required->specialty) != actual->specialty))
@@ -307,7 +314,7 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 
 								if(!classestable->getAnalyzer()->isASubtypeOfB(required, actual)) {
 									errors->addError(new SemanticError(TYPE_ERROR, "Injection is not a proper subtype for class dependencies", tree));
-								} else if(arguments->node_data.nodes[i]->node_type == NT_TYPEDATA) {
+								} else if(injections->node_data.nodes[i]->node_type == NT_TYPEDATA) {
 									classestable->getAnalyzer()->assertClassCanProvide(classname, actual);
 								}
 							} else {

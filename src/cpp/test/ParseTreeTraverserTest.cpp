@@ -2874,4 +2874,31 @@ PTT_TEST_CASE(
 	PTT_VALID
 );
 
+PTT_TEST_CASE(
+	TestProvisionArgumentNotSubtypeOfNeed,
+	"every MyClass is:						\n\
+		needs Num;							\n\
+		provides MyClass <- MyClass(?Text);	\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	TestProvisionArgumentSubtypeOfNeed,
+	"every MyClass is:						\n\
+		needs Num;							\n\
+		provides MyClass <- MyClass(?Num);	\n\
+	",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestProvisionArgumentNonexistClass,
+	"every MyClass is:							\n\
+		needs Num;								\n\
+		provides MyClass <- MyClass(?Nurmm);	\n\
+	",
+	PTT_EXPECT(CLASSNAME_NOT_FOUND)
+);
+
 BOOST_AUTO_TEST_SUITE_END()
