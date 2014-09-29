@@ -39,7 +39,7 @@ class ReadOnlyPropertySymbolTable {
 		virtual boost::optional<Type*> find(string name)=0;
 		virtual bool isPublic(string name)=0;
 		virtual string getAddress(string name)=0;
-		virtual string getProvisionSymbol(Type* provided)=0;
+		virtual string getProvisionSymbol(Type* provided, vector<Type*> &arguments)=0;
 		virtual vector<Type*>* getNeeds()=0;
 		virtual string getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments)=0;
 		virtual bool isAbstract()=0;

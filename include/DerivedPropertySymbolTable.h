@@ -37,7 +37,7 @@ class DerivedPropertySymbolTable : public ReadOnlyPropertySymbolTable {
 		boost::optional<Type*> find(string name);
 		bool isPublic(string name);
 		string getAddress(string name);
-		string getProvisionSymbol(Type* provided);
+		string getProvisionSymbol(Type* provided, vector<Type*> &arguments);
 		vector<Type*>* getNeeds();
 		string getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments);
 		bool isAbstract();

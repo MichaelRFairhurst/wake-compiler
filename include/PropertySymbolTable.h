@@ -41,10 +41,10 @@ class PropertySymbolTable : public ReadOnlyPropertySymbolTable {
 		boost::optional<Type*> find(string name);
 		bool isPublic(string name);
 		string getAddress(string name);
-		string getProvisionSymbol(Type* provided);
+		string getProvisionSymbol(Type* provided, vector<Type*> &arguments);
 		boost::optional<SemanticError*> addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, int flags);
 		boost::optional<SemanticError*> addProperty(Type* property, int flags);
-		boost::optional<SemanticError*> addProvision(Type* provision, int flags);
+		boost::optional<SemanticError*> addProvision(Type* provision, vector<Type*> &arguments, int flags);
 		bool isBehavioralProvision(string name);
 		void addNeed(Type* returntype, int flags);
 		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);

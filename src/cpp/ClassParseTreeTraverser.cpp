@@ -61,8 +61,17 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 		case NT_PROVISION:
 			try {
 				int flags = 0;
+				std::vector<Type*> arguments;
 				if(tree->subnodes > 1 && tree->node_data.nodes[1]->node_type == NT_PROVISION_BEHAVIOR) flags |= PROPERTY_BLOCKPROVISION;
-				boost::optional<SemanticError*> error = propertysymtable->addProvision(tree->node_data.nodes[0]->node_data.type, flags);
+				if(tree->subnodes > 1 && tree->node_data.nodes[1]->node_type == NT_INJECTION) {
+					Node* subinjections = tree->node_data.nodes[1]->node_data.nodes[1];
+					for(int i = 0; i < subinjections->subnodes; i++) {
+						if(subinjections->node_data.nodes[i]->node_type == NT_INJECTION_ARG) {
+							arguments.push_back(subinjections->node_data.nodes[i]->node_data.nodes[0]->node_data.type);
+						}
+					}
+				}
+				boost::optional<SemanticError*> error = propertysymtable->addProvision(tree->node_data.nodes[0]->node_data.type, arguments, flags);
 				if(error) {
 					(*error)->token = tree;
 					errors->addError(*error);
@@ -228,7 +237,9 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 				switch(served->node_type) {
 					case NT_PROVISION_BEHAVIOR:
 						{
-							errors->pushContext("In declaration of 'every " + classname + "' provision " + propertysymtable->getProvisionSymbol(provision));
+							// @TODO get arguments for symbol name
+							vector<Type*> arguments;
+							errors->pushContext("In declaration of 'every " + classname + "' provision " + propertysymtable->getProvisionSymbol(provision, arguments));
 
 							Node* block = served->node_data.nodes[served->subnodes == 1 ? 0 : 1];
 

@@ -350,3 +350,18 @@ string TypeAnalyzer::getNameForTypeAsProperty(Type* type) {
 		}
 	}
 }
+
+string TypeAnalyzer::getProvisionSymbol(Type* provided, vector<Type*> &arguments) {
+	string name = getNameForType(provided);
+	if(arguments.size()) {
+		name += "(";
+		for(vector<Type*>::iterator it = arguments.begin(); it != arguments.end(); ++it) {
+			if(it != arguments.begin()) name += ",";
+			name += getNameForType(*it);
+		}
+		name += ")";
+	}
+	name += "<-";
+	if(provided->specialty != NULL) name += provided->specialty;
+	return name;
+}

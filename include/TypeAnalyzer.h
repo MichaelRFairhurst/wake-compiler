@@ -20,6 +20,7 @@ extern "C" {
 }
 
 #include <string>
+#include <vector>
 
 class ClassSpaceSymbolTable;
 
@@ -44,6 +45,7 @@ class TypeAnalyzer {
 		bool isException(Type* type);
 		string getNameForType(Type* type);
 		string getNameForTypeAsProperty(Type* type);
+		string getProvisionSymbol(Type* provided, vector<Type*> &arguments);
 
 };
 

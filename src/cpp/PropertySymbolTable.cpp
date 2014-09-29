@@ -81,12 +81,11 @@ boost::optional<SemanticError*> PropertySymbolTable::addProperty(Type* property,
 	return boost::optional<SemanticError*>();
 }
 
-boost::optional<SemanticError*> PropertySymbolTable::addProvision(Type* provided, int flags) {
-	string name = analyzer->getNameForType(provided) + "<-";
-	if(provided->specialty != NULL) name += provided->specialty;
+boost::optional<SemanticError*> PropertySymbolTable::addProvision(Type* provided, vector<Type*> &arguments, int flags) {
+	string name = getProvisionSymbol(provided, arguments);
 
 	if(properties.count(name)) {
-		string temp = "duplicate provisoning is " + name;
+		string temp = "duplicate provision is " + name;
 		return boost::optional<SemanticError*>(new SemanticError(DUPLICATE_PROPERTY_DEFINITION, temp));
 	}
 
@@ -117,10 +116,8 @@ string PropertySymbolTable::getAddress(string name) {
 	return properties.find(name)->second->address;
 }
 
-string PropertySymbolTable::getProvisionSymbol(Type* provided) {
-	string name = analyzer->getNameForType(provided) + "<-";
-	if(provided->specialty != NULL) name += provided->specialty;
-	return name;
+string PropertySymbolTable::getProvisionSymbol(Type* provided, vector<Type*> &arguments) {
+	return analyzer->getProvisionSymbol(provided, arguments);
 }
 
 string PropertySymbolTable::getCasingNameOf(vector<pair<string, TypeArray*> >* segments_arguments) {

@@ -2901,4 +2901,61 @@ PTT_TEST_CASE(
 	PTT_EXPECT(CLASSNAME_NOT_FOUND)
 );
 
+PTT_TEST_CASE(
+	TestCallProvisionWithNoArgsIsSymbolNotFound,
+	"every MyClass is:							\n\
+		needs Text;								\n\
+		provides MyClass <- MyClass(?Text);		\n\
+		myMethod() {							\n\
+			var MyClass from this;				\n\
+		}",
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+);
+
+PTT_TEST_CASE(
+	TestCallProvisionWithTooManyArgsIsSymbolNotFound,
+	"every MyClass is:								\n\
+		needs Text;									\n\
+		provides MyClass <- MyClass(?Text);			\n\
+		myMethod() {								\n\
+			var MyClass('Text', 'Text') from this;	\n\
+		}",
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+);
+
+PTT_TEST_CASE(
+	TestCallProvisionWithWrongArgsIsSymbolNotFound,
+	"every MyClass is:								\n\
+		needs Text;									\n\
+		provides MyClass <- MyClass(?Text);			\n\
+		myMethod() {								\n\
+			var MyClass(5) from this;				\n\
+		}",
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+);
+
+PTT_TEST_CASE(
+	TestCallProvisionWithCorrectArgsIsCorrect,
+	"every MyClass is:								\n\
+		needs Text;									\n\
+		provides MyClass <- MyClass(?Text);			\n\
+		myMethod() {								\n\
+			var MyClass('Hey') from this;			\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestCallOverloadedProvisionIsCorrect,
+	"every MyClass is:								\n\
+		needs Text;									\n\
+		provides MyClass <- MyClass(?Text);			\n\
+		provides MyClass <- MyClass('hey');			\n\
+		myMethod() {								\n\
+			var MyClass('Hey') from this;			\n\
+			var $MyClass from this;					\n\
+		}",
+	PTT_VALID
+);
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -705,12 +705,25 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						ret = copyType(tree->node_data.nodes[0]->node_data.type);
 						//TODO index 1 is the arguments
 						classestable->assertTypeIsValid(ret);
+						vector<Type*> arguments;
+
+						if(tree->node_data.nodes[1]->node_type != NT_EMPTY) {
+							for(int i = 0; i < tree->node_data.nodes[1]->subnodes; i++) {
+								Type* argtype = typeCheckUsable(tree->node_data.nodes[1]->node_data.nodes[i], forceArrayIdentifier);
+								arguments.push_back(argtype);
+							}
+						}
+
+						string name = analyzer->getProvisionSymbol(provider, arguments);
+
 						try {
-							// TODO This does more work than we need to since it recurses
-							classestable->getAnalyzer()->assertClassCanProvide(provider, ret);
-						} catch(SemanticError *e) {
-							e->token = tree;
-							errors->addError(e);
+							ReadOnlyPropertySymbolTable* table = classestable->find(provider);
+							boost::optional<Type*> provision = table->find(name);
+							if(!*provision) {
+								errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Provision " + name + " does not exist on class " + analyzer->getNameForType(provider), tree));
+							}
+						} catch(SymbolNotFoundException *e) {
+							delete e;
 						}
 						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(provider->typedata._class.classname)));
 					} catch(SymbolNotFoundException* e) {

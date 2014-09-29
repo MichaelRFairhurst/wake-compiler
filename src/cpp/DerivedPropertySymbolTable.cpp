@@ -30,8 +30,8 @@ string DerivedPropertySymbolTable::getAddress(string name) {
 	return properties.find(name)->second->address;
 }
 
-string DerivedPropertySymbolTable::getProvisionSymbol(Type* provided) {
-	//throw new std::runtime_error("NOT IMPLEMENTED YET");
+string DerivedPropertySymbolTable::getProvisionSymbol(Type* provided, vector<Type*> &arguments) {
+	return analyzer.getProvisionSymbol(provided, arguments);
 }
 
 vector<Type*>* DerivedPropertySymbolTable::getNeeds() {
