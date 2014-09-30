@@ -470,12 +470,12 @@ expression_noretrieval:
 
 expressions:
 	expression																	{ $$ = MakeOneBranchNode(NT_EXPRESSIONS, $1); }
-	| expression ',' expressions												{ $$ = $3; AddSubNode($$, $1); }
+	| expressions ',' expression												{ $$ = $1; AddSubNode($$, $3); }
 	;
 
 expressions_noretrieval:
 	expression_noretrieval														{ $$ = MakeOneBranchNode(NT_EXPRESSIONS, $1); }
-	| expression_noretrieval ',' expressions_noretrieval						{ $$ = $3; AddSubNode($$, $1); }
+	| expressions_noretrieval ',' expression_noretrieval						{ $$ = $1; AddSubNode($$, $3); }
 	;
 
 identifier:
