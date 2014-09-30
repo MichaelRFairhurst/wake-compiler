@@ -196,25 +196,27 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 		case NT_PROVISION:
 			file << "this.";
-			header->addPropertyUsage(file.tellp(), classes->find(classname)->getProvisionSymbol(tree->node_data.nodes[0]->node_data.type));
+			header->addPropertyUsage(file.tellp(), tree->node_data.nodes[tree->subnodes - 1]->node_data.string);
 			file << "=function(){";
-			if(tree->subnodes == 1) {
+			if(tree->subnodes == 2) { // one for type, on for hint
 				string provisionname = tree->node_data.nodes[0]->node_data.type->typedata._class.classname;
 				file << "return new ";
 				header->addClassUsage(file.tellp(), provisionname);
 				file << "(";
 				vector<Type*>* needs = classes->find(provisionname)->getNeeds();
 				for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
+					vector<Type*> no_args;
 					if(it != needs->begin()) file << ",";
 					file << "this.";
-					header->addPropertyUsage(file.tellp(), classes->find(classname)->getProvisionSymbol(*it));
+					header->addPropertyUsage(file.tellp(), classes->find(classname)->getProvisionSymbol(*it, no_args));
 					file << "()";
 				}
 				file << ");";
 			} else {
 				if(tree->node_data.nodes[1]->node_type == NT_TYPEDATA) {
 					file << "return this.";
-					header->addPropertyUsage(file.tellp(), classes->find(classname)->getProvisionSymbol(tree->node_data.nodes[1]->node_data.type));
+					vector<Type*> no_args;
+					header->addPropertyUsage(file.tellp(), classes->find(classname)->getProvisionSymbol(tree->node_data.nodes[1]->node_data.type, no_args));
 					file << "();";
 				} else if(tree->node_data.nodes[1]->node_type == NT_INJECTION) {
 					file << "return new ";
@@ -245,7 +247,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 					}
 
 					file << "this.";
-					header->addPropertyUsage(file.tellp(), classes->find(classname)->getProvisionSymbol(tree->node_data.nodes[i]->node_data.type));
+					//header->addPropertyUsage(file.tellp(), classes->find(classname)->getProvisionSymbol(tree->node_data.nodes[i]->node_data.type));
 					file << "()";
 				}
 			}
@@ -350,7 +352,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 				string providerclass = tree->node_data.nodes[tree->subnodes - 1]->node_data.string;
 
 				file << ".";
-				header->addPropertyUsage(file.tellp(), classes->find(providerclass)->getProvisionSymbol(tree->node_data.nodes[0]->node_data.type));
+				//header->addPropertyUsage(file.tellp(), classes->find(providerclass)->getProvisionSymbol(tree->node_data.nodes[0]->node_data.type));
 				file << "()";
 			}
 			break;

@@ -1,0 +1,20 @@
+import Asserts;
+
+every DataClass is:
+	needs public Num, public Text;
+
+every ProvisionArgumentTest is:
+
+	provides DataClass <- DataClass(?Num, ?Text);
+
+	~[ test gotten data class has proper values in initializiation ]~(Asserts) {
+		var DataClass(5, "hello") from this;
+		Asserts.that(DataClass.Num)Equals(5);
+		Asserts.that(DataClass.Text)Equals("hello");
+	}
+
+	~[ test gotten data class has proper values in retrieval ]~(Asserts) {
+		var DataClass = DataClass(5, "hello") from this;
+		Asserts.that(DataClass.Num)Equals(5);
+		Asserts.that(DataClass.Text)Equals("hello");
+	}

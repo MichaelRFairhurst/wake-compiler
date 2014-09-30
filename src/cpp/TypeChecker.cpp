@@ -714,12 +714,12 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 							}
 						}
 
-						string name = analyzer->getProvisionSymbol(provider, arguments);
+						string name = analyzer->getProvisionSymbol(ret, arguments);
 
 						try {
 							ReadOnlyPropertySymbolTable* table = classestable->find(provider);
 							boost::optional<Type*> provision = table->find(name);
-							if(!*provision) {
+							if(!provision) {
 								errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Provision " + name + " does not exist on class " + analyzer->getNameForType(provider), tree));
 							}
 						} catch(SymbolNotFoundException *e) {

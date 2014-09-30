@@ -72,6 +72,7 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 					}
 				}
 				boost::optional<SemanticError*> error = propertysymtable->addProvision(tree->node_data.nodes[0]->node_data.type, arguments, flags);
+				AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(classestable->getAnalyzer()->getProvisionSymbol(tree->node_data.nodes[0]->node_data.type, arguments).c_str())));
 				if(error) {
 					(*error)->token = tree;
 					errors->addError(*error);
@@ -231,7 +232,7 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 			break;
 
 		case NT_PROVISION:
-			if(tree->subnodes > 1) {
+			if(tree->subnodes > 2) { // this time we use > 2 because we have the hint as the second node
 				Type* provision = tree->node_data.nodes[0]->node_data.type;
 				Node* served = tree->node_data.nodes[1];
 				switch(served->node_type) {
