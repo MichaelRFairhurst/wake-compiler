@@ -725,7 +725,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						} catch(SymbolNotFoundException *e) {
 							delete e;
 						}
-						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(provider->typedata._class.classname)));
+						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(name.c_str())));
 					} catch(SymbolNotFoundException* e) {
 						errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
 						delete e;
