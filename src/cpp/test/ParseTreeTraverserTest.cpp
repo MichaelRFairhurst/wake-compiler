@@ -2958,4 +2958,30 @@ PTT_TEST_CASE(
 	PTT_VALID
 );
 
+PTT_TEST_CASE(
+	TestSubtypeProvisionDontNeedToProvideNeeds,
+	"every ClassA is:											\n\
+		needs ClassB;											\n\
+	every ClassB is:											\n\
+	every ParentClassA (capable ClassA) is:						\n\
+	every Provider is:											\n\
+		provides ClassA <- ParentClassA;						\n\
+		provides ParentClassA;									\n\
+		",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestInjectionProvisionDontNeedToProvideNeeds,
+	"every ClassA is:											\n\
+		needs ClassB;											\n\
+	every ClassB is:											\n\
+	every Provider is:											\n\
+		provides ClassA <- ClassA(ClassB:test);					\n\
+		provides ClassB:test;									\n\
+		",
+	PTT_VALID
+);
+
+
 BOOST_AUTO_TEST_SUITE_END()
