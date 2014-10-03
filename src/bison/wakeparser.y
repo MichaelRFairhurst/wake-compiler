@@ -168,7 +168,7 @@ providable:
 	;
 
 provision_args:
-	/* empty */																	{ $$ = MakeEmptyNode(NT_PROVISION_BEHAVIOR); }
+	/* empty */																	{ $$ = MakeOneBranchNode(NT_PROVISION_BEHAVIOR, MakeNodeFromTypeArray(MakeTypeArray())); }
 	| '(' types ')'																{ $$ = MakeOneBranchNode(NT_PROVISION_BEHAVIOR, MakeNodeFromTypeArray($2)); }
 	;
 

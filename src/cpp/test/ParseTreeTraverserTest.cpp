@@ -2983,5 +2983,60 @@ PTT_TEST_CASE(
 	PTT_VALID
 );
 
+PTT_TEST_CASE(
+	TestBehavioralProvisionUsingArguments,
+	"every ClassA is:											\n\
+	every ClassB is:											\n\
+	every MyClass is:											\n\
+		needs ClassA, ClassB;									\n\
+		provides MyClass <- (ClassA, ClassB) {					\n\
+			return this;										\n\
+		};														\n\
+	",
+);
+
+PTT_TEST_CASE(
+	TestBehavioralProvisionTypeChecksArguments,
+	"every MyClass is:											\n\
+		provides MyClass <- (Num, Text, Bool) {					\n\
+			Num + 'hey';										\n\
+			Text + 5;											\n\
+			Bool + 'hey';										\n\
+			return this;										\n\
+		};														\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	TestBehavioralProvisionTypeChecksArgumentsPositive,
+	"every ClassA is:											\n\
+	every ClassB is:											\n\
+	every MyClass is:											\n\
+		needs ClassA, ClassB;									\n\
+		provides MyClass <- (Num, Text, Bool) {					\n\
+			Num + 5;											\n\
+			Text + 'hey';										\n\
+			Bool = false;										\n\
+			return this;										\n\
+		};														\n\
+	",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestUseBehavioralProvision,
+	"every ClassA is:											\n\
+	every ClassB is:											\n\
+	every MyClass is:											\n\
+		needs ClassA, ClassB;									\n\
+		provides MyClass <- (Num, Text, Bool) {					\n\
+			return MyClass(Num, Text, Bool) from this;			\n\
+		};														\n\
+	",
+	PTT_VALID
+);
 
 BOOST_AUTO_TEST_SUITE_END()

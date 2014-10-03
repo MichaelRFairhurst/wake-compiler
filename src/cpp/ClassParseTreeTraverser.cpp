@@ -62,7 +62,13 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 			try {
 				int flags = 0;
 				std::vector<Type*> arguments;
-				if(tree->subnodes > 1 && tree->node_data.nodes[1]->node_type == NT_PROVISION_BEHAVIOR) flags |= PROPERTY_BLOCKPROVISION;
+				if(tree->subnodes > 1 && tree->node_data.nodes[1]->node_type == NT_PROVISION_BEHAVIOR) {
+					flags |= PROPERTY_BLOCKPROVISION;
+					Node* argnodes = tree->node_data.nodes[1]->node_data.nodes[0];
+					for(int i = 0; i < argnodes->node_data.typearray->typecount; i++) {
+						arguments.push_back(argnodes->node_data.typearray->types[i]);
+					}
+				}
 				if(tree->subnodes > 1 && tree->node_data.nodes[1]->node_type == NT_INJECTION) {
 					Node* subinjections = tree->node_data.nodes[1]->node_data.nodes[1];
 					for(int i = 0; i < subinjections->subnodes; i++) {
@@ -240,12 +246,22 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 						{
 							// @TODO get arguments for symbol name
 							vector<Type*> arguments;
-							errors->pushContext("In declaration of 'every " + classname + "' provision " + propertysymtable->getProvisionSymbol(provision, arguments));
 
-							Node* block = served->node_data.nodes[served->subnodes == 1 ? 0 : 1];
+							Node* argnodes = served->node_data.nodes[0];
+							for(int i = 0; i < argnodes->node_data.typearray->typecount; i++) {
+								arguments.push_back(argnodes->node_data.typearray->types[i]);
+							}
+
+							errors->pushContext("In declaration of 'every " + classname + "' provision " + propertysymtable->getProvisionSymbol(provision, arguments));
 
 							// Begin Method Scope For Type Analysis
 							scopesymtable->pushScope();
+
+							for(vector<Type*>::iterator it = arguments.begin(); it != arguments.end(); ++it) {
+								scopesymtable->add(*it);
+							}
+
+							Node* block = served->node_data.nodes[served->subnodes == 1 ? 0 : 1];
 
 							try {
 								// Run Type Analysis
