@@ -258,9 +258,20 @@ void ObjectFileGenerator::generate(Node* tree) {
 					file << "function(){return ";
 					generate(tree->node_data.nodes[1]);
 				} else if(tree->node_data.nodes[1]->node_type == NT_PROVISION_BEHAVIOR) {
-					file << "function(){";
-					int block_index = tree->node_data.nodes[1]->subnodes == 2 ? 1 : 0;
-					generate(tree->node_data.nodes[1]->node_data.nodes[block_index]);
+					file << "function(";
+
+					table.pushScope();
+
+					TypeArray* argarray = tree->node_data.nodes[1]->node_data.nodes[0]->node_data.typearray;
+					for(int i = 0; i < argarray->typecount; i++) {
+						if(i != 0) file << ",";
+						table.add(argarray->types[i]);
+						file << table.getAddress(argarray->types[i]);
+					}
+
+					file << "){";
+					generate(tree->node_data.nodes[1]->node_data.nodes[1]);
+					table.popScope();
 				}
 			}
 			file << "};";
