@@ -54,6 +54,7 @@
 				<li><a href="#specializedprovisions">- Specialized Provisions</a></li>
 				<li><a href="#primitiveprovisions">- Providing Primitive Values</a></li>
 				<li><a href="#ctorprovisions">- Constructor Provisions</a></li>
+				<li><a href="#provisionargs">- Provisions Arguments</a></li>
 				<li><a href="#behavioralprovisions">- Behavioral Provisions</a></li>
 				<li><a href="#entry">Program entry points</a></li>
 			</ul>
@@ -654,6 +655,23 @@ every User is:
         DBConnection:Test &lt;- DBConnection(<span class="goodcode" title="If a DBConnection accepts any Text username, we can create specialized connections by letting the provider find the right Username and Port.">Text:Username, Num:Port</span>),
         <span class="goodcode" title="Constructor provisions do not require specialization.">User</span> &lt;- <span class="goodcode" title="Constructor provisions can be used with subtype provision simultaneously.">TestUser</span>(DBConnection:Test);</code></pre>
 		<p>If a class with needs extends another class with needs, constructor provisions require that you supply all of these. When doing this, supply the childclass needs first, and then the parent class needs, in that order. And don't worry, the compiler will make sure you don't mess up.</p>
+
+		<h3 id="provisionargs">Provision Arguments <span class="label label-inverse">flexible</span> <span class="label label-inverse">typesafe</span> <span class="label label-inverse">testable</span></h3>
+		<p>Not all object needs should be satisfied by the dependency injection in wake. We stil want to be able to pass in values when we call a provision. Providers can be coded up to do this.</p>
+			<span class="label label-info">Wake</span>
+		<pre><code class="wake"
+>every Person in:
+    needs Text firstname, Text lastname;
+every PersonProvider is:
+    provides
+        Person &lt;- Person(<span class="goodcode" title="The beginning ? shows that we are declaring the type of dependency we're asking for. Here we ask for the first name.">?Text</span>, <span class="goodcode" title="Here we provide the second need of Person, the lastanem.">?Text</span>);
+    usePersonProvision() {
+        var <span class="goodcode" title="Here we pass the arguments 'Bobby' and 'Ratsnest' into the first and last name arguments of our provision, and name the resulting variable 'Person'.">Person('Bobby', 'Ratsnest')</span> from this;
+        var <span class="goodcode" title="Aliases before the type name look like what you would expect.">second</span> Person("Bobby", "Ratsnest") from this;
+        var Person <span class="goodcode" title="When putting the alias of a variable after the name of the type, you use a slightly c++style syntax.">three("Bobby", "Ratsnest")</span> from this;
+    }</code></pre>
+		<div class="alert alert-info">The syntax <code>?Text</code> has two purposes. Firstly, it documents the need types on the API where you will look for them: the provider you are using. Secondly, it allows you to ask for a more specific type than the object you're providing actually requires. i.e., when providing an object which only <code>needs</code> a <code>Printer</code>, you could ask for a <code>CachingPrinter</code> instead.</div>
+		<p>For classes that inherit needs, follow the instructions in the <a href="#ctorprovisions">Constructor Provisions</a> section on which order to specify them.</p>
 		<h3 id="behavioralprovisions">Behavioral Provisions <span class="label label-inverse">flexible</span></h3>
 		<p>Provisions can be treated as a code body with a return type where necessary. Note that the end result must be a provision; however it can be used to configure objects or provide different objects conditionally, or create a singleton.</p>
 			<span class="label label-info">Wake</span>
@@ -667,6 +685,13 @@ every User is:
     provides
         Text:SessionFile,
         Session &lt;- <span class="goodcode" title="This, together with our constructor, guarantees that we only distribute one session, and that its been properly loaded.">{ return Session; }</span>;</code></pre>
+		<p>You can also have arguments to your behavioral provisions, so that you can mock out provisions with arguments, and/or perform your own unique operations required.</p>
+		<pre><code class="wake"
+>every Provider is:
+    needs BabyMaker;
+    provides Child &lt;- <span class="goodcode" title="Ask for two people that will construct your child">(Person dad, Person mom)</span> {
+        return BabyMaker.makeBabyWithFather(<span class="goodcode" title="You can use these arguments like you would in any function">dad</span>)AndMom(mom);
+    };</code></pre>
 		</div></div>
 		<script src="bootstrap/js/bootstrap.min.js"></script>
 	</body>
