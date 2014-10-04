@@ -662,9 +662,10 @@ every User is:
 		<pre><code class="wake"
 >every Person in:
     needs Text firstname, Text lastname;
+
 every PersonProvider is:
-    provides
-        Person &lt;- Person(<span class="goodcode" title="The beginning ? shows that we are declaring the type of dependency we're asking for. Here we ask for the first name.">?Text</span>, <span class="goodcode" title="Here we provide the second need of Person, the lastanem.">?Text</span>);
+    provides Person &lt;- Person(<span class="goodcode" title="The beginning ? shows that we are declaring the type of dependency we're asking for. Here we ask for the first name.">?Text</span>, <span class="goodcode" title="Here we provide the second need of Person, the lastanem.">?Text</span>);
+
     usePersonProvision() {
         var <span class="goodcode" title="Here we pass the arguments 'Bobby' and 'Ratsnest' into the first and last name arguments of our provision, and name the resulting variable 'Person'.">Person('Bobby', 'Ratsnest')</span> from this;
         var <span class="goodcode" title="Aliases before the type name look like what you would expect.">second</span> Person("Bobby", "Ratsnest") from this;

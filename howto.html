@@ -297,20 +297,6 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
 				<h1 id="knownisssues">Known Issues</h1>
 				<p>These issues have the potential to crash/corrupt a running program. Some are pretty standard use cases - sorry! And others are pretty obscure/obviously wrong at compile-time.</p>
 				<br/>
-				<h3 id="optionalarrays">Optional Arrays</h3>
-				<p>Before I had optional types, I had list types. When adding optional types I did not consider that they could be combined. Num?[] and Num[]? were parse errors and all was well, albeit incomplete.</p>
-				<p>Now I think Num?[] and Num[]? are still parse errors, but at the very least its possible that these types will appear out in the wild through generics, since a class which returns T[] can be instantiated like Class{Num?}.</p>
-				<p>Anyways, the end result of this is that a type which is both optional and a lst, acts as both an optional type, and a list. So depending on how it was used and when you call exists {}, its possible to access an index off of nothing, which makes your program explode.</p>
-			<span class="label label-info">wake</span>
-			<pre><code class="wake"
->every Main is:
-
-    getElementOutOfNothing() {
-        var Num?[] = nothing;
-        var Num? yourProgramExplodesHere = Num[0];
-    }</code></pre>
-				<p>This fix is important but also requires essentially rewriting all list or all optional code. So it may be quite a while.</p>
-				<br/>
 				<h3 id="nestedoptionals">Nested Optionals</h3>
 				<p>Another thing I had not considered when implementing optionals is that "null" is an idequate runtime representation of a true optional type system. What can optional types do that nulls can't? Nest, that's what!</p>
 			<pre><code class="wake"
@@ -356,35 +342,6 @@ wake -l -d bin/tables ~/wake/installation/stdlib.o bin/obj/Hello.o bin/obj/Main.
 				<br/>
 				<h1 id="missingfeats">Missing Features + Workarounds</h1>
 				<p>These missing functionalities should not crash or corrupt any programs, but they may get in the way of your designs. Sorry!</p>
-				<br/>
-				<h3 id="ctorargs">Constructor Arguments</h3>
-				<p>This is a big one!! While wake intended to make struct-like objects excellent to use:</p>
-			<span class="label label-info">wake</span>
-			<pre><code class="wake"
->every Person is:
-
-    needs public Text firstname, public Text lastname, public Num age, public Gender;</code></pre>
-				<p>Easy! That's it!</p>
-				<p>Except, well, you can't supply these values, only the providing class can provide them. I haven't fully decided whether this class, the providing class, or the class using the providing class, should allow and/or require manual ctor argument supplying. If you have been bitten by this in your designs and have any ideas for syntax, keywords, concepts, etc that can solve this problem, send it to me asap!!</p>
-				<p>In the meantime, do this dirty hack:</p>
-			<pre><code class="wake"
->every PersonProvider is:
-
-    provides Person, Gender; // must provide gender since its a class!
-    Person -- getPerson(Text firstname, Text lastname, Num age, Gender) {
-        var Person from this;
-        Person.firstname = firstname;
-        Person.lastname = lastname;
-        Person.age = age;
-        Person.Gender = Gender;
-    }
-
-every Person is:
-
-    needs public Gender;
-    with public Text lastname = ""; // By starting with "", this field doesn't need to be optional
-    with public Text firstname = "";
-    with public Num age = 0;</code></pre>
 				<br/>
 				<h3 id="parentmethods">Parent Method Calls</h3>
 				<p>This is a semantic analysis and parsing problem. I simply need to look for parent.aMethod() calls and treat them specially. Haven't done it yet. Also, I'm partially waiting on this one because I am pondering two-way-inheritance. There's an easy workaround, though!</p>
