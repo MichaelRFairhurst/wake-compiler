@@ -59,7 +59,7 @@
 	.logo-label-label {
 		display: none;
 	}
-	h2.logo-label {
+	h2 a.logo-label {
 		font-size: 25px;
 	}
 
@@ -185,6 +185,19 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#529eea', end
 
 }
 
+#intro a {
+	text-decoration: none;
+	text-shadow: 0px 0px 10px grey;
+	color: #FFFFFF;
+    font-family: 'Roboto';
+    font-size: 62px;
+    font-weight: 100;
+}
+
+#intro a:hover {
+	color: #eee;
+}
+
 #logo {
     background-image: url("/wake_logo.png");
     background-position: 0 -85px;
@@ -197,13 +210,9 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#529eea', end
 	margin-left: -40px;
 }
 
-.logo-label {
-	    color: #FFFFFF;
+#intro h2 {
     display: block;
     float: left;
-    font-family: 'Roboto';
-    font-size: 62px;
-    font-weight: 100;
     margin-left: 23px;
     margin-top: 53px;
 }

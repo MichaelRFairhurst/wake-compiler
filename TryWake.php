@@ -44,10 +44,27 @@ if($code) {
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 		<script type="text/javascript" src="page.js"></script>
 		<link rel="stylesheet" type="text/css" href="page.css">
+		<link href='http://fonts.googleapis.com/css?family=Roboto:100' rel='stylesheet' type='text/css'>
 	</head>
 <body>
-<div class="content" data-spy="scroll" data-target=".mynavbar">
-	<div class="inner-content">
+	<div class="mynavbar">
+		<ul class="nav nav-tabs nav-stacked">
+			<li><a href="index.html">Wake Home</a></li>
+			<li><a href="howto.html">Getting Started Guide</a></li>
+			<li><a href="TryWake.php">Online Compiler</a></li>
+		</ul>
+	</div>
+	<div class="opennav"><button class="btn btn-inverse btn-small"><i class="icon-align-justify icon-white"></i></button></div>
+		<div class="content" data-spy="scroll" data-target=".mynavbar">
+			<div class="inner-content">
+			<div id="intro">
+				<div id="logo">
+				</div>
+				<h2><a class="logo-label" href="/">WAKE</a></h2>
+				<p class="logo-label-label">
+				a <span class="accent">fast</span>, <span class="accent">expressive</span>, <span class="accent">typesafe</span> language that gives you <span class="accent">testability from the ground up</span>.
+				</p>
+			</div>
 		<h1>Online Wake to Javascript compiler</h1>
 		<form method="POST">
 		<div class="row">
@@ -82,7 +99,7 @@ every Main is:
 			</div>
 		</div>
 		<div class="row"><div class="span12">OR</div></div>
-		
+
 		<div class="row">
 			<div class="span6">List available main classes &amp; methods</div>
 			<div class="span6"><input type="checkbox" name="List"></div>
