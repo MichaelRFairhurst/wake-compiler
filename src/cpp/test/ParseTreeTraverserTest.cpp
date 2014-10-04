@@ -2893,6 +2893,52 @@ PTT_TEST_CASE(
 );
 
 PTT_TEST_CASE(
+	TestProvisionContravariantArgumentIsInvalid,
+	"every ClassA is:							\n\
+	every ClassB (a ClassA) is:					\n\
+	every MyClass is:							\n\
+		needs ClassB;							\n\
+		provides MyClass <- MyClass(?ClassA);	\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	TestProvisionCovariantArgumentIsValid,
+	"every ClassA is:							\n\
+	every ClassB (a ClassA) is:					\n\
+	every MyClass is:							\n\
+		needs ClassA;							\n\
+		provides MyClass <- MyClass(?ClassB);	\n\
+	",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestProvisionContravariantInjectionIsInvalid,
+	"every ClassA is:							\n\
+	every ClassB (a ClassA) is:					\n\
+	every MyClass is:							\n\
+		needs ClassB;							\n\
+		provides MyClass <- MyClass(ClassA),	\n\
+			ClassA;								\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	TestProvisionCovariantInjectionIsValid,
+	"every ClassA is:							\n\
+	every ClassB (a ClassA) is:					\n\
+	every MyClass is:							\n\
+		needs ClassA;							\n\
+		provides MyClass <- MyClass(ClassB),	\n\
+			ClassB;								\n\
+	",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
 	TestProvisionArgumentNonexistClass,
 	"every MyClass is:							\n\
 		needs Num;								\n\

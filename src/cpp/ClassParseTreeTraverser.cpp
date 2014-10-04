@@ -340,7 +340,7 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 								if(required->specialty != NULL && (actual->specialty == NULL || string(required->specialty) != actual->specialty))
 									errors->addError(new SemanticError(WARNING, "Injected a class with specialized dependencies...it may not be looking for what you're giving it!", tree));
 
-								if(!classestable->getAnalyzer()->isASubtypeOfB(required, actual)) {
+								if(!classestable->getAnalyzer()->isASubtypeOfB(actual, required)) {
 									errors->addError(new SemanticError(TYPE_ERROR, "Injection is not a proper subtype for class dependencies", tree));
 								} else if(injections->node_data.nodes[i]->node_type == NT_TYPEDATA) {
 									classestable->getAnalyzer()->assertClassCanProvide(classname, actual);
