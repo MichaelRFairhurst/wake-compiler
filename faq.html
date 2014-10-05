@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Wake The Language</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<!-- Bootstrap -->
+		<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+		<link rel="stylesheet" href="/highlight.js/styles/tomorrow.css">
+		<script src="/highlight.js/highlight.pack.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script type="text/javascript" src="page.js"></script>
+		<link rel="stylesheet" type="text/css" href="page.css">
+		<link href='http://fonts.googleapis.com/css?family=Roboto:100' rel='stylesheet' type='text/css'>
+	</head>
+	<body>
+		<div class="mynavbar">
+			<ul class="nav nav-tabs nav-stacked">
+				<li><a href="index.html">Wake Home</a></li>
+				<li><a href="installing.html">Installing</a></li>
+				<li><a href="howto.html">Getting Started Guide</a></li>
+				<li><a href="TryWake.php">Online Compiler</a></li>
+			</ul>
+			<hr />
+			<ul class="nav nav-tabs nav-stacked">
+				<li><a href="#/varnames-optional">Why aren't variable names required?</a></li>
+				<li><a href="#/varnames-first-second">Why don't variables always follow the type?</a></li>
+				<li><a href="#/classdeclaration">What's with the unique class declarations?</a></li>
+			</ul>
+		</div>
+		<div class="opennav"><button class="btn btn-inverse btn-small"><i class="icon-align-justify icon-white"></i></button></div>
+		<div class="content" data-spy="scroll" data-target=".mynavbar">
+			<div class="inner-content">
+			<div id="intro">
+				<div id="logo">
+				</div>
+				<h2><a class="logo-label" href="/">WAKE</a></h2>
+				<p class="logo-label-label">
+				a <span class="accent">fast</span>, <span class="accent">expressive</span>, <span class="accent">typesafe</span> language that gives you <span class="accent">testability from the ground up</span>.
+				</p>
+			</div>
+
+			<h1>Wake FAQ</h1>
+			<p>Wake has many new ideas. If you dislike a choice we made, there very well might be a good answer here for why we did what we did.</p>
+			<h3 id="varnames-optional">Why aren't variable names required?</h3>
+			<p>A lot of people get worried about this. They claim that variables should be named after what they <i>do</i> rather than after what they <i>are</i>. They also claim that refactoring becomes more difficult if types aren't separated from the names of variables.</p>
+			<p>The first concern is unfounded. When we name a variable <code>min</code> or <code>max</code>, we aren't describing how its used. Its the function name, <code>printFrom(min Num)To(max Num)</code>, that tells us how <code>min</code>/<code>max</code> will be used. What the code <i>does</i> is equally clear if you change it to <code>printFrom(Num)To($Num)</code>.</p>
+			<p>The varnames <code>min</code> and <code>max</code> are clearer here because its best description of what they <i>are</i>. Therefore we believe that much of the code we write such as <code>delete(File)</code> and <code>rename(Person)To(Text)</code> are clearest in precisely that form, without any other labels that your brain must process.</p>
+
+			<h3 id="varnames-first-second">Why don't variables always follow the type?</h3>
+			<p>Some recent languages such as Go and Scala have had to, for syntactic reasons, require varable names to preceed their types, such as <code>percentage: float</code> instead of C/Java style <code>float percentage</code>. This has spawned some controversy over which method is the most readable.</p>
+			<p>We thought quite hard on which is the best, and we determined that both ways are awful for readability.</p>
+			<p>In English we put adjectives before our nouns, which usually corresponds to types and then variable names. Types are merely a description of your variable that is read by the compiler, so it makes sense to put them first when you have a double noun group such as <code>Printer outputter</code>. It also works with Java-style designs quite well where interfaces are often adjectives, such as <code>Iterable&lt;T&gt; startingList</code>.</p>
+			<p>But we already know that the <code>Iterable&lt;T&gt;</code> is a list. We could leave the variable name as simply <code>starting</code> since that's what makes it unique. Now we find ourselves with an adjective for a variable name. This should be written as <code>starting Iterable&lt;T&gt;</code> for optimal readability.</p>
+			<p>Many of our variable names are adjectives -- <code>min</code>, <code>max</code>, <code>first</code> -- or are compound words that begin with adjectives -- <code>newItems</code>, <code>addingCategory</code>, <code>oldId</code>. In these instances English speakers will have more concise and more readable code when putting the variable name before the type.</p>
+			<p>Moreover, if you still aren't convinced, not all code is written in English. Allowing both options is more universal for our increasingly global world.</p>
+
+			<h3 id="classdeclaration">What's with the unique class declarations?</h3>
+			<p>Frequently the worry here is that files can only define one class. Let's start off by assuring you that this is not the case. Simply open another class definiton to close the previous one.</p>
+			<p>We do this for a couple reasons. Firstly, it becomes that much extra bracket management which we have proven is unnecessary by not having it. If it were necessary in other languages, we would've had to do it too. The exception to this is anonymous classes, which we have chosen not to add in favor of closures.</p>
+			<p>Secondly, indentation is valuable. By wrapping your entire class in a bracket encourages you to indent everything else in the file. This is a waste of indentation, brought on mostly by a likeness to features that require indentation such as methods, if statements, and more.</p>
+			<p>Thirdly, extra closing brackets in your methods will get accepted by parsers as the end of your class declaration. Depending on the language, the parser will report an error on the opening of the next method, or the extra closing bracket at the end of the file. We thought it important that the parse error is reported as close as possible to the source, which in Wake will usually be the end of the method that contains the extra bracket.</p>
+
+		</div>
+		</div>
+
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+	</body>
+</html>
