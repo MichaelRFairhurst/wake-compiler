@@ -57,3 +57,5 @@ every Text is:
 	Text[] -- split(Text) { var Text[] = []; return Text[]; }
 
 	Num? -- indexOf(Text) { return 0; }
+
+	Text -- join(Text[]) { return ""; }

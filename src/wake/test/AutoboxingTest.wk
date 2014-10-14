@@ -270,3 +270,17 @@ every AutoboxingTest is:
 		Asserts.that(Text[].getSize())Equals(1);
 		Asserts.that(Text[0])Equals("hey");
 	}
+
+	~[ test Join ]~(Asserts) {
+		var Text[] = [];
+		Text[].push('hey');
+		Asserts.that(''.join(Text[]))Equals('hey');
+		Asserts.that(','.join(Text[]))Equals('hey');
+		Text[].push('hey');
+		Asserts.that(''.join(Text[]))Equals('heyhey');
+		Asserts.that(','.join(Text[]))Equals('hey,hey');
+		Text[].push('boo');
+		Asserts.that(''.join(Text[]))Equals('heyheyboo');
+		Asserts.that(','.join(Text[]))Equals('hey,hey,boo');
+		Asserts.that(','.join(Text[]))Equals('hey,hey,boo');
+	}

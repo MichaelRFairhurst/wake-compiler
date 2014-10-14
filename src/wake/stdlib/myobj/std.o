@@ -149,6 +149,10 @@ function$ $$A(a, b) {
 			return$ a.split(b);
 		};
 
+		this.`join(Text[])` = function(b) {
+			return$ b.join(a);
+		};
+
 	};
 
 	~List~ = function$ ~List~(a) {
