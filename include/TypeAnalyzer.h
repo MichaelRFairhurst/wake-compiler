@@ -21,6 +21,7 @@ extern "C" {
 
 #include <string>
 #include <vector>
+#include <boost/optional/optional.hpp>
 
 class ClassSpaceSymbolTable;
 
@@ -37,7 +38,7 @@ class TypeAnalyzer {
 		void assertClassCanProvide(string provider, Type* binding);
 		void assertClassCanBeBound(Type* binding);
 		void assertNeedIsNotCircular(string classname, Type* need);
-		Type* getCommonSubtypeOf(Type* a, Type* b);
+		boost::optional<Type*> getCommonSubtypeOf(Type* a, Type* b);
 		bool isPrimitiveTypeNum(Type* theint);
 		bool isPrimitiveTypeText(Type* theint);
 		bool isPrimitiveTypeBool(Type* theint);

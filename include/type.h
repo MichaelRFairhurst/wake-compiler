@@ -56,12 +56,35 @@ typedef struct Type {
 	} typedata;
 	char* alias;						// this should be moved....
 	char* specialty;					// {Alive}
+
+#ifdef __cplusplus
+	public:
+		~Type();
+		Type(int type);
+		Type(const Type& other);
+		Type& operator=(const Type& other);
+#endif
 } Type;
 
 typedef struct TypeArray {
 	Type** types;
 	int typecount;
+#ifdef __cplusplus
+	public:
+		~TypeArray() {
+			for(int i = 0; i < typecount; i++) {
+				delete types[i];
+			}
+			delete types;
+		}
+		TypeArray(const TypeArray& other);
+		TypeArray& operator=(const TypeArray& other);
+#endif
 } TypeArray;
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 Type* MakeType(int type);
 TypeArray* MakeTypeArray();
@@ -70,5 +93,9 @@ void freeType(Type* t);
 void freeTypeArray(TypeArray* ta);
 Type* copyType(Type* t);
 TypeArray* copyTypeArray(TypeArray* ta);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

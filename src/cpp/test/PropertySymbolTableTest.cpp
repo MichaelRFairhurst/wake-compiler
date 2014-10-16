@@ -40,16 +40,16 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesReturnTypes) {
 	vector<Type*> parameters;
 	vector<Type*> parameterizations;
 	Type* methodtype = MakeType(TYPE_LAMBDA);
-	Type* parameter = MakeType(TYPE_PARAMETERIZED);
-	Type* parameterization = MakeType(TYPE_CLASS);
+	Type parameter(TYPE_PARAMETERIZED);
+	Type parameterization(TYPE_CLASS);
 
-	parameterization->typedata._class.classname = strdup("AClass");
-	parameter->typedata.parameterized.label = strdup("E");
-	methodtype->typedata.lambda.returntype = copyType(parameter);
+	parameterization.typedata._class.classname = strdup("AClass");
+	parameter.typedata.parameterized.label = strdup("E");
+	methodtype->typedata.lambda.returntype = copyType(&parameter);
 	property->type = methodtype;
 	property->casing = "myMethod";
-	parameters.push_back(parameter);
-	parameterizations.push_back(parameterization);
+	parameters.push_back(&parameter);
+	parameterizations.push_back(&parameterization);
 	table.setParameters(&parameters);
 
 	table.properties["myMethod"] = property;
@@ -64,9 +64,6 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesReturnTypes) {
 	BOOST_REQUIRE((*method)->typedata.lambda.arguments == NULL);
 	BOOST_REQUIRE((*method)->typedata.lambda.returntype->type == TYPE_CLASS);
 	BOOST_REQUIRE((*method)->typedata.lambda.returntype->typedata._class.classname == string("AClass"));
-
-	//freeType(methodtype);
-	freeType(parameter); freeType(parameterization);
 }
 
 BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesPropertyName) {
@@ -76,17 +73,17 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesPropertyName) {
 	vector<Type*> parameters;
 	vector<Type*> parameterizations;
 	Type* methodtype = MakeType(TYPE_LAMBDA);
-	Type* parameter = MakeType(TYPE_PARAMETERIZED);
-	Type* parameterization = MakeType(TYPE_CLASS);
+	Type parameter(TYPE_PARAMETERIZED);
+	Type parameterization(TYPE_CLASS);
 
-	parameterization->typedata._class.classname = strdup("AClass");
-	parameter->typedata.parameterized.label = strdup("E");
+	parameterization.typedata._class.classname = strdup("AClass");
+	parameter.typedata.parameterized.label = strdup("E");
 	methodtype->typedata.lambda.arguments = MakeTypeArray();
-	AddTypeToTypeArray(copyType(parameter), methodtype->typedata.lambda.arguments);
+	AddTypeToTypeArray(copyType(&parameter), methodtype->typedata.lambda.arguments);
 	property->type = methodtype;
 	property->casing = "myMethod(#)";
-	parameters.push_back(parameter);
-	parameterizations.push_back(parameterization);
+	parameters.push_back(&parameter);
+	parameterizations.push_back(&parameterization);
 	table.setParameters(&parameters);
 
 	table.properties["myMethod(E)"] = property;
@@ -102,9 +99,6 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesPropertyName) {
 	BOOST_REQUIRE((*method)->typedata.lambda.arguments->typecount == 1);
 	BOOST_REQUIRE((*method)->typedata.lambda.arguments->types[0]->type == TYPE_CLASS);
 	BOOST_REQUIRE((*method)->typedata.lambda.arguments->types[0]->typedata._class.classname == string("AClass"));
-
-	//freeType(methodtype);
-	freeType(parameter); freeType(parameterization);
 }
 
 BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesNeedName) {
@@ -113,12 +107,12 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesNeedName) {
 	vector<Type*> parameters;
 	vector<Type*> parameterizations;
 	Type* parameter = MakeType(TYPE_PARAMETERIZED);
-	Type* parameterization = MakeType(TYPE_CLASS);
+	Type parameterization(TYPE_CLASS);
 
-	parameterization->typedata._class.classname = strdup("AClass");
+	parameterization.typedata._class.classname = strdup("AClass");
 	parameter->typedata.parameterized.label = strdup("E");
 	parameters.push_back(parameter);
-	parameterizations.push_back(parameterization);
+	parameterizations.push_back(&parameterization);
 	table.setParameters(&parameters);
 	table.addNeed(parameter, 0);
 
@@ -130,9 +124,7 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesNeedName) {
 	BOOST_REQUIRE(needs->at(0)->type == TYPE_CLASS);
 	BOOST_REQUIRE(needs->at(0)->typedata._class.classname == string("AClass"));
 
-	//freeType(methodtype);
-	//freeType(parameter);
-	freeType(parameterization);
+	freeType(&parameterization);
 }
 
 BOOST_AUTO_TEST_SUITE_END();

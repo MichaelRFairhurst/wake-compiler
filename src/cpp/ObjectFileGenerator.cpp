@@ -474,19 +474,17 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 		case NT_TYPEDATA:
 			{
-				Type* type = copyType(tree->node_data.type);
+				Type type = *tree->node_data.type;
 				if(forceArrayIdentifier) {
-					if(type->type == TYPE_LIST) {
-						type->typedata.list.levels++;
+					if(type.type == TYPE_LIST) {
+						type.typedata.list.levels++;
 					} else {
-						Type* contained = type;
-						type = MakeType(TYPE_LIST);
-						type->typedata.list.levels = 1;
-						type->typedata.list.contained = contained;
+						type = Type(TYPE_LIST);
+						type.typedata.list.levels = 1;
+						type.typedata.list.contained = new Type(*tree->node_data.type);
 					}
 				}
-				file << table.getAddress(type);
-				freeType(type);
+				file << table.getAddress(&type);
 			}
 			break;
 

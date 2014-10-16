@@ -25,8 +25,8 @@
 #include "TypeChecker.h"
 #include "MethodSignatureParseTreeTraverser.h"
 
-extern "C" {
 	#include "type.h"
+extern "C" {
 	#include "node.h"
 	#include "tree.h"
 }

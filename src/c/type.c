@@ -25,6 +25,7 @@ Type* MakeType(int type) {
 		case TYPE_CLASS:
 			thetype->typedata._class.shadow = 0;
 			thetype->typedata._class.parameters = NULL;
+			thetype->typedata._class.classname = NULL;
 			break;
 		case TYPE_LAMBDA:
 			thetype->typedata.lambda.returntype = NULL;
@@ -62,6 +63,7 @@ void AddTypeToTypeArray(Type* nexttype, TypeArray* container) {
 }
 
 void freeType(Type *t) {
+	return;
 	if(t == NULL) return;
 
 	switch(t->type) {
@@ -97,6 +99,7 @@ void freeType(Type *t) {
 }
 
 void freeTypeArray(TypeArray *ta) {
+	return;
 	if(ta == NULL) return;
 	int i;
 	for(i = 0; i < ta->typecount; i++) freeType(ta->types[i]);

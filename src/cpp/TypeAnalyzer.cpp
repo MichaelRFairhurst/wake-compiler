@@ -199,8 +199,138 @@ void TypeAnalyzer::assertClassCanProvide(Type* provider, Type* binding) {
 	assertClassCanProvide(string(provider->typedata._class.classname), binding);
 }
 
-Type* TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
-	return a;
+boost::optional<Type*> TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
+	if(a->type == TYPE_MATCHALL || b->type == TYPE_MATCHALL) return boost::optional<Type*>(MakeType(TYPE_MATCHALL));
+
+	if(a->type == TYPE_OPTIONAL || b->type == TYPE_OPTIONAL) {
+		Type* optional = a->type == TYPE_OPTIONAL ? a : b;
+		Type* other = a == optional ? b : a;
+
+		// [nothing, Text?] is common to type Text?
+		if(other->type == TYPE_NOTHING) {
+			return boost::optional<Type*>(copyType(optional));
+		}
+
+		// [X, Y?] is common to type Z? where Z is the common type to [X, Y]
+		boost::optional<Type*> nonoptcommon = getCommonSubtypeOf(optional->typedata.optional.contained, other);
+
+		if(!nonoptcommon) {
+			return nonoptcommon;
+		}
+
+		if((*nonoptcommon)->type == TYPE_OPTIONAL) {
+			if(a->type != TYPE_OPTIONAL || b->type != TYPE_OPTIONAL) {
+				return boost::optional<Type*>();
+			}
+			// [X?, Y??] becomes Y??
+			if((*nonoptcommon)->typedata.optional.levels < a->typedata.optional.levels) {
+				(*nonoptcommon)->typedata.optional.levels = a->typedata.optional.levels;
+			}
+			// [X??, Y?] becomes X??
+			if((*nonoptcommon)->typedata.optional.levels < b->typedata.optional.levels) {
+				(*nonoptcommon)->typedata.optional.levels = b->typedata.optional.levels;
+			}
+		}
+
+		Type* common = MakeType(TYPE_OPTIONAL);
+
+		// [Text?, Text] becomes Text?
+		common->typedata.optional.levels = optional->typedata.optional.levels;
+		common->typedata.optional.contained = *nonoptcommon;
+		return boost::optional<Type*>(common);
+	}
+
+	if(a->type != b->type) {
+		// [Nothing, Printer] common type is Printer?
+		if(a->type == TYPE_NOTHING || b->type == TYPE_NOTHING) {
+			Type* notnothing = a->type == TYPE_NOTHING ? b : a;
+			Type* common = MakeType(TYPE_OPTIONAL);
+			common->typedata.optional.levels = 1;
+			common->typedata.optional.contained = copyType(notnothing);
+			return boost::optional<Type*>(common);
+		}
+		return boost::optional<Type*>();
+	}
+
+	if(a->type == TYPE_NOTHING) {
+		return boost::optional<Type*>(MakeType(TYPE_NOTHING));
+
+	} else if(a->type == TYPE_LIST) {
+		// [Text[], Num[]] and [Printer[], DisabledPrinter[]] are both common to nothing
+		if(!isAExactlyB(a, b)) return boost::optional<Type*>();
+		// but [Text[], Text[]] is common to Text[]
+		return boost::optional<Type*>(copyType(a));
+
+	} else if(a->type == TYPE_CLASS) {
+		// check if one pointer exists and the other is null: !ptr == 0 and !NULL == 1
+		if(!a->typedata._class.parameters != !b->typedata._class.parameters) {
+			return boost::optional<Type*>();
+		}
+
+		//if(a->typedata._class.parameters) { // Here if A is not null, neither is B
+			//int len = a->typedata._class.parameters->typecount;
+			//if(b->typedata._class.parameters->typecount != len) {
+				//return false;
+			//}
+
+			//for(int i = 0; i < len; i++)
+			//if(!isAExactlyB(a->typedata._class.parameters->types[i], b->typedata._class.parameters->types[i]))
+				//return false;
+		//}
+
+		if(string(a->typedata._class.classname) == b->typedata._class.classname) {
+			return boost::optional<Type*>(copyType(a));
+		}
+
+		//try {
+
+			//ReadOnlyPropertySymbolTable* a_data = reference->find(a->typedata._class.classname);
+
+			//for(map<string, bool>::const_iterator it = a_data->getParentage().begin(); it != a_data->getParentage().end(); ++it) {
+				//if(isASubtypeOfB(it->first, b->typedata._class.classname)) return true;
+			//}
+
+		//} catch(SymbolNotFoundException* e) {
+			//delete e;
+		//}
+
+		//return false;
+	/*
+	} else if(a->type == TYPE_PARAMETERIZED) {
+		if(a->typedata.parameterized.label == string(b->typedata.parameterized.label)) return true;
+		// TODO: lower/upper bounds comparison
+		return false;
+	*/
+	}
+
+	/*
+	if(a->type == TYPE_LAMBDA) {
+
+		// if one or the other is a pointer
+		if((a->typedata.lambda.arguments == NULL) != (b->typedata.lambda.arguments == NULL))
+			return false;
+
+		// Bool -- fn() is a subtype of void -- fn(), since the subtype will simply ignore the returnval
+		// however, void --fn() is not a subtype of Bool -- fn() as you probably guessed
+		if(a->typedata.lambda.returntype == NULL && b->typedata.lambda.returntype != NULL)
+			return false;
+		else if(b->typedata.lambda.returntype != NULL && !isASubtypeOfB(a->typedata.lambda.returntype, b->typedata.lambda.returntype))
+			return false;
+
+		if(a->typedata.lambda.arguments != NULL) {
+			// A fn taking 3 arguments is not a subtype of a fn taking 2 or 4
+			if(a->typedata.lambda.arguments->typecount != b->typedata.lambda.arguments->typecount)
+				return false;
+
+			int i;
+			for(i = 0; i < a->typedata.lambda.arguments->typecount; i++)
+			if(!isASubtypeOfB(a->typedata.lambda.arguments->types[i], b->typedata.lambda.arguments->types[i]))
+				return false;
+		}
+
+		return true;
+
+	*/
 }
 
 bool TypeAnalyzer::isPrimitiveTypeNum(Type* type) {
