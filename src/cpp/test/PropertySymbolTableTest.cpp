@@ -123,8 +123,6 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesNeedName) {
 	BOOST_REQUIRE(needs->size() == 1);
 	BOOST_REQUIRE(needs->at(0)->type == TYPE_CLASS);
 	BOOST_REQUIRE(needs->at(0)->typedata._class.classname == string("AClass"));
-
-	freeType(&parameterization);
 }
 
 BOOST_AUTO_TEST_SUITE_END();

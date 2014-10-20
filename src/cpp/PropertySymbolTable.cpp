@@ -41,7 +41,7 @@ boost::optional<SemanticError*> PropertySymbolTable::addMethod(Type* returntype,
 	}
 
 	Type* method = MakeType(TYPE_LAMBDA);
-	method->typedata.lambda.returntype = copyType(returntype);
+	method->typedata.lambda.returntype = returntype == NULL ? NULL : new Type(*returntype);
 
 	TypeArray* conglomerate = MakeTypeArray();
 	for(vector<pair<string, TypeArray*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {

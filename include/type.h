@@ -63,6 +63,9 @@ typedef struct Type {
 		Type(int type);
 		Type(const Type& other);
 		Type& operator=(const Type& other);
+	private:
+		void releaseData();
+		void deepCopy(const Type& other);
 #endif
 } Type;
 
@@ -71,12 +74,8 @@ typedef struct TypeArray {
 	int typecount;
 #ifdef __cplusplus
 	public:
-		~TypeArray() {
-			for(int i = 0; i < typecount; i++) {
-				delete types[i];
-			}
-			delete types;
-		}
+		TypeArray();
+		~TypeArray();
 		TypeArray(const TypeArray& other);
 		TypeArray& operator=(const TypeArray& other);
 #endif
