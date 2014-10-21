@@ -28,6 +28,10 @@ struct ObjectProperty {
 	string casing;
 	int flags;
 	Type* type;
+
+	~ObjectProperty() {
+		delete type;
+	}
 };
 
 #endif

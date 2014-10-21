@@ -194,7 +194,7 @@ BOOST_AUTO_TEST_CASE(TestWritesParameters)
 	TypeAnalyzer tanalyzer;
 	PropertySymbolTable table(&tanalyzer);
 	table.classname = "classname";
-	vector<Type*> parameters;
+	vector<Type*>* parameters = new vector<Type*>();
 	Type* t = MakeType(TYPE_PARAMETERIZED); t->typedata.parameterized.label = strdup("T");
 	Type* b = MakeType(TYPE_PARAMETERIZED); b->typedata.parameterized.label = strdup("B");
 	Type* text = MakeType(TYPE_CLASS);
@@ -203,8 +203,8 @@ BOOST_AUTO_TEST_CASE(TestWritesParameters)
 	text->typedata._class.classname = strdup("Text");
 	booL->typedata._class.classname = strdup("Bool");
 	b->typedata.parameterized.lowerbound = booL;
-	parameters.push_back(t); parameters.push_back(b);
-	table.setParameters(&parameters);
+	parameters->push_back(t); parameters->push_back(b);
+	table.setParameters(parameters);
 	writer.write(out, &table);
 	ASSERTLENGTH(47);
 

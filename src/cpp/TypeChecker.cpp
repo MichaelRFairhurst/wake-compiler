@@ -16,6 +16,9 @@
 #include "CompilationExceptions.h"
 #include "TypeParameterizer.h"
 
+#include <memory>
+#include <boost/ptr_container/ptr_vector.hpp>
+
 TypeChecker::TypeChecker(ErrorTracker* errors, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, MethodSignatureParseTreeTraverser* methodanalyzer) {
 	this->errors = errors;
 	this->classestable = classestable;
@@ -245,15 +248,15 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 			case NT_ADD:
 				{
 					ret = typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier);
-					Type additive = *typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier);
+					Type additive = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier));
 
 					// Ensure the left operand is never a matchall when the right is
 					// this way, when ret is matchall, so we can run all typechecks by the
 					// lefthand side
 					if(ret->type == TYPE_MATCHALL) {
-						Type temp = *ret;
+						auto_ptr<Type> temp(ret);
 						ret = new Type(additive);
-						additive = temp;
+						additive = *temp;
 					}
 
 					if(analyzer->isPrimitiveTypeNum(ret) || ret->type == TYPE_MATCHALL) {
@@ -294,7 +297,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 			case NT_SUBTRACT:
 				{
 					ret = typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier);
-					Type factor = *typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier);
+					Type factor = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier));
 
 					if(!analyzer->isPrimitiveTypeNum(ret) || !analyzer->isPrimitiveTypeNum(&factor)) {
 						expectedstring = "Num";
@@ -321,8 +324,8 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 					ret = MakeType(TYPE_CLASS);
 					ret->typedata._class.classname = strdup("Bool");
 
-					Type a = *typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier);
-					Type b = *typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier);
+					Type a = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier));
+					Type b = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier));
 
 					if(!analyzer->isPrimitiveTypeNum(&a) || !analyzer->isPrimitiveTypeNum(&b)) {
 						expectedstring = "Num";
@@ -341,8 +344,8 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 			case NT_EQUALITY:
 			case NT_INEQUALITY:
 				{
-					Type a = *typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier);
-					Type b = *typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier);
+					Type a = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier));
+					Type b = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier));
 					ret = MakeType(TYPE_CLASS);
 					ret->typedata._class.classname = strdup("Bool");
 
@@ -358,7 +361,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 			case NT_OR:
 				{
 					ret = typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier);
-					Type cmp = *typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier);
+					Type cmp = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier));
 
 					if(!analyzer->isPrimitiveTypeBool(ret) || !analyzer->isPrimitiveTypeBool(&cmp)) {
 						if(analyzer->isPrimitiveTypeBool(ret)) {
@@ -395,7 +398,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 				{
 					forceArrayIdentifier = false;
 					ret = typeCheckUsable(tree->node_data.nodes[0], true);
-					Type index = *typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier);
+					Type index = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier));
 					if(ret->type != TYPE_LIST && ret->type != TYPE_MATCHALL) {
 						erroneousstring = analyzer->getNameForType(ret);
 						throw string("Getting index of non-array");
@@ -441,6 +444,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 					if(!analyzer->isPrimitiveTypeNum(ret) && !analyzer->isPrimitiveTypeBool(ret)) {
 						erroneousstring = analyzer->getNameForType(ret);
 						expectedstring = "Bool";
+						delete ret;
 						ret = new Type(TYPE_CLASS);
 						ret->typedata._class.classname = strdup("Bool");
 						throw string("If/While conditions must be Bool or Num");
@@ -498,7 +502,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						errors->addError(new SemanticError(INVALID_ASSIGNMENT, "", tree));
 						ret = new Type(tree->node_type == NT_ASSIGNMENT ? TYPE_UNUSABLE : TYPE_MATCHALL);
 					} else {
-						Type subject = *typeCheck(tree->node_data.nodes[0], forceArrayIdentifier);
+						Type subject = *auto_ptr<Type>(typeCheck(tree->node_data.nodes[0], forceArrayIdentifier));
 						ret = tree->node_type == NT_ASSIGNMENT ? new Type(TYPE_UNUSABLE) : new Type(subject);
 						if(tree->node_data.nodes[1]->node_type == NT_ARRAY_DECLARATION && tree->node_data.nodes[1]->subnodes == 0) {
 							if(subject.type != TYPE_LIST) {
@@ -507,7 +511,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 								throw string("Invalid type in assignment");
 							}
 						} else {
-							Type assignment = *typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier);
+							Type assignment = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier));
 							if(!analyzer->isASubtypeOfB(&assignment, &subject)) {
 								expectedstring = analyzer->getNameForType(&subject);
 								erroneousstring = analyzer->getNameForType(&assignment);
@@ -520,7 +524,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 
 			case NT_LAMBDA_INVOCATION:
 				{
-					Type lambda = *typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier);
+					Type lambda = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier));
 					Type actual(TYPE_LAMBDA);
 					actual.typedata.lambda.arguments = MakeTypeArray();
 					if(lambda.typedata.lambda.returntype != NULL) {
@@ -560,7 +564,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						}
 					}
 
-					Type subject = *typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier);
+					Type subject = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier));
 
 					if(subject.type == TYPE_MATCHALL) {
 						ret = new Type(subject);
@@ -578,11 +582,12 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						Node* node = tree->node_data.nodes[0];
 						tree->node_data.nodes[0] = MakeTwoBranchNode(NT_AUTOBOX, node, MakeNodeFromString(NT_COMPILER_HINT, strdup(boxedtype->typedata._class.classname)));
 						subject = *boxedtype;
+						delete boxedtype;
 					}
 
-					ReadOnlyPropertySymbolTable* methodtable;
+					auto_ptr<ReadOnlyPropertySymbolTable> methodtable;
 					try {
-						methodtable = classestable->find(&subject);
+						methodtable.reset(classestable->find(&subject));
 					} catch (SymbolNotFoundException* e) {
 						ret = MakeType(TYPE_MATCHALL);
 						errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, string("Class by name of ") + subject.typedata._class.classname + " returned by another expression has not been imported and cannot be resolved", tree));
@@ -636,7 +641,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 					if(assignee.type == TYPE_LIST && tree->node_data.nodes[1]->subnodes == 0 && tree->node_data.nodes[1]->node_type == NT_ARRAY_DECLARATION) {
 						// Nothing to do here but relax.
 					} else {
-						Type assignment = *typeCheck(tree->node_data.nodes[1], forceArrayIdentifier);
+						Type assignment = *auto_ptr<Type>(typeCheck(tree->node_data.nodes[1], forceArrayIdentifier));
 						if(!analyzer->isASubtypeOfB(&assignment, &assignee)) {
 							expectedstring = analyzer->getNameForType(&assignee);
 							erroneousstring = analyzer->getNameForType(&assignment);
@@ -656,7 +661,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 					parameterizer.writeInParameterizations(&tree->node_data.nodes[0]->node_data.type, parameterizedtypes);
 					ret = copyType(tree->node_data.nodes[0]->node_data.type);
 					classestable->assertTypeIsValid(ret);
-					Type casted = *typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier);
+					Type casted = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier));
 					if(!analyzer->isASubtypeOfB(&casted, ret)) {
 						expectedstring = analyzer->getNameForType(ret);
 						erroneousstring = analyzer->getNameForType(&casted);
@@ -673,22 +678,24 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 					TypeParameterizer parameterizer;
 					parameterizer.writeInParameterizations(&tree->node_data.nodes[0]->node_data.type, parameterizedtypes);
 					try {
-						Type provider = *typeCheckUsable(tree->node_data.nodes[2], forceArrayIdentifier);
+						Type provider = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[2], forceArrayIdentifier));
 						ret = new Type(*tree->node_data.nodes[0]->node_data.type);
 						classestable->assertTypeIsValid(ret);
 						vector<Type*> arguments;
+						boost::ptr_vector<Type> arguments_latch;
 
 						if(tree->node_data.nodes[1]->node_type != NT_EMPTY) {
 							for(int i = 0; i < tree->node_data.nodes[1]->subnodes; i++) {
 								Type* argtype = typeCheckUsable(tree->node_data.nodes[1]->node_data.nodes[i], forceArrayIdentifier);
 								arguments.push_back(argtype);
+								arguments_latch.push_back(argtype);
 							}
 						}
 
 						string name = analyzer->getProvisionSymbol(ret, arguments);
 
 						try {
-							ReadOnlyPropertySymbolTable* table = classestable->find(&provider);
+							auto_ptr<ReadOnlyPropertySymbolTable> table(classestable->find(&provider));
 							boost::optional<Type*> provision = table->find(name);
 							if(!provision) {
 								errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Provision " + name + " does not exist on class " + analyzer->getNameForType(&provider), tree));
@@ -731,16 +738,19 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						real.typedata.optional.levels--;
 					}
 
+					Type* orig;
 					if(tree->node_data.nodes[0]->node_type == NT_MEMBER_ACCESS) {
 						errors->addError(new SemanticError(TYPE_ERROR, "Calling exists { } on a property is illegal as it is a shared reference and therefore might be unset amid the scope", tree));
+						break;
 					} else {
+						orig = *scopesymtable->find(ret);
 						scopesymtable->addOverwriting(&real);
 					}
 
 					delete typeCheck(tree->node_data.nodes[1], forceArrayIdentifier);
 
 					if(tree->node_data.nodes[0]->node_type != NT_MEMBER_ACCESS) {
-						scopesymtable->addOverwriting(new Type(*ret));
+						scopesymtable->addOverwriting(orig);
 					}
 
 					if(tree->subnodes > 2) {
@@ -754,7 +764,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 
 			case NT_MEMBER_ACCESS:
 				{
-					Type subject = *typeCheckUsable(tree->node_data.nodes[0], false);
+					Type subject = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[0], false));
 					if(subject.type == TYPE_MATCHALL) {
 						ret = new Type(subject);
 						break;
@@ -780,7 +790,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						break;
 					}
 
-					ReadOnlyPropertySymbolTable* proptable = classestable->find(&subject);
+					auto_ptr<ReadOnlyPropertySymbolTable> proptable(classestable->find(&subject));
 					boost::optional<Type*> variable = proptable->find(name);
 					if(!variable) {
 						ret = MakeType(TYPE_MATCHALL);
@@ -805,6 +815,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 
 					if(ret->type == TYPE_OPTIONAL) {
 						errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Iterating over optional type. You must first wrap object in an exists { } clause.", tree));
+						delete ret;
 						ret = MakeType(TYPE_MATCHALL);
 						break;
 					}

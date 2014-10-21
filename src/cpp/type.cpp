@@ -66,7 +66,7 @@ void Type::deepCopy(const Type& other) {
 	switch(type) {
 		case TYPE_CLASS:
 			typedata._class.shadow = other.typedata._class.shadow;
-			typedata._class.classname = strdup(other.typedata._class.classname);
+			typedata._class.classname = other.typedata._class.classname ? strdup(other.typedata._class.classname) : NULL;
 			if(other.typedata._class.parameters != NULL) {
 				typedata._class.parameters = new TypeArray(*other.typedata._class.parameters);
 			} else {

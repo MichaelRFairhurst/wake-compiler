@@ -174,9 +174,11 @@ bool PropertySymbolTable::isAbstract() {
 
 PropertySymbolTable::~PropertySymbolTable() {
 	for(map<string, ObjectProperty*>::iterator it = properties.begin(); it != properties.end(); ++it) {
-		freeType(it->second->type);
 		delete it->second;
 	}
+
+	delete needs;
+	delete declaredtypeparameters;
 }
 
 void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable* parent, bool extend, ErrorTracker& errors) {
@@ -223,6 +225,7 @@ bool PropertySymbolTable::isPublic(string name) {
 }
 
 void PropertySymbolTable::setParameters(vector<Type*>* parameters) {
+	delete declaredtypeparameters;
 	declaredtypeparameters = parameters;
 }
 
@@ -261,8 +264,7 @@ ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<Type*
 		newneeds->push_back(newneed);
 	}
 
-	return new DerivedPropertySymbolTable(*analyzer, *newneeds, *newprops, parentage);
-	return this;
+	return new DerivedPropertySymbolTable(*analyzer, newneeds, newprops, parentage);
 }
 
 Type* PropertySymbolTable::getAsType() {

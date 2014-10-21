@@ -17,17 +17,17 @@
 
 boost::optional<Type*> DerivedPropertySymbolTable::find(string name) {
 	map<string, ObjectProperty*>::iterator searcher;
-	searcher = properties.find(name);
-	if(searcher == properties.end()) return boost::optional<Type*>();
+	searcher = properties->find(name);
+	if(searcher == properties->end()) return boost::optional<Type*>();
 	else return boost::optional<Type*>(searcher->second->type);
 }
 
 bool DerivedPropertySymbolTable::isPublic(string name) {
-	return properties.find(name)->second->flags & PROPERTY_PUBLIC;
+	return properties->find(name)->second->flags & PROPERTY_PUBLIC;
 }
 
 string DerivedPropertySymbolTable::getAddress(string name) {
-	return properties.find(name)->second->address;
+	return properties->find(name)->second->address;
 }
 
 string DerivedPropertySymbolTable::getProvisionSymbol(Type* provided, vector<Type*> &arguments) {
@@ -35,7 +35,7 @@ string DerivedPropertySymbolTable::getProvisionSymbol(Type* provided, vector<Typ
 }
 
 vector<Type*>* DerivedPropertySymbolTable::getNeeds() {
-	return &needs;
+	return needs;
 }
 
 string DerivedPropertySymbolTable::getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments) {
@@ -57,7 +57,7 @@ string DerivedPropertySymbolTable::getSymbolNameOf(vector<pair<string, TypeArray
 
 bool DerivedPropertySymbolTable::isAbstract() {
 	//@TODO cache this result or something
-	for(map<string, ObjectProperty*>::iterator it = properties.begin(); it != properties.end(); ++it) {
+	for(map<string, ObjectProperty*>::iterator it = properties->begin(); it != properties->end(); ++it) {
 		if(it->second->flags & PROPERTY_ABSTRACT) return true;
 	}
 
@@ -66,4 +66,14 @@ bool DerivedPropertySymbolTable::isAbstract() {
 
 const map<string, bool>& DerivedPropertySymbolTable::getParentage() {
 	return parentage;
+}
+
+DerivedPropertySymbolTable::~DerivedPropertySymbolTable() {
+	for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
+		delete *it;
+	}
+	for(map<string, ObjectProperty*>::iterator it = properties->begin(); it != properties->end(); ++it) {
+		delete it->second;
+	}
+	delete needs; delete properties;
 }

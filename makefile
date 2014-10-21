@@ -48,6 +48,7 @@ CPPNAMES= \
 	ImportParseTreeTraverser.cpp \
 	TypeParameterizer.cpp \
 	DerivedPropertySymbolTable.cpp \
+	TempPropertySymbolTable.cpp \
 	type.cpp
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))

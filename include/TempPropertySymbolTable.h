@@ -2,7 +2,7 @@
  * Source Code for the Original Compiler for the
  * Programming Language Wake
  *
- * DerivedPropertySymbolTable.h
+ * TempPropertySymbolTable.h
  *
  * Licensed under the MIT license
  * See LICENSE.TXT for details
@@ -12,8 +12,8 @@
  *
  **************************************************/
 
-#ifndef HEADER_DERIVED_PROPERTY_SYMBOL
-#define HEADER_DERIVED_PROPERTY_SYMBOL
+#ifndef HEADER_TEMP_PROPERTY_SYMBOL
+#define HEADER_TEMP_PROPERTY_SYMBOL
 #include <map>
 #include <string>
 #include <vector>
@@ -26,17 +26,15 @@ extern "C" {
 }
 
 #include "ReadOnlyPropertySymbolTable.h"
+#include "PropertySymbolTable.h"
 #include "ObjectProperty.h"
 #include "TypeAnalyzer.h"
 
 using namespace std;
 
-class DerivedPropertySymbolTable : public ReadOnlyPropertySymbolTable {
+class TempPropertySymbolTable : public ReadOnlyPropertySymbolTable {
 	public:
-		DerivedPropertySymbolTable(TypeAnalyzer& analyzer, vector<Type*>* needs, map<string, ObjectProperty*>* properties, const map<string, bool>& parentage) : analyzer(analyzer), parentage(parentage) {
-			this->needs = needs;
-			this->properties = properties;
-		};
+		TempPropertySymbolTable(PropertySymbolTable& table) : table(table) {};
 		boost::optional<Type*> find(string name);
 		bool isPublic(string name);
 		string getAddress(string name);
@@ -45,14 +43,10 @@ class DerivedPropertySymbolTable : public ReadOnlyPropertySymbolTable {
 		string getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments);
 		bool isAbstract();
 		const map<string, bool>& getParentage();
-		~DerivedPropertySymbolTable();
+		~TempPropertySymbolTable() {};
 
 	private:
-		TypeAnalyzer& analyzer;
-		vector<Type*>* needs;
-		map<string, ObjectProperty*>* properties;
-		const map<string, bool>& parentage;
-
+		PropertySymbolTable& table;
 
 };
 

@@ -15,6 +15,7 @@
 #include "ClassSpaceSymbolTable.h"
 #include <algorithm>
 #include "CompilationExceptions.h"
+#include "TempPropertySymbolTable.h"
 
 ClassSpaceSymbolTable::ClassSpaceSymbolTable() {
 	analyzer.reference = this;
@@ -125,7 +126,7 @@ ReadOnlyPropertySymbolTable* ClassSpaceSymbolTable::find(Type* type) {
 			error->errormsg = "Type " + string(type->typedata._class.classname) + " cannot be used without type parameters";;
 			throw error;
 		}
-		return table;
+		return new TempPropertySymbolTable(*table);
 	} else {
 		if(table->getParameters().size() != type->typedata._class.parameters->typecount) {
 			SymbolNotFoundException* error = new SymbolNotFoundException();

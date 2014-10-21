@@ -15,6 +15,7 @@
 #include "ClassParseTreeTraverser.h"
 #include "CompilationExceptions.h"
 #include "TypeParameterizer.h"
+#include <memory>
 
 /**
  * This class makes several passes to have the proper type info at the proper times.
@@ -112,9 +113,9 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 			try {
 				TypeParameterizer parameterizer;
 				parameterizer.writeInParameterizations(&tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type, propertysymtable->getParameters());
-				Type* prop = copyType(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type);
-				classestable->assertTypeIsValid(prop);
-				boost::optional<SemanticError*> error = propertysymtable->addProperty(prop, tree->subnodes == 2 ? PROPERTY_PUBLIC : 0);
+				Type prop = *tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type;
+				classestable->assertTypeIsValid(&prop);
+				boost::optional<SemanticError*> error = propertysymtable->addProperty(new Type(prop), tree->subnodes == 2 ? PROPERTY_PUBLIC : 0);
 				if(error) {
 					(*error)->token = tree;
 					errors->addError(*error);
@@ -144,8 +145,11 @@ void ClassParseTreeTraverser::secondPass(Node* tree) {
 				typeCheckProperties(tree);
 				scopesymtable->popScope();
 				scopesymtable->pushScope();
+				//auto_ptr<Type> thiscontext(propertysymtable->getAsType());
 				typechecker->setThisContext(propertysymtable->getAsType());
 				typeCheckMethods(tree);
+				//typechecker->setThisContext(NULL);
+
 				scopesymtable->popScope();
 			}
 			break;
@@ -312,38 +316,38 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 							if(needs->size() == injections->subnodes)
 							for(i = 0; i < injections->subnodes; i++) {
 								Type* required = needs->at(i);
-								Type* actual;
+								Type actual(TYPE_UNUSABLE);
 								switch(injections->node_data.nodes[i]->node_type) {
 									case NT_TYPEDATA:
 										{
-											actual = copyType(injections->node_data.nodes[i]->node_data.type);
-											classestable->assertTypeIsValid(actual);
+											actual = *injections->node_data.nodes[i]->node_data.type;
+											classestable->assertTypeIsValid(&actual);
 										}
 										break;
 									case NT_STRINGLIT:
-										actual = MakeType(TYPE_CLASS);
-										actual->typedata._class.classname = "Text";
+										actual = Type(TYPE_CLASS);
+										actual.typedata._class.classname = strdup("Text");
 										break;
 									case NT_NUMBERLIT:
-										actual = MakeType(TYPE_CLASS);
-										actual->typedata._class.classname = "Num";
+										actual = Type(TYPE_CLASS);
+										actual.typedata._class.classname = strdup("Num");
 										break;
 
 									case NT_INJECTION_ARG:
 										{
-											actual = copyType(injections->node_data.nodes[i]->node_data.nodes[0]->node_data.type);
-											classestable->assertTypeIsValid(actual);
+											actual = *injections->node_data.nodes[i]->node_data.nodes[0]->node_data.type;
+											classestable->assertTypeIsValid(&actual);
 										}
 										break;
 								}
 
-								if(required->specialty != NULL && (actual->specialty == NULL || string(required->specialty) != actual->specialty))
+								if(required->specialty != NULL && (actual.specialty == NULL || string(required->specialty) != actual.specialty))
 									errors->addError(new SemanticError(WARNING, "Injected a class with specialized dependencies...it may not be looking for what you're giving it!", tree));
 
-								if(!classestable->getAnalyzer()->isASubtypeOfB(actual, required)) {
+								if(!classestable->getAnalyzer()->isASubtypeOfB(&actual, required)) {
 									errors->addError(new SemanticError(TYPE_ERROR, "Injection is not a proper subtype for class dependencies", tree));
 								} else if(injections->node_data.nodes[i]->node_type == NT_TYPEDATA) {
-									classestable->getAnalyzer()->assertClassCanProvide(classname, actual);
+									classestable->getAnalyzer()->assertClassCanProvide(classname, &actual);
 								}
 							} else {
 								errors->addError(new SemanticError(MISMATCHED_INJECTION, "Too many or too few injected dependencies", tree));
