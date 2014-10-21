@@ -48,6 +48,9 @@ class TypeAnalyzer {
 		string getNameForTypeAsProperty(Type* type);
 		string getProvisionSymbol(Type* provided, vector<Type*> &arguments);
 
+	private:
+		boost::optional<pair<int, Type*> > getCommonClassnamesWithDepth(Type& a, Type& b, int depth);
+
 };
 
 #endif

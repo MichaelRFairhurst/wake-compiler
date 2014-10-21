@@ -369,13 +369,23 @@ BOOST_AUTO_TEST_CASE(LambdaTypesAreNotExactWithDifferentArguments) {
 	BOOST_REQUIRE(!analyzer.isAExactlyB(&b, &a));
 }
 
-BOOST_AUTO_TEST_CASE(MatchallTypesCommonAreMatchall) {
+/**
+ * This is a bit of a tricky one. On the one hand, if someone
+ * makes an array [1, TYPE_ERROR], that turns into [1, TYPE_MATCHALL],
+ * which we then don't understand and should assume TYPE_MATCHALL[].
+ * But on the other hand, this way we can represent `[]` and `nothing`
+ * as a TYPE_LIST[TYPE_MATCHALL] and TYPE_OPTIONAL[TYPE_MATCHALL]
+ */
+BOOST_AUTO_TEST_CASE(MatchallTypesCommonAreTheirNeighbor) {
 	TypeAnalyzer analyzer;
 	Type a(TYPE_MATCHALL);
 	Type b(TYPE_OPTIONAL);
+	b.typedata.optional.contained = new Type(TYPE_MATCHALL);
 	Type c(TYPE_CLASS);
+	c.typedata._class.classname = strdup("Test");
 	Type d(TYPE_LAMBDA);
 	Type e(TYPE_LIST);
+	e.typedata.optional.contained = new Type(TYPE_MATCHALL);
 	Type f(TYPE_NOTHING);
 	boost::optional<Type*> ret;
 
@@ -384,34 +394,34 @@ BOOST_AUTO_TEST_CASE(MatchallTypesCommonAreMatchall) {
 	BOOST_REQUIRE((*ret)->type == TYPE_MATCHALL); freeType(*ret);
 	ret = analyzer.getCommonSubtypeOf(&a, &b);
 	BOOST_REQUIRE(ret);
-	BOOST_REQUIRE((*ret)->type == TYPE_MATCHALL); freeType(*ret);
+	BOOST_REQUIRE((*ret)->type == TYPE_OPTIONAL); freeType(*ret);
 	ret = analyzer.getCommonSubtypeOf(&a, &c);
 	BOOST_REQUIRE(ret);
-	BOOST_REQUIRE((*ret)->type == TYPE_MATCHALL); freeType(*ret);
+	BOOST_REQUIRE((*ret)->type == TYPE_CLASS); freeType(*ret);
 	ret = analyzer.getCommonSubtypeOf(&a, &d);
 	BOOST_REQUIRE(ret);
-	BOOST_REQUIRE((*ret)->type == TYPE_MATCHALL); freeType(*ret);
+	BOOST_REQUIRE((*ret)->type == TYPE_LAMBDA); freeType(*ret);
 	ret = analyzer.getCommonSubtypeOf(&a, &e);
 	BOOST_REQUIRE(ret);
-	BOOST_REQUIRE((*ret)->type == TYPE_MATCHALL); freeType(*ret);
+	BOOST_REQUIRE((*ret)->type == TYPE_LIST); freeType(*ret);
 	ret = analyzer.getCommonSubtypeOf(&a, &f);
 	BOOST_REQUIRE(ret);
-	BOOST_REQUIRE((*ret)->type == TYPE_MATCHALL); freeType(*ret);
+	BOOST_REQUIRE((*ret)->type == TYPE_NOTHING); freeType(*ret);
 	ret = analyzer.getCommonSubtypeOf(&b, &a);
 	BOOST_REQUIRE(ret);
-	BOOST_REQUIRE((*ret)->type == TYPE_MATCHALL); freeType(*ret);
+	BOOST_REQUIRE((*ret)->type == TYPE_OPTIONAL); freeType(*ret);
 	ret = analyzer.getCommonSubtypeOf(&c, &a);
 	BOOST_REQUIRE(ret);
-	BOOST_REQUIRE((*ret)->type == TYPE_MATCHALL); freeType(*ret);
+	BOOST_REQUIRE((*ret)->type == TYPE_CLASS); freeType(*ret);
 	ret = analyzer.getCommonSubtypeOf(&d, &a);
 	BOOST_REQUIRE(ret);
-	BOOST_REQUIRE((*ret)->type == TYPE_MATCHALL); freeType(*ret);
+	BOOST_REQUIRE((*ret)->type == TYPE_LAMBDA); freeType(*ret);
 	ret = analyzer.getCommonSubtypeOf(&e, &a);
 	BOOST_REQUIRE(ret);
-	BOOST_REQUIRE((*ret)->type == TYPE_MATCHALL); freeType(*ret);
+	BOOST_REQUIRE((*ret)->type == TYPE_LIST); freeType(*ret);
 	ret = analyzer.getCommonSubtypeOf(&f, &a);
 	BOOST_REQUIRE(ret);
-	BOOST_REQUIRE((*ret)->type == TYPE_MATCHALL); freeType(*ret);
+	BOOST_REQUIRE((*ret)->type == TYPE_NOTHING); freeType(*ret);
 }
 
 BOOST_AUTO_TEST_CASE(NothingOptionalCommonTypeIsOptionalType) {
@@ -633,14 +643,15 @@ BOOST_AUTO_TEST_CASE(TestClassesWithMismatchedParameterExistenceHaveNoCommonType
 	text2.typedata._class.classname = strdup("Text");
 	text2.typedata._class.shadow = 1;
 
-	boost::optional<Type*> ret = analyzer.getCommonSubtypeOf(&text1, &text2);
+	boost::optional<Type*> ret;
 	BOOST_REQUIRE(!analyzer.getCommonSubtypeOf(&text1, &text2));
 	BOOST_REQUIRE(!analyzer.getCommonSubtypeOf(&text2, &text1));
 }
 
-/*
 BOOST_AUTO_TEST_CASE(TestClassesWithParameterValuesDifferentHaveNoCommonType) {
 	TypeAnalyzer analyzer;
+	ClassSpaceSymbolTable reference;
+	analyzer.reference = &reference;
 	Type text1(TYPE_CLASS);
 	text1.typedata._class.classname = strdup("Text");
 	text1.typedata._class.shadow = 0;
@@ -656,6 +667,210 @@ BOOST_AUTO_TEST_CASE(TestClassesWithParameterValuesDifferentHaveNoCommonType) {
 	BOOST_REQUIRE(!analyzer.getCommonSubtypeOf(&text1, &text2));
 	BOOST_REQUIRE(!analyzer.getCommonSubtypeOf(&text2, &text1));
 }
-*/
+
+BOOST_AUTO_TEST_CASE(TestClassWithParentIsCommonToParent) {
+	TypeAnalyzer analyzer;
+	ClassSpaceSymbolTable reference;
+	analyzer.reference = &reference;
+	Type printer(TYPE_CLASS);
+	printer.typedata._class.classname = strdup("Printer");
+	printer.typedata._class.shadow = 0;
+	Type disabledPrinter(TYPE_CLASS);
+	disabledPrinter.typedata._class.classname = strdup("DisabledPrinter");
+	disabledPrinter.typedata._class.shadow = 1;
+
+	reference.addClass("Printer");
+	reference.addClass("DisabledPrinter");
+	reference.addInheritance("Printer", true);
+
+	boost::optional<Type*> ret = analyzer.getCommonSubtypeOf(&printer, &disabledPrinter);
+	BOOST_REQUIRE(ret);
+	BOOST_REQUIRE((*ret)->type == TYPE_CLASS);
+	BOOST_REQUIRE((*ret)->typedata._class.classname == string("Printer"));
+	freeType(*ret);
+	ret = analyzer.getCommonSubtypeOf(&disabledPrinter, &printer);
+	BOOST_REQUIRE(ret);
+	BOOST_REQUIRE((*ret)->type == TYPE_CLASS);
+	BOOST_REQUIRE((*ret)->typedata._class.classname == string("Printer"));
+	freeType(*ret);
+}
+
+BOOST_AUTO_TEST_CASE(TestClassesWithRootParentIsRootParent) {
+	TypeAnalyzer analyzer;
+	ClassSpaceSymbolTable reference;
+	analyzer.reference = &reference;
+	Type stdErrPrinter(TYPE_CLASS);
+	stdErrPrinter.typedata._class.classname = strdup("StdErrPrinter");
+	stdErrPrinter.typedata._class.shadow = 0;
+	Type disabledPrinter(TYPE_CLASS);
+	disabledPrinter.typedata._class.classname = strdup("DisabledPrinter");
+	disabledPrinter.typedata._class.shadow = 1;
+
+	reference.addClass("Printer");
+	reference.addClass("DisabledPrinter"); reference.addInheritance("Printer", true);
+	reference.addClass("StdErrPrinter"); reference.addInheritance("Printer", true);
+
+	boost::optional<Type*> ret = analyzer.getCommonSubtypeOf(&stdErrPrinter, &disabledPrinter);
+	BOOST_REQUIRE(ret);
+	BOOST_REQUIRE((*ret)->type == TYPE_CLASS);
+	BOOST_REQUIRE((*ret)->typedata._class.classname == string("Printer"));
+	freeType(*ret);
+	ret = analyzer.getCommonSubtypeOf(&disabledPrinter, &stdErrPrinter);
+	BOOST_REQUIRE(ret);
+	BOOST_REQUIRE((*ret)->type == TYPE_CLASS);
+	BOOST_REQUIRE((*ret)->typedata._class.classname == string("Printer"));
+	freeType(*ret);
+}
+
+BOOST_AUTO_TEST_CASE(TestClassesWithDifferenntLengthPathsToRootParentIsRootParent) {
+	TypeAnalyzer analyzer;
+	ClassSpaceSymbolTable reference;
+	analyzer.reference = &reference;
+	Type stdErrPrinter(TYPE_CLASS);
+	stdErrPrinter.typedata._class.classname = strdup("StdErrPrinter");
+	stdErrPrinter.typedata._class.shadow = 0;
+	Type logger(TYPE_CLASS);
+	logger.typedata._class.classname = strdup("Logger");
+	logger.typedata._class.shadow = 1;
+
+	reference.addClass("OStream");
+	reference.addClass("Printer"); reference.addInheritance("OStream", true);
+	reference.addClass("StdErrPrinter"); reference.addInheritance("Printer", true);
+	reference.addClass("Logger"); reference.addInheritance("OStream", true);
+
+	boost::optional<Type*> ret = analyzer.getCommonSubtypeOf(&stdErrPrinter, &logger);
+	BOOST_REQUIRE(ret);
+	BOOST_REQUIRE((*ret)->type == TYPE_CLASS);
+	BOOST_REQUIRE((*ret)->typedata._class.classname == string("OStream"));
+	freeType(*ret);
+	ret = analyzer.getCommonSubtypeOf(&logger, &stdErrPrinter);
+	BOOST_REQUIRE(ret);
+	BOOST_REQUIRE((*ret)->type == TYPE_CLASS);
+	BOOST_REQUIRE((*ret)->typedata._class.classname == string("OStream"));
+	freeType(*ret);
+}
+
+BOOST_AUTO_TEST_CASE(TestClassesWithRootRootParentIsRootRootParent) {
+	TypeAnalyzer analyzer;
+	ClassSpaceSymbolTable reference;
+	analyzer.reference = &reference;
+	Type stdErrPrinter(TYPE_CLASS);
+	stdErrPrinter.typedata._class.classname = strdup("StdErrPrinter");
+	stdErrPrinter.typedata._class.shadow = 0;
+	Type disabledLogger(TYPE_CLASS);
+	disabledLogger.typedata._class.classname = strdup("DisabledLogger");
+	disabledLogger.typedata._class.shadow = 1;
+
+	reference.addClass("OStream");
+	reference.addClass("Printer"); reference.addInheritance("OStream", true);
+	reference.addClass("StdErrPrinter"); reference.addInheritance("Printer", true);
+	reference.addClass("Logger"); reference.addInheritance("OStream", true);
+	reference.addClass("DisabledLogger"); reference.addInheritance("Logger", true);
+
+	boost::optional<Type*> ret = analyzer.getCommonSubtypeOf(&stdErrPrinter, &disabledLogger);
+	BOOST_REQUIRE(ret);
+	BOOST_REQUIRE((*ret)->type == TYPE_CLASS);
+	BOOST_REQUIRE((*ret)->typedata._class.classname == string("OStream"));
+	freeType(*ret);
+	ret = analyzer.getCommonSubtypeOf(&disabledLogger, &stdErrPrinter);
+	BOOST_REQUIRE(ret);
+	BOOST_REQUIRE((*ret)->type == TYPE_CLASS);
+	BOOST_REQUIRE((*ret)->typedata._class.classname == string("OStream"));
+	freeType(*ret);
+}
+
+BOOST_AUTO_TEST_CASE(TestTwoEquallyViableParentClassesHasNoCommonType) {
+	TypeAnalyzer analyzer;
+	ClassSpaceSymbolTable reference;
+	analyzer.reference = &reference;
+	Type printer(TYPE_CLASS);
+	printer.typedata._class.classname = strdup("Printer");
+	printer.typedata._class.shadow = 0;
+	Type logger(TYPE_CLASS);
+	logger.typedata._class.classname = strdup("Logger");
+	logger.typedata._class.shadow = 1;
+
+	reference.addClass("OStream");
+	reference.addClass("Serializable");
+	reference.addClass("Printer"); reference.addInheritance("OStream", true); reference.addInheritance("Serializable", false);
+	reference.addClass("Logger"); reference.addInheritance("OStream", true); reference.addInheritance("Serializable", false);
+
+	BOOST_REQUIRE(!analyzer.getCommonSubtypeOf(&printer, &logger));
+	BOOST_REQUIRE(!analyzer.getCommonSubtypeOf(&logger, &printer));
+}
+
+BOOST_AUTO_TEST_CASE(TestTwoDistantEquallyViableParentClassesHasNoCommonType) {
+	TypeAnalyzer analyzer;
+	ClassSpaceSymbolTable reference;
+	analyzer.reference = &reference;
+	Type disabledPrinter(TYPE_CLASS);
+	disabledPrinter.typedata._class.classname = strdup("DisabledPrinter");
+	disabledPrinter.typedata._class.shadow = 0;
+	Type stdErrLogger(TYPE_CLASS);
+	stdErrLogger.typedata._class.classname = strdup("StdErrLogger");
+	stdErrLogger.typedata._class.shadow = 1;
+
+	reference.addClass("OStream");
+	reference.addClass("Serializable");
+	reference.addClass("Printer"); reference.addInheritance("OStream", true); reference.addInheritance("Serializable", false);
+	reference.addClass("Logger"); reference.addInheritance("OStream", true); reference.addInheritance("Serializable", false);
+	reference.addClass("DisabledPrinter"); reference.addInheritance("Printer", true);
+	reference.addClass("StdErrLogger"); reference.addInheritance("Logger", true);
+
+	BOOST_REQUIRE(!analyzer.getCommonSubtypeOf(&disabledPrinter, &stdErrLogger));
+	BOOST_REQUIRE(!analyzer.getCommonSubtypeOf(&stdErrLogger, &disabledPrinter));
+}
+
+BOOST_AUTO_TEST_CASE(TestTwoLopsidedEquallyViableParentClassesHasNoCommonType) {
+	TypeAnalyzer analyzer;
+	ClassSpaceSymbolTable reference;
+	analyzer.reference = &reference;
+	Type disabledPrinter(TYPE_CLASS);
+	disabledPrinter.typedata._class.classname = strdup("DisabledPrinter");
+	disabledPrinter.typedata._class.shadow = 0;
+	Type logger(TYPE_CLASS);
+	logger.typedata._class.classname = strdup("Logger");
+	logger.typedata._class.shadow = 1;
+
+	reference.addClass("OStream");
+	reference.addClass("Serializable");
+	reference.addClass("Printer"); reference.addInheritance("OStream", true); reference.addInheritance("Serializable", false);
+	reference.addClass("Logger"); reference.addInheritance("OStream", true); reference.addInheritance("Serializable", false);
+	reference.addClass("DisabledPrinter"); reference.addInheritance("Printer", true);
+
+	BOOST_REQUIRE(!analyzer.getCommonSubtypeOf(&disabledPrinter, &logger));
+	BOOST_REQUIRE(!analyzer.getCommonSubtypeOf(&logger, &disabledPrinter));
+}
+
+BOOST_AUTO_TEST_CASE(TestDistantEquallyViableParentClassesBelowValidParentClassIsNotAnIssue) {
+	TypeAnalyzer analyzer;
+	ClassSpaceSymbolTable reference;
+	analyzer.reference = &reference;
+	Type disabledPrinter(TYPE_CLASS);
+	disabledPrinter.typedata._class.classname = strdup("DisabledPrinter");
+	disabledPrinter.typedata._class.shadow = 0;
+	Type stdErrLogger(TYPE_CLASS);
+	stdErrLogger.typedata._class.classname = strdup("StdErrLogger");
+	stdErrLogger.typedata._class.shadow = 1;
+
+	reference.addClass("OStream");
+	reference.addClass("Serializable");
+	reference.addClass("Debuggable");
+	reference.addClass("Printer"); reference.addInheritance("OStream", true); reference.addInheritance("Serializable", false);
+	reference.addClass("Logger"); reference.addInheritance("OStream", true); reference.addInheritance("Serializable", false);
+	reference.addClass("DisabledPrinter"); reference.addInheritance("Printer", true); reference.addInheritance("Debuggable", false);
+	reference.addClass("StdErrLogger"); reference.addInheritance("Logger", true); reference.addInheritance("Debuggable", false);
+
+	boost::optional<Type*> ret = analyzer.getCommonSubtypeOf(&stdErrLogger, &disabledPrinter);
+	BOOST_REQUIRE(ret);
+	BOOST_REQUIRE((*ret)->type == TYPE_CLASS);
+	BOOST_REQUIRE((*ret)->typedata._class.classname == string("Debuggable"));
+	freeType(*ret);
+	ret = analyzer.getCommonSubtypeOf(&disabledPrinter, &stdErrLogger);
+	BOOST_REQUIRE(ret);
+	BOOST_REQUIRE((*ret)->type == TYPE_CLASS);
+	BOOST_REQUIRE((*ret)->typedata._class.classname == string("Debuggable"));
+	freeType(*ret);
+}
 
 BOOST_AUTO_TEST_SUITE_END();

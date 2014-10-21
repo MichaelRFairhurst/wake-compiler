@@ -16,6 +16,7 @@
 #include "ClassSpaceSymbolTable.h"
 #include "ReadOnlyPropertySymbolTable.h"
 #include "CompilationExceptions.h"
+#include <memory>
 
 bool TypeAnalyzer::isASubtypeOfB(string a, string b) {
 	try {
@@ -200,7 +201,8 @@ void TypeAnalyzer::assertClassCanProvide(Type* provider, Type* binding) {
 }
 
 boost::optional<Type*> TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
-	if(a->type == TYPE_MATCHALL || b->type == TYPE_MATCHALL) return boost::optional<Type*>(MakeType(TYPE_MATCHALL));
+	if(a->type == TYPE_MATCHALL) return boost::optional<Type*>(new Type(*b));
+	if(b->type == TYPE_MATCHALL) return boost::optional<Type*>(new Type(*a));
 
 	if(a->type == TYPE_OPTIONAL || b->type == TYPE_OPTIONAL) {
 		Type* optional = a->type == TYPE_OPTIONAL ? a : b;
@@ -208,7 +210,7 @@ boost::optional<Type*> TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
 
 		// [nothing, Text?] is common to type Text?
 		if(other->type == TYPE_NOTHING) {
-			return boost::optional<Type*>(copyType(optional));
+			return boost::optional<Type*>(new Type(*optional));
 		}
 
 		// [X, Y?] is common to type Z? where Z is the common type to [X, Y]
@@ -246,7 +248,7 @@ boost::optional<Type*> TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
 			Type* notnothing = a->type == TYPE_NOTHING ? b : a;
 			Type* common = MakeType(TYPE_OPTIONAL);
 			common->typedata.optional.levels = 1;
-			common->typedata.optional.contained = copyType(notnothing);
+			common->typedata.optional.contained = new Type(*notnothing);
 			return boost::optional<Type*>(common);
 		}
 		return boost::optional<Type*>();
@@ -259,7 +261,7 @@ boost::optional<Type*> TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
 		// [Text[], Num[]] and [Printer[], DisabledPrinter[]] are both common to nothing
 		if(!isAExactlyB(a, b)) return boost::optional<Type*>();
 		// but [Text[], Text[]] is common to Text[]
-		return boost::optional<Type*>(copyType(a));
+		return boost::optional<Type*>(new Type(*a));
 
 	} else if(a->type == TYPE_CLASS) {
 		// check if one pointer exists and the other is null: !ptr == 0 and !NULL == 1
@@ -278,23 +280,16 @@ boost::optional<Type*> TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
 				//return false;
 		//}
 
-		if(string(a->typedata._class.classname) == b->typedata._class.classname) {
-			return boost::optional<Type*>(copyType(a));
+		if(isASubtypeOfB(a, b)) return boost::optional<Type*>(new Type(*b));
+
+		if(isASubtypeOfB(b, a)) return boost::optional<Type*>(new Type(*a));
+
+		boost::optional<pair<int, Type*> > common = getCommonClassnamesWithDepth(*a, *b, 0);
+		if(!common || common->second == NULL) {
+			return boost::optional<Type*>();
+		} else {
+			return boost::optional<Type*>(common->second);
 		}
-
-		//try {
-
-			//ReadOnlyPropertySymbolTable* a_data = reference->find(a->typedata._class.classname);
-
-			//for(map<string, bool>::const_iterator it = a_data->getParentage().begin(); it != a_data->getParentage().end(); ++it) {
-				//if(isASubtypeOfB(it->first, b->typedata._class.classname)) return true;
-			//}
-
-		//} catch(SymbolNotFoundException* e) {
-			//delete e;
-		//}
-
-		//return false;
 	/*
 	} else if(a->type == TYPE_PARAMETERIZED) {
 		if(a->typedata.parameterized.label == string(b->typedata.parameterized.label)) return true;
@@ -333,6 +328,81 @@ boost::optional<Type*> TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
 	*/
 }
 
+boost::optional<pair<int, Type*> > TypeAnalyzer::getCommonClassnamesWithDepth(Type& a, Type& b, int depth) {
+	try {
+		ReadOnlyPropertySymbolTable* a_data = reference->find(a.typedata._class.classname);
+
+		boost::optional<boost::optional<pair<int, Type*> > > contender;
+		bool duplicated = false;
+		for(map<string, bool>::const_iterator it = a_data->getParentage().begin(); it != a_data->getParentage().end(); ++it) {
+			Type lowered(TYPE_CLASS);
+			lowered.typedata._class.classname = strdup(it->first.c_str());
+			if(it->first == b.typedata._class.classname) {
+				if(contender && (*contender)->first == depth) {
+					//cout << "Checking " << a.typedata._class.classname << "/" << b.typedata._class.classname << ", " << depth;
+					//cout << " is duped!" << endl;
+					return boost::optional<pair<int, Type*> >(pair<int, Type*>(depth, NULL));
+				}
+
+				boost::optional<pair<int, Type*> > found(pair<int, Type*>(depth, new Type(lowered)));
+				contender = boost::optional<boost::optional<pair<int, Type*> > >(found);
+				duplicated = false;
+			} else {
+				boost::optional<pair<int, Type*> > recurse = getCommonClassnamesWithDepth(b, lowered, depth + 1);
+
+				if(recurse) {
+					if(contender && (*contender)->first == recurse->first) {
+						if((*contender)->second && recurse->second && (*contender)->second->typedata._class.classname != string(recurse->second->typedata._class.classname)) {
+							duplicated = true;
+						}
+					} else {
+						if(contender && (*contender)->first > recurse->first) {
+							delete (*contender)->second;
+						} else if(!contender || recurse->second) {
+							contender = boost::optional<boost::optional<pair<int, Type*> > >(recurse);
+						}
+						if(recurse->second) duplicated = false;
+					}
+				}
+
+				recurse = getCommonClassnamesWithDepth(lowered, b, depth + 1);
+
+				if(recurse) {
+					if(contender && (*contender)->first == recurse->first) {
+						if((*contender)->second && recurse->second && (*contender)->second->typedata._class.classname != string(recurse->second->typedata._class.classname)) {
+							duplicated = true;
+						}
+					} else {
+						if(contender && (*contender)->first > recurse->first) {
+							delete (*contender)->second;
+						} else if(!contender || recurse->second) {
+							contender = boost::optional<boost::optional<pair<int, Type*> > >(recurse);
+						}
+						if(recurse->second) duplicated = false;
+					}
+				}
+			}
+		}
+		//cout << "Checking " << a.typedata._class.classname << "/" << b.typedata._class.classname << ", " << depth;
+
+		if(duplicated) {
+			//cout << " has dupe parents!" << endl;
+			delete (*contender)->second;
+			return boost::optional<pair<int, Type*> >(pair<int, Type*>(depth, NULL));
+		}
+
+		if(!contender) {
+			//cout << " has no child matches!" << endl;
+			return boost::optional<pair<int, Type*> >();
+		}
+		//cout << " has match " << (*contender)->first << ", " << ((*contender)->second ? (*contender)->second->typedata._class.classname : "NULL") << "!" << endl;
+		return *contender;
+	} catch(SymbolNotFoundException* e) {
+		delete e;
+	}
+	return boost::optional<pair<int, Type*> >();
+}
+
 bool TypeAnalyzer::isPrimitiveTypeNum(Type* type) {
 	if(type->type == TYPE_MATCHALL) return true;
 	return type->type == TYPE_CLASS && type->typedata._class.classname == string("Num");
@@ -357,7 +427,7 @@ bool TypeAnalyzer::isAutoboxedType(Type* type, Type** boxed) {
 	// need to return a List<T>
 	if(type->type == TYPE_LIST) {
 		*boxed = MakeType(TYPE_CLASS);
-		Type* loweredtype = copyType(type->typedata.list.contained);
+		Type* loweredtype = new Type(*type->typedata.list.contained);
 		(*boxed)->typedata._class.classname = strdup("List");
 		(*boxed)->typedata._class.parameters = MakeTypeArray();
 		AddTypeToTypeArray(loweredtype, (*boxed)->typedata._class.parameters);
