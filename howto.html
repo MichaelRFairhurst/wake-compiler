@@ -49,7 +49,6 @@
 				<li><a href="#lvaluesexist">- Exists on some L-Values</a></li>
 				<li><a href="#namespaces">- Namespaces</a></li>
 				<li><a href="#nothingargs">- "Nothing" as an Argument</a></li>
-				<li><a href="#arrayliterals">- List Literals</a></li>
 				<li><a href="#genericprovs">- Generic Provisions</a></li>
 				<li><a href="#genericinheritance">- Generic Inheritance</a></li>
 				<li><a href="#genericmethods">- Generic Methods</a></li>
@@ -416,18 +415,6 @@ every ChildClass is:
     }</code></pre>
 				<p>Any big O and little O geeks out there should lend me hand on this one to create a fast binary tree or something. The only way that comes to mind for truly solving this problem would be O of n to the n, I think.</p>
 				<br/>
-				<h3 id="arrayliterals">List Literals</h3>
-				<p>List literals requires Lowest-Common-Ancestor logic to be implemented, which isn't the easiest analysis to implement unfortunately. The only supported list literal is an empty list literal. This gets you far enough but I'll add this later.</p>
-
-			<span class="label label-info">wake</span>
-			<pre><code class="wake"
->every DeclareArray is:
-
-    declareArray() {
-        Num[] = [1, 2, 3]; // not working yet :(
-        Num[] = []; Num[0] = 1; Num[1] = 2; Num[2] = 3; // This will have to do for now
-    }</code></pre>
-
 				<h3 id="genericprovs">Generic Provisions</h3>
 				<p>Not sure exactly how to put this one. Its a pretty big hole in wake. I'll list the things you can't do, because otherwise its tough to describe.</p>
 			<span class="label label-info">wake</span>
