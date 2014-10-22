@@ -1,3 +1,17 @@
+/**************************************************
+ * Source Code for the Original Compiler for the
+ * Programming Language Wake
+ *
+ * type.cpp
+ *
+ * Licensed under the MIT license
+ * See LICENSE.TXT for details
+ *
+ * Author: Michael Fairhurst
+ * Revised By:
+ *
+ **************************************************/
+
 #include "type.h"
 #include <cstddef>
 #include <cstdlib>
