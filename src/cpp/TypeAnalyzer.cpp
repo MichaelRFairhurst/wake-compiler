@@ -112,10 +112,8 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 		// TODO: lower/upper bounds comparison
 		return false;
 	} else if(a->type == TYPE_LIST) {
-		if(a->typedata.list.levels != b->typedata.list.levels) return false;
 		return isAExactlyB(a->typedata.list.contained, b->typedata.list.contained);
 	} else if(a->type == TYPE_OPTIONAL) {
-		if(a->typedata.optional.levels != b->typedata.optional.levels) return false;
 		return isASubtypeOfB(a->typedata.optional.contained, b->typedata.optional.contained);
 	}
 
@@ -150,9 +148,9 @@ bool TypeAnalyzer::isAExactlyB(Type* a, Type* b) {
 				return false;
 		}
 	} else if(a->type == TYPE_LIST) {
-		return a->typedata.list.levels == b->typedata.list.levels && isAExactlyB(a->typedata.list.contained, b->typedata.list.contained);
+		return isAExactlyB(a->typedata.list.contained, b->typedata.list.contained);
 	} else if(a->type == TYPE_OPTIONAL) {
-		return a->typedata.optional.levels == b->typedata.optional.levels && isAExactlyB(a->typedata.optional.contained, b->typedata.optional.contained);
+		return isAExactlyB(a->typedata.optional.contained, b->typedata.optional.contained);
 	}
 	return true;
 }
@@ -220,24 +218,9 @@ boost::optional<Type*> TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
 			return nonoptcommon;
 		}
 
-		if((*nonoptcommon)->type == TYPE_OPTIONAL) {
-			if(a->type != TYPE_OPTIONAL || b->type != TYPE_OPTIONAL) {
-				return boost::optional<Type*>();
-			}
-			// [X?, Y??] becomes Y??
-			if((*nonoptcommon)->typedata.optional.levels < a->typedata.optional.levels) {
-				(*nonoptcommon)->typedata.optional.levels = a->typedata.optional.levels;
-			}
-			// [X??, Y?] becomes X??
-			if((*nonoptcommon)->typedata.optional.levels < b->typedata.optional.levels) {
-				(*nonoptcommon)->typedata.optional.levels = b->typedata.optional.levels;
-			}
-		}
-
-		Type* common = MakeType(TYPE_OPTIONAL);
+		Type* common = new Type(TYPE_OPTIONAL);
 
 		// [Text?, Text] becomes Text?
-		common->typedata.optional.levels = optional->typedata.optional.levels;
 		common->typedata.optional.contained = *nonoptcommon;
 		return boost::optional<Type*>(common);
 	}
@@ -247,7 +230,6 @@ boost::optional<Type*> TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
 		if(a->type == TYPE_NOTHING || b->type == TYPE_NOTHING) {
 			Type* notnothing = a->type == TYPE_NOTHING ? b : a;
 			Type* common = MakeType(TYPE_OPTIONAL);
-			common->typedata.optional.levels = 1;
 			common->typedata.optional.contained = new Type(*notnothing);
 			return boost::optional<Type*>(common);
 		}
@@ -518,16 +500,12 @@ string TypeAnalyzer::getNameForType(Type* type) {
 
 	if(type->type == TYPE_LIST) {
 		name = getNameForType(type->typedata.list.contained);
-		int i;
-		for(i = 0; i < type->typedata.list.levels; i++)
-			name += "[]";
+		name += "[]";
 	}
 
 	if(type->type == TYPE_OPTIONAL) {
 		name = getNameForType(type->typedata.optional.contained);
-		int i;
-		for(i = 0; i < type->typedata.optional.levels; i++)
-			name += "?";
+		name += "?";
 	}
 
 	return name;
@@ -540,7 +518,13 @@ string TypeAnalyzer::getNameForTypeAsProperty(Type* type) {
 		if(type->type == TYPE_CLASS) {
 			return string(type->typedata._class.shadow, '$') + type->typedata._class.classname;
 		} else if(type->type == TYPE_LIST) {
-			return getNameForTypeAsProperty(type->typedata.list.contained) + "[]";
+			Type* noList_noOpt = type->typedata.list.contained;
+
+			while(noList_noOpt->type == TYPE_LIST || noList_noOpt->type == TYPE_OPTIONAL) {
+				noList_noOpt = noList_noOpt->type == TYPE_LIST ? noList_noOpt->typedata.list.contained : noList_noOpt->typedata.optional.contained;
+			}
+
+			return getNameForTypeAsProperty(noList_noOpt) + "[]";
 		} else if(type->type == TYPE_OPTIONAL) {
 			return getNameForTypeAsProperty(type->typedata.optional.contained);
 		} else if(type->type == TYPE_PARAMETERIZED) {

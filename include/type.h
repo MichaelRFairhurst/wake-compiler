@@ -47,11 +47,9 @@ typedef struct Type {
 		} parameterized;
 		struct {
 			struct Type* contained;
-			int levels;					// number of []
 		} list;
 		struct {
 			struct Type* contained;
-			int levels;					// number of ??
 		} optional;
 	} typedata;
 	char* alias;						// this should be moved....

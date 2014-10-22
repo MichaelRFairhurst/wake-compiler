@@ -478,13 +478,8 @@ void ObjectFileGenerator::generate(Node* tree) {
 			{
 				Type type = *tree->node_data.type;
 				if(forceArrayIdentifier) {
-					if(type.type == TYPE_LIST) {
-						type.typedata.list.levels++;
-					} else {
-						type = Type(TYPE_LIST);
-						type.typedata.list.levels = 1;
-						type.typedata.list.contained = new Type(*tree->node_data.type);
-					}
+					type = Type(TYPE_LIST);
+					type.typedata.list.contained = new Type(*tree->node_data.type);
 				}
 				file << table.getAddress(&type);
 			}

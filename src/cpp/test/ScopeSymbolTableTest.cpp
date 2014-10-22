@@ -98,12 +98,12 @@ BOOST_AUTO_TEST_CASE( TestSymbolsAddedByType ) {
 	ScopeSymbolTable table;
 	Type simple(TYPE_CLASS);
 	simple.typedata._class.shadow = 0;
-	simple.alias = NULL;
+	//simple.alias = NULL;
 	simple.typedata._class.classname = strdup("MyClass");
 	Type aliased(TYPE_CLASS);
 	aliased.alias = strdup("myClass");
 	Type shadowed(TYPE_CLASS);
-	shadowed.alias = NULL;
+	//shadowed.alias = NULL;
 	shadowed.typedata._class.classname = strdup("MyClass");
 	shadowed.typedata._class.shadow = 3;
 
@@ -125,11 +125,11 @@ BOOST_AUTO_TEST_CASE( TestGetSymbolByType ) {
 	table.add("$$$MyClass", &shadowedp);
 
 	Type simple(TYPE_CLASS);
-	simple.alias = NULL;
+	//simple.alias = NULL;
 	simple.typedata._class.shadow = 0;
 	simple.typedata._class.classname = strdup("MyClass");
 	Type shadowed(TYPE_CLASS);
-	shadowed.alias = NULL;
+	//shadowed.alias = NULL;
 	shadowed.typedata._class.classname = strdup("MyClass");
 	shadowed.typedata._class.shadow = 3;
 
@@ -145,18 +145,19 @@ BOOST_AUTO_TEST_CASE( TestArrayedSymbolsAddedByType ) {
 	Type* onecontained = new Type(TYPE_CLASS);
 	onecontained->typedata._class.shadow = 0;
 	onecontained->typedata._class.classname = strdup("One");
-	onecontained->alias = NULL;
+	//onecontained->alias = NULL;
 	onearray.type = TYPE_LIST;
-	onearray.typedata.list.levels = 1;
 	onearray.typedata.list.contained = onecontained;
 	Type twoarray(TYPE_LIST);
+	Type* twoarrayinner = new Type(TYPE_LIST);
 	Type* twocontained = new Type(TYPE_CLASS);
 	twocontained->typedata._class.classname = strdup("Two");
 	twocontained->typedata._class.shadow = 0;
-	twocontained->alias = NULL;
-	twoarray.alias = NULL;
-	twoarray.typedata.list.levels = 2;
-	twoarray.typedata.list.contained = twocontained;
+	//twocontained->alias = NULL;
+	//twoarray.alias = NULL;
+	//twoarrayinner->alias = NULL;
+	twoarrayinner->typedata.list.contained = twocontained;
+	twoarray.typedata.list.contained = twoarrayinner;
 
 	table.add(&onearray);
 	table.add(&twoarray);

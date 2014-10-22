@@ -214,7 +214,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 					} else {
 						// detect if they wrote Printer[] instead of Printer[][]
 						// Either way Printer[x] would work, so if forceArrayIdentifier skip this step
-						if(!forceArrayIdentifier && type.type == TYPE_LIST && type.typedata.list.levels != (*variable)->typedata.list.levels)
+						if(!forceArrayIdentifier && type.type == TYPE_LIST && !analyzer->isAExactlyB(&type, *variable))
 							errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Accessed arrayed variable " + scopesymtable->getNameForType(&type) + " with wrong number of [] brackets.", tree));
 
 						ret = new Type(**variable);
@@ -403,13 +403,9 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						erroneousstring = analyzer->getNameForType(ret);
 						throw string("Getting index of non-array");
 					} else if(ret->type == TYPE_LIST) { // Otherwise we're a matchall
-						if(ret->typedata.list.levels == 1) {
-							Type temp = *ret->typedata.list.contained;
-							delete ret;
-							ret = new Type(temp);
-						} else {
-							--ret->typedata.list.levels;;
-						}
+						Type temp = *ret->typedata.list.contained;
+						delete ret;
+						ret = new Type(temp);
 					}
 
 					if(!analyzer->isPrimitiveTypeNum(&index) && index.type != TYPE_MATCHALL) {
@@ -718,13 +714,6 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 				} else if(tree->node_data.nodes[0]->subnodes == 1) {
 					ret = new Type(TYPE_LIST);
 					ret->typedata.list.contained = typeCheckUsable(tree->node_data.nodes[0]->node_data.nodes[0], false);
-					ret->typedata.list.levels = 1;
-					if(ret->typedata.list.contained->type == TYPE_LIST) {
-						auto_ptr<Type> cleanme(ret->typedata.list.contained);
-						ret->typedata.list.levels += cleanme->typedata.list.levels;
-						ret->typedata.list.contained = cleanme->typedata.list.contained;
-						cleanme->typedata.list.contained = NULL;
-					}
 				} else {
 					auto_ptr<Type> first(typeCheckUsable(tree->node_data.nodes[0]->node_data.nodes[0], false));
 					auto_ptr<Type> second(typeCheckUsable(tree->node_data.nodes[0]->node_data.nodes[1], false));
@@ -748,14 +737,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 					}
 
 					ret = new Type(TYPE_LIST);
-					ret->typedata.list.levels = 1;
 					ret->typedata.list.contained = *common;
-					if((*common)->type == TYPE_LIST) {
-						auto_ptr<Type> clean(*common);
-						ret->typedata.list.levels += clean->typedata.list.levels;
-						ret->typedata.list.contained = clean->typedata.list.contained;
-						clean->typedata.list.contained = NULL;
-					}
 				}
 				break;
 
@@ -769,13 +751,8 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 					}
 
 					Type real(TYPE_MATCHALL);
-					if(ret->typedata.optional.levels == 1) {
-						real = *ret->typedata.optional.contained;
-						if(ret->alias != NULL) real.alias = strdup(ret->alias);
-					} else {
-						real = *ret;
-						real.typedata.optional.levels--;
-					}
+					real = *ret->typedata.optional.contained;
+					if(ret->alias != NULL) real.alias = strdup(ret->alias);
 
 					Type* orig;
 					if(tree->node_data.nodes[0]->node_type == NT_MEMBER_ACCESS) {
@@ -836,7 +813,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Symbol by name of " + name + " not found", tree));
 					} else {
 						Type* member = tree->node_data.nodes[1]->node_data.type;
-						if(!forceArrayIdentifier && tree->node_data.nodes[1]->node_type != NT_ALIAS && member->type == TYPE_LIST && member->typedata.list.levels != (*variable)->typedata.list.levels)
+						if(!forceArrayIdentifier && tree->node_data.nodes[1]->node_type != NT_ALIAS && member->type == TYPE_LIST && !analyzer->isAExactlyB(member, *variable))
 							errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Accessed arrayed variable " + name + " with wrong number of [] brackets.", tree));
 
 						ret = copyType(*variable);
@@ -865,13 +842,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 					if(ret->type != TYPE_LIST) {
 						errors->addError(new SemanticError(TYPE_ERROR, "Calling foreach over something that is not a list", tree));
 					} else {
-						Type lowered(TYPE_UNUSABLE);
-						if(ret->typedata.list.levels == 1) {
-							lowered = *ret->typedata.list.contained;
-						} else {
-							lowered = *ret;
-							lowered.typedata.list.levels--;
-						}
+						Type lowered(*ret->typedata.list.contained);
 
 						if(lowered.alias != NULL) free(lowered.alias);
 

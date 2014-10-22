@@ -47,11 +47,9 @@ Type::Type(int type) {
 			typedata.parameterized.lowerbound = NULL;
 			break;
 		case TYPE_LIST:
-			typedata.list.levels = 0;
 			typedata.list.contained = NULL;
 			break;
 		case TYPE_OPTIONAL:
-			typedata.optional.levels = 0;
 			typedata.optional.contained = NULL;
 			break;
 	}
@@ -100,7 +98,6 @@ void Type::deepCopy(const Type& other) {
 			typedata.parameterized.label = strdup(other.typedata.parameterized.label);
 			break;
 		case TYPE_LIST:
-			typedata.list.levels = other.typedata.list.levels;
 			if(other.typedata.list.contained != NULL) {
 				typedata.list.contained = new Type(*other.typedata.list.contained);
 			} else {
@@ -108,7 +105,6 @@ void Type::deepCopy(const Type& other) {
 			}
 			break;
 		case TYPE_OPTIONAL:
-			typedata.optional.levels = other.typedata.optional.levels;
 			if(other.typedata.optional.contained != NULL) {
 				typedata.optional.contained = new Type(*other.typedata.optional.contained);
 			} else {

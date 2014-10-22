@@ -164,7 +164,7 @@ Type* TableFileReader::readParameterizedType(istream& s) {
 Type* TableFileReader::readListType(istream& s) {
 	Type* type = MakeType(TYPE_LIST);
 	type->typedata.list.contained = readType(s);
-	type->typedata.list.levels = readUInt8(s);
+	readUInt8(s); // backwards compat
 
 	readTypeCommon(type, s);
 	return type;
@@ -173,7 +173,7 @@ Type* TableFileReader::readListType(istream& s) {
 Type* TableFileReader::readOptionalType(istream& s) {
 	Type* type = MakeType(TYPE_OPTIONAL);
 	type->typedata.optional.contained = readType(s);
-	type->typedata.optional.levels = readUInt8(s);
+	readUInt8(s); // backwards compat
 
 	readTypeCommon(type, s);
 	return type;

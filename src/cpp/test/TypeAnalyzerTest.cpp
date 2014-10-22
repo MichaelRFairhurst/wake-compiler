@@ -38,7 +38,6 @@ BOOST_AUTO_TEST_CASE(RealTypeIsSubtypesOfOptionalType) {
 	Type* wrappedtype = new Type(TYPE_CLASS);
 	wrappedtype->typedata._class.classname = strdup("test");
 	Type optionaltype(TYPE_OPTIONAL);
-	optionaltype.typedata.optional.levels = 1;
 	optionaltype.typedata.optional.contained = wrappedtype;
 
 	BOOST_REQUIRE(analyzer.isASubtypeOfB(&realtype, &optionaltype));
@@ -50,7 +49,6 @@ BOOST_AUTO_TEST_CASE(OptionalTypeIsNotSubtypeOfRealType) {
 	Type* wrappedtype = new Type(TYPE_CLASS);
 	wrappedtype->typedata._class.classname = strdup("test");
 	Type optionaltype(TYPE_OPTIONAL);
-	optionaltype.typedata.optional.levels = 1;
 	optionaltype.typedata.optional.contained = wrappedtype;
 
 	Type realtype(TYPE_CLASS);
@@ -62,7 +60,6 @@ BOOST_AUTO_TEST_CASE(OptionalTypeIsNotSubtypeOfRealType) {
 BOOST_AUTO_TEST_CASE(NothingIsSubtypesOfOptionalType) {
 	TypeAnalyzer analyzer;
 	Type optionaltype(TYPE_OPTIONAL);
-	optionaltype.typedata.optional.levels = 1;
 	optionaltype.typedata.optional.contained = NULL;
 	Type nothing(TYPE_NOTHING);
 	BOOST_REQUIRE(analyzer.isASubtypeOfB(&nothing, &optionaltype));
@@ -176,10 +173,10 @@ BOOST_AUTO_TEST_CASE(MismatchedArrayTypesArentExact) {
 
 	Type a(TYPE_LIST);
 	Type b(TYPE_LIST);
+	Type* binner = new Type(TYPE_LIST);
 	a.typedata.list.contained = acontained;
-	b.typedata.list.contained = bcontained;
-	b.typedata.list.levels = 1;
-	a.typedata.list.levels = 2;
+	b.typedata.list.contained = binner;
+	binner->typedata.list.contained = bcontained;
 
 	BOOST_REQUIRE(!analyzer.isAExactlyB(acontained, &b));
 	BOOST_REQUIRE(!analyzer.isAExactlyB(&b, acontained));
@@ -196,11 +193,11 @@ BOOST_AUTO_TEST_CASE(MismatchedOptionalTypesArentExact) {
 	bwrapped->typedata._class.classname = strdup("hello");
 
 	Type a(TYPE_OPTIONAL);
-	a.typedata.optional.levels = 2;
-	a.typedata.optional.contained = awrapped;
+	Type* ainner = new Type(TYPE_OPTIONAL);
+	ainner->typedata.optional.contained = awrapped;
+	a.typedata.optional.contained = ainner;
 
 	Type b(TYPE_OPTIONAL);
-	b.typedata.optional.levels = 1;
 	b.typedata.optional.contained = bwrapped;
 
 	BOOST_REQUIRE(!analyzer.isAExactlyB(awrapped, &b));
@@ -428,7 +425,6 @@ BOOST_AUTO_TEST_CASE(NothingOptionalCommonTypeIsOptionalType) {
 	TypeAnalyzer analyzer;
 	Type optional(TYPE_OPTIONAL);
 	Type* contained = new Type(TYPE_CLASS);
-	optional.typedata.optional.levels = 1;
 	optional.typedata.optional.contained = contained;
 	contained->typedata._class.classname = strdup("Classname");
 	Type nothing(TYPE_NOTHING);
@@ -436,14 +432,12 @@ BOOST_AUTO_TEST_CASE(NothingOptionalCommonTypeIsOptionalType) {
 	boost::optional<Type*> ret = analyzer.getCommonSubtypeOf(&optional, &nothing);
 	BOOST_REQUIRE(ret);
 	BOOST_REQUIRE((*ret)->type == TYPE_OPTIONAL);
-	BOOST_REQUIRE((*ret)->typedata.optional.levels == 1);
 	BOOST_REQUIRE((*ret)->typedata.optional.contained->type == TYPE_CLASS);
 	BOOST_REQUIRE((*ret)->typedata.optional.contained->typedata._class.classname == string("Classname"));
 	freeType(*ret);
 	ret = analyzer.getCommonSubtypeOf(&nothing, &optional);
 	BOOST_REQUIRE(ret);
 	BOOST_REQUIRE((*ret)->type == TYPE_OPTIONAL);
-	BOOST_REQUIRE((*ret)->typedata.optional.levels == 1);
 	BOOST_REQUIRE((*ret)->typedata.optional.contained->type == TYPE_CLASS);
 	BOOST_REQUIRE((*ret)->typedata.optional.contained->typedata._class.classname == string("Classname"));
 	freeType(*ret);
@@ -489,14 +483,12 @@ BOOST_AUTO_TEST_CASE(CommonTypeNothingNotOptionalNotNothingIsOptionalOtherType) 
 	boost::optional<Type*> ret = analyzer.getCommonSubtypeOf(&clazz, &nothing);
 	BOOST_REQUIRE(ret);
 	BOOST_REQUIRE((*ret)->type == TYPE_OPTIONAL);
-	BOOST_REQUIRE((*ret)->typedata.optional.levels == 1);
 	BOOST_REQUIRE((*ret)->typedata.optional.contained->type == TYPE_CLASS);
 	BOOST_REQUIRE((*ret)->typedata.optional.contained->typedata._class.classname == string("Classname"));
 	freeType(*ret);
 	ret = analyzer.getCommonSubtypeOf(&nothing, &clazz);
 	BOOST_REQUIRE(ret);
 	BOOST_REQUIRE((*ret)->type == TYPE_OPTIONAL);
-	BOOST_REQUIRE((*ret)->typedata.optional.levels == 1);
 	BOOST_REQUIRE((*ret)->typedata.optional.contained->type == TYPE_CLASS);
 	BOOST_REQUIRE((*ret)->typedata.optional.contained->typedata._class.classname == string("Classname"));
 	freeType(*ret);
@@ -508,48 +500,46 @@ BOOST_AUTO_TEST_CASE(ListTypesNotExactlyEqualHaveNoCommonType) {
 	Type* optNums = new Type(TYPE_OPTIONAL);
 	Type* num = new Type(TYPE_CLASS);
 
-	listOptNums.typedata.list.levels = 1;
 	listOptNums.typedata.list.contained = optNums;
-	optNums->typedata.optional.levels = 1;
 	optNums->typedata.optional.contained = num;
 	num->typedata._class.classname = strdup("Num");
 
 	Type listNums(TYPE_LIST);
 	Type* num2 = new Type(TYPE_CLASS);
 
-	listNums.typedata.list.levels = 1;
 	listNums.typedata.list.contained = num2;
 	num2->typedata._class.classname = strdup("Num");
 
 	Type listTexts(TYPE_LIST);
 	Type* text = new Type(TYPE_CLASS);
 
-	listTexts.typedata.list.levels = 1;
 	listTexts.typedata.list.contained = text;
 	text->typedata._class.classname = strdup("Text");
 
 	Type listListTexts(TYPE_LIST);
+	Type* listListTextsInner = new Type(TYPE_LIST);
 	Type* text2 = new Type(TYPE_CLASS);
 
-	listListTexts.typedata.list.levels = 2;
-	listListTexts.typedata.list.contained = text2;
+	listListTextsInner->typedata.list.contained = text2;
+	listListTexts.typedata.list.contained = listListTextsInner;
 	text2->typedata._class.classname = strdup("Text");
 
 	Type listListOptNums(TYPE_LIST);
+	Type* listListOptNumsInner = new Type(TYPE_LIST);
 	Type* optNums2 = new Type(TYPE_OPTIONAL);
 	Type* num3 = new Type(TYPE_CLASS);
 
-	listListOptNums.typedata.list.levels = 2;
-	listListOptNums.typedata.list.contained = optNums2;
-	optNums2->typedata.optional.levels = 1;
+	listListOptNums.typedata.list.contained = listListOptNumsInner;
+	listListOptNumsInner->typedata.list.contained = optNums2;
 	optNums2->typedata.optional.contained = num3;
 	num3->typedata._class.classname = strdup("Num");
 
 	Type listListNums(TYPE_LIST);
+	Type* listListNumsInner = new Type(TYPE_LIST);
 	Type* num4 = new Type(TYPE_CLASS);
 
-	listListNums.typedata.list.levels = 2;
-	listListNums.typedata.list.contained = num4;
+	listListNums.typedata.list.contained = listListNumsInner;
+	listListNumsInner->typedata.list.contained = num4;
 	num4->typedata._class.classname = strdup("Num");
 
 	BOOST_REQUIRE(!analyzer.getCommonSubtypeOf(&listOptNums, &listNums));

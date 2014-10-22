@@ -252,7 +252,6 @@ BOOST_AUTO_TEST_CASE(TestWritesList)
 	Type* list = MakeType(TYPE_LIST);
 	Type* text = MakeType(TYPE_CLASS);
 	list->typedata.list.contained = text;
-	list->typedata.list.levels = 2;
 	text->typedata._class.classname = strdup("Text");
 	table.addProperty(list, 1);
 	writer.write(out, &table);
@@ -274,7 +273,7 @@ BOOST_AUTO_TEST_CASE(TestWritesList)
 			ASSERTCHAR(0); // shadow
 			ASSERTCHAR(0); // alias length
 			ASSERTCHAR(0); // specialty length
-		ASSERTCHAR(2); // levels
+		ASSERTCHAR(1); // backwards compat
 		ASSERTCHAR(0); // alias length
 		ASSERTCHAR(0); // specialty length
 	ASSERTCHAR(0); // inheritances
@@ -292,7 +291,6 @@ BOOST_AUTO_TEST_CASE(TestWritesOptional)
 	Type* optional = MakeType(TYPE_OPTIONAL);
 	Type* text = MakeType(TYPE_CLASS);
 	optional->typedata.optional.contained = text;
-	optional->typedata.optional.levels = 2;
 	text->typedata._class.classname = strdup("Text");
 	table.addProperty(optional, 1);
 	writer.write(out, &table);
@@ -314,7 +312,7 @@ BOOST_AUTO_TEST_CASE(TestWritesOptional)
 			ASSERTCHAR(0); // shadow
 			ASSERTCHAR(0); // alias length
 			ASSERTCHAR(0); // specialty length
-		ASSERTCHAR(2); // levels
+		ASSERTCHAR(1); // backwards compat
 		ASSERTCHAR(0); // alias length
 		ASSERTCHAR(0); // specialty length
 	ASSERTCHAR(0); // inheritances

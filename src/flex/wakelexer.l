@@ -126,7 +126,7 @@ from					count(); return FROM;
 \n						line++; column = 1;
 
 \$+						count(); wakelval.number = strlen(waketext); return SYM_SHADOW;
-(\[\])+					count(); wakelval.number = strlen(waketext)>>1; return SYM_ARRAYED;
+\[\]					count(); wakelval.number = strlen(waketext)>>1; return SYM_ARRAYED;
 
 true					count(); wakelval.number = 1; return BOOL;
 false					count(); wakelval.number = 0; return BOOL;

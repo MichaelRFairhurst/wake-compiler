@@ -69,7 +69,7 @@ int wakewrap()
 %token <number> NUMBER
 %token <number> BOOL
 %token <number> SYM_SHADOW
-%token <number> SYM_ARRAYED
+%token <void> SYM_ARRAYED
 %type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments lmethodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args
 %type <type> type specializabletype shadowabletype puretype classtype fntype parameterizedtype unboundtypespecification classdeclarationtype
 %type <type_array> puretypes types unboundtypespecifications
@@ -497,10 +497,10 @@ specializabletype:
 shadowabletype:
 	puretype																	{ $$ = $1; }
 	| SYM_SHADOW classtype														{ $$ = $2;
-																					if($$->type == TYPE_CLASS) $$->typedata._class.shadow = $1;
-																					else if($$->type == TYPE_LIST) $$->typedata.list.contained->typedata._class.shadow = $1;
-																					else if($$->type == TYPE_OPTIONAL) $$->typedata.optional.contained->typedata._class.shadow = $1; }
-
+																					Type* classtype = $$;
+																					while(classtype->type != TYPE_CLASS)
+																						classtype = classtype->type == TYPE_OPTIONAL ? classtype->typedata.optional.contained : classtype->typedata.list.contained;
+																					classtype->typedata._class.shadow = $1; }
 puretype:
 	classtype																	{ $$ = $1; }
 	| fntype																	{ $$ = $1; }
@@ -518,8 +518,8 @@ types:
 
 classtype:
 	parameterizedtype															{ $$ = $1; }
-	| parameterizedtype '?'														{ $$ = MakeType(TYPE_OPTIONAL); $$->typedata.optional.levels = 1; $$->typedata.optional.contained = $1; }
-	| parameterizedtype SYM_ARRAYED												{ $$ = MakeType(TYPE_LIST); $$->typedata.list.levels = $2; $$->typedata.list.contained = $1; }
+	| classtype '?'																{ $$ = MakeType(TYPE_OPTIONAL); $$->typedata.optional.contained = $1; }
+	| classtype SYM_ARRAYED														{ $$ = MakeType(TYPE_LIST); $$->typedata.list.contained = $1; }
 	;
 
 parameterizedtype:
@@ -532,8 +532,8 @@ fntype:
 	| puretype SYM_RETURN_DECREMENT FN '(' ')'									{ $$ = MakeType(TYPE_LAMBDA); $$->typedata.lambda.returntype = $1; }
 	| FN '(' puretypes ')'														{ $$ = MakeType(TYPE_LAMBDA); $$->typedata.lambda.arguments = $3; }
 	| FN '(' ')'																{ $$ = MakeType(TYPE_LAMBDA); }
-	| fntype '?'																{ $$ = MakeType(TYPE_OPTIONAL); $$->typedata.optional.levels = 1; $$->typedata.optional.contained = $1; }
-	| fntype SYM_ARRAYED														{ $$ = MakeType(TYPE_LIST); $$->typedata.list.levels = $2; $$->typedata.list.contained = $1; }
+	| fntype '?'																{ $$ = MakeType(TYPE_OPTIONAL); $$->typedata.optional.contained = $1; }
+	| fntype SYM_ARRAYED														{ $$ = MakeType(TYPE_LIST); $$->typedata.list.contained = $1; }
 	;
 
 unboundtypespecifications:

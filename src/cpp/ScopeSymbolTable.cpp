@@ -81,7 +81,13 @@ string ScopeSymbolTable::getNameForType(Type* type) {
 		} else if(type->type == TYPE_CLASS) {
 			return string(type->typedata._class.shadow, '$') + type->typedata._class.classname;
 		} else if(type->type == TYPE_LIST) {
-			return getNameForType(type->typedata.list.contained) + "[]";
+			Type* noList_noOpt = type->typedata.list.contained;
+
+			while(noList_noOpt->type == TYPE_LIST || noList_noOpt->type == TYPE_OPTIONAL) {
+				noList_noOpt = noList_noOpt->type == TYPE_LIST ? noList_noOpt->typedata.list.contained : noList_noOpt->typedata.optional.contained;
+			}
+
+			return getNameForType(noList_noOpt) + "[]";
 		} else if(type->type == TYPE_OPTIONAL) {
 			return getNameForType(type->typedata.optional.contained);
 		}

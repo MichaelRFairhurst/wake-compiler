@@ -44,20 +44,8 @@ void TypeParameterizer::writeInParameterizations(Type** typeaddr, const std::vec
 			writeInParameterizations(type->typedata.lambda.arguments, parameters);
 	} else if(type->type == TYPE_LIST) {
 		writeInParameterizations(&type->typedata.list.contained, parameters);
-		if(type->typedata.list.contained->type == TYPE_LIST) {
-			auto_ptr<Type> doublewrapper(type->typedata.list.contained);
-			type->typedata.list.levels += doublewrapper->typedata.list.levels;
-			type->typedata.list.contained = doublewrapper->typedata.list.contained;
-			doublewrapper->typedata.list.contained = NULL;
-		}
 	} else if(type->type == TYPE_OPTIONAL) {
 		writeInParameterizations(&type->typedata.optional.contained, parameters);
-		if(type->typedata.optional.contained->type == TYPE_OPTIONAL) {
-			auto_ptr<Type> doublewrapper(type->typedata.optional.contained);
-			type->typedata.optional.levels += doublewrapper->typedata.optional.levels;
-			type->typedata.optional.contained = doublewrapper->typedata.optional.contained;
-			doublewrapper->typedata.optional.contained = NULL;
-		}
 	}
 }
 
@@ -92,20 +80,8 @@ void TypeParameterizer::applyParameterizations(Type** typeaddr, const std::vecto
 			applyParameterizations(type->typedata.lambda.arguments, parameters, parameterizations);
 	} else if(type->type == TYPE_LIST) {
 		applyParameterizations(&type->typedata.list.contained, parameters, parameterizations);
-		if(type->typedata.list.contained->type == TYPE_LIST) {
-			auto_ptr<Type> doublewrapper(type->typedata.list.contained);
-			type->typedata.list.levels += doublewrapper->typedata.list.levels;
-			type->typedata.list.contained = doublewrapper->typedata.list.contained;
-			doublewrapper->typedata.list.contained = NULL;
-		}
 	} else if(type->type == TYPE_OPTIONAL) {
 		applyParameterizations(&type->typedata.optional.contained, parameters, parameterizations);
-		if(type->typedata.optional.contained->type == TYPE_OPTIONAL) {
-			auto_ptr<Type> doublewrapper(type->typedata.optional.contained);
-			type->typedata.optional.levels += doublewrapper->typedata.optional.levels;
-			type->typedata.optional.contained = doublewrapper->typedata.optional.contained;
-			doublewrapper->typedata.optional.contained = NULL;
-		}
 	}
 }
 
