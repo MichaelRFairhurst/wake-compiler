@@ -928,15 +928,35 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 				}
 				break;
 
+			case NT_IF_THEN_ELSE:
+				{
+					auto_ptr<Type> condition(typeCheckUsable(tree->node_data.nodes[1], false));
+					auto_ptr<Type> left(typeCheckUsable(tree->node_data.nodes[0], false));
+					auto_ptr<Type> right(typeCheckUsable(tree->node_data.nodes[2], false));
+					boost::optional<Type*> common = analyzer->getCommonSubtypeOf(left.get(), right.get());
+					if(!common) {
+						ret = MakeType(TYPE_MATCHALL);
+						expectedstring = "Two types with a single closest common ancestor";
+						erroneousstring = analyzer->getNameForType(left.get()) + " and " + analyzer->getNameForType(right.get());
+						throw string("Only booleans can go inside a ternary operator");
+					}
+
+					ret = *common;
+
+					if(!analyzer->isPrimitiveTypeBool(condition.get()) && !analyzer->isPrimitiveTypeNum(condition.get())) {
+						expectedstring = "Bool or Num";
+						erroneousstring = analyzer->getNameForType(condition.get());
+						throw string("Only booleans and nums can go inside a ternary operator condition");
+					}
+				}
+				break;
+
 			// Ignoring these for now
 			case NT_SWITCH:
 			case NT_CURRIED:
 			case NT_INCREMENT:
 			case NT_DECREMENT:
 			// These require a common-ancestor function
-			case NT_IF_THEN_ELSE:
-			// These I will implement soon(ish)
-			// these might not be necessary
 			case NT_TYPE_ARRAY:
 			case NT_VALUES:
 				throw string("Not supported yet");

@@ -3085,4 +3085,70 @@ PTT_TEST_CASE(
 	PTT_VALID
 );
 
+PTT_TEST_CASE(
+	TestValidArrayLiterals,
+	"every MyClass is:											\n\
+		method() {												\n\
+			var Text[] = ['hey'];								\n\
+			var $Text[] = ['hey', 'man'];						\n\
+			var $$Text[] = [];									\n\
+			var Num[] = [];										\n\
+			var $$Num[] = [1];									\n\
+			var $$$Num[] = [1, 2];								\n\
+			var $$$$Num[][] = [[1]];							\n\
+			var $$$Text[][] = [['hey']];						\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestInvalidArrayLiterals,
+	"every MyClass is:											\n\
+		method() {												\n\
+			var Num[] = ['hey'];								\n\
+			var Text[] = ['hey', 3];							\n\
+			var $Text[] = [true];								\n\
+			var $Num[] = [nothing];								\n\
+			var $$Num[] = [this];								\n\
+			var $$$Num[] = [1, [2]];							\n\
+			var $$$$Num[][] = [['hey']];						\n\
+			var $$Text[][] = [[['hey']]];						\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	TestValidTernaries,
+	"every MyClass is:											\n\
+		method() {												\n\
+			var Bool = true if true else true;					\n\
+			var Num = 1 if 2 else 3;							\n\
+			var Text = 'hey' if Bool else 'hello';				\n\
+			var MyClass? = nothing if 1 else this;				\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestInvalidTernaries,
+	"every MyClass is:											\n\
+		method() {												\n\
+			var Num = 1 if 'hey' else 3;						\n\
+			var $Num = 'hey' if true else 'hello';				\n\
+			var $$Num = 'hey' if true else 1;					\n\
+			var MyClass = this if this else true;				\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+);
+
 BOOST_AUTO_TEST_SUITE_END()

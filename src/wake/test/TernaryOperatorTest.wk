@@ -1,0 +1,13 @@
+import Asserts;
+
+every TernaryOperatorTest is:
+
+	testTrue(Asserts) {
+	   Asserts.that(true if true else false)Equals(true);
+	   Asserts.that(3 if true else 0)Equals(3);
+	}
+
+	testFalse(Asserts) {
+	   Asserts.that(false if false else true)Equals(true);
+	   Asserts.that(0 if false else 3)Equals(3);
+	}

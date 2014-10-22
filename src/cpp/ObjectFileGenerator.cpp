@@ -30,7 +30,6 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_CURRIED:
 		case NT_CASE:
 		case NT_DEFAULTCASE:
-		case NT_IF_THEN_ELSE:
 		case NT_INCREMENT:
 		case NT_DECREMENT:
 		case NT_SWITCH:
@@ -619,6 +618,16 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_BREAK: file << "break;"; break;
 		case NT_CONTINUE: file << "continue;"; break;
 		case NT_THIS: file << "this"; break;
+
+		case NT_IF_THEN_ELSE:
+			file << "(";
+			generate(tree->node_data.nodes[1]);
+			file << ")?(";
+			generate(tree->node_data.nodes[0]);
+			file << "):(";
+			generate(tree->node_data.nodes[2]);
+			file << ")";
+			break;
 
 		case NT_RETURN:
 			file << "return ";
