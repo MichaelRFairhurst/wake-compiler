@@ -60,14 +60,16 @@ BOOST_AUTO_TEST_CASE(OptionalTypeIsNotSubtypeOfRealType) {
 BOOST_AUTO_TEST_CASE(NothingIsSubtypesOfOptionalType) {
 	TypeAnalyzer analyzer;
 	Type optionaltype(TYPE_OPTIONAL);
-	optionaltype.typedata.optional.contained = NULL;
-	Type nothing(TYPE_NOTHING);
+	optionaltype.typedata.optional.contained = new Type(TYPE_CLASS);
+	Type nothing(TYPE_OPTIONAL);
+	nothing.typedata.optional.contained = new Type(TYPE_MATCHALL);
 	BOOST_REQUIRE(analyzer.isASubtypeOfB(&nothing, &optionaltype));
 }
 
 BOOST_AUTO_TEST_CASE(NothingIsNotSubtypeOfRealType) {
 	TypeAnalyzer analyzer;
-	Type nothing(TYPE_NOTHING);
+	Type nothing(TYPE_OPTIONAL);
+	nothing.typedata.optional.contained = new Type(TYPE_MATCHALL);
 	Type realtype(TYPE_CLASS);
 	realtype.typedata._class.classname = strdup("test");
 	BOOST_REQUIRE(!analyzer.isASubtypeOfB(&nothing, &realtype));
@@ -383,7 +385,6 @@ BOOST_AUTO_TEST_CASE(MatchallTypesCommonAreTheirNeighbor) {
 	Type d(TYPE_LAMBDA);
 	Type e(TYPE_LIST);
 	e.typedata.optional.contained = new Type(TYPE_MATCHALL);
-	Type f(TYPE_NOTHING);
 	boost::optional<Type*> ret;
 
 	ret = analyzer.getCommonSubtypeOf(&a, &a);
@@ -401,9 +402,6 @@ BOOST_AUTO_TEST_CASE(MatchallTypesCommonAreTheirNeighbor) {
 	ret = analyzer.getCommonSubtypeOf(&a, &e);
 	BOOST_REQUIRE(ret);
 	BOOST_REQUIRE((*ret)->type == TYPE_LIST); freeType(*ret);
-	ret = analyzer.getCommonSubtypeOf(&a, &f);
-	BOOST_REQUIRE(ret);
-	BOOST_REQUIRE((*ret)->type == TYPE_NOTHING); freeType(*ret);
 	ret = analyzer.getCommonSubtypeOf(&b, &a);
 	BOOST_REQUIRE(ret);
 	BOOST_REQUIRE((*ret)->type == TYPE_OPTIONAL); freeType(*ret);
@@ -416,9 +414,6 @@ BOOST_AUTO_TEST_CASE(MatchallTypesCommonAreTheirNeighbor) {
 	ret = analyzer.getCommonSubtypeOf(&e, &a);
 	BOOST_REQUIRE(ret);
 	BOOST_REQUIRE((*ret)->type == TYPE_LIST); freeType(*ret);
-	ret = analyzer.getCommonSubtypeOf(&f, &a);
-	BOOST_REQUIRE(ret);
-	BOOST_REQUIRE((*ret)->type == TYPE_NOTHING); freeType(*ret);
 }
 
 BOOST_AUTO_TEST_CASE(NothingOptionalCommonTypeIsOptionalType) {
@@ -427,7 +422,8 @@ BOOST_AUTO_TEST_CASE(NothingOptionalCommonTypeIsOptionalType) {
 	Type* contained = new Type(TYPE_CLASS);
 	optional.typedata.optional.contained = contained;
 	contained->typedata._class.classname = strdup("Classname");
-	Type nothing(TYPE_NOTHING);
+	Type nothing(TYPE_OPTIONAL);
+	nothing.typedata.optional.contained = new Type(TYPE_MATCHALL);
 
 	boost::optional<Type*> ret = analyzer.getCommonSubtypeOf(&optional, &nothing);
 	BOOST_REQUIRE(ret);
@@ -445,18 +441,21 @@ BOOST_AUTO_TEST_CASE(NothingOptionalCommonTypeIsOptionalType) {
 
 BOOST_AUTO_TEST_CASE(NothingNothingCommonTypeIsNothing) {
 	TypeAnalyzer analyzer;
-	Type nothing(TYPE_NOTHING);
+	Type nothing(TYPE_OPTIONAL);
+	nothing.typedata.optional.contained = new Type(TYPE_MATCHALL);
 	boost::optional<Type*> ret = analyzer.getCommonSubtypeOf(&nothing, &nothing);
 	BOOST_REQUIRE(ret);
-	BOOST_REQUIRE((*ret)->type == TYPE_NOTHING);
+	BOOST_REQUIRE((*ret)->type == TYPE_OPTIONAL);
+	BOOST_REQUIRE((*ret)->typedata.optional.contained->type == TYPE_MATCHALL);
 	freeType(*ret);
 }
 
 BOOST_AUTO_TEST_CASE(MismatchedTypesWithNoCommonType) {
 	TypeAnalyzer analyzer;
 	Type lambda(TYPE_LAMBDA);
-	Type clazz(TYPE_CLASS);
+	Type clazz(TYPE_CLASS); clazz.typedata._class.classname = strdup("Test");
 	Type list(TYPE_LIST);
+	list.typedata.list.contained = new Type(clazz);
 	Type unusable(TYPE_UNUSABLE);
 
 	BOOST_REQUIRE(!analyzer.getCommonSubtypeOf(&lambda, &clazz));
@@ -478,7 +477,8 @@ BOOST_AUTO_TEST_CASE(CommonTypeNothingNotOptionalNotNothingIsOptionalOtherType) 
 	TypeAnalyzer analyzer;
 	Type clazz(TYPE_CLASS);
 	clazz.typedata._class.classname = strdup("Classname");
-	Type nothing(TYPE_NOTHING);
+	Type nothing(TYPE_OPTIONAL);
+	nothing.typedata.optional.contained = new Type(TYPE_MATCHALL);
 
 	boost::optional<Type*> ret = analyzer.getCommonSubtypeOf(&clazz, &nothing);
 	BOOST_REQUIRE(ret);

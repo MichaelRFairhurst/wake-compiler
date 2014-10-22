@@ -19,7 +19,6 @@
 #define TYPE_CLASS 2
 #define TYPE_PARAMETERIZED 3
 #define TYPE_MATCHALL 4
-#define TYPE_NOTHING 5
 #define TYPE_UNUSABLE 6
 #define TYPE_LIST 7
 #define TYPE_OPTIONAL 8

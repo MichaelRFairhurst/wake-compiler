@@ -38,7 +38,6 @@ bool TypeAnalyzer::isASubtypeOfB(string a, string b) {
 bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 	//if(a == NULL || b == NULL) return false;
 	if(a->type == TYPE_MATCHALL || b->type == TYPE_MATCHALL) return true;
-	if(a->type == TYPE_NOTHING) return b->type == TYPE_OPTIONAL;
 	if(a->type != b->type) {
 		if(b->type == TYPE_OPTIONAL) {
 			return isASubtypeOfB(a, b->typedata.optional.contained);
@@ -120,6 +119,7 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 }
 
 bool TypeAnalyzer::isAExactlyB(Type* a, Type* b) {
+	if(a->type == TYPE_MATCHALL || b->type == TYPE_MATCHALL) return true;
 	if(a->type != b->type) return false;
 	if(a->type == TYPE_CLASS) {
 		if(a->typedata._class.classname != string(b->typedata._class.classname)) return false;
@@ -199,18 +199,16 @@ void TypeAnalyzer::assertClassCanProvide(Type* provider, Type* binding) {
 }
 
 boost::optional<Type*> TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
+	if(a->type == TYPE_UNUSABLE || b->type == TYPE_UNUSABLE) return boost::optional<Type*>(); // this maybe should return TYPE_UNUSABLE...but unusable types aren't necessarily similar at all
 	if(a->type == TYPE_MATCHALL) return boost::optional<Type*>(new Type(*b));
 	if(b->type == TYPE_MATCHALL) return boost::optional<Type*>(new Type(*a));
 
 	if(a->type == TYPE_OPTIONAL || b->type == TYPE_OPTIONAL) {
 		Type* optional = a->type == TYPE_OPTIONAL ? a : b;
 		Type* other = a == optional ? b : a;
+		if(other->type == TYPE_OPTIONAL) other = other->typedata.optional.contained;
 
 		// [nothing, Text?] is common to type Text?
-		if(other->type == TYPE_NOTHING) {
-			return boost::optional<Type*>(new Type(*optional));
-		}
-
 		// [X, Y?] is common to type Z? where Z is the common type to [X, Y]
 		boost::optional<Type*> nonoptcommon = getCommonSubtypeOf(optional->typedata.optional.contained, other);
 
@@ -225,21 +223,9 @@ boost::optional<Type*> TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
 		return boost::optional<Type*>(common);
 	}
 
-	if(a->type != b->type) {
-		// [Nothing, Printer] common type is Printer?
-		if(a->type == TYPE_NOTHING || b->type == TYPE_NOTHING) {
-			Type* notnothing = a->type == TYPE_NOTHING ? b : a;
-			Type* common = MakeType(TYPE_OPTIONAL);
-			common->typedata.optional.contained = new Type(*notnothing);
-			return boost::optional<Type*>(common);
-		}
-		return boost::optional<Type*>();
-	}
+	if(a->type != b->type) return boost::optional<Type*>();
 
-	if(a->type == TYPE_NOTHING) {
-		return boost::optional<Type*>(MakeType(TYPE_NOTHING));
-
-	} else if(a->type == TYPE_LIST) {
+	if(a->type == TYPE_LIST) {
 		// [Text[], Num[]] and [Printer[], DisabledPrinter[]] are both common to nothing
 		if(!isAExactlyB(a, b)) return boost::optional<Type*>();
 		// but [Text[], Text[]] is common to Text[]
@@ -467,10 +453,6 @@ string TypeAnalyzer::getNameForType(Type* type) {
 
 	if(type->type == TYPE_MATCHALL) {
 		return "{inferencing failed}";
-	}
-
-	if(type->type == TYPE_NOTHING) {
-		return "[NOTHING]";
 	}
 
 	if(type->type == TYPE_CLASS) {

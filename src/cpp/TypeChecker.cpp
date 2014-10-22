@@ -227,7 +227,8 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 				break;
 
 			case NT_NOTHING:
-				ret = MakeType(TYPE_NOTHING);
+				ret = new Type(TYPE_OPTIONAL);
+				ret->typedata.optional.contained = new Type(TYPE_MATCHALL);
 				break;
 
 			case NT_PARENT:
@@ -500,19 +501,11 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 					} else {
 						Type subject = *auto_ptr<Type>(typeCheck(tree->node_data.nodes[0], forceArrayIdentifier));
 						ret = tree->node_type == NT_ASSIGNMENT ? new Type(TYPE_UNUSABLE) : new Type(subject);
-						if(tree->node_data.nodes[1]->node_type == NT_ARRAY_DECLARATION && tree->node_data.nodes[1]->subnodes == 0) {
-							if(subject.type != TYPE_LIST) {
-								expectedstring = analyzer->getNameForType(&subject);
-								erroneousstring = "[]";
-								throw string("Invalid type in assignment");
-							}
-						} else {
-							Type assignment = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier));
-							if(!analyzer->isASubtypeOfB(&assignment, &subject)) {
-								expectedstring = analyzer->getNameForType(&subject);
-								erroneousstring = analyzer->getNameForType(&assignment);
-								throw string("Invalid type in assignment");
-							}
+						Type assignment = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier));
+						if(!analyzer->isASubtypeOfB(&assignment, &subject)) {
+							expectedstring = analyzer->getNameForType(&subject);
+							erroneousstring = analyzer->getNameForType(&assignment);
+							throw string("Invalid type in assignment");
 						}
 					}
 				}
@@ -634,15 +627,11 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 					parameterizer.writeInParameterizations(&tree->node_data.nodes[0]->node_data.type, parameterizedtypes);
 					Type assignee = *tree->node_data.nodes[0]->node_data.type;
 					classestable->assertTypeIsValid(&assignee);
-					if(assignee.type == TYPE_LIST && tree->node_data.nodes[1]->subnodes == 0 && tree->node_data.nodes[1]->node_type == NT_ARRAY_DECLARATION) {
-						// Nothing to do here but relax.
-					} else {
-						Type assignment = *auto_ptr<Type>(typeCheck(tree->node_data.nodes[1], forceArrayIdentifier));
-						if(!analyzer->isASubtypeOfB(&assignment, &assignee)) {
-							expectedstring = analyzer->getNameForType(&assignee);
-							erroneousstring = analyzer->getNameForType(&assignment);
-							throw string("Invalid value in declaration of variable");
-						}
+					Type assignment = *auto_ptr<Type>(typeCheck(tree->node_data.nodes[1], forceArrayIdentifier));
+					if(!analyzer->isASubtypeOfB(&assignment, &assignee)) {
+						expectedstring = analyzer->getNameForType(&assignee);
+						erroneousstring = analyzer->getNameForType(&assignment);
+						throw string("Invalid value in declaration of variable");
 					}
 					scopesymtable->add(tree->node_data.nodes[0]->node_data.type);
 				} catch(SymbolNotFoundException* e) {
@@ -710,7 +699,8 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 			case NT_ARRAY_DECLARATION:
 				// These should all be specially handled in the other cases
 				if(!tree->subnodes) {
-					errors->addError(new SemanticError(TYPE_ERROR, "Invalid use of empty list", tree));
+					ret = new Type(TYPE_LIST);
+					ret->typedata.list.contained = new Type(TYPE_MATCHALL);
 				} else if(tree->node_data.nodes[0]->subnodes == 1) {
 					ret = new Type(TYPE_LIST);
 					ret->typedata.list.contained = typeCheckUsable(tree->node_data.nodes[0]->node_data.nodes[0], false);
@@ -993,7 +983,7 @@ bool TypeChecker::isValidLValue(Node* n) {
 Type* TypeChecker::typeCheckUsable(Node* n, bool forceArrayIdentifier) {
 	Type* t = typeCheck(n, forceArrayIdentifier);
 	if(t == NULL) {
-		return MakeType(TYPE_NOTHING);
+		return MakeType(TYPE_UNUSABLE);
 	}
 
 	if(t->type == TYPE_UNUSABLE) {

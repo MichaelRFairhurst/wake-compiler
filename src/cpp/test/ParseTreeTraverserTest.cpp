@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_SUITE( ParseTreeTraverserTest )
 		loader.loadStdLibToTable(&table); \
 		ParseTreeTraverser t(&table, errors); \
 		MockSemanticErrorPrinter e; \
-		p.parse( "every Num is: every Bool is: every Text is: every List{T} is: every Exception is: Text[] -- getStackTrace() { var Text[] = []; return Text[]; }" CODE ); \
+		p.parse( "every Num is: every Bool is: every Text is: every List{T} is: Num -- getSize() { return 0; } every Exception is: Text[] -- getStackTrace() { var Text[] = []; return Text[]; }" CODE ); \
 		if(PTT_PRINT_TREE) p.print(); \
 		{ EXPECTATIONS } \
 		t.traverse(p.getParseTree()); \
@@ -3144,6 +3144,35 @@ PTT_TEST_CASE(
 			var $Num = 'hey' if true else 'hello';				\n\
 			var $$Num = 'hey' if true else 1;					\n\
 			var MyClass = this if this else true;				\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	TestStrangeValidUsagesOfEmptyArray,
+	"every MyClass is:											\n\
+		with Num[][][] = [];									\n\
+		with Num len = [].getSize();							\n\
+		MyClass[] -- myMethod() {								\n\
+			var Text[][] = [[], [], []];						\n\
+			var Text = [[], [], []][0][0];						\n\
+			var $Text = [][0][0][0]; // technically valid!		\n\
+			return [];											\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestStrangeInvalidUsagesOfEmptyArray,
+	"every MyClass is:											\n\
+		with Num[][][] = [[[[]]]];								\n\
+		with Num len = [];										\n\
+		MyClass -- myMethod() {									\n\
+			var Text[][] = [[3], [], []];						\n\
+			return [];											\n\
 		}",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
