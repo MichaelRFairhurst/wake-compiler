@@ -17,39 +17,29 @@ import Asserts;
 every ArrayTest is:
 
 	~[test set array index]~(Asserts) {
-		var Num[] = [];
-		Num[0] = 5;
+		var Num[] = [5];
 		Asserts.that(Num[0])Equals(5);
 	}
 
 	~[test reset array index]~(Asserts) {
-		var Num[] = [];
-		Num[0] = 5;
+		var Num[] = [5];
 		Num[0] = 3;
 		Asserts.that(Num[0])Equals(3);
 	}
 
 	~[test set array array index index]~(Asserts) {
-		var Num[][] = [];
-		Num[0] = [];
-		Num[0][0] = 3;
+		var Num[][] = [[3]];
 		Asserts.that(Num[0][0])Equals(3);
 	}
 
 	~[test reset array array index index]~(Asserts) {
-		var Num[][] = [];
-		Num[0] = [];
-		Num[0][0] = 3;
+		var Num[][] = [[3]];
 		Num[0][0] = 5;
 		Asserts.that(Num[0][0])Equals(5);
 	}
 
 	~[test set multiple array indices]~(Asserts) {
-		var Num[] = [];
-		Num[0] = 5;
-		Num[1] = 6;
-		Num[2] = 7;
-		Num[3] = 8;
+		var Num[] = [5, 6, 7, 8];
 		Asserts.that(Num[0])Equals(5);
 		Asserts.that(Num[1])Equals(6);
 		Asserts.that(Num[2])Equals(7);
@@ -57,16 +47,7 @@ every ArrayTest is:
 	}
 
 	~[test set multiple array array indices indices]~(Asserts) {
-		var Num[][] = [];
-		Num[0] = [];
-		Num[1] = [];
-		Num[0][0] = 5;
-		Num[0][1] = 6;
-		Num[0][2] = 7;
-		Num[1][0] = 6;
-		Num[1][1] = 7;
-		Num[1][2] = 8;
-		Num[2] = Num[1];
+		var Num[][] = [[5, 6, 7], [6, 7, 8], [6, 7, 8]];
 		Asserts.that(Num[0][0])Equals(5);
 		Asserts.that(Num[0][1])Equals(6);
 		Asserts.that(Num[0][2])Equals(7);

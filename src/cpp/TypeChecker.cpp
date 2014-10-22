@@ -715,8 +715,47 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 				// These should all be specially handled in the other cases
 				if(!tree->subnodes) {
 					errors->addError(new SemanticError(TYPE_ERROR, "Invalid use of empty list", tree));
+				} else if(tree->node_data.nodes[0]->subnodes == 1) {
+					ret = new Type(TYPE_LIST);
+					ret->typedata.list.contained = typeCheckUsable(tree->node_data.nodes[0]->node_data.nodes[0], false);
+					ret->typedata.list.levels = 1;
+					if(ret->typedata.list.contained->type == TYPE_LIST) {
+						auto_ptr<Type> cleanme(ret->typedata.list.contained);
+						ret->typedata.list.levels += cleanme->typedata.list.levels;
+						ret->typedata.list.contained = cleanme->typedata.list.contained;
+						cleanme->typedata.list.contained = NULL;
+					}
 				} else {
-					errors->addError(new SemanticError(WARNING, "Not supported yet", tree));
+					auto_ptr<Type> first(typeCheckUsable(tree->node_data.nodes[0]->node_data.nodes[0], false));
+					auto_ptr<Type> second(typeCheckUsable(tree->node_data.nodes[0]->node_data.nodes[1], false));
+					boost::optional<Type*> common;
+
+					int i = 1;
+					while(true) {
+						common = analyzer->getCommonSubtypeOf(first.get(), second.get());
+
+						if(!common) {
+							expectedstring = "Types with a common ancestor";
+							erroneousstring = analyzer->getNameForType(first.get()) + " and " + analyzer->getNameForType(second.get());
+							ret = new Type(TYPE_MATCHALL);
+							throw string("No common type between items in array declaration");
+						}
+
+						i++;
+						if(i == tree->node_data.nodes[0]->subnodes) break;
+						first.reset(*common);
+						second.reset(typeCheckUsable(tree->node_data.nodes[0]->node_data.nodes[i], false));
+					}
+
+					ret = new Type(TYPE_LIST);
+					ret->typedata.list.levels = 1;
+					ret->typedata.list.contained = *common;
+					if((*common)->type == TYPE_LIST) {
+						auto_ptr<Type> clean(*common);
+						ret->typedata.list.levels += clean->typedata.list.levels;
+						ret->typedata.list.contained = clean->typedata.list.contained;
+						clean->typedata.list.contained = NULL;
+					}
 				}
 				break;
 

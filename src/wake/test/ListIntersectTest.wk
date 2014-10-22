@@ -28,25 +28,21 @@ every ListIntersectTest is:
 
 	~[ test intersect empty num list with nonempty num list is empty num list ]~(Asserts) {
 		var Num[] = [];
-		var $Num[] = [];
-		$Num[0] = 4;
+		var $Num[] = [4];
 		Asserts.that($Num[].intersect(Num[]).getSize())Equals(0);
 		Asserts.that(Num[].intersect($Num[]).getSize())Equals(0);
 	}
 
 	~[ test intersect empty text list with nonempty text list is empty text list ]~(Asserts) {
 		var Text[] = [];
-		var $Text[] = [];
-		$Text[0] = "hey";
+		var $Text[] = ["hey"];
 		Asserts.that($Text[].intersect(Text[]).getSize())Equals(0);
 		Asserts.that(Text[].intersect($Text[]).getSize())Equals(0);
 	}
 
 	~[ test intersect nonempty num list with nonempty num list is nonempty num list ]~(Asserts) {
-		var Num[] = [];
-		Num[0] = 5;
-		var $Num[] = [];
-		$Num[0] = 5;
+		var Num[] = [5];
+		var $Num[] = [5];
 		Asserts.that(Num[].intersect($Num[]).getSize())Equals(1);
 		Asserts.that(Num[].intersect($Num[])[0])Equals(5);
 		Asserts.that($Num[].intersect(Num[]).getSize())Equals(1);
@@ -54,10 +50,8 @@ every ListIntersectTest is:
 	}
 
 	~[ test intersect nonempty text list with nonempty text list is nonempty text list ]~(Asserts) {
-		var Text[] = [];
-		Text[0] = "hey";
-		var $Text[] = [];
-		$Text[0] = "hey";
+		var Text[] = ["hey"];
+		var $Text[] = ["hey"];
 		Asserts.that(Text[].intersect($Text[]).getSize())Equals(1);
 		Asserts.that(Text[].intersect($Text[])[0])Equals("hey");
 		Asserts.that($Text[].intersect(Text[]).getSize())Equals(1);
@@ -65,34 +59,22 @@ every ListIntersectTest is:
 	}
 
 	~[ test intersect different num lists with no commonality is empty list ]~(Asserts) {
-		var Num[] = [];
-		var $Num[] = [];
-		Num[0] = 1;
-		Num[1] = 2;
-		$Num[0] = 3;
-		$Num[1] = 4;
+		var Num[] = [1, 2];
+		var $Num[] = [3, 4];
 		Asserts.that(Num[].intersect($Num[]).getSize())Equals(0);
 		Asserts.that($Num[].intersect(Num[]).getSize())Equals(0);
 	}
 
 	~[ test intersect different text lists with no commonality is empty list ]~(Asserts) {
-		var Text[] = [];
-		var $Text[] = [];
-		Text[0] = "one";
-		Text[1] = "two";
-		$Text[0] = "three";
-		$Text[1] = "four";
+		var Text[] = ["one", "two"];
+		var $Text[] = ["three", "four"];
 		Asserts.that(Text[].intersect($Text[]).getSize())Equals(0);
 		Asserts.that($Text[].intersect(Text[]).getSize())Equals(0);
 	}
 
 	~[ test intersect same num lists but different orders returns both ]~(Asserts) {
-		var Num[] = [];
-		var $Num[] = [];
-		Num[0] = 0;
-		Num[1] = 1;
-		$Num[0] = 1;
-		$Num[1] = 0;
+		var Num[] = [0, 1];
+		var $Num[] = [1, 0];
 
 		Asserts.that(Num[].intersect($Num[]).getSize())Equals(2);
 		Asserts.that(Num[].intersect($Num[])[0])Equals(0);
@@ -103,12 +85,8 @@ every ListIntersectTest is:
 	}
 
 	~[ test intersect same text lists but different orders returns both ]~(Asserts) {
-		var Text[] = [];
-		var $Text[] = [];
-		Text[0] = "hey";
-		Text[1] = "yo";
-		$Text[0] = "yo";
-		$Text[1] = "hey";
+		var Text[] = ["hey", "yo"];
+		var $Text[] = ["yo", "hey"];
 
 		Asserts.that(Text[].intersect($Text[]).getSize())Equals(2);
 		Asserts.that(Text[].intersect($Text[])[0])Equals("hey");
@@ -119,14 +97,8 @@ every ListIntersectTest is:
 	}
 
 	~[ test intersect two common nums are kept ]~(Asserts) {
-		var Num[] = [];
-		var $Num[] = [];
-		Num[0] = 0;
-		Num[1] = 1;
-		Num[2] = 2;
-		$Num[0] = 3;
-		$Num[1] = 1;
-		$Num[2] = 2;
+		var Num[] = [0, 1, 2];
+		var $Num[] = [3, 1, 2];
 		Asserts.that(Num[].intersect($Num[]).getSize())Equals(2);
 		Asserts.that(Num[].intersect($Num[])[0])Equals(1);
 		Asserts.that(Num[].intersect($Num[])[1])Equals(2);
@@ -136,14 +108,8 @@ every ListIntersectTest is:
 	}
 
 	~[ test intersect two common texts are kept ]~(Asserts) {
-		var Text[] = [];
-		var $Text[] = [];
-		Text[0] = "zero";
-		Text[1] = "one";
-		Text[2] = "two";
-		$Text[0] = "three";
-		$Text[1] = "one";
-		$Text[2] = "two";
+		var Text[] = ["zero", "one", "two"];
+		var $Text[] = ["three", "one", "two"];
 		Asserts.that(Text[].intersect($Text[]).getSize())Equals(2);
 		Asserts.that(Text[].intersect($Text[])[0])Equals("one");
 		Asserts.that(Text[].intersect($Text[])[1])Equals("two");

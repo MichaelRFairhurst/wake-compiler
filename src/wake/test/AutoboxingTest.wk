@@ -34,12 +34,11 @@ every AutoboxingTest is:
 	}
 
 	testMaxOfNums(Asserts) {
-		var Num[] = [];
-		Num[0] = 5;
+		var Num[] = [5];
 		Asserts.that(5.orMaxOf(Num[]))Equals(5);
-		Num[1] = 4;
+		Num[] = [5, 4];
 		Asserts.that(5.orMaxOf(Num[]))Equals(5);
-		Num[2] = 6;
+		Num[] = [5, 4, 6];
 		Asserts.that(5.orMaxOf(Num[]))Equals(6);
 	}
 
@@ -50,12 +49,11 @@ every AutoboxingTest is:
 	}
 
 	testMinOfNums(Asserts) {
-		var Num[] = [];
-		Num[0] = 5;
+		var Num[] = [5];
 		Asserts.that(5.orMinOf(Num[]))Equals(5);
-		Num[1] = 4;
+		Num[] = [5, 4];
 		Asserts.that(5.orMinOf(Num[]))Equals(4);
-		Num[2] = 6;
+		Num[] = [5, 4, 6];
 		Asserts.that(5.orMinOf(Num[]))Equals(4);
 	}
 
@@ -94,9 +92,9 @@ every AutoboxingTest is:
 	testArraySize(Asserts) {
 		var Num[] = [];
 		Asserts.that(Num[].getSize())Equals(0);
-		Num[0] = 1;
+		Num[] = [1];
 		Asserts.that(Num[].getSize())Equals(1);
-		Num[1] = 1;
+		Num[] = [1, 1];
 		Asserts.that(Num[].getSize())Equals(2);
 	}
 
@@ -107,14 +105,14 @@ every AutoboxingTest is:
 		Asserts.isFalse(Num[].contains(5));
 		Asserts.isFalse(Text[].contains("test"));
 		Asserts.isFalse(AutoboxingTest[].contains(this));
-		Num[0] = 4;
-		Text[0] = "hey";
+		Num[] = [4];
+		Text[] = ["hey"];
 		Asserts.isFalse(Num[].contains(5));
 		Asserts.isFalse(Text[].contains("test"));
 		Asserts.isFalse(AutoboxingTest[].contains(this));
-		Num[1] = 5;
-		Text[1] = "test";
-		AutoboxingTest[0] = this;
+		Num[] = [4, 5];
+		Text[] = ["hey", "test"];
+		AutoboxingTest[] = [this];
 		Asserts.isTrue(Num[].contains(5));
 		Asserts.isTrue(Text[].contains("test"));
 		Asserts.isTrue(AutoboxingTest[].contains(this));
@@ -272,15 +270,14 @@ every AutoboxingTest is:
 	}
 
 	~[ test Join ]~(Asserts) {
-		var Text[] = [];
-		Text[].push('hey');
+		var Text[] = ['hey'];
 		Asserts.that(''.join(Text[]))Equals('hey');
 		Asserts.that(','.join(Text[]))Equals('hey');
-		Text[].push('hey');
+		Text[] = ['hey', 'hey'];
 		Asserts.that(''.join(Text[]))Equals('heyhey');
 		Asserts.that(','.join(Text[]))Equals('hey,hey');
-		Text[].push('boo');
+		Text[] = ['hey', 'hey', 'boo'];
 		Asserts.that(''.join(Text[]))Equals('heyheyboo');
 		Asserts.that(','.join(Text[]))Equals('hey,hey,boo');
-		Asserts.that(','.join(Text[]))Equals('hey,hey,boo');
+		Asserts.that(', '.join(Text[]))Equals('hey, hey, boo');
 	}

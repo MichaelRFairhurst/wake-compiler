@@ -269,16 +269,16 @@ boost::optional<Type*> TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
 			return boost::optional<Type*>();
 		}
 
-		//if(a->typedata._class.parameters) { // Here if A is not null, neither is B
-			//int len = a->typedata._class.parameters->typecount;
-			//if(b->typedata._class.parameters->typecount != len) {
-				//return false;
-			//}
+		if(a->typedata._class.parameters) { // Here if A is not null, neither is B
+			int len = a->typedata._class.parameters->typecount;
+			if(b->typedata._class.parameters->typecount != len) {
+				return boost::optional<Type*>();
+			}
 
-			//for(int i = 0; i < len; i++)
-			//if(!isAExactlyB(a->typedata._class.parameters->types[i], b->typedata._class.parameters->types[i]))
-				//return false;
-		//}
+			for(int i = 0; i < len; i++)
+			if(!isAExactlyB(a->typedata._class.parameters->types[i], b->typedata._class.parameters->types[i]))
+				return boost::optional<Type*>();
+		}
 
 		if(isASubtypeOfB(a, b)) return boost::optional<Type*>(new Type(*b));
 
@@ -290,17 +290,15 @@ boost::optional<Type*> TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
 		} else {
 			return boost::optional<Type*>(common->second);
 		}
-	/*
 	} else if(a->type == TYPE_PARAMETERIZED) {
-		if(a->typedata.parameterized.label == string(b->typedata.parameterized.label)) return true;
+		if(a->typedata.parameterized.label == string(b->typedata.parameterized.label)) return boost::optional<Type*>(new Type(*a));
 		// TODO: lower/upper bounds comparison
-		return false;
-	*/
+		return boost::optional<Type*>();
 	}
 
-	/*
 	if(a->type == TYPE_LAMBDA) {
-
+		return boost::optional<Type*>();
+	/*
 		// if one or the other is a pointer
 		if((a->typedata.lambda.arguments == NULL) != (b->typedata.lambda.arguments == NULL))
 			return false;
@@ -324,8 +322,8 @@ boost::optional<Type*> TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
 		}
 
 		return true;
-
 	*/
+	}
 }
 
 boost::optional<pair<int, Type*> > TypeAnalyzer::getCommonClassnamesWithDepth(Type& a, Type& b, int depth) {

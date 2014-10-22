@@ -466,8 +466,11 @@ void ObjectFileGenerator::generate(Node* tree) {
 			file << "[";
 			if(tree->subnodes) {
 				int i;
-				for(i = 0; i < tree->subnodes; i++)
-					generate(tree->node_data.nodes[i]);
+				for(i = 0; i < tree->node_data.nodes[0]->subnodes; i++) {
+					if(i != 0) file << ",";
+					generate(tree->node_data.nodes[0]->node_data.nodes[i]);
+				}
+
 			}
 			file << "]";
 			break;

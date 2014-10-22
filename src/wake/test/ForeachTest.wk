@@ -28,12 +28,8 @@ every ForeachTest is:
 	}
 
 	~[ test loop with values executes with each once ]~(Asserts) {
-		var Num[] = [];
+		var Num[] = [1, 2, 3];
 		var $Num[] = [];
-
-		Num[0] = 1;
-		Num[1] = 2;
-		Num[2] = 3;
 
 		foreach(Num[]) {
 			$Num[].push(Num);
@@ -46,11 +42,7 @@ every ForeachTest is:
 	}
 
 	~[ test loop with values aren't references ]~(Asserts) {
-		var Num[] = [];
-
-		Num[0] = 0;
-		Num[1] = 1;
-		Num[2] = 2;
+		var Num[] = [0, 1, 2];
 
 		foreach(Num[]) {
 			Num += 2;
@@ -63,12 +55,7 @@ every ForeachTest is:
 
 	~[ test loop that inserts still executes with all ]~(Asserts) {
 		var Num = 0;
-		var Bool[] = [];
-
-		Bool[0] = true;
-		Bool[1] = false;
-		Bool[2] = false;
-		Bool[3] = true;
+		var Bool[] = [true, false, false, true];
 
 		foreach(Bool[]) {
 			if(Bool) {
@@ -96,10 +83,7 @@ every ForeachTest is:
 	with Num counter = 0;
 	Num[] -- getNumArray() {
 		counter += 1;
-		var Num[] = [];
-		Num[].push(0);
-		Num[].push(1);
-		Num[].push(2);
+		var Num[] = [0, 1, 2];
 		return Num[];
 	}
 
@@ -111,7 +95,7 @@ every ForeachTest is:
 
 	~[ test foreach as alias sets value properly in var ]~(Asserts) {
 		var Num[] copy = [];
-		var Num[] = []; Num[].push(0); Num[].push(1); Num[].push(2);
+		var Num[] = [0, 1, 2];
 		foreach(num in Num[]) {
 			copy.push(num);
 		}
@@ -123,7 +107,7 @@ every ForeachTest is:
 
 	~[ test foreach as class sets value properly in var ]~(Asserts) {
 		var Num[] copy = [];
-		var Num[] = []; Num[].push(0); Num[].push(1); Num[].push(2);
+		var Num[] = [0, 1, 2];
 		foreach(Num in Num[]) {
 			copy.push(Num);
 		}
@@ -135,7 +119,7 @@ every ForeachTest is:
 
 	~[ test foreach as shadow sets value properly in var ]~(Asserts) {
 		var Num[] copy = [];
-		var Num[] = []; Num[].push(0); Num[].push(1); Num[].push(2);
+		var Num[] = [0, 1, 2];
 		foreach($Num in Num[]) {
 			copy.push($Num);
 		}
