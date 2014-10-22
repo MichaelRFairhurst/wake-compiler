@@ -61,6 +61,7 @@
 				<li><a href="#ctorprovisions">- Constructor Provisions</a></li>
 				<li><a href="#provisionargs">- Provisions Arguments</a></li>
 				<li><a href="#behavioralprovisions">- Behavioral Provisions</a></li>
+				<li><a href="#ternaries">Ternary Operators</a></li>
 				<li><a href="#entry">Program entry points</a></li>
 			</ul>
 		</div>
@@ -432,8 +433,8 @@
     }
 </code></pre>
 			<h3 id="lists">Using Lists <span class="label label-inverse">typesafe</span></h3>
-			<div class="alert alert-error">
-				Until further releases, reading an unassigned list index results in undefined behavior, like in C/C++. Later on it will throw exceptions.
+			<div class="alert alert-warning">
+				For ease of use, the type returned by T[x] is a T, and not a T?. For this reason, getting an unassigned list index will throw an exception so that the type system is happy. Safe array accesses which return T? and do not throw are on the way.
 			</div>
 			<p>Lists (called Arrays in many other languages) are a way of storing sets of a particular type. They are incredibly useful.</p>
 			<span class="label label-info">Wake</span>
@@ -460,7 +461,7 @@
         foreach(<span class="goodcode" title="The compiler reduces Person[] to Person, and performs the following code for each person in our list.">Person[]</span>) Person.delete();
     }</code></pre>
 			<div class="alert alert-success">This works as you would expect for shadowed variables, where <code>$Person[]</code> becomes <code>$Person</code>. And it also works for expressions, where <code>foreach(db.getPeople())</code> lets you iterate over <code>Person</code>, since the compiler knows your db returns <code>Person[]</code>.</div>
-			<p>Wake also plans to support other foreach constructs, such as:</p>
+			<p>Wake also plans to supports giving custom names to the items you iterate over, and will soon support getting the index at the same time.</p>
 			<span class="label label-info">Wake</span>
 			<pre><code class="wake"
 >every PersonDatabase is:
@@ -697,6 +698,16 @@ every PersonProvider is:
     needs BabyMaker;
     provides Child &lt;- <span class="goodcode" title="Ask for two people that will construct your child">(Person dad, Person mom)</span> {
         return BabyMaker.makeBabyWithFather(<span class="goodcode" title="You can use these arguments like you would in any function">dad</span>)AndMom(mom);
+    };</code></pre>
+
+		<h3 id="ternaries">Ternary Operators <span class="label label-inverse">readable</span> <span class="label label-inverse">concise</span></h3>
+		<p>Wake uses python style ternary operators, which are more readable than the c-style <code>:?</code> approach.</p>
+			<span class="label label-info">Wake</span>
+		<pre><code class="wake"
+>every MyClass
+
+    Num -- myMethod(Bool) {
+		return <span class="goodcode" title="Return 4 on the true case of our condition">4</span> if <span class="goodcode" title="The value of this Bool variable determines if we evaluate the left or right expression">Bool</span> else <span class="goodcode" title="Return 5 when our variable Bool is false">5</span>;
     };</code></pre>
 		</div></div>
 		<script src="bootstrap/js/bootstrap.min.js"></script>
