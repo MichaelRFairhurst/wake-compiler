@@ -3180,4 +3180,37 @@ PTT_TEST_CASE(
 	PTT_EXPECT(TYPE_ERROR)
 );
 
+PTT_TEST_CASE(
+	TestNestedArrayAndOptionals,
+	"every MyClass is:											\n\
+		needs Num??;											\n\
+		with Num?[] = [nothing];								\n\
+		with $Num?[] = [];										\n\
+		with $$Num[]? = [];										\n\
+		with $$$Num[]? = nothing;								\n\
+		with $$$$Num?[][][]?[]?[] = [nothing, [nothing, [[[nothing]]]]];",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestSetOptionalOptionalToValues,
+	"every MyClass is:											\n\
+		myMethod() {											\n\
+			var Num? = nothing;									\n\
+			Num = [1, 1][0];									\n\
+			Num = [1, nothing][0];								\n\
+			Num = [nothing][0];									\n\
+			var $Num?? = Num;									\n\
+			$Num = nothing;										\n\
+			$Num = 1;											\n\
+			$Num = [1, 1][0];									\n\
+			$Num = [1, nothing][0];								\n\
+			$Num = [1, Num][0];									\n\
+			$Num = [nothing, Num][0];							\n\
+			$Num = [nothing][0];								\n\
+			$Num = [Num][0];									\n\
+		}",
+	PTT_VALID
+);
+
 BOOST_AUTO_TEST_SUITE_END()
