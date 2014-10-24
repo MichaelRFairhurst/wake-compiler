@@ -57,7 +57,7 @@ WAKETABLENAMES=Printer.wk System.wk List.wk Text.wk Num.wk Bool.wk File.wk FileP
 WAKETABLEOBJS=$(addprefix bin/waketable/, $(WAKETABLENAMES:.wk=.table))
 WAKETABLEINCLUDES=$(addprefix gen/, $(WAKETABLENAMES:.wk=.table.h))
 
-CNAMES=tree.c type.c parseUtil.c
+CNAMES=tree.c type.c parseUtil.c error.c
 COBJS=$(addprefix bin/c/, $(CNAMES:.c=.o))
 
 GENNAMES=lex.wake.c wake.tab.c objectfile.tab.c lex.objectfile.c

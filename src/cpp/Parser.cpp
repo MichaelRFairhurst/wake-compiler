@@ -14,18 +14,25 @@
 
 #include "Parser.h"
 #include <iostream>
+#include "error.h"
+#include "wake.tab.h"
 
 extern "C" int wakelex_destroy  (void);
+extern "C" int line;
+extern "C" int column;
 
 bool Parser::parse(const char* input) {
 	parsetree = NULL;
+	error_set_buffer(input);
 	wake_scan_string(input);
+	line = 1; column = 1;
 	return wakeparse();
 }
 
 bool Parser::parse(FILE* input) {
 	parsetree = NULL;
 	wakein = input;
+	line = 1; column = 1;
 	return wakeparse();
 }
 

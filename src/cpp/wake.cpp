@@ -27,6 +27,7 @@ extern "C" {
 	extern FILE *yyin;
 }
 
+#include "error.h"
 #include "Parser.h"
 #include "Linker.h"
 #include "ParseTreeTraverser.h"
@@ -62,6 +63,7 @@ void compileFile(Options* options) {
 	}
 
 	FILE *myfile = fopen(options->compileFilename.c_str(), "r");
+	error_open_file(options->compileFilename.c_str());
 
 	if (!myfile) {
 		printf("[ couldn't open file ]\n");

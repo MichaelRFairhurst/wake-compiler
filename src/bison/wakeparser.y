@@ -20,6 +20,7 @@
 #include "tree.h"
 #include "type.h"
 #include "wakelltype.h"
+#include "error.h"
 
 #define YYLEX_PARAM &yylval, &yylloc
 #define YYERROR_VERBOSE
@@ -31,11 +32,9 @@ Node* parsetree;
 
 void wakeerror(const char *str)
 {
-        fprintf(stderr, "[ Error                             ]\n");
-        fprintf(stderr, "[ On line %d col %d                 ]\n", line, column);
-        fprintf(stderr, "[ %s                                ]\n", str);
-        fprintf(stderr, "[ Unexpected %s                     ]\n", waketext);
-        fprintf(stderr, "[ yeah this spacing aint pretty yet ]\n");
+		//error_open_file(YYFILE);
+		error_print_error_token(&yylloc);
+        puts(str);
 }
 
 int wakewrap()
