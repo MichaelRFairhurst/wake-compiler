@@ -72,18 +72,18 @@ void error_read_line(int target) {
 }
 
 void error_print_multiline(YYLTYPE* location) {
-	printf("%*c\n", location->first_column, ' ');
+	printf("%*cv\n", location->first_column, ' ');
 	int i;
 	for(i = location->first_line; i <= location->last_line; i++) {
 		if(i - 2 > location->first_line && i + 2 < location->last_line) {
-			puts(" ... \n");
+			puts(" ...");
 			i = location->last_line - 2;
 		}
 		error_read_line(i);
-		puts(error_linebuffer);
-		puts(" <<\n");
+		printf("%s", error_linebuffer);
+		puts(" <");
 	}
-	printf("%*c\n", location->last_column, ' ');
+	printf("%*c^\n", location->last_column, ' ');
 }
 
 void error_print_single_line(YYLTYPE* location) {

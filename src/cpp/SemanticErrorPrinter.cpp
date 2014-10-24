@@ -14,9 +14,11 @@
 
 #include <iostream>
 #include "SemanticErrorPrinter.h"
+#include "error.h";
 
 void SemanticErrorPrinter::print(SemanticError* e) {
 
+	if(e->token != NULL) error_print_error_token(&e->token->loc);
 	if(e->token != NULL) cout << "[ ERROR on line " << e->token->line << ", column " << e->token->col << " ]" << endl;
 
 	if(e->context != "") cout << "[ -CONTEXT: " << e->context << " ]" << endl;
