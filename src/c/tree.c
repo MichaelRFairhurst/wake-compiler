@@ -14,6 +14,7 @@
 
 #include <stdio.h>
 #include "tree.h"
+#include "wakelltype.h"
 
 extern int line;
 extern int column;
@@ -115,57 +116,58 @@ void PrependSubNode(Node* parent, Node* child) {
 	parent->node_data.nodes[0] = child;
 }
 
-Node* NodeFactory(int nodetype) {
+Node* NodeFactory(int nodetype, YYLTYPE loc) {
 	Node* mynode = malloc(sizeof(Node));
 	mynode->line = line;
 	mynode->col = column;
 	mynode->node_type = nodetype;
 	mynode->subnodes = 0;
+	mynode->loc = loc;
 	return mynode;
 }
 
-Node* MakeEmptyNode(int nodetype) {
-	Node* mynode = NodeFactory(nodetype);
+Node* MakeEmptyNode(int nodetype, YYLTYPE loc) {
+	Node* mynode = NodeFactory(nodetype, loc);
 	mynode->node_data.nodes = NULL;
 	return mynode;
 }
 
-Node* MakeNodeFromType(Type* thetype) {
-	Node* mynode = NodeFactory(NT_TYPEDATA);
+Node* MakeNodeFromType(Type* thetype, YYLTYPE loc) {
+	Node* mynode = NodeFactory(NT_TYPEDATA, loc);
 	mynode->node_data.type = thetype;
 	return mynode;
 }
 
-Node* MakeNodeFromTypeArray(TypeArray* thearray) {
-	Node* mynode = NodeFactory(NT_TYPE_ARRAY);
+Node* MakeNodeFromTypeArray(TypeArray* thearray, YYLTYPE loc) {
+	Node* mynode = NodeFactory(NT_TYPE_ARRAY, loc);
 	mynode->node_data.typearray = thearray;
 
 	return mynode;
 }
 
-Node* MakeNodeFromString(int nodetype, char* mystring) {
-	Node* mynode = NodeFactory(nodetype);
+Node* MakeNodeFromString(int nodetype, char* mystring, YYLTYPE loc) {
+	Node* mynode = NodeFactory(nodetype, loc);
 	mynode->node_data.string = mystring;
 	//mynode->node_data.string = strdup(mystring);
 	return mynode;
 }
 
-Node* MakeNodeFromNumber(int nodetype, float number) {
-	Node* mynode = NodeFactory(nodetype);
+Node* MakeNodeFromNumber(int nodetype, float number, YYLTYPE loc) {
+	Node* mynode = NodeFactory(nodetype, loc);
 	mynode->node_data.number = number;
 	return mynode;
 }
 
-Node* MakeTwoBranchNode(int nodetype, Node* a, Node* b) {
-	Node* mynode = NodeFactory(nodetype);
+Node* MakeTwoBranchNode(int nodetype, Node* a, Node* b, YYLTYPE loc) {
+	Node* mynode = NodeFactory(nodetype, loc);
 	mynode->subnodes = 2;
 	mynode->node_data.nodes = malloc(2 * sizeof(Node*));
 	mynode->node_data.nodes[0] = a; mynode->node_data.nodes[1] = b;
 	return mynode;
 }
 
-Node* MakeOneBranchNode(int nodetype, Node* a) {
-	Node* mynode = NodeFactory(nodetype);
+Node* MakeOneBranchNode(int nodetype, Node* a, YYLTYPE loc) {
+	Node* mynode = NodeFactory(nodetype, loc);
 	mynode->subnodes = 1;
 	mynode->node_data.nodes = malloc(1 * sizeof(Node*));
 	mynode->node_data.nodes[0] = a;

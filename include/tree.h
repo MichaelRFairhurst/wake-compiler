@@ -134,19 +134,19 @@ void AddSubNode(Node* parent, Node* child);
 
 void PrependSubNode(Node* parent, Node* child);
 
-Node* MakeEmptyNode(int nodetype);
+Node* MakeEmptyNode(int nodetype, YYLTYPE loc);
 
-Node* MakeNodeFromType(Type* thetype);
+Node* MakeNodeFromType(Type* thetype, YYLTYPE loc);
 
-Node* MakeNodeFromTypeArray(TypeArray* thearray);
+Node* MakeNodeFromTypeArray(TypeArray* thearray, YYLTYPE loc);
 
-Node* MakeNodeFromString(int nodetype, char* mystring);
+Node* MakeNodeFromString(int nodetype, char* mystring, YYLTYPE loc);
 
-Node* MakeNodeFromNumber(int nodetype, float number);
+Node* MakeNodeFromNumber(int nodetype, float number, YYLTYPE loc);
 
-Node* MakeTwoBranchNode(int nodetype, Node* a, Node* b);
+Node* MakeTwoBranchNode(int nodetype, Node* a, Node* b, YYLTYPE loc);
 
-Node* MakeOneBranchNode(int nodetype, Node* a);
+Node* MakeOneBranchNode(int nodetype, Node* a, YYLTYPE loc);
 
 char* getTypeLabel(Type* thetype);
 

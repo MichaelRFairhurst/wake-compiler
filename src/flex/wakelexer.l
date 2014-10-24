@@ -15,6 +15,7 @@
 
 #include <stdio.h>
 #include "tree.h"
+#include "wakelltype.h"
 #include "wake.tab.h"
 
 extern YYSTYPE wakelval;
@@ -26,6 +27,7 @@ void count();
 
 %}
 
+%option yylineno
 %x ST_BLOCKCOMMENT
 %x ST_LINECOMMENT
 
@@ -145,6 +147,9 @@ void count()
 {
 	int i;
 
+	wakelloc.first_line = line;
+	wakelloc.first_column = column;
+
 	for (i = 0; waketext[i] != '\0'; i++)
 	switch(waketext[i]) {
 		case '\t':
@@ -154,4 +159,7 @@ void count()
 		default:
 			column++;
 	}
+
+	wakelloc.last_line = line;
+	wakelloc.last_column = column;
 }

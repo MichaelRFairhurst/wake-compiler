@@ -15,9 +15,12 @@
 #ifndef HEADER_NODE
 #define HEADER_NODE
 
+#include "wakelltype.h"
+
 typedef struct Node {
 	int line;
 	int col;
+	YYLTYPE loc;
 	int node_type;
 	int subnodes;
 	union {

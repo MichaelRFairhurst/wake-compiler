@@ -171,8 +171,8 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						if(variable) {
 							name = strdup(name);
 							tree->node_type = NT_MEMBER_ACCESS;
-							AddSubNode(tree, MakeEmptyNode(NT_THIS));
-							AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, name));
+							AddSubNode(tree, MakeEmptyNode(NT_THIS, tree->loc));
+							AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, name, tree->loc));
 						}
 					}
 					if(!variable) {
@@ -204,8 +204,8 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 							char* propname = strdup(scopesymtable->getNameForType(&type).c_str());
 							delete tree->node_data.type; tree->node_data.nodes = NULL;
 							tree->node_type = NT_MEMBER_ACCESS;
-							AddSubNode(tree, MakeEmptyNode(NT_THIS));
-							AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, propname));
+							AddSubNode(tree, MakeEmptyNode(NT_THIS, tree->loc));
+							AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, propname, tree->loc));
 						}
 					}
 					if(!variable) {
@@ -569,7 +569,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 					Type* boxedtype;
 					if(analyzer->isAutoboxedType(&subject, &boxedtype)) {
 						Node* node = tree->node_data.nodes[0];
-						tree->node_data.nodes[0] = MakeTwoBranchNode(NT_AUTOBOX, node, MakeNodeFromString(NT_COMPILER_HINT, strdup(boxedtype->typedata._class.classname)));
+						tree->node_data.nodes[0] = MakeTwoBranchNode(NT_AUTOBOX, node, MakeNodeFromString(NT_COMPILER_HINT, strdup(boxedtype->typedata._class.classname), tree->loc), tree->loc);
 						subject = *boxedtype;
 						delete boxedtype;
 					}
@@ -609,8 +609,8 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 							ret = new Type(*(*lambdatype)->typedata.lambda.returntype);
 						}
 
-						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(subject.typedata._class.classname)));
-						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(methodtable->getAddress(methodtable->getSymbolNameOf(&method_segments)).c_str())));
+						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(subject.typedata._class.classname), tree->loc));
+						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(methodtable->getAddress(methodtable->getSymbolNameOf(&method_segments)).c_str()), tree->loc));
 					} else {
 						errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Couldn't find property " + methodtable->getSymbolNameOf(&method_segments) + " on class" + subject.typedata._class.classname, tree));
 						ret = MakeType(TYPE_MATCHALL);
@@ -688,7 +688,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						} catch(SymbolNotFoundException *e) {
 							delete e;
 						}
-						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(name.c_str())));
+						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(name.c_str()), tree->loc));
 					} catch(SymbolNotFoundException* e) {
 						errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
 						delete e;
@@ -779,7 +779,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 					Type* boxedtype;
 					if(analyzer->isAutoboxedType(&subject, &boxedtype)) {
 						Node* node = tree->node_data.nodes[0];
-						tree->node_data.nodes[0] = MakeTwoBranchNode(NT_AUTOBOX, node, MakeNodeFromString(NT_COMPILER_HINT, strdup(boxedtype->typedata._class.classname)));
+						tree->node_data.nodes[0] = MakeTwoBranchNode(NT_AUTOBOX, node, MakeNodeFromString(NT_COMPILER_HINT, strdup(boxedtype->typedata._class.classname), tree->loc), tree->loc);
 						subject = *boxedtype;
 						delete boxedtype;
 					}
@@ -807,7 +807,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 							errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Accessed arrayed variable " + name + " with wrong number of [] brackets.", tree));
 
 						ret = copyType(*variable);
-						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(name.c_str())));
+						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(name.c_str()), tree->loc));
 					}
 				}
 				break;
@@ -859,7 +859,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						delete typeCheck(nodebase[1], forceArrayIdentifier);
 						scopesymtable->popScope();
 
-						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(scopesymtable->getNameForType(&lowered).c_str())));
+						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(scopesymtable->getNameForType(&lowered).c_str()), tree->loc));
 					}
 				}
 				break;
@@ -877,7 +877,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 							erroneousstring = analyzer->getNameForType(exception);
 							throw string("Only exceptions can be thrown");
 						}
-						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(exception->typedata._class.classname)));
+						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(exception->typedata._class.classname), tree->loc));
 						scopesymtable->pushScope();
 						scopesymtable->add(exception);
 						delete typeCheck(tree->node_data.nodes[1], forceArrayIdentifier);

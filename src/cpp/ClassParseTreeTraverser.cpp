@@ -79,7 +79,7 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 					}
 				}
 				boost::optional<SemanticError*> error = propertysymtable->addProvision(tree->node_data.nodes[0]->node_data.type, arguments, flags);
-				AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(classestable->getAnalyzer()->getProvisionSymbol(tree->node_data.nodes[0]->node_data.type, arguments).c_str())));
+				AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(classestable->getAnalyzer()->getProvisionSymbol(tree->node_data.nodes[0]->node_data.type, arguments).c_str()), tree->loc));
 				if(error) {
 					(*error)->token = tree;
 					errors->addError(*error);
@@ -400,7 +400,7 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 				Type* method = *optmethod;
 
 				errors->pushContext("In declaration of 'every " + classname + "' method " + name);
-				AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(name.c_str())));
+				AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(name.c_str()), tree->loc));
 
 				// Begin Method Scope For Type Analysis
 				scopesymtable->pushScope();

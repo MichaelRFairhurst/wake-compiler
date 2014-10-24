@@ -171,7 +171,7 @@ bin/c/%.o: src/c/%.c gen/wake.tab.c gen/objectfile.tab.c
 	$(CC) $(OPT) -c $< -o $@
 
 gen/%.tab.c: src/bison/%parser.y
-	bison --report=states -p $* -dg -o $@ $<
+	bison --report=states --locations -p $* -dg -o $@ $<
 
 gen/%.table.h: bin/waketable/%.table bin/wake-nolib
 	xxd -i $< $@
