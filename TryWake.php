@@ -30,7 +30,7 @@ if($code) {
 	if(file_exists(@$filename . '.o'))
 		system($command2);
 
-	$compiler_output = trim(ob_get_clean());
+	$compiler_output = ob_get_clean();
 }
 ?>
 <html>
