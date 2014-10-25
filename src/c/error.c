@@ -102,7 +102,7 @@ void error_print_single_line(YYLTYPE* location) {
 void error_print_error_token(YYLTYPE* location) {
 	if(location->first_line < error_line) {
 		if(error_file != NULL) {
-			fseek(0, error_file, SEEK_SET);
+			fseek(error_file, 0, SEEK_SET);
 			error_buffer_len = 0;
 			error_offset = 0;
 			error_line = 1;
