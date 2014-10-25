@@ -46,13 +46,20 @@ if($code) {
 		<link rel="stylesheet" type="text/css" href="page.css">
 		<link href='http://fonts.googleapis.com/css?family=Roboto:100' rel='stylesheet' type='text/css'>
 	</head>
+	<script>
+		console.log = function(text) {
+			$('#programoutput').text($('#programoutput').text() + '\n' + text);
+		};
+	</script>
 <body>
 	<div class="mynavbar">
 		<ul class="nav nav-tabs nav-stacked">
 			<li><a href="index.html">Wake Home</a></li>
-			<li><a href="faq.html">Wake FAQ</a></li>
-			<li><a href="howto.html">Getting Started Guide</a></li>
+			<li><a href="howto.html">Quick Tutorial</a></li>
 			<li><a href="installing.html">Installing</a></li>
+			<li><a href="faq.html">FAQ</a></li>
+			<li><a href="std.html">Standard Library</a></li>
+			<li><a href="TryWake.php">Online Compiler</a></li>
 		</ul>
 	</div>
 	<div class="opennav"><button class="btn btn-inverse btn-small"><i class="icon-align-justify icon-white"></i></button></div>
@@ -119,6 +126,10 @@ every Main is:
 		<h3>Compilation Result:</h3>
 
 		<pre><?php echo htmlentities(file_get_contents($filename . '.js')); ?></pre>
+
+		<h3>Program Output:</h3>
+
+		<pre id="programoutput"></pre>
 	<?php else: ?>
 		<h3>No compilation result.</h3>
 	<?php endif; ?>
@@ -130,6 +141,7 @@ every Main is:
 		<input type="hidden" id="result" value="<?php echo htmlentities(file_get_contents($filename . '.js')); ?>" />
 		<?php endif; ?>
 	</div>
+
 </div>
 </body>
 </html>
