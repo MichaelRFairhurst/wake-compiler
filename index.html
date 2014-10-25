@@ -22,14 +22,17 @@
 					<ul class="dropdown-menu">
 						<li><a href="TryWake.php">Try it Online</a></li>
 						<li><a href="installing.html">Installation</a></li>
-						<li><a href="howto.html">Getting Started</a></li>
+						<li><a href="howto.html">Quick Tutorial</a></li>
 						<li><a href="https://github.com/MichaelRFairhurst/wake-compiler">View on Github</a></li>
 					</ul>
 				</div>
 			<hr />
 			<ul class="nav nav-tabs nav-stacked">
-				<li><a href="faq.html">Wake FAQ</a></li>
-				<li><a href="howto.html">Getting Started</a></li>
+				<li><a href="howto.html">Quick Tutorial</a></li>
+				<li><a href="installing.html">Installing</a></li>
+				<li><a href="faq.html">FAQ</a></li>
+				<li><a href="std.html">Standard Library</a></li>
+				<li><a href="TryWake.php">Online Compiler</a></li>
 			</ul>
 			<hr />
 			<ul class="nav nav-tabs nav-stacked">
@@ -697,7 +700,7 @@ every PersonProvider is:
 >every Provider is:
     needs BabyMaker;
     provides Child &lt;- <span class="goodcode" title="Ask for two people that will construct your child">(Person dad, Person mom)</span> {
-        return BabyMaker.makeBabyWithFather(<span class="goodcode" title="You can use these arguments like you would in any function">dad</span>)AndMom(mom);
+        return BabyMaker.makeBabyWithFather(<span class="goodcode" title="You can use these arguments like you would in any function">dad</span>)AndMother(mom);
     };</code></pre>
 
 		<h3 id="ternaries">Ternary Operators <span class="label label-inverse">readable</span> <span class="label label-inverse">concise</span></h3>
@@ -707,8 +710,12 @@ every PersonProvider is:
 >every MyClass
 
     Num -- myMethod(Bool) {
-		return <span class="goodcode" title="Return 4 on the true case of our condition">4</span> if <span class="goodcode" title="The value of this Bool variable determines if we evaluate the left or right expression">Bool</span> else <span class="goodcode" title="Return 5 when our variable Bool is false">5</span>;
+        return <span class="goodcode" title="Return 4 on the true case of our condition">4</span> if <span class="goodcode" title="The value of this Bool variable determines if we evaluate the left or right expression">Bool</span> else <span class="goodcode" title="Return 5 when our variable Bool is false">5</span>;
     };</code></pre>
+		<h3 id="entry">Program Entry Points <span class="label label-inverse">flexible</span> <span class="label label-inverse">testable</span> <span class="label label-inverse">fast</span></h3>
+		<p>After compiling each Wake file, you can link the files together and choose where the program begins. This means the code you write does not guarantee any particular entry point, which in turn means your test suite can have a different entry point than your app. Without this, you would be unable to test your application's startup in unit tests.</p>
+		<p>Any class with automatically inferrable dependencies (ie, no primitives, lists, etc) can be your startup class, and any of its methods which take no arguments can be the starting method. These are provided by the compile time flags <code>-c</code> and <code>-m</code> respectively, but default to <code>Main</code> and <code>main()</code>.</p>
+		<p>This means that when you link your wake files together, the compiler generates a startup routine that wires up the complete object graph required by your main class, and invokes your desired startup method. This makes for a fast, flexible, and testable program startup.</p>
 		</div></div>
 		<script src="bootstrap/js/bootstrap.min.js"></script>
 	</body>

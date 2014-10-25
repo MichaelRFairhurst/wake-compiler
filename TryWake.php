@@ -50,9 +50,11 @@ if($code) {
 	<div class="mynavbar">
 		<ul class="nav nav-tabs nav-stacked">
 			<li><a href="index.html">Wake Home</a></li>
-			<li><a href="faq.html">Wake FAQ</a></li>
-			<li><a href="howto.html">Getting Started Guide</a></li>
+			<li><a href="howto.html">Quick Tutorial</a></li>
 			<li><a href="installing.html">Installing</a></li>
+			<li><a href="faq.html">FAQ</a></li>
+			<li><a href="std.html">Standard Library</a></li>
+			<li><a href="TryWake.php">Online Compiler</a></li>
 		</ul>
 	</div>
 	<div class="opennav"><button class="btn btn-inverse btn-small"><i class="icon-align-justify icon-white"></i></button></div>
