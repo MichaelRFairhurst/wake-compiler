@@ -46,7 +46,7 @@ if($code) {
 		<link rel="stylesheet" type="text/css" href="page.css">
 		<link href='http://fonts.googleapis.com/css?family=Roboto:100' rel='stylesheet' type='text/css'>
 	</head>
-	<script>
+	<script type="text/javascript">
 		console.log = function(text) {
 			$('#programoutput').text($('#programoutput').text() + '\n' + text);
 		};
