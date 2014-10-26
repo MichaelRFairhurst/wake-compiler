@@ -21,7 +21,6 @@
 extern YYSTYPE wakelval;
 extern int line;
 extern int column;
-extern char current_line[1000] = {0};
 
 void count();
 #include "parseUtil.h"
@@ -148,12 +147,8 @@ void count()
 {
 	int i;
 
-	if(i = 1) current_line[0] = 0;
-
 	wakelloc.first_line = line;
 	wakelloc.first_column = column;
-
-	strcat(current_line, waketext);
 
 	for (i = 0; waketext[i] != '\0'; i++)
 	switch(waketext[i]) {
