@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Wake The Language</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<!-- Bootstrap -->
+		<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+		<link rel="stylesheet" href="/highlight.js/styles/tomorrow.css">
+		<script src="/highlight.js/highlight.pack.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script type="text/javascript" src="page.js"></script>
+		<link rel="stylesheet" type="text/css" href="page.css">
+		<link href='http://fonts.googleapis.com/css?family=Roboto:100' rel='stylesheet' type='text/css'>
+	</head>
+	<body>
+		<div class="mynavbar">
+			<ul class="nav nav-tabs nav-stacked">
+				<li><a href="index.html">Wake Home</a></li>
+				<li><a href="howto.html">Quick Tutorial</a></li>
+				<li><a href="installing.html">Installing</a></li>
+				<li><a href="faq.html">FAQ</a></li>
+				<li><a href="std.html">Standard Library</a></li>
+				<li><a href="TryWake.php">Online Compiler</a></li>
+				<li><a href="contributing.html">Wake Developer Guide</a></li>
+			</ul>
+			<hr />
+			<ul class="nav nav-tabs nav-stacked">
+				<li><a href="#getting-source">Getting the source</a></li>
+				<li><a href="#building">Buiding the code</a></li>
+				<li><a href="#buildingtests">Running the tests</a></li>
+				<li><a href="#issues">Issues</a></li>
+				<li><a href="#sourcetypes">Source Types in the Compiler</a></li>
+				<li><a href="#trees">Node and Type Trees</a></li>
+				<li><a href="#typechecker">Standard type checking</a></li>
+				<li><a href="#testing">Testing</a></li>
+			</ul>
+		</div>
+		<div class="opennav"><button class="btn btn-inverse btn-small"><i class="icon-align-justify icon-white"></i></button></div>
+		<div class="content" data-spy="scroll" data-target=".mynavbar">
+			<div class="inner-content">
+			<div id="intro">
+				<div id="logo">
+				</div>
+				<h2><a class="logo-label" href="/">WAKE</a></h2>
+				<p class="logo-label-label">
+				a <span class="accent">fast</span>, <span class="accent">expressive</span>, <span class="accent">typesafe</span> language that gives you <span class="accent">testability from the ground up</span>.
+				</p>
+			</div>
+
+			<h1>Wake Developer Guide</h1>
+			<p>This is a guide for those who wish to contribute to the compiler, which is mostly written in C++. If you wish to contribute by writing wake libraries, follow the <a href="howto.html">tutorial</a>, and either contribute to an <a href="https://github.com/search?q=user%3AMichaelRFairhurst+wake">existing wake repository</a> or create your own and email it to <a href="mailto:michaelrfairhurst@gmail.com">michaelrfairhurst@gmail.com</a> for inclusion/publication. For the compiler hackers, read on.</p>
+			<h3 id="getting-source">Getting the source</h3>
+			<p>If you haven't used git before, install it and check out a tutorial such as <a href="https://try.github.io/levels/1/challenges/1">this one</a>.</p>
+			<p>The wake source is on github <a href="https://github.com/MichaelRFairhurst/wake-compiler">here</a>, you can download it with <code>git clone https://github.com/MichaelRFairhurst/wake-compiler.git</code>.</a>
+			<h3 id="building">Building the code</h3>
+			<p>You will need gcc, make, flex, bison, nodejs, boost, xxd, and md5sum all installed on your system. Many of these are standard to unix. I have not built it with visual studio or clang before, and am not sure about how difficult it is to compile flex or bison with them. MinGW is probably best for windows, but you could try cygwin if you want. Remember that bison is just a tool, while flex is both a tool and a shared library.</p>
+			<p>You will need a compiled version of boost::test and boost::filesystem for your system. If you cannot compile boost::test, that's OK, you'll just miss out on unit tests and risk getting your pull requests turned down from missing tests or test failures. Nonetheless, travis will run these tests for you, so you can get by without it.</p>
+			<p>Now run <code>make bin/wake</code>. If you have everything installed and in your path, this should work just fine.<p>
+			<h3 id="buildingtests">Running the tests</h3>
+			<p>Try <code>make bin/wake TEST=true</code> to run the boost::test unit tests. Everything should work perfectly if you have boost::test installed.</p>
+			<p>To run the wake tests, which actually builds wake source code that tests the output of compilations, you'll need <a href="http://build.testception.com/job/wUnit/">the latest wUnit artifacts</a>. Put the executable <code>wunit-compiler</code> in your PATH (its a js file), and by default all of the <code>.o</code> and <code>.table</code> files should be in <code>../wUnit/bin/wakeobj</code> and <code>../wUnit/bin/waketable</code> respectively, but you can change that to whatever you'd like by setting <code>WUNITLIBRARYROOT</code> and <code>WUNITTABLEROOT</code> to something else inside <code>wmake.mk</code>. Now that all that has been done, you can now run <code>make</code>, and you should see a bunch of wake files build, then a unit test output folloowed by a happy printout of tests run vs tests failed.</p>
+			<h3 id="issues">Issues</h3>
+			<p>Now that you have the code and/or tests building, you can pick a bug or feature from the <a href="https://github.com/MichaelRFairhurst/wake-compiler/issues">Github issue tracker</a>, and get to work. Feel free to ask questions before settling on anything.</p>
+			<p>I also want to call out a few milestones and labels. There are different milestones for high vs low priority, and a bucket for all the features we'd like to include. High priority or feature push are a great starting place. For labels, there is a <a href="https://github.com/MichaelRFairhurst/wake-compiler/issues?q=is%3Aopen+is%3Aissue+label%3Abite-sized">bite-sized</a> label for small bugs/features that are great for first taking on. Additionally, semantics, parsing, and codegen have all been split out for those who are interested/more comfortable in one area vs another. The exception to this is the fullstack label, which indicates all of the above will be involved.</p>
+			<h3 id="sourcetypes">Source Types in the Compiler<h3>
+			<p>If you <code>ls src</code>, you'll see source types flex, bison, c, c++, and wake. The vast majority of the compiler lives in <code>src/cpp</code>. Why the others?</p>
+			<p><b>flex</b>: These files contain rules for lexical analysis of wake files. One is for lexing wake source, and the other is for lexing linkable files. Lexing is also called tokenization. Tokenization breaks the text into meaningful chunks, but does not attempt to put any of them in context.</p>
+			<p><b>bison</b>: Bison is a parser-generator. You can define rules, and nest rules within them. When a rule is matched, you get to call code. This code creates parse tree, where each matched rule creates a node in the tree. It uses <code>$$</code> to indicate the value returned by a rule match, and it uses <code>$1</code>, <code>$2</code>, ... to indicate the value returned by the first, second, etc matched rules. Once again, we have two files, one for wake source code, and one for linkable files.</p>
+			<p><b>c</b>: Bison generates c parsers, and flex generates c lexers, though there are forks that generate C++ ones. For this reason, many things related flex and bison are written in c, such as error printing, and node management.</p>
+			<p><b>cpp</b>: The C++ class <code>Parser</code> is a wrapper for the generater bison parser. This connects the c parser to the c++ typechecker and object generator. This holds the vast majority of the code.</p>
+			<p><b>wake</b>: This has subdirectories <code>test</code>, which contains wake test programs that assert their own valid execution to test the code generator, and <code>std/table</code>, and <code>std/myobj</code>. The tables are there for convenience. We can compile them to get their <code>.table</code> files, which are binary files describing their interfaces. Automatic imports like primitives and <code>Num</code> are serialized and compiled into the compiler source code. Others are there to expose the interface of handwritten object files that call native javacript libraries, which exist in <code>std/myobj</code>. These files are a temporary means of doing js interop, with a simple script to transform them into a linkable <code>.o</code> file.</p>
+			<h3 id="trees">Node and Type trees</h3>
+			<p>in progress</p>
+			<h3 id="typechecker">Standard type checking</h3>
+			<p>in progress</p>
+			<h3 id="testing">Testing</h3>
+			<p>in progress</p>
+
+		</div>
+		</div>
+
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+	</body>
+</html>
