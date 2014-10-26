@@ -10,7 +10,7 @@ function$ $$A(a, b) {
 }
 
 (function(require) {
-	var$ b='', fs = require('fs')||{};
+	var$ b='', fs = require('fs');
 	fs.existsSync = fs.existsSync || require("path").existsSync;
 
 	~Printer~ = function$ ~Printer~(){
@@ -371,4 +371,4 @@ function$ $$A(a, b) {
 		};
 	};
 
-})(typeof$ require === 'undefined' ? function() {} : require);
+})(typeof$ require === 'undefined' ? function() {return {};} : require);
