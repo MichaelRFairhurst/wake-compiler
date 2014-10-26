@@ -214,7 +214,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 					} else {
 						// detect if they wrote Printer[] instead of Printer[][]
 						// Either way Printer[x] would work, so if forceArrayIdentifier skip this step
-						if(!forceArrayIdentifier && type.type == TYPE_LIST && !analyzer->isAExactlyB(&type, *variable))
+						if(!forceArrayIdentifier && type.type == TYPE_LIST && analyzer->getArrayReferenceLevel(type) != analyzer->getArrayReferenceLevel(**variable))
 							errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Accessed arrayed variable " + scopesymtable->getNameForType(&type) + " with wrong number of [] brackets.", tree));
 
 						ret = new Type(**variable);
@@ -803,7 +803,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Symbol by name of " + name + " not found", tree));
 					} else {
 						Type* member = tree->node_data.nodes[1]->node_data.type;
-						if(!forceArrayIdentifier && tree->node_data.nodes[1]->node_type != NT_ALIAS && member->type == TYPE_LIST && !analyzer->isAExactlyB(member, *variable))
+						if(!forceArrayIdentifier && tree->node_data.nodes[1]->node_type != NT_ALIAS && member->type == TYPE_LIST && analyzer->getArrayReferenceLevel(*member) != analyzer->getArrayReferenceLevel(**variable))
 							errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Accessed arrayed variable " + name + " with wrong number of [] brackets.", tree));
 
 						ret = copyType(*variable);

@@ -3213,4 +3213,17 @@ PTT_TEST_CASE(
 	PTT_VALID
 );
 
+PTT_TEST_CASE(
+	TestGenericListCanBeReferencedWithoutGenericParams,
+	"every MyClass is:											\n\
+		with $List{Text}[] = [];								\n\
+		myMethod() {											\n\
+			var List{Text}[] = [];								\n\
+			List[] = [];										\n\
+			$List[] = [];										\n\
+			this.$List[] = [];									\n\
+		}",
+	PTT_VALID
+);
+
 BOOST_AUTO_TEST_SUITE_END()

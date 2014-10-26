@@ -529,3 +529,9 @@ string TypeAnalyzer::getProvisionSymbol(Type* provided, vector<Type*> &arguments
 	if(provided->specialty != NULL) name += provided->specialty;
 	return name;
 }
+
+int TypeAnalyzer::getArrayReferenceLevel(Type& type) {
+	if(type.type == TYPE_LIST) return 1 + getArrayReferenceLevel(*type.typedata.list.contained);
+	if(type.type == TYPE_OPTIONAL) return getArrayReferenceLevel(*type.typedata.optional.contained);
+	return 0;
+}

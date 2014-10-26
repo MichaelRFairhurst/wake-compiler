@@ -863,4 +863,34 @@ BOOST_AUTO_TEST_CASE(TestDistantEquallyViableParentClassesBelowValidParentClassI
 	freeType(*ret);
 }
 
+BOOST_AUTO_TEST_CASE(TestGetArrayReferenceLevelForClassIs0) {
+	TypeAnalyzer analyzer;
+	Type clazz(TYPE_CLASS);
+	BOOST_REQUIRE(analyzer.getArrayReferenceLevel(clazz) == 0);
+}
+
+BOOST_AUTO_TEST_CASE(TestGetArrayReferenceLevelForListIs1) {
+	TypeAnalyzer analyzer;
+	Type list(TYPE_LIST);
+	list.typedata.list.contained = new Type(TYPE_CLASS);
+	BOOST_REQUIRE(analyzer.getArrayReferenceLevel(list) == 1);
+}
+
+BOOST_AUTO_TEST_CASE(TestGetArrayReferenceLevelForListListIs2) {
+	TypeAnalyzer analyzer;
+	Type list(TYPE_LIST);
+	list.typedata.list.contained = new Type(TYPE_LIST);
+	list.typedata.list.contained->typedata.list.contained = new Type(TYPE_CLASS);
+	BOOST_REQUIRE(analyzer.getArrayReferenceLevel(list) == 2);
+}
+
+BOOST_AUTO_TEST_CASE(TestGetArrayReferenceLevelForListOptionalListIs2) {
+	TypeAnalyzer analyzer;
+	Type list(TYPE_LIST);
+	list.typedata.list.contained = new Type(TYPE_OPTIONAL);
+	list.typedata.list.contained->typedata.optional.contained = new Type(TYPE_LIST);
+	list.typedata.list.contained->typedata.optional.contained->typedata.list.contained = new Type(TYPE_CLASS);
+	BOOST_REQUIRE(analyzer.getArrayReferenceLevel(list) == 2);
+}
+
 BOOST_AUTO_TEST_SUITE_END();

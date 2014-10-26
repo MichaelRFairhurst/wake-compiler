@@ -44,6 +44,13 @@ class TypeAnalyzer {
 		bool isPrimitiveTypeBool(Type* theint);
 		bool isAutoboxedType(Type* type, Type** boxedtype);
 		bool isException(Type* type);
+
+		/**
+		 * Text[][] -- 2
+		 * Text[]?[] -- 2
+		 * Text?[] -- 1
+		 */
+		int getArrayReferenceLevel(Type& type);
 		string getNameForType(Type* type);
 		string getNameForTypeAsProperty(Type* type);
 		string getProvisionSymbol(Type* provided, vector<Type*> &arguments);
