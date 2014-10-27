@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Wake The Language</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<!-- Bootstrap -->
+		<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.1.5/angular.min.js"></script>
+		<script type="text/javascript">
+
+angular.module('wakeDemo', [])
+.directive('explainedCode', function() {
+	return {
+		transclude: true,
+		template: '<div ng-transclude></div>',
+		controller: function($scope) {
+			var explanations = {}, closeActive = function() {};
+			this.addExplanation = function(l, open, close) {
+				explanations[l] = [open, close];
+			};
+
+			this.openExplanation = function(l) {
+				closeActive();
+				explanations[l][0]();
+				closeActive = explanations[l][1];
+			};
+		}
+	};
+})
+.directive('explanation', function() {
+	return {
+		require: '^explainedCode',
+		transclude: true,
+		template: '<div ng-transclude></div>',
+		link: function(scope, elem, attrs, explainedCodeCtrl) {
+			elem.hide();
+			explainedCodeCtrl.addExplanation(attrs.l, function() {
+				elem.show();
+			}, function() {
+				elem.hide();
+			});
+		}
+	};
+})
+.directive('x', function($timeout) {
+	var c = 0;
+	return {
+		scope: {
+			//label: '=l',
+		},
+		restrict: 'E',
+		require: ['^explainedCode', 'x'],
+		transclude: 'true',
+		template: '<span ng-click="click()" ng-class="{highlightable: isClickable()}"><span ng-transclude></span></span>',
+		link: function(scope, elem, attrs, ctrls) {
+			var explainedCtrl = ctrls[0],
+				myCtrl = ctrls[1],
+				parentCtrl = elem.parent().inheritedData('$xController'),
+				offset = 0;
+
+			myCtrl.parent = parentCtrl;
+			scope.label = attrs.l;
+			if(!parentCtrl) myCtrl.open();
+			else {
+				offset = parentCtrl.children.length;
+				parentCtrl.children.push(myCtrl);
+			}
+
+			scope.$watch('showDescription()', function(v) {
+				if(v) explainedCtrl.openExplanation(attrs.l);
+			});
+
+			if(!parentCtrl) {
+				elem.show();
+				$timeout(function() {
+					myCtrl.ready();
+				}, 1000);
+				return;
+			}
+
+			var hasBeenColored = false;
+
+			myCtrl.readyFunction = function () {
+				scope.$watch('isClickable() && !isGreyed()', function(val) {
+					if(val) {
+						setTimeout(function() {
+							$(elem).fadeTo(240, 0.01, function() {
+								hasBeenColored = true;
+								$(elem).fadeTo(240, 1).addClass('color-' + c);
+								c++;
+								if(c > 5) c = 0;
+							})
+						}, offset * 360);
+					}
+				});
+
+				scope.$watch('!isClickable() && !isGreyed() && !is_open', function(val) {
+					// For elements that start out as unclickable, ungreyed children of clickable, ungreyed parents, this will fire
+					// therefore we must track which elements were ever colored in the first place before we uncolor them.
+					if(val && hasBeenColored) {
+						$(elem).fadeTo(600, 0.01, function() {
+							$(elem).fadeTo(800, 1).removeClass('color-0').removeClass('color-1').removeClass('color-2').removeClass('color-3').removeClass('color-4').removeClass('color-5');
+						});
+					}
+				});
+
+				scope.$watch('!isClickable() && !isGreyed() && is_open', function(val) {
+					if(val) {
+						$(elem).fadeTo(240, 1);
+					}
+				});
+
+				scope.$watch('isGreyed()', function(val) {
+					if(val) $(elem).fadeTo(600, .2);
+					//else $(elem).fadeTo(240, 1);
+				});
+			};
+		},
+		controller: function($scope) {
+			var ctrl = this;
+
+			ctrl.is_open = false;
+			ctrl.has_child_open = false;
+			ctrl.children = [];
+			ctrl.readyFunction = function() {};
+			$scope.show = false;
+
+			ctrl.ready = function(first) {
+				$scope.show = true;
+				ctrl.readyFunction();
+				for(var i = 0; i < ctrl.children.length; i++) {
+					ctrl.children[i].ready();
+				}
+			};
+
+			ctrl.open = function() {
+				if(ctrl.parent) {
+					if(ctrl.parent.has_child_open) ctrl.parent.close();
+					if(!ctrl.parent.is_open) ctrl.parent.open();
+					ctrl.parent.has_child_open = true;
+				}
+				$scope.is_open = true;
+				ctrl.is_open = true;
+			};
+
+			ctrl.close = function() {
+				$scope.is_open = false;
+				ctrl.is_open = false;
+				if(ctrl.parent) ctrl.parent.has_child_open = false;
+
+				if(!ctrl.children) return;
+				for(var i = 0; i < ctrl.children.length; i++) {
+					ctrl.children[i].close();
+				}
+			};
+
+			ctrl.openChild = function() {
+				for(var i = 0; i < ctrl.children.length; i++) {
+					ctrl.children[1].close();
+				}
+			}
+
+			$scope.click = function() {
+				if(!$scope.isClickable()) return;
+				if(ctrl.is_open && !ctrl.children.length) ctrl.close();
+				else if(!ctrl.is_open) {
+					ctrl.open();
+				}
+			};
+
+			$scope.isGreyed = function() {
+				return (!ctrl.parent || ctrl.parent.has_child_open) && !ctrl.is_open;
+			};
+
+			$scope.isClickable = function() {
+				return ctrl.parent && ctrl.parent.is_open && (!ctrl.is_open || !ctrl.children.length);
+			};
+
+			$scope.showDescription = function() {
+				return ctrl.is_open && !ctrl.has_child_open;
+			};
+
+		}
+	};
+});
+		</script>
+	</head>
+	<body>
+		<div ng-app="wakeDemo" class="container">
+			<Br />
+			<div class="hero-unit">
+				<h1>Interactive Wake Explanation</h1>
+				<hr/>
+				<div explained-code>
+
+					<pre style="font-size:22px" id="code"
+><x l="begin"><x l="classdeclaration"><x l="every">every</x> <x l="classname">MyClass</x> is:</x>
+
+	<x l="dependency">needs Printer;</x>
+
+	<x l="methods"><x l="returntype"><x l="type">Num</x> <x l="dashes">--</x></x> <x l="methodname"><x l="segmentone">distanceFrom(</x><x l="argone">Num</x><x l="segmenttwo">)To(</x><x l="argtwo"><x l="shadow">$</x><x l="type">Num</x></x><x l="methodnameclose">)</x></x> <x l="methodbody">{
+		// code
+	}</x></x></x></pre>
+
+					<p explanation l="begin">Click on any colored segment of code to get broken down explanations of everything in Wake.</p>
+					<p explanation l="classdeclaration">This is a class definition. <a ng-click="show_inheritance = true">What if I'm using inheritance?</a></p>
+					<p explanation l="dependency">Wake has intuitive ways of doing dependencies between objects.</p>
+					<p explanation l="methods">This is a method in wake. This method is named distanceFrom(Num)To($Num), and returns a Num.</p>
+				</div>
+			</div>
+		</div>
+		<style>
+			.greyed {
+				opacity: .1;
+			}
+			.color-0 {
+				color: #5da5da;
+			}
+			.color-1 {
+				color:#faa43a;
+			}
+			.color-2 {
+				color: #60bd68;
+			}
+			.color-3 {
+				color: #f17cb0;
+			}
+			.color-4 {
+				color: #b2912f;
+			}
+			.color-5 {
+				color: #b276b2;
+			}
+			span.highlightable {
+				cursor: pointer;
+			}
+			span.highlightable:hover {
+				color: #aaa;
+				transition: .7s;
+				text-shadow: 2px 2px 2px #ccc;
+			}
+		</style>
+	</body>
+</html>

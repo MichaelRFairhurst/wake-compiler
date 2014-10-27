@@ -61,6 +61,7 @@ if($code) {
 			<li><a href="std.html">Standard Library</a></li>
 			<li><a href="TryWake.php">Online Compiler</a></li>
 			<li><a href="contributing.html">Wake Developer Guide</a></li>
+			<li><a href="changelog.html">Changelog</a></li>
 		</ul>
 	</div>
 	<div class="opennav"><button class="btn btn-inverse btn-small"><i class="icon-align-justify icon-white"></i></button></div>

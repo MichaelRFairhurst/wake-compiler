@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Wake The Language</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<!-- Bootstrap -->
+		<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
+		<link rel="stylesheet" href="/highlight.js/styles/tomorrow.css">
+		<script src="/highlight.js/highlight.pack.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+		<script type="text/javascript" src="page.js"></script>
+		<link rel="stylesheet" type="text/css" href="page.css">
+		<link href='http://fonts.googleapis.com/css?family=Roboto:100' rel='stylesheet' type='text/css'>
+	</head>
+	<body>
+		<div class="mynavbar">
+			<ul class="nav nav-tabs nav-stacked">
+				<li><a href="index.html">Wake Home</a></li>
+				<li><a href="howto.html">Quick Tutorial</a></li>
+				<li><a href="installing.html">Installing</a></li>
+				<li><a href="faq.html">FAQ</a></li>
+				<li><a href="std.html">Standard Library</a></li>
+				<li><a href="TryWake.php">Online Compiler</a></li>
+				<li><a href="contributing.html">Wake Developer Guide</a></li>
+				<li><a href="changelog.html">Changelog</a></li>
+			</ul>
+			<hr />
+			<ul class="nav nav-tabs nav-stacked">
+				<li><a href="#v0.0.5">0.0.5 alpha</a></li>
+				<li><a href="#v0.0.4">0.0.4 alpha</a></li>
+				<li><a href="#v0.0.3">0.0.3 alpha</a></li>
+				<li><a href="#v0.0.2">0.0.2 alpha</a></li>
+				<li><a href="#v0.0.1">0.0.1 alpha</a></li>
+			</ul>
+		</div>
+		<div class="opennav"><button class="btn btn-inverse btn-small"><i class="icon-align-justify icon-white"></i></button></div>
+		<div class="content" data-spy="scroll" data-target=".mynavbar">
+			<div class="inner-content">
+				<div id="intro">
+					<div id="logo">
+					</div>
+					<h2><a class="logo-label" href="/">WAKE</a></h2>
+					<p class="logo-label-label">
+						a <span class="accent">fast</span>, <span class="accent">expressive</span>, <span class="accent">typesafe</span> language that gives you <span class="accent">testability from the ground up</span>.
+					</p>
+				</div>
+				<h1>Changelog</h1>
+				<p>We're still in alpha status, but you can check here to see what you'll get by updating, and/or gauge our progress.</p>
+				<br/>
+
+				<h3 id="v0.0.5">v0.0.5</h3>
+				<p><b>Features</b><p>
+				<p>Constructor arguments in provisions, arguments in behavioral provisions</p>
+				<p>List literals: typechecked declarations of any length now supported, empty list literal works everywhere</p>
+				<p>Ternary operator: python style 'x if cond else y'</p>
+				<p>Type system: Num now valid for if/while/for conditions (thanks Cole W!), types with arbirtrary nesting of arrays of optionals of arrays, etc</p>
+				<p>Arrays now throw UndefinedIndexException when index does not exist</p>
+				<p><b>Bugfixes</b><p>
+				<p>innaccurate text at the end of an import error</p>
+				<p>no code was generated for injection provisions</p>
+				<p>ambiguiting in optional lists vs lists of optionals</p>
+				<p>constructor provisions with subclasses still required you provide the parent class</p>
+				<p>Fixed a giant swath of memory leaks</p>
+				<p>Fixed segfaults when using empty array literals in invalid places</p>
+				<p><b>Standard Library</b><p>
+				<p>Text.join(Text[])</p>
+				<p>UndefinedIndexException</p>
+				<p><b>Compatibility Notes</b><p>
+				<p>Methods now must begin with lower case to disambiguate with arguments passed into a provider</p>
+
+				<h3 id="v0.0.4">v0.0.4</h3>
+				<p><b>Features</b><p>
+				<p>Exceptions - throwing, catching, extending, stack traces, catching native errors, printing uncaught exceptions</p>
+				<p>Foreach - Now supports `foreach _ in _` to name variables as you iterate over them</p>
+				<p><b>Bugfixes</b><p>
+				<p>Segfault when running foreach over an aliased variable</p>
+				<p>public arrayed unaliased class members and/or needs were innacessible to other classes</p>
+				<p>classes can no longer be extended and given methods with incompatible return types</p>
+				<p><b>Standard Library</b><p>
+				<p>Map.getValues()</p>
+				<p>Exception</p>
+				<p><b>Compatibility Notes</b><p>
+				<p>Removed requirement of C++11</p>
+				<p>Build process no longer tests by default</p>
+				<p>Table files are not compatible with v0.0.3</p>
+
+				<h3 id="v0.0.3">v0.0.3</h3>
+				<p><b>Features</b><p>
+				<p>- Brew support</p>
+				<p><b>Bugfixes</b><p>
+				<p>- Fixed bug in compiler for OSX where it wouldn't read inheritance from compiled files</p>
+				<p>- Fixed bug in std runtime for OSX that wrote /0 bytes into files</p>
+				<p>- Fixed bug in wockito for OSX that opened the same file twice that wrote over each other</p>
+				<p><b>Standard Library</b><p>
+				<p><b>Compatibility Notes</b><p>
+				<p>- Changed syntax of <code>var MyClass &lt- MyProvider</code> to <code>var MyClass from MyProvider</code></p>
+
+				<h3 id="v0.0.2">v0.0.2</h3>
+				<p><b>Features</b><p>
+				<p>- Generics allow parameterized types in needs</p>
+				<p>- Foreach</p>
+				<p><b>Bugfixes</b><p>
+				<p>- Missing codegen from typesafe cast</p>
+				<p><b>Standard Library</b><p>
+				<p>- Argv</p>
+				<p><b>Compatibility Notes</b><p>
+				<p>- Exists no longer allowed on class members, since other references may reset it to nothing</p>
+				<p>- Arrayed variables must be referenced with '[]' brackets, ie <code>Num[]</code> is now named <code>Num[]</code> instead of <code>Num</code></p>
+
+				<h3 id="v0.0.1">v0.0.1</h3>
+				<p>Massive release including fully-fledged OOP, powerful typesystem, generics, and more.</p>
+			</div>
+		</div>
+
+		<script src="bootstrap/js/bootstrap.min.js"></script>
+	</body>
+</html>
