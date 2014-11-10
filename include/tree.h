@@ -130,6 +130,14 @@
 #define NT_PRIVATE 79
 #define NT_PUBLIC 80
 
+#define NT_ANNOTATION 95
+#define NT_ANNOTATIONS 100
+#define NT_ANNOTATED_NEED 96
+#define NT_ANNOTATED_CLASS 97
+#define NT_ANNOTATED_METHOD 98
+#define NT_ANNOTATION_NAME 99
+#define NT_ANNOTATION_VALS 101
+
 void AddSubNode(Node* parent, Node* child);
 
 void PrependSubNode(Node* parent, Node* child);

@@ -73,7 +73,7 @@ int wakewrap()
 %token <number> BOOL
 %token <number> SYM_SHADOW
 %token <void> SYM_ARRAYED
-%type <node> imports import importtarget classes annotatedclass class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments lmethodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args annotatedtype annotatedmethod
+%type <node> imports import importtarget classes annotatedclass class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments lmethodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args annotatedtype annotatedmethod annotation annotations annotationvals annotationval
 %type <type> type specializabletype shadowabletype puretype classtype fntype parameterizedtype unboundtypespecification classdeclarationtype
 %type <type_array> puretypes types unboundtypespecifications
 %start file
@@ -104,35 +104,35 @@ importtarget:
 	;
 
 classes:
-	classes annotatedclass																{ $$ = $1; AddSubNode($$, $2); }
-	| annotatedclass																		{ $$ = MakeOneBranchNode(NT_CLASSSET, $1, @$); }
+	classes annotatedclass														{ $$ = $1; AddSubNode($$, $2); }
+	| annotatedclass															{ $$ = MakeOneBranchNode(NT_CLASSSET, $1, @$); }
 	;
 
 annotations:
-	annotations annotation
-	| annotation
+	annotations annotation														{ $$ = $1; AddSubNode($$, $2); }
+	| annotation																{ $$ = MakeOneBranchNode(NT_ANNOTATIONS, $1, @$); }
 	;
 
 annotation:
-	ANNOTATION
-	| ANNOTATION '(' annotationvals ')'
+	ANNOTATION																	{ $$ = MakeOneBranchNode(NT_ANNOTATION, MakeNodeFromString(NT_ANNOTATION_NAME, $1, @$), @$); }
+	| ANNOTATION '(' annotationvals ')'											{ $$ = MakeTwoBranchNode(NT_ANNOTATION, MakeNodeFromString(NT_ANNOTATION_NAME, $1, @$), $3, @$); }
 	;
 
 annotationvals:
-	annotationvals ',' annotationval
-	| annotationval
+	annotationvals ',' annotationval											{ $$ = $1; AddSubNode($$, $3); }
+	| annotationval																{ $$ = MakeOneBranchNode(NT_ANNOTATION_VALS, $1, @$); }
 	;
 
 annotationval:
-	STRING
-	| NUMBER
-	| BOOL
-	| NOTHING
+	STRING																		{ $$ = MakeNodeFromString(NT_STRINGLIT, $1, @$); }
+	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1, @$); }
+	| BOOL																		{ $$ = MakeNodeFromNumber(NT_BOOLLIT, $1, @$); }
+	| NOTHING																	{ $$ = MakeEmptyNode(NT_NOTHING, @$); }
 	;
 
 annotatedclass:
 	class																		{ $$ = $1; }
-	| annotations class															{ $$ = $2; }
+	| annotations class															{ $$ = MakeTwoBranchNode(NT_ANNOTATED_CLASS, $2, $1, @$); }
 	;
 
 class:
@@ -237,7 +237,7 @@ ctorarg:
 	;
 
 annotatedmethod:
-	annotations method															{ $$ = $2; }
+	annotations method															{ $$ = MakeTwoBranchNode(NT_ANNOTATED_METHOD, $2, $1, @$); }
 	| method																	{ $$ = $1; }
 	;
 
@@ -520,7 +520,7 @@ identifier:
 	;
 
 annotatedtype:
-	annotations type															{ $$ = $2; }
+	annotations type															{ $$ = MakeTwoBranchNode(NT_ANNOTATED_TYPE, $2, $1, @$); }
 	| type																		{ $$ = $1; }
 	;
 
