@@ -66,13 +66,14 @@ int wakewrap()
 %token <string> UIDENTIFIER
 %token <string> LIDENTIFIER
 %token <string> SPECIALTY
+%token <string> ANNOTATION
 %token <string> STRING
 %type <string> identifier
 %token <number> NUMBER
 %token <number> BOOL
 %token <number> SYM_SHADOW
 %token <void> SYM_ARRAYED
-%type <node> imports import importtarget classes class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments lmethodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args
+%type <node> imports import importtarget classes annotatedclass class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments lmethodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args
 %type <type> type specializabletype shadowabletype puretype classtype fntype parameterizedtype unboundtypespecification classdeclarationtype
 %type <type_array> puretypes types unboundtypespecifications
 %start file
@@ -102,8 +103,35 @@ importtarget:
 	;
 
 classes:
-	classes class																{ $$ = $1; AddSubNode($$, $2); }
-	| class																		{ $$ = MakeOneBranchNode(NT_CLASSSET, $1, @$); }
+	classes annotatedclass																{ $$ = $1; AddSubNode($$, $2); }
+	| annotatedclass																		{ $$ = MakeOneBranchNode(NT_CLASSSET, $1, @$); }
+	;
+
+annotations:
+	annotations annotation
+	| annotation
+	;
+
+annotation:
+	ANNOTATION
+	| ANNOTATION '(' annotationvals ')'
+	;
+
+annotationvals:
+	annotationvals ',' annotationval
+	| annotationval
+	;
+
+annotationval:
+	STRING
+	| NUMBER
+	| BOOL
+	| NOTHING
+	;
+
+annotatedclass:
+	class																		{ $$ = $1; }
+	| annotations class															{ $$ = $2; }
 	;
 
 class:
