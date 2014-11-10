@@ -73,12 +73,13 @@ int wakewrap()
 %token <number> BOOL
 %token <number> SYM_SHADOW
 %token <void> SYM_ARRAYED
-%type <node> imports import importtarget classes annotatedclass class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments lmethodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args
+%type <node> imports import importtarget classes annotatedclass class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments lmethodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args annotatedtype annotatedmethod
 %type <type> type specializabletype shadowabletype puretype classtype fntype parameterizedtype unboundtypespecification classdeclarationtype
 %type <type_array> puretypes types unboundtypespecifications
 %start file
 
-%expect 3
+/* 2 are from @annotations before class definitions, 1 from if/else, 1 from try/catch, 1 from exists/else */
+%expect 5
 %expect-rr 0
 %%
 
@@ -162,7 +163,7 @@ classbody:
 classprop:
 	PROVIDES provisions ';'														{ $$ = $2; }
 	| ctor																		{ $$ = $1; }
-	| method																	{ $$ = $1; }
+	| annotatedmethod															{ $$ = $1; }
 	| property																	{ $$ = $1; }
 	;
 
@@ -231,8 +232,13 @@ ctorargs:
 	;
 
 ctorarg:
-	type																		{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, MakeNodeFromType($1, @$), MakeEmptyNode(NT_PRIVATE, @$), @$); }
-	| PUBLIC type																{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, MakeNodeFromType($2, @$), MakeEmptyNode(NT_PUBLIC, @$), @$); }
+	annotatedtype																{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, MakeNodeFromType($1, @$), MakeEmptyNode(NT_PRIVATE, @$), @$); }
+	| PUBLIC annotatedtype														{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, MakeNodeFromType($2, @$), MakeEmptyNode(NT_PUBLIC, @$), @$); }
+	;
+
+annotatedmethod:
+	annotations method															{ $$ = $2; }
+	| method																	{ $$ = $1; }
 	;
 
 method:
@@ -511,6 +517,11 @@ expressions_noretrieval:
 identifier:
 	UIDENTIFIER																	{ $$ = $1; }
 	| LIDENTIFIER																{ $$ = $1; }
+	;
+
+annotatedtype:
+	annotations type															{ $$ = $2; }
+	| type																		{ $$ = $1; }
 	;
 
 type:
