@@ -285,3 +285,7 @@ Type* PropertySymbolTable::getAsType() {
 bool PropertySymbolTable::isBehavioralProvision(string name) {
 	return properties.find(name)->second->flags & PROPERTY_BLOCKPROVISION;
 }
+
+void PropertySymbolTable::setAnnotations(vector<Annotation*> annotations) {
+	this->annotations = boost::ptr_vector<Annotation*>(annotations.begin(), annotations.end());
+}

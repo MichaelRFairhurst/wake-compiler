@@ -15,6 +15,7 @@
 #include "ParseTreeTraverser.h"
 #include "CompilationExceptions.h"
 #include "ClassParseTreeTraverser.h"
+#include "AnnotationTreeTraverser.h"
 #include <string.h>
 
 void ParseTreeTraverser::traverse(Node* tree) {
@@ -107,16 +108,21 @@ void ParseTreeTraverser::secondPass(Node* tree) {
 			break;
 
 		case NT_ANNOTATED_CLASS:
-			secondPass(tree->node_data.nodes[0]);
-			break;
-
 		case NT_CLASS:
 			{
+				vector<Annotation*> annotations;
+				if(tree->node_type == NT_ANNOTATED_CLASS) {
+					AnnotationTreeTraverser traverser;
+					annotations = traverser.getAnnotations(tree->node_data.nodes[1]);
+					tree = tree->node_data.nodes[0];
+				}
+
 				Type* classtype = tree->node_data.nodes[0]->node_data.type;
 				string classname = classtype->typedata._class.classname;
 				errors.pushContext("In declaration of 'every " + classname + "'");
 
 				PropertySymbolTable* proptable = objectsymtable->findModifiable(classname);
+				proptable->setAnnotations(annotations);
 
 				ClassParseTreeTraverser classtraverser(&errors, objectsymtable, &scopesymtable, classname, &typechecker, &methodanalyzer, proptable);
 
