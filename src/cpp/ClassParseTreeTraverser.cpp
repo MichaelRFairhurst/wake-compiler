@@ -124,7 +124,7 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 				parameterizer.writeInParameterizations(&tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type, propertysymtable->getParameters());
 				Type prop = *tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type;
 				classestable->assertTypeIsValid(&prop);
-				boost::optional<SemanticError*> error = propertysymtable->addProperty(new Type(prop), tree->subnodes == 2 ? PROPERTY_PUBLIC : 0);
+				boost::optional<SemanticError*> error = propertysymtable->addProperty(new Type(prop), tree->subnodes == 2 ? PROPERTY_PUBLIC : 0, vector<Annotation*>());
 				if(error) {
 					(*error)->token = tree;
 					errors->addError(*error);

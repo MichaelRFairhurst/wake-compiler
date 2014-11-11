@@ -18,7 +18,8 @@
 
 void TableFileReader::read(PropertySymbolTable* table, istream& s) {
 	//@TODO work rom tablefile
-	table->setParameters(new vector<Type*>());
+	int version = readUInt8(s);
+	if(version != 3) throw string("Can not read table file, it has an unsupported version");
 	table->classname = readString(s);
 	table->abstract = readUInt8(s);
 	unsigned char tag;
@@ -38,11 +39,13 @@ void TableFileReader::read(PropertySymbolTable* table, istream& s) {
 
 	vector<Type*>* parameters = new vector<Type*>();
 	while(true) {
-		s.peek(); // trigger EOF
-		if(s.eof()) break;
+		tag = readUInt8(s);
+		if(tag == 0x00) break;
+		s.putback(tag);// TODO make tag an argument on readInheritance
 		parameters->push_back(readType(s)); // @TODO read parameterized types
 	}
 	table->setParameters(parameters);
+	readAnnotations(s);
 }
 
 std::string TableFileReader::readString(istream& s) {
@@ -192,6 +195,8 @@ void TableFileReader::readMethod(PropertySymbolTable* table, istream& s) {
 	prop->casing = readString(s);
 	prop->flags = readUInt8(s);
 	prop->type = readType(s);
+	vector<Annotation*> annotations = readAnnotations(s);
+	prop->annotations = boost::ptr_vector<Annotation*>(annotations.begin(), annotations.end());
 	table->properties[name] = prop;
 	if(prop->flags & PROPERTY_NEED) table->getNeeds()->push_back(prop->type);
 }
@@ -199,4 +204,17 @@ void TableFileReader::readMethod(PropertySymbolTable* table, istream& s) {
 void TableFileReader::readInheritance(PropertySymbolTable* table, istream& s) {
 	string classname = readString(s);
 	table->parentage[classname] = readUInt8(s);;
+}
+
+vector<Annotation*> TableFileReader::readAnnotations(istream& s) {
+	vector<Annotation*> annotations;
+	int tag = readUInt8(s);
+	while(tag != 0) {
+		annotations.push_back(readAnnotation(s));
+	}
+	return annotations;
+}
+
+Annotation* TableFileReader::readAnnotation(istream& s) {
+	throw "oops";
 }

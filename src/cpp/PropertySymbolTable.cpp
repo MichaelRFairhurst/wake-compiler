@@ -57,13 +57,14 @@ boost::optional<SemanticError*> PropertySymbolTable::addMethod(Type* returntype,
 	prop->type = method;
 	prop->casing = getCasingNameOf(segments_arguments);
 	prop->address = name;
+	prop->annotations = boost::ptr_vector<Annotation*>(annotations.begin(), annotations.end());
 
 	properties[name] = prop;
 
 	return boost::optional<SemanticError*>();
 }
 
-boost::optional<SemanticError*> PropertySymbolTable::addProperty(Type* property, int flags) {
+boost::optional<SemanticError*> PropertySymbolTable::addProperty(Type* property, int flags, vector<Annotation*> annotations) {
 	string name = analyzer->getNameForTypeAsProperty(property);
 
 	if(properties.count(name)) {
@@ -76,6 +77,7 @@ boost::optional<SemanticError*> PropertySymbolTable::addProperty(Type* property,
 	prop->flags = flags;
 	prop->type = property;
 	prop->address = name;
+	prop->annotations = boost::ptr_vector<Annotation*>(annotations.begin(), annotations.end());
 
 	properties[name] = prop;
 	return boost::optional<SemanticError*>();
@@ -161,7 +163,7 @@ void PropertySymbolTable::printEntryPoints(EntryPointAnalyzer* entryanalyzer) {
 
 void PropertySymbolTable::addNeed(Type* needed, int flags, vector<Annotation*> annotations) {
 	needs->push_back(needed);
-	addProperty(needed, flags | PROPERTY_NEED);
+	addProperty(needed, flags | PROPERTY_NEED, annotations);
 }
 
 vector<Type*>* PropertySymbolTable::getNeeds() {

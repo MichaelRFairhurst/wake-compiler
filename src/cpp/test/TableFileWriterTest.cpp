@@ -21,6 +21,8 @@
 #define ASSERTCHAR(v) BOOST_CHECK_MESSAGE(dataptr[i++] == v, "Expected " #v " in stream at pos " + string(1, i) + " got " + string(1, (unsigned char) dataptr[i]));
 #define ASSERTLENGTH(l) char* dataptr = (char*) malloc(l); out.read(dataptr, l); BOOST_CHECK_MESSAGE(!out.eof(), "too short"); out.peek(); BOOST_CHECK_MESSAGE(out.eof(), "too long"); int i = 0;
 
+#define TABLE_FILE_VERSION 3
+
 BOOST_AUTO_TEST_SUITE(TableFileWriterTest)
 
 BOOST_AUTO_TEST_CASE(TestWritesSimple)
@@ -31,13 +33,16 @@ BOOST_AUTO_TEST_CASE(TestWritesSimple)
 	PropertySymbolTable table(&tanalyzer);
 	table.classname = "classname";
 	writer.write(out, &table);
-	ASSERTLENGTH(13);
+	ASSERTLENGTH(16);
 
+	ASSERTCHAR(TABLE_FILE_VERSION);
 	ASSERTCHAR(9);
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
 	ASSERTCHAR(0); // inheritances
-	ASSERTCHAR(0); // inheritance
+	ASSERTCHAR(0); // begin parameters
+	ASSERTCHAR(0); // end parameters
+	ASSERTCHAR(0); // annotations
 }
 
 BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
@@ -58,7 +63,8 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 
 	writer.write(out, &table);
 
-	ASSERTLENGTH(50);
+	ASSERTLENGTH(54);
+	ASSERTCHAR(TABLE_FILE_VERSION);
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
@@ -79,8 +85,11 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 	ASSERTCHAR(0); // end arguments
 	ASSERTCHAR(0); // alias length
 	ASSERTCHAR(0); // specialty length
+	ASSERTCHAR(0)  // prop annotations
 	ASSERTCHAR(0); // inheritances
-	ASSERTCHAR(0); // parameters
+	ASSERTCHAR(0); // begin parameters
+	ASSERTCHAR(0); // end parameters
+	ASSERTCHAR(0); // class annotations
 }
 
 BOOST_AUTO_TEST_CASE(TestWritesNeed)
@@ -95,7 +104,8 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 	table.classname = "classname";
 
 	writer.write(out, &table);
-	ASSERTLENGTH(34);
+	ASSERTLENGTH(38);
+	ASSERTCHAR(TABLE_FILE_VERSION);
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
@@ -111,8 +121,11 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 	ASSERTCHAR(0); // shadow
 	ASSERTCHAR(0); // alias length
 	ASSERTCHAR(0); // spec length
+	ASSERTCHAR(0); // prop annotations
 	ASSERTCHAR(0); // inheritance
-	ASSERTCHAR(0); // parameters
+	ASSERTCHAR(0); // begin parameters
+	ASSERTCHAR(0); // end parameters
+	ASSERTCHAR(0); // annotations
 }
 
 BOOST_AUTO_TEST_CASE(TestWritesNeeds)
@@ -130,7 +143,8 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 
 	writer.write(out, &table);
 
-	ASSERTLENGTH(64);
+	ASSERTLENGTH(69);
+	ASSERTCHAR(TABLE_FILE_VERSION);
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
@@ -146,6 +160,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	ASSERTCHAR(0); // shadow
 	ASSERTCHAR(0); // alias length
 	ASSERTCHAR(0); // spec length
+	ASSERTCHAR(0); // prop annotations
 	ASSERTCHAR(7); // property length
 	ASSERTCHAR('P'); ASSERTCHAR('r'); ASSERTCHAR('i'); ASSERTCHAR('n'); ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('r');
 	ASSERTCHAR(7); // casing length
@@ -158,8 +173,11 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	ASSERTCHAR(0); // shadow
 	ASSERTCHAR(0); // alias length
 	ASSERTCHAR(0); // spec length
+	ASSERTCHAR(0); // prop annotations
 	ASSERTCHAR(0); // inheritance
-	ASSERTCHAR(0); // parameters
+	ASSERTCHAR(0); // begin parameters
+	ASSERTCHAR(0); // end parameters
+	ASSERTCHAR(0); // annotations
 }
 
 BOOST_AUTO_TEST_CASE(TestWritesInheritance)
@@ -172,8 +190,9 @@ BOOST_AUTO_TEST_CASE(TestWritesInheritance)
 	table.parentage["myparent"] = true;
 	table.parentage["myinterface"] = false;
 	writer.write(out, &table);
-	ASSERTLENGTH(36);
+	ASSERTLENGTH(39);
 
+	ASSERTCHAR(TABLE_FILE_VERSION);
 	ASSERTCHAR(9);
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
@@ -184,7 +203,9 @@ BOOST_AUTO_TEST_CASE(TestWritesInheritance)
 	ASSERTCHAR(8); // "myparent" length
 	ASSERTCHAR('m'); ASSERTCHAR('y'); ASSERTCHAR('p'); ASSERTCHAR('a'); ASSERTCHAR('r'); ASSERTCHAR('e'); ASSERTCHAR('n'); ASSERTCHAR('t');
 	ASSERTCHAR(1); // extends = true
-	ASSERTCHAR(0); // parameters
+	ASSERTCHAR(0); // begin parameters
+	ASSERTCHAR(0); // end parameters
+	ASSERTCHAR(0); // annotations
 }
 
 BOOST_AUTO_TEST_CASE(TestWritesParameters)
@@ -206,8 +227,9 @@ BOOST_AUTO_TEST_CASE(TestWritesParameters)
 	parameters->push_back(t); parameters->push_back(b);
 	table.setParameters(parameters);
 	writer.write(out, &table);
-	ASSERTLENGTH(47);
+	ASSERTLENGTH(50);
 
+	ASSERTCHAR(TABLE_FILE_VERSION);
 	ASSERTCHAR(9);
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
@@ -237,6 +259,8 @@ BOOST_AUTO_TEST_CASE(TestWritesParameters)
 	ASSERTCHAR(0); // shadow
 	ASSERTCHAR(0); // alias
 	ASSERTCHAR(0); // specialty
+	ASSERTCHAR(0); // end parameters
+	ASSERTCHAR(0); // end class annotations
 
 	freeType(t); freeType(b);
 }
@@ -253,10 +277,11 @@ BOOST_AUTO_TEST_CASE(TestWritesList)
 	Type* text = MakeType(TYPE_CLASS);
 	list->typedata.list.contained = text;
 	text->typedata._class.classname = strdup("Text");
-	table.addProperty(list, 1);
+	table.addProperty(list, 1, vector<Annotation*>());
 	writer.write(out, &table);
 
-	ASSERTLENGTH(42);
+	ASSERTLENGTH(46);
+	ASSERTCHAR(TABLE_FILE_VERSION);
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
@@ -276,8 +301,11 @@ BOOST_AUTO_TEST_CASE(TestWritesList)
 		ASSERTCHAR(1); // backwards compat
 		ASSERTCHAR(0); // alias length
 		ASSERTCHAR(0); // specialty length
+		ASSERTCHAR(0); // prop annotations
 	ASSERTCHAR(0); // inheritances
-	ASSERTCHAR(0); // parameters
+	ASSERTCHAR(0); // begin parameters
+	ASSERTCHAR(0); // end parameters
+	ASSERTCHAR(0); // class annotations
 }
 
 BOOST_AUTO_TEST_CASE(TestWritesOptional)
@@ -292,10 +320,11 @@ BOOST_AUTO_TEST_CASE(TestWritesOptional)
 	Type* text = MakeType(TYPE_CLASS);
 	optional->typedata.optional.contained = text;
 	text->typedata._class.classname = strdup("Text");
-	table.addProperty(optional, 1);
+	table.addProperty(optional, 1, vector<Annotation*>());
 	writer.write(out, &table);
 
-	ASSERTLENGTH(38);
+	ASSERTLENGTH(42);
+	ASSERTCHAR(TABLE_FILE_VERSION);
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
@@ -315,8 +344,10 @@ BOOST_AUTO_TEST_CASE(TestWritesOptional)
 		ASSERTCHAR(1); // backwards compat
 		ASSERTCHAR(0); // alias length
 		ASSERTCHAR(0); // specialty length
+		ASSERTCHAR(0); // every annotations
 	ASSERTCHAR(0); // inheritances
 	ASSERTCHAR(0); // parameters
+	ASSERTCHAR(0); // annotations
 }
 
 BOOST_AUTO_TEST_SUITE_END()

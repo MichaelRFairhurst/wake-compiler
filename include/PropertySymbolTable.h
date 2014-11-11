@@ -44,7 +44,7 @@ class PropertySymbolTable : public ReadOnlyPropertySymbolTable {
 		string getAddress(string name);
 		string getProvisionSymbol(Type* provided, vector<Type*> &arguments);
 		boost::optional<SemanticError*> addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, int flags, vector<Annotation*> annotations);
-		boost::optional<SemanticError*> addProperty(Type* property, int flags);
+		boost::optional<SemanticError*> addProperty(Type* property, int flags, vector<Annotation*> annotations);
 		boost::optional<SemanticError*> addProvision(Type* provision, vector<Type*> &arguments, int flags);
 		bool isBehavioralProvision(string name);
 		void addNeed(Type* returntype, int flags, vector<Annotation*> annotations);

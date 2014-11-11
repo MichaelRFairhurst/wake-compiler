@@ -18,15 +18,17 @@
 #include <string>
 #include "type.h"
 
+#define TABLE_FILE_VERSION "\003"
+
 BOOST_AUTO_TEST_SUITE(TableFileReaderTest)
 
 BOOST_AUTO_TEST_CASE(TestReadsSimple)
 {
-					// classname length 9  classname   not abstract begin inheritance begin parameters
-	char* dataptr = "\011"                 "classname" "\000"       "\000"			"\000";
+										// classname length 9  classname   not abstract begin inheritance	begin parameters	end parameters	begin annotations;
+	char* dataptr = TABLE_FILE_VERSION	"\011"                 "classname" "\000"       "\000"				"\000"				"\000"			"\000";
 
 	std::stringstream in;
-	in.write(dataptr, 13);
+	in.write(dataptr, 16);
 
 	TableFileReader reader;
 
@@ -44,7 +46,8 @@ BOOST_AUTO_TEST_CASE(TestReadsSimple)
 
 BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 {
-	char* dataptr = "\011" // classname length of 9
+	char* dataptr = TABLE_FILE_VERSION
+					"\011" // classname length of 9
 					"classname"
 					"\000" // not abstract
 					"\013" // method name length of 11
@@ -61,14 +64,17 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 						"\000" // shadow
 						"\000" // alias length
 						"\000" // specialty length
+						"\000" // annotations
 					"\000" // end arguments
 					"\000" // alias length
 					"\000" // specialty length
 					"\000" // begin inheritance
-					"\000"; // begin parameters
+					"\000" // begin parameters
+					"\000" // end parameters
+					"\000"; // begin annotations
 
 	std::stringstream in;
-	in.write(dataptr, 50);
+	in.write(dataptr, 54);
 
 	TableFileReader reader;
 
@@ -98,7 +104,8 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 
 BOOST_AUTO_TEST_CASE(TestWritesNeed)
 {
-	char* dataptr = "\011" // classname length of 9
+	char* dataptr = TABLE_FILE_VERSION
+					"\011" // classname length of 9
 					"classname"
 					"\000" // not abstract
 					"\004" // property len
@@ -113,11 +120,14 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 					"\000" // shadow
 					"\000" // alias length
 					"\000" // spec length
+					"\000" // prop annotations
 					"\000" // begin inheritance
-					"\000"; // begin parameters
+					"\000" // begin parameters
+					"\000" // end parameters
+					"\000"; // begin annotations
 
 	std::stringstream in;
-	in.write(dataptr, 34);
+	in.write(dataptr, 38);
 
 	TableFileReader reader;
 
@@ -142,7 +152,8 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 
 BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 {
-	char* dataptr = "\011" // classname length of 9
+	char* dataptr = TABLE_FILE_VERSION
+					"\011" // classname length of 9
 					"classname"
 					"\000" // not abstract
 					"\004" // property length
@@ -157,6 +168,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 					"\000" // shadow
 					"\000" // alias length
 					"\000" // spec length
+					"\000" // prop annotations
 					"\007" // property length
 					"Printer"
 					"\007" // casing length
@@ -169,11 +181,14 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 					"\000" // shadow
 					"\000" // alias length
 					"\000" // spec length
+					"\000" // prop annotations
 					"\000" // begin inheritance
-					"\000"; // begin parameters
+					"\000" // begin parameters
+					"\000" // end parameters
+					"\000"; // begin annotations
 
 	std::stringstream in;
-	in.write(dataptr, 64);
+	in.write(dataptr, 69);
 
 	TableFileReader reader;
 
@@ -204,7 +219,8 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 
 BOOST_AUTO_TEST_CASE(TestReadsInheritance)
 {
-	char* dataptr = "\011" // classname len
+	char* dataptr = TABLE_FILE_VERSION
+					"\011" // classname len
 					"classname"
 					"\000" // not abstract
 					"\000" // begin inheritance
@@ -214,10 +230,12 @@ BOOST_AUTO_TEST_CASE(TestReadsInheritance)
 					"\013" // parent length 11
 					"myinterface"
 					"\000" // doesn't extend
-					"\000"; // begin parameters
+					"\000" // begin parameters
+					"\000" // end parameters
+					"\000"; // begin annotations
 
 	std::stringstream in;
-	in.write(dataptr, 36);
+	in.write(dataptr, 39);
 
 	TableFileReader reader;
 
@@ -237,7 +255,8 @@ BOOST_AUTO_TEST_CASE(TestReadsInheritance)
 
 BOOST_AUTO_TEST_CASE(TestReadsParameters)
 {
-	char* dataptr = "\011" // classname len
+	char* dataptr = TABLE_FILE_VERSION
+					"\011" // classname len
 					"classname"
 					"\000" // not abstract
 					"\000" // begin inheritance
@@ -265,10 +284,12 @@ BOOST_AUTO_TEST_CASE(TestReadsParameters)
 						"\000" // specialty
 					"\000" // shadow
 					"\000" // alias
-					"\000";// specialty
+					"\000" // specialty
+					"\000" // end annotations
+					"\000";// begin annotations
 
 	std::stringstream in;
-	in.write(dataptr, 47);
+	in.write(dataptr, 50);
 
 	TableFileReader reader;
 

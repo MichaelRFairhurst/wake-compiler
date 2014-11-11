@@ -42,6 +42,8 @@ class TableFileReader {
 		Type* readParameterizedType(istream& s);
 		Type* readListType(istream& s);
 		Type* readOptionalType(istream& s);
+		vector<Annotation*> readAnnotations(istream& s);
+		Annotation* readAnnotation(istream& s);
 
 };
 

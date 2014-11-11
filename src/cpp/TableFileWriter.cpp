@@ -17,6 +17,9 @@
 void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 	char* dataptr = (char*) malloc(1);
 
+	dataptr[0] = (char) 3; //version
+	out.write(dataptr, 1);
+
 	dataptr[0] = (char) table->classname.size();
 	out.write(dataptr, 1);
 	out.write(table->classname.c_str(), table->classname.size());
@@ -63,6 +66,13 @@ void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 	for(vector<Type*>::const_iterator it = table->getParameters().begin(); it != table->getParameters().end(); ++it) {
 		writeType(out, *it);
 	}
+
+	dataptr[0] = 0x00; // End Parameters
+	out.write(dataptr, 1);
+
+	dataptr[0] = 0x00; // End Annotations
+	out.write(dataptr, 1);
+
 	free(dataptr);
 }
 
@@ -179,5 +189,9 @@ void TableFileWriter::writeProperty(ostream& out, ObjectProperty* property) {
 	out.write(dataptr, 1);
 
 	writeType(out, property->type);
+
+	// annotations... hard coded to none
+	dataptr[0] = (char) 0;
+	out.write(dataptr, 1);
 	free(dataptr);
 }
