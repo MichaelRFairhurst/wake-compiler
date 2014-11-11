@@ -37,7 +37,7 @@ BOOST_AUTO_TEST_SUITE( ParseTreeTraverserTest )
 		loader.loadStdLibToTable(&table); \
 		ParseTreeTraverser t(&table, errors); \
 		MockSemanticErrorPrinter e; \
-		p.parse( "every Num is: every Bool is: every Text is: every List{T} is: Num -- getSize() { return 0; } every Exception is: Text[] -- getStackTrace() { var Text[] = []; return Text[]; }\n" CODE ); \
+		p.parse( CODE  "\nevery Num is: every Bool is: every Text is: every List{T} is: Num -- getSize() { return 0; } every Exception is: Text[] -- getStackTrace() { var Text[] = []; return Text[]; }"); \
 		if(PTT_PRINT_TREE) p.print(); \
 		{ EXPECTATIONS } \
 		t.traverse(p.getParseTree()); \
@@ -3225,5 +3225,40 @@ PTT_TEST_CASE(
 		}",
 	PTT_VALID
 );
+
+PTT_TEST_CASE(
+	TestAnnotatedMethodsNeedsClassesParseAndTypeCheck,
+	"@Annotated													\n\
+	@AnnotatedVal(true)											\n\
+	@AnnotatedParams('test', 123)								\n\
+	every MyClass is:											\n\
+		needs													\n\
+			@Annotated											\n\
+			@AnnotatedVal(true)									\n\
+			@AnnotatedParams('test', 123)						\n\
+			Num;												\n\
+																\n\
+		@Annotated												\n\
+		@AnnotatedVal(true)										\n\
+		@AnnotatedParams('test', 123)							\n\
+		myTypecheckedMethod() {									\n\
+			1 + 'test';											\n\
+		}														\n\
+																\n\
+		@Annotated												\n\
+		@AnnotatedVal(true)										\n\
+		@AnnotatedParams('test', 123)							\n\
+		myMethod() {											\n\
+		}														\n\
+																\n\
+		@Annotated												\n\
+		@AnnotatedVal(true)										\n\
+		@AnnotatedParams('test', 123)							\n\
+		myMethod() {											\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(MULTIPLE_METHOD_DEFINITION)
+);
+
 
 BOOST_AUTO_TEST_SUITE_END()

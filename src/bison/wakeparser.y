@@ -232,8 +232,8 @@ ctorargs:
 	;
 
 ctorarg:
-	annotatedtype																{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, MakeNodeFromType($1, @$), MakeEmptyNode(NT_PRIVATE, @$), @$); }
-	| PUBLIC annotatedtype														{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, MakeNodeFromType($2, @$), MakeEmptyNode(NT_PUBLIC, @$), @$); }
+	annotatedtype																{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, $1, MakeEmptyNode(NT_PRIVATE, @$), @$); }
+	| PUBLIC annotatedtype														{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, $2, MakeEmptyNode(NT_PUBLIC, @$), @$); }
 	;
 
 annotatedmethod:
@@ -520,8 +520,8 @@ identifier:
 	;
 
 annotatedtype:
-	annotations type															{ $$ = MakeTwoBranchNode(NT_ANNOTATED_TYPE, $2, $1, @$); }
-	| type																		{ $$ = $1; }
+	annotations type															{ $$ = MakeTwoBranchNode(NT_ANNOTATED_TYPE, MakeNodeFromType($2, @2), $1, @$); }
+	| type																		{ $$ = MakeNodeFromType($1, @$); }
 	;
 
 type:

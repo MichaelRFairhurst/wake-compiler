@@ -91,6 +91,10 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 			}
 			break;
 
+		case NT_ANNOTATED_METHOD:
+			firstPass(tree->node_data.nodes[0]);
+			break;
+
 		case NT_METHOD_DECLARATION:
 			try {
 				methodanalyzer->convertParameterizedTypes(tree, propertysymtable->getParameters());
@@ -176,11 +180,13 @@ void ClassParseTreeTraverser::checkCtorArgs(Node* tree) {
 				TypeParameterizer parameterizer;
 				for(int i = 0; i < tree->subnodes; i++) {
 					try {
-						parameterizer.writeInParameterizations(&tree->node_data.nodes[i]->node_data.nodes[0]->node_data.type, propertysymtable->getParameters());
-						Type* needtype = tree->node_data.nodes[i]->node_data.nodes[0]->node_data.type;
+						Node* needNode = tree->node_data.nodes[i];
+						Node* typeNode = needNode->node_data.nodes[0]->node_type == NT_ANNOTATED_TYPE ? needNode->node_data.nodes[0]->node_data.nodes[0] : needNode->node_data.nodes[0];
+						parameterizer.writeInParameterizations(&typeNode->node_data.type, propertysymtable->getParameters());
+						Type* needtype = typeNode->node_data.type;
 						classestable->assertTypeIsValid(needtype);
 						//classestable->getAnalyzer()->assertNeedIsNotCircular(classname, needtype); DISABLED because we can't tell without importing everything
-						propertysymtable->addNeed(copyType(needtype), tree->node_data.nodes[i]->node_data.nodes[1]->node_type == NT_PUBLIC ? PROPERTY_PUBLIC : 0);
+						propertysymtable->addNeed(copyType(needtype), needNode->node_data.nodes[1]->node_type == NT_PUBLIC ? PROPERTY_PUBLIC : 0);
 					} catch(SymbolNotFoundException* e) {
 						errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
 						delete e;
@@ -377,6 +383,9 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 			}
 			break;
 
+		case NT_ANNOTATED_METHOD:
+			typeCheckMethods(tree->node_data.nodes[0]);
+			break;
 
 		case NT_METHOD_DECLARATION:
 			try {

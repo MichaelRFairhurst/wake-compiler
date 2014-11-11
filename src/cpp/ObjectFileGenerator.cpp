@@ -35,6 +35,12 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_SWITCH:
 			return;
 
+		case NT_ANNOTATED_CLASS:
+		case NT_ANNOTATED_METHOD:
+		case NT_ANNOTATED_TYPE:
+			generate(tree->node_data.nodes[0]);
+			break;
+
 		case NT_PROGRAM:
 			{
 				int i;
@@ -309,7 +315,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 				// Generate methods & provisions
 				for(i = 0; i < tree->subnodes; i++)
-				if(tree->node_data.nodes[i]->node_type == NT_METHOD_DECLARATION || tree->node_data.nodes[i]->node_type == NT_PROVISIONS)
+				if(tree->node_data.nodes[i]->node_type == NT_METHOD_DECLARATION || tree->node_data.nodes[i]->node_type == NT_ANNOTATED_METHOD || tree->node_data.nodes[i]->node_type == NT_PROVISIONS)
 					generate(tree->node_data.nodes[i]);
 
 				// TODO generate ctor body

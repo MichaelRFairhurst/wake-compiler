@@ -51,6 +51,10 @@ void ParseTreeTraverser::traverse(Node* tree) {
 			}
 			break;
 
+		case NT_ANNOTATED_CLASS:
+			traverse(tree->node_data.nodes[0]);
+			break;
+
 		case NT_CLASS:
 			{
 				errors.pushContext("In declaration of 'every " + string(tree->node_data.nodes[0]->node_data.type->typedata._class.classname) + "'");
@@ -87,6 +91,10 @@ void ParseTreeTraverser::secondPass(Node* tree) {
 					i++;
 				}
 			}
+			break;
+
+		case NT_ANNOTATED_CLASS:
+			secondPass(tree->node_data.nodes[0]);
 			break;
 
 		case NT_CLASS:
@@ -138,6 +146,10 @@ void ParseTreeTraverser::thirdPass(Node* tree) {
 					i++;
 				}
 			}
+			break;
+
+		case NT_ANNOTATED_CLASS:
+			thirdPass(tree->node_data.nodes[0]);
 			break;
 
 		case NT_CLASS:
