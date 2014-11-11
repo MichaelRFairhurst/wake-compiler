@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 	Type* text = MakeType(TYPE_CLASS);text->typedata._class.classname = strdup("Text");
 	AddTypeToTypeArray(text, arguments);
 	segments_arguments.push_back(pair<string, TypeArray*>("print", arguments));
-	table.addMethod(NULL, &segments_arguments, PROPERTY_PUBLIC);
+	table.addMethod(NULL, &segments_arguments, PROPERTY_PUBLIC, vector<Annotation*>());
 	table.classname = "classname";
 	//freeTypeArray(arguments);
 
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 	PropertySymbolTable table(&tanalyzer);
 
 	Type* text = MakeType(TYPE_CLASS);text->typedata._class.classname = strdup("Text");
-	table.addNeed(text, 0);
+	table.addNeed(text, 0, vector<Annotation*>());
 	table.classname = "classname";
 
 	writer.write(out, &table);
@@ -124,8 +124,8 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 
 	Type* text = MakeType(TYPE_CLASS);text->typedata._class.classname = strdup("Text");
 	Type* printer = MakeType(TYPE_CLASS);printer->typedata._class.classname = strdup("Printer");
-	table.addNeed(text, 0);
-	table.addNeed(printer, 0);
+	table.addNeed(text, 0, vector<Annotation*>());
+	table.addNeed(printer, 0, vector<Annotation*>());
 	table.classname = "classname";
 
 	writer.write(out, &table);

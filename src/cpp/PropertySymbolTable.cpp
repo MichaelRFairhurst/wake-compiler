@@ -28,7 +28,7 @@ const map<string, bool>& PropertySymbolTable::getParentage() {
 	return parentage;
 }
 
-boost::optional<SemanticError*> PropertySymbolTable::addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, int flags) {
+boost::optional<SemanticError*> PropertySymbolTable::addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, int flags, vector<Annotation*> annotations) {
 	string name = getSymbolNameOf(segments_arguments);
 
 	if(properties.count(name)) {
@@ -159,7 +159,7 @@ void PropertySymbolTable::printEntryPoints(EntryPointAnalyzer* entryanalyzer) {
 	}
 }
 
-void PropertySymbolTable::addNeed(Type* needed, int flags) {
+void PropertySymbolTable::addNeed(Type* needed, int flags, vector<Annotation*> annotations) {
 	needs->push_back(needed);
 	addProperty(needed, flags | PROPERTY_NEED);
 }

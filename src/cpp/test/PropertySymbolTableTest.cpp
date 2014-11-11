@@ -27,8 +27,8 @@ BOOST_AUTO_TEST_CASE(AddingNeedsAreGotten) {
 	thefirsttype->typedata._class.shadow = 0;
 	thesecondtype->typedata._class.classname = strdup("");
 	thesecondtype->typedata._class.shadow = 0;
-	table.addNeed(thefirsttype, 0);
-	table.addNeed(thesecondtype, 0);
+	table.addNeed(thefirsttype, 0, vector<Annotation*>());
+	table.addNeed(thesecondtype, 0, vector<Annotation*>());
 	BOOST_REQUIRE(table.getNeeds()->at(0) == thefirsttype);
 	BOOST_REQUIRE(table.getNeeds()->at(1) == thesecondtype);
 }
@@ -114,7 +114,7 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesNeedName) {
 	parameters->push_back(parameter);
 	parameterizations.push_back(&parameterization);
 	table.setParameters(parameters);
-	table.addNeed(parameter, 0);
+	table.addNeed(parameter, 0, vector<Annotation*>());
 
 	auto_ptr<ReadOnlyPropertySymbolTable> derived(table.resolveParameters(parameterizations));
 

@@ -12,7 +12,7 @@ file = version (1 byte) | namelength (1 byte) | name | Properties | 0x00 | Inher
 	ReturnType = (0x01 | Type) or (0x00)
 	TypeCommon = arrayed | aliaslength | alias | specialtylength | specialty | optional
 	Annotation = NameLength (1 byte) | Name | AnnotationVals | 0x00
-	AnnotationVals = (StrAnnotationVal | NumAnnotationVal | BoolAnnotationVal)*
+	AnnotationVals = (StrAnnotationVal | NumAnnotationVal | BoolAnnotationVal | NothingAnnotationVal)*
 	StrAnnotationVal = 0x01 | len (1 byte) | value
 	NumAnnotationVal = 0x02 | value (4 bytes)
 	BoolAnnotationVal = 0x03 | value (1 bytes)
@@ -54,10 +54,10 @@ Memory Layout
 
 
 
-  Annotation     StrAnnotnVal    NumAnnotnVal    BoolAnnotVal
- ------------    ------------    ------------    ------------
-| NameLength |  |    0x01    |  |    0x02    |  |    0x03    |
- ------------    ------------    ------------    ------------
+  Annotation     StrAnnotnVal    NumAnnotnVal    BoolAnnotVal    NothingAnntV
+ ------------    ------------    ------------    ------------    ------------
+| NameLength |  |    0x01    |  |    0x02    |  |    0x03    |  |    0x04    |
+ ------------    ------------    ------------    ------------    ------------
 |    Name    |  |     len    |  |   value    |  |   value    |
  ------------    ------------   |    ...     |   ------------
 |    Vals    |  |   value    |   ------------

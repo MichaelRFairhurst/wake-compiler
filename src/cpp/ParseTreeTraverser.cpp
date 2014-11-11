@@ -59,10 +59,23 @@ void ParseTreeTraverser::traverse(Node* tree) {
 			{
 				errors.pushContext("In declaration of 'every " + string(tree->node_data.nodes[0]->node_data.type->typedata._class.classname) + "'");
 				boost::optional<SemanticError*> error = objectsymtable->addClass(tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
+
 				if(error) {
 					(*error)->token = tree;
 					errors.addError(*error);
 				}
+
+				PropertySymbolTable* proptable = objectsymtable->findModifiable(tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
+
+				Type* classtype = tree->node_data.nodes[0]->node_data.type;
+				vector<Type*>* parameters = new vector<Type*>();
+				if(classtype->typedata._class.parameters != NULL) {
+					int i;
+					for(i = 0; i < classtype->typedata._class.parameters->typecount; i++) {
+						parameters->push_back(classtype->typedata._class.parameters->types[i]);
+					}
+				}
+				proptable->setParameters(parameters);
 
 				traverse(tree->node_data.nodes[1]);
 			}
@@ -103,16 +116,7 @@ void ParseTreeTraverser::secondPass(Node* tree) {
 				string classname = classtype->typedata._class.classname;
 				errors.pushContext("In declaration of 'every " + classname + "'");
 
-				vector<Type*>* parameters = new vector<Type*>();
-				if(classtype->typedata._class.parameters != NULL) {
-					int i;
-					for(i = 0; i < classtype->typedata._class.parameters->typecount; i++) {
-						parameters->push_back(classtype->typedata._class.parameters->types[i]);
-					}
-				}
-
 				PropertySymbolTable* proptable = objectsymtable->findModifiable(classname);
-				proptable->setParameters(parameters);
 
 				ClassParseTreeTraverser classtraverser(&errors, objectsymtable, &scopesymtable, classname, &typechecker, &methodanalyzer, proptable);
 

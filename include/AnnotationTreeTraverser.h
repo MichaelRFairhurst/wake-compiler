@@ -2,7 +2,7 @@
  * Source Code for the Original Compiler for the
  * Programming Language Wake
  *
- * ObjectProperty.h
+ * AnnotationTreeTraverser.h
  *
  * Licensed under the MIT license
  * See LICENSE.TXT for details
@@ -12,28 +12,23 @@
  *
  **************************************************/
 
-#ifndef HEADER_OBJECT_PROPERTY
-#define HEADER_OBJECT_PROPERTY
+#ifndef HEADER_ANNOTATION_TREE_TRAVERSER
+#define HEADER_ANNOTATION_TREE_TRAVERSER
 
-#include <string>
+#include <vector>
+#include "tree.h"
 #include "Annotation.h"
-
-extern "C" {
-	#include "type.h"
-}
 
 using namespace std;
 
-struct ObjectProperty {
-	string address;
-	string casing;
-	int flags;
-	Type* type;
-	boost::ptr_vector<Annotation*> annotations;
+class AnnotationTreeTraverser {
 
-	~ObjectProperty() {
-		delete type;
-	}
+	public:
+		 vector<Annotation*> getAnnotations(Node* tree);
+
+	private:
+		 Annotation* getSingleAnnotation(Node* tree);
+
 };
 
 #endif
