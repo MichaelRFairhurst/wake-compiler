@@ -62,7 +62,7 @@ class PropertySymbolTable : public ReadOnlyPropertySymbolTable {
 		const vector<Type*>& getParameters();
 		Type* getAsType();
 		void setAnnotations(vector<Annotation*> annotations);
-		const boost::ptr_vector<Annotation*>& getAnnotations();
+		const boost::ptr_vector<Annotation>& getAnnotations();
 
 		ReadOnlyPropertySymbolTable* resolveParameters(vector<Type*>& parameters);
 
@@ -72,7 +72,7 @@ class PropertySymbolTable : public ReadOnlyPropertySymbolTable {
 		TypeAnalyzer* analyzer;
 		vector<Type*>* needs;
 		vector<Type*>* declaredtypeparameters;
-		boost::ptr_vector<Annotation*> annotations;
+		boost::ptr_vector<Annotation> annotations;
 };
 
 #endif

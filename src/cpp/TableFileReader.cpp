@@ -208,7 +208,8 @@ void TableFileReader::readMethod(PropertySymbolTable* table, istream& s) {
 	prop->flags = readUInt8(s);
 	prop->type = readType(s);
 	vector<Annotation*> annotations = readAnnotations(s);
-	prop->annotations = boost::ptr_vector<Annotation*>(annotations.begin(), annotations.end());
+	for(vector<Annotation*>::iterator ann = annotations.begin(); ann != annotations.end(); ++ann)
+		prop->annotations.push_back(*ann);
 	table->properties[name] = prop;
 	if(prop->flags & PROPERTY_NEED) table->getNeeds()->push_back(prop->type);
 }

@@ -361,7 +361,7 @@ BOOST_AUTO_TEST_CASE(TestWritesClassAnnotations)
 	vector<Annotation*> annotations;
 	annotations.push_back(new Annotation());
 	annotations.push_back(new Annotation());
-	annotations[0]->name = "Annotation";
+	annotations[0]->name = strdup("Annotation");
 	annotations[0]->vals.push_back(new AnnotationVal());
 	annotations[0]->vals.push_back(new AnnotationVal());
 	annotations[0]->vals.push_back(new AnnotationVal());
@@ -370,7 +370,7 @@ BOOST_AUTO_TEST_CASE(TestWritesClassAnnotations)
 	annotations[0]->vals[1].type = ANNOTATION_VAL_TYPE_BOOL;
 	annotations[0]->vals[1].valdata.num = 0;
 	annotations[0]->vals[2].type = ANNOTATION_VAL_TYPE_NOTHING;
-	annotations[1]->name = "Annotation2";
+	annotations[1]->name = strdup("Annotation2");
 	annotations[1]->vals.push_back(new AnnotationVal());
 	annotations[1]->vals.push_back(new AnnotationVal());
 	annotations[1]->vals.push_back(new AnnotationVal());
@@ -423,7 +423,7 @@ BOOST_AUTO_TEST_CASE(TestWritesMethodAnnotations)
 	vector<Annotation*> annotations;
 	annotations.push_back(new Annotation());
 	annotations.push_back(new Annotation());
-	annotations[0]->name = "Annotation";
+	annotations[0]->name = strdup("Annotation");
 	annotations[0]->vals.push_back(new AnnotationVal());
 	annotations[0]->vals.push_back(new AnnotationVal());
 	annotations[0]->vals.push_back(new AnnotationVal());
@@ -432,7 +432,7 @@ BOOST_AUTO_TEST_CASE(TestWritesMethodAnnotations)
 	annotations[0]->vals[1].type = ANNOTATION_VAL_TYPE_BOOL;
 	annotations[0]->vals[1].valdata.num = 0;
 	annotations[0]->vals[2].type = ANNOTATION_VAL_TYPE_NOTHING;
-	annotations[1]->name = "Annotation2";
+	annotations[1]->name = strdup("Annotation2");
 	annotations[1]->vals.push_back(new AnnotationVal());
 	annotations[1]->vals.push_back(new AnnotationVal());
 	annotations[1]->vals.push_back(new AnnotationVal());

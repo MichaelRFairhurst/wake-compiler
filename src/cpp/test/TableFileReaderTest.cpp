@@ -375,20 +375,20 @@ BOOST_AUTO_TEST_CASE(TestReadsClassAnnotations)
 	BOOST_CHECK(table.parentage.size() == 0);
 	BOOST_CHECK(table.getParameters().size() == 0);
 	BOOST_CHECK(table.getAnnotations().size() == 2);
-	BOOST_CHECK(table.getAnnotations()[0]->name == string("Annotated"));
-	BOOST_CHECK(table.getAnnotations()[1]->name == string("Annotated2"));
-	BOOST_CHECK(table.getAnnotations()[0]->vals.size() == 3);
-	BOOST_CHECK(table.getAnnotations()[0]->vals[0].type == ANNOTATION_VAL_TYPE_TEXT);
-	BOOST_CHECK(table.getAnnotations()[0]->vals[0].valdata.text == string("test"));
-	BOOST_CHECK(table.getAnnotations()[0]->vals[1].type == ANNOTATION_VAL_TYPE_BOOL);
-	BOOST_CHECK(table.getAnnotations()[0]->vals[1].valdata.num == 0);
-	BOOST_CHECK(table.getAnnotations()[0]->vals[2].type == ANNOTATION_VAL_TYPE_NOTHING);
-	BOOST_CHECK(table.getAnnotations()[1]->vals.size() == 3);
-	BOOST_CHECK(table.getAnnotations()[1]->vals[0].type == ANNOTATION_VAL_TYPE_TEXT);
-	BOOST_CHECK(table.getAnnotations()[1]->vals[0].valdata.text == string("test2"));
-	BOOST_CHECK(table.getAnnotations()[1]->vals[1].type == ANNOTATION_VAL_TYPE_BOOL);
-	BOOST_CHECK(table.getAnnotations()[1]->vals[1].valdata.num == 1);
-	BOOST_CHECK(table.getAnnotations()[1]->vals[2].type == ANNOTATION_VAL_TYPE_NOTHING);
+	BOOST_CHECK(table.getAnnotations()[0].name == string("Annotated"));
+	BOOST_CHECK(table.getAnnotations()[1].name == string("Annotated2"));
+	BOOST_CHECK(table.getAnnotations()[0].vals.size() == 3);
+	BOOST_CHECK(table.getAnnotations()[0].vals[0].type == ANNOTATION_VAL_TYPE_TEXT);
+	BOOST_CHECK(table.getAnnotations()[0].vals[0].valdata.text == string("test"));
+	BOOST_CHECK(table.getAnnotations()[0].vals[1].type == ANNOTATION_VAL_TYPE_BOOL);
+	BOOST_CHECK(table.getAnnotations()[0].vals[1].valdata.num == 0);
+	BOOST_CHECK(table.getAnnotations()[0].vals[2].type == ANNOTATION_VAL_TYPE_NOTHING);
+	BOOST_CHECK(table.getAnnotations()[1].vals.size() == 3);
+	BOOST_CHECK(table.getAnnotations()[1].vals[0].type == ANNOTATION_VAL_TYPE_TEXT);
+	BOOST_CHECK(table.getAnnotations()[1].vals[0].valdata.text == string("test2"));
+	BOOST_CHECK(table.getAnnotations()[1].vals[1].type == ANNOTATION_VAL_TYPE_BOOL);
+	BOOST_CHECK(table.getAnnotations()[1].vals[1].valdata.num == 1);
+	BOOST_CHECK(table.getAnnotations()[1].vals[2].type == ANNOTATION_VAL_TYPE_NOTHING);
 
 }
 
@@ -451,20 +451,20 @@ BOOST_AUTO_TEST_CASE(TestReadsPropertyAnnotations)
 	BOOST_CHECK(table.getAnnotations().size() == 0);
 	BOOST_CHECK(table.properties["prop()"]);
 	BOOST_CHECK(table.properties["prop()"]->annotations.size() == 2);
-	BOOST_CHECK(table.properties["prop()"]->annotations[0]->name == string("Annotated"));
-	BOOST_CHECK(table.properties["prop()"]->annotations[1]->name == string("Annotated2"));
-	BOOST_CHECK(table.properties["prop()"]->annotations[0]->vals.size() == 3);
-	BOOST_CHECK(table.properties["prop()"]->annotations[0]->vals[0].type == ANNOTATION_VAL_TYPE_TEXT);
-	BOOST_CHECK(table.properties["prop()"]->annotations[0]->vals[0].valdata.text == string("test"));
-	BOOST_CHECK(table.properties["prop()"]->annotations[0]->vals[1].type == ANNOTATION_VAL_TYPE_BOOL);
-	BOOST_CHECK(table.properties["prop()"]->annotations[0]->vals[1].valdata.num == 0);
-	BOOST_CHECK(table.properties["prop()"]->annotations[0]->vals[2].type == ANNOTATION_VAL_TYPE_NOTHING);
-	BOOST_CHECK(table.properties["prop()"]->annotations[1]->vals.size() == 3);
-	BOOST_CHECK(table.properties["prop()"]->annotations[1]->vals[0].type == ANNOTATION_VAL_TYPE_TEXT);
-	BOOST_CHECK(table.properties["prop()"]->annotations[1]->vals[0].valdata.text == string("test2"));
-	BOOST_CHECK(table.properties["prop()"]->annotations[1]->vals[1].type == ANNOTATION_VAL_TYPE_BOOL);
-	BOOST_CHECK(table.properties["prop()"]->annotations[1]->vals[1].valdata.num == 1);
-	BOOST_CHECK(table.properties["prop()"]->annotations[1]->vals[2].type == ANNOTATION_VAL_TYPE_NOTHING);
+	BOOST_CHECK(table.properties["prop()"]->annotations[0].name == string("Annotated"));
+	BOOST_CHECK(table.properties["prop()"]->annotations[1].name == string("Annotated2"));
+	BOOST_CHECK(table.properties["prop()"]->annotations[0].vals.size() == 3);
+	BOOST_CHECK(table.properties["prop()"]->annotations[0].vals[0].type == ANNOTATION_VAL_TYPE_TEXT);
+	BOOST_CHECK(table.properties["prop()"]->annotations[0].vals[0].valdata.text == string("test"));
+	BOOST_CHECK(table.properties["prop()"]->annotations[0].vals[1].type == ANNOTATION_VAL_TYPE_BOOL);
+	BOOST_CHECK(table.properties["prop()"]->annotations[0].vals[1].valdata.num == 0);
+	BOOST_CHECK(table.properties["prop()"]->annotations[0].vals[2].type == ANNOTATION_VAL_TYPE_NOTHING);
+	BOOST_CHECK(table.properties["prop()"]->annotations[1].vals.size() == 3);
+	BOOST_CHECK(table.properties["prop()"]->annotations[1].vals[0].type == ANNOTATION_VAL_TYPE_TEXT);
+	BOOST_CHECK(table.properties["prop()"]->annotations[1].vals[0].valdata.text == string("test2"));
+	BOOST_CHECK(table.properties["prop()"]->annotations[1].vals[1].type == ANNOTATION_VAL_TYPE_BOOL);
+	BOOST_CHECK(table.properties["prop()"]->annotations[1].vals[1].valdata.num == 1);
+	BOOST_CHECK(table.properties["prop()"]->annotations[1].vals[2].type == ANNOTATION_VAL_TYPE_NOTHING);
 
 }
 

@@ -70,10 +70,9 @@ void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 	dataptr[0] = 0x00; // End Parameters
 	out.write(dataptr, 1);
 
-	dataptr[0] = 0x00; // End Annotations
-	out.write(dataptr, 1);
-
 	free(dataptr);
+
+	writeAnnotations(out, table->getAnnotations());
 }
 
 void TableFileWriter::writeType(ostream& out, Type* type) {
@@ -191,7 +190,42 @@ void TableFileWriter::writeProperty(ostream& out, ObjectProperty* property) {
 	writeType(out, property->type);
 
 	// annotations... hard coded to none
-	dataptr[0] = (char) 0;
-	out.write(dataptr, 1);
 	free(dataptr);
+	writeAnnotations(out, property->annotations);
+}
+
+void TableFileWriter::writeAnnotations(ostream& out, const boost::ptr_vector<Annotation>& annotations) {
+	char dataptr[4];
+	for(boost::ptr_vector<Annotation>::const_iterator ann = annotations.begin(); ann != annotations.end(); ++ann) {
+		dataptr[0] = (char) strlen(ann->name);
+		out.write(dataptr, 1);
+		out.write(ann->name, strlen(ann->name));
+
+		for(boost::ptr_vector<AnnotationVal>::const_iterator val = ann->vals.begin(); val != ann->vals.end(); ++val) {
+			dataptr[0] = (char) val->type;
+			out.write(dataptr, 1);
+
+			switch(val->type) {
+				case ANNOTATION_VAL_TYPE_TEXT:
+					dataptr[0] = (char) strlen(val->valdata.text);
+					out.write(dataptr, 1);
+					out.write(ann->name, strlen(val->valdata.text));
+					break;
+
+				case ANNOTATION_VAL_TYPE_BOOL:
+					dataptr[0] = (char) (bool) val->valdata.num;
+					out.write(dataptr, 1);
+
+				case ANNOTATION_VAL_TYPE_NUM:
+					memcpy((void*) &val->valdata.num, dataptr, sizeof(float));
+					out.write(dataptr, sizeof(float));
+			}
+
+			dataptr[0] = (char) 0x00;
+			out.write(dataptr, 1);
+		}
+	}
+
+	dataptr[0] = (char) 0x00;
+	out.write(dataptr, 1);
 }

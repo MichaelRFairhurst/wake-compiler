@@ -29,7 +29,7 @@ struct ObjectProperty {
 	string casing;
 	int flags;
 	Type* type;
-	boost::ptr_vector<Annotation*> annotations;
+	boost::ptr_vector<Annotation> annotations;
 
 	~ObjectProperty() {
 		delete type;

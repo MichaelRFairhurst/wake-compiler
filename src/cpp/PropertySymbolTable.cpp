@@ -57,7 +57,8 @@ boost::optional<SemanticError*> PropertySymbolTable::addMethod(Type* returntype,
 	prop->type = method;
 	prop->casing = getCasingNameOf(segments_arguments);
 	prop->address = name;
-	prop->annotations = boost::ptr_vector<Annotation*>(annotations.begin(), annotations.end());
+	for(vector<Annotation*>::iterator annit = annotations.begin(); annit != annotations.end(); ++annit)
+		prop->annotations.push_back(*annit);
 
 	properties[name] = prop;
 
@@ -77,7 +78,8 @@ boost::optional<SemanticError*> PropertySymbolTable::addProperty(Type* property,
 	prop->flags = flags;
 	prop->type = property;
 	prop->address = name;
-	prop->annotations = boost::ptr_vector<Annotation*>(annotations.begin(), annotations.end());
+	for(vector<Annotation*>::iterator annit = annotations.begin(); annit != annotations.end(); ++annit)
+		prop->annotations.push_back(*annit);
 
 	properties[name] = prop;
 	return boost::optional<SemanticError*>();
@@ -287,9 +289,10 @@ bool PropertySymbolTable::isBehavioralProvision(string name) {
 }
 
 void PropertySymbolTable::setAnnotations(vector<Annotation*> annotations) {
-	this->annotations = boost::ptr_vector<Annotation*>(annotations.begin(), annotations.end());
+	for(vector<Annotation*>::iterator annit = annotations.begin(); annit != annotations.end(); ++annit)
+		this->annotations.push_back(*annit);
 }
 
-const boost::ptr_vector<Annotation*>& PropertySymbolTable::getAnnotations() {
+const boost::ptr_vector<Annotation>& PropertySymbolTable::getAnnotations() {
 	return annotations;
 }

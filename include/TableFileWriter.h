@@ -28,6 +28,7 @@ class TableFileWriter {
 	private:
 		void writeType(ostream& out, Type* type);
 		void writeProperty(ostream& out, ObjectProperty* property);
+		void writeAnnotations(ostream& out, const boost::ptr_vector<Annotation>& annotations);
 };
 
 #endif
