@@ -29,6 +29,7 @@ void TableFileReader::read(PropertySymbolTable* table, istream& s) {
 		s.putback(tag);// TODO make tag an argument on readMethod
 		readMethod(table, s);
 	}
+	//cout << "done with props" << endl;
 
 	while(true) {
 		tag = readUInt8(s);
@@ -36,6 +37,7 @@ void TableFileReader::read(PropertySymbolTable* table, istream& s) {
 		s.putback(tag);// TODO make tag an argument on readInheritance
 		readInheritance(table, s);
 	}
+	//cout << "done with inheritance" << endl;
 
 	vector<Type*>* parameters = new vector<Type*>();
 	while(true) {
@@ -44,8 +46,9 @@ void TableFileReader::read(PropertySymbolTable* table, istream& s) {
 		s.putback(tag);// TODO make tag an argument on readInheritance
 		parameters->push_back(readType(s)); // @TODO read parameterized types
 	}
+	//cout << "done with parameters" << endl;
 	table->setParameters(parameters);
-	readAnnotations(s);
+	table->setAnnotations(readAnnotations(s));
 }
 
 std::string TableFileReader::readString(istream& s) {
@@ -77,6 +80,14 @@ unsigned char TableFileReader::readUInt8(istream& s) {
 	free(uint8p);
 	//cout << "Read uint8 " << ((int) uint8) << endl;
 	return uint8;
+}
+
+float TableFileReader::readNum64(istream& s) {
+	char buffer[4] = {0};
+	s.read(buffer, 4);
+	float num64 = 0;
+	memcpy(buffer, &num64, sizeof(float));
+	return num64;
 }
 
 Type* TableFileReader::readType(istream& s) {
@@ -186,6 +197,7 @@ void TableFileReader::readTypeCommon(Type* type, istream& s) {
 	//cout << "reading type common" << endl;
 	type->alias = readCString(s);
 	type->specialty = readCString(s);
+	//cout << "done reading type" << endl;
 }
 
 void TableFileReader::readMethod(PropertySymbolTable* table, istream& s) {
@@ -207,14 +219,43 @@ void TableFileReader::readInheritance(PropertySymbolTable* table, istream& s) {
 }
 
 vector<Annotation*> TableFileReader::readAnnotations(istream& s) {
+	//cout << "reading annotations" << endl;
 	vector<Annotation*> annotations;
-	int tag = readUInt8(s);
-	while(tag != 0) {
+	while(true) {
+		int tag = readUInt8(s);
+		if(tag == 0) break;
+
+		s.putback(tag);
 		annotations.push_back(readAnnotation(s));
 	}
+	//cout << "ending annotations" << endl;
 	return annotations;
 }
 
 Annotation* TableFileReader::readAnnotation(istream& s) {
-	throw "oops";
+	//cout << "reading annotation" << endl;
+	Annotation* annotation = new Annotation();
+	annotation->name = strdup(readString(s).c_str());
+
+	while(true) {
+		//cout << "reading annotation val" << endl;
+		int tag = readUInt8(s);
+		if(tag == 0) break;
+
+		AnnotationVal* val = new AnnotationVal;
+		val->type = tag;
+
+		if(tag == ANNOTATION_VAL_TYPE_TEXT) {
+			val->valdata.text = readCString(s);
+		} else if(tag == ANNOTATION_VAL_TYPE_BOOL) {
+			val->valdata.num = readUInt8(s);
+		} else if(tag == ANNOTATION_VAL_TYPE_NUM) {
+			val->valdata.num = readNum64(s);
+		} // nothing to do for ANNOTATION_VAL_TYPE_NOTHING
+
+		annotation->vals.push_back(val);
+	}
+
+	//cout << "end annotation" << endl;
+	return annotation;
 }

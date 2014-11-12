@@ -289,3 +289,7 @@ bool PropertySymbolTable::isBehavioralProvision(string name) {
 void PropertySymbolTable::setAnnotations(vector<Annotation*> annotations) {
 	this->annotations = boost::ptr_vector<Annotation*>(annotations.begin(), annotations.end());
 }
+
+const boost::ptr_vector<Annotation*>& PropertySymbolTable::getAnnotations() {
+	return annotations;
+}

@@ -3262,7 +3262,7 @@ PTT_TEST_CASE(
 		@AnnotatedVal(true)										\n\
 		@AnnotatedParams('test', 123)							\n\
 		myTypecheckedMethod() {									\n\
-			Num + 'test';											\n\
+			Num + 'test';										\n\
 		}",
 	PTT_EXPECT(TYPE_ERROR)
 );

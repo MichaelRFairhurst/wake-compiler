@@ -32,6 +32,7 @@ class TableFileReader {
 		std::string readString(istream& s);
 		char* readCString(istream& s);
 		unsigned char readUInt8(istream& s);
+		float readNum64(istream& s);
 		void readMethod(PropertySymbolTable* table, istream& s);
 		void readInheritance(PropertySymbolTable* table, istream& s);
 		Type* readType(istream& s);

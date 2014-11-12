@@ -28,8 +28,12 @@ void ImportParseTreeTraverser::traverse(Node* tree, ClassSpaceSymbolTable& class
 
 		case NT_IMPORTPATH:
 			// TODO use actual path
-			if(!l.loadImport(tree->node_data.string, importpath, classes)) {
-				errors.addError(new SemanticError(BAD_IMPORT, "Could not import class by name " + string(tree->node_data.string), tree));
+			try {
+				if(!l.loadImport(tree->node_data.string, importpath, classes)) {
+					errors.addError(new SemanticError(BAD_IMPORT, "Could not import class by name " + string(tree->node_data.string), tree));
+				}
+			} catch(string errormsg) {
+				errors.addError(new SemanticError(BAD_IMPORT, "Error importing class by name " + string(tree->node_data.string) + ": " + errormsg, tree));
 			}
 			break;
 

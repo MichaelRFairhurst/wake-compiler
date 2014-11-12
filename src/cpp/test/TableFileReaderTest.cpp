@@ -285,8 +285,8 @@ BOOST_AUTO_TEST_CASE(TestReadsParameters)
 					"\000" // shadow
 					"\000" // alias
 					"\000" // specialty
-					"\000" // end annotations
-					"\000";// begin annotations
+					"\000" // begin annotations
+					"\000";// end annotations
 
 	std::stringstream in;
 	in.write(dataptr, 50);
@@ -328,6 +328,144 @@ BOOST_AUTO_TEST_CASE(TestReadsParameters)
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.shadow == 0);
 	BOOST_CHECK(table.getParameters()[1]->alias == NULL);
 	BOOST_CHECK(table.getParameters()[1]->specialty == NULL);
+}
+
+BOOST_AUTO_TEST_CASE(TestReadsClassAnnotations)
+{
+	char* dataptr = TABLE_FILE_VERSION
+					"\011" // classname len
+					"classname"
+					"\000" // not abstract
+					"\000" // begin inheritance
+					"\000" // begin parameters
+					"\000" // end parameters
+					"\011" // length 9
+					"Annotated"
+					"\001" // string val
+					"\004" // length 4
+					"test"
+					"\003" // bool val
+					"\000" // false
+					"\004" // nothing val
+					"\000" // end annotation vals
+					"\012" // length 10
+					"Annotated2"
+					"\001" // string val
+					"\005" // length 5
+					"test2"
+					"\003" // bool val
+					"\001" // true
+					"\004" // nothing val
+					"\000" // end annotation vals
+					"\000";// end annotations
+
+	std::stringstream in;
+	in.write(dataptr, 58);
+
+	TableFileReader reader;
+
+	TypeAnalyzer tanalyzer;
+	PropertySymbolTable table(&tanalyzer);
+	reader.read(&table, in);
+
+	BOOST_CHECK(table.classname == string("classname"));
+	BOOST_CHECK(table.isAbstract() == false);
+	BOOST_CHECK(table.getNeeds()->size() == 0);
+	BOOST_CHECK(table.properties.size() == 0);
+	BOOST_CHECK(table.parentage.size() == 0);
+	BOOST_CHECK(table.getParameters().size() == 0);
+	BOOST_CHECK(table.getAnnotations().size() == 2);
+	BOOST_CHECK(table.getAnnotations()[0]->name == string("Annotated"));
+	BOOST_CHECK(table.getAnnotations()[1]->name == string("Annotated2"));
+	BOOST_CHECK(table.getAnnotations()[0]->vals.size() == 3);
+	BOOST_CHECK(table.getAnnotations()[0]->vals[0].type == ANNOTATION_VAL_TYPE_TEXT);
+	BOOST_CHECK(table.getAnnotations()[0]->vals[0].valdata.text == string("test"));
+	BOOST_CHECK(table.getAnnotations()[0]->vals[1].type == ANNOTATION_VAL_TYPE_BOOL);
+	BOOST_CHECK(table.getAnnotations()[0]->vals[1].valdata.num == 0);
+	BOOST_CHECK(table.getAnnotations()[0]->vals[2].type == ANNOTATION_VAL_TYPE_NOTHING);
+	BOOST_CHECK(table.getAnnotations()[1]->vals.size() == 3);
+	BOOST_CHECK(table.getAnnotations()[1]->vals[0].type == ANNOTATION_VAL_TYPE_TEXT);
+	BOOST_CHECK(table.getAnnotations()[1]->vals[0].valdata.text == string("test2"));
+	BOOST_CHECK(table.getAnnotations()[1]->vals[1].type == ANNOTATION_VAL_TYPE_BOOL);
+	BOOST_CHECK(table.getAnnotations()[1]->vals[1].valdata.num == 1);
+	BOOST_CHECK(table.getAnnotations()[1]->vals[2].type == ANNOTATION_VAL_TYPE_NOTHING);
+
+}
+
+BOOST_AUTO_TEST_CASE(TestReadsPropertyAnnotations)
+{
+	char* dataptr = TABLE_FILE_VERSION
+					"\011" // classname len
+					"classname"
+					"\000" // not abstract
+					"\006"
+					"prop()" // prop name
+					"\006"
+					"prop()" // prop casing
+					"\000" // flags
+					"\001" // lambda
+					"\000" // no return type
+					"\000" // no types
+					"\000" // no alias
+					"\000" // no specialty
+					// begin annotations
+					"\011" // length 9
+					"Annotated"
+					"\001" // string val
+					"\004" // length 4
+					"test"
+					"\003" // bool val
+					"\000" // false
+					"\004" // nothing val
+					"\000" // end annotation vals
+					"\012" // length 10
+					"Annotated2"
+					"\001" // string val
+					"\005" // length 5
+					"test2"
+					"\003" // bool val
+					"\001" // true
+					"\004" // nothing val
+					"\000" // end annotation vals
+					"\000" // end annotations
+					"\000" // begin inheritance
+					"\000" // begin parameters
+					"\000" // end parameters
+					"\000";// end annotations
+
+	std::stringstream in;
+	in.write(dataptr, 79);
+
+	TableFileReader reader;
+
+	TypeAnalyzer tanalyzer;
+	PropertySymbolTable table(&tanalyzer);
+	reader.read(&table, in);
+
+	BOOST_CHECK(table.classname == string("classname"));
+	BOOST_CHECK(table.isAbstract() == false);
+	BOOST_CHECK(table.getNeeds()->size() == 0);
+	BOOST_CHECK(table.properties.size() == 1);
+	BOOST_CHECK(table.parentage.size() == 0);
+	BOOST_CHECK(table.getParameters().size() == 0);
+	BOOST_CHECK(table.getAnnotations().size() == 0);
+	BOOST_CHECK(table.properties["prop()"]);
+	BOOST_CHECK(table.properties["prop()"]->annotations.size() == 2);
+	BOOST_CHECK(table.properties["prop()"]->annotations[0]->name == string("Annotated"));
+	BOOST_CHECK(table.properties["prop()"]->annotations[1]->name == string("Annotated2"));
+	BOOST_CHECK(table.properties["prop()"]->annotations[0]->vals.size() == 3);
+	BOOST_CHECK(table.properties["prop()"]->annotations[0]->vals[0].type == ANNOTATION_VAL_TYPE_TEXT);
+	BOOST_CHECK(table.properties["prop()"]->annotations[0]->vals[0].valdata.text == string("test"));
+	BOOST_CHECK(table.properties["prop()"]->annotations[0]->vals[1].type == ANNOTATION_VAL_TYPE_BOOL);
+	BOOST_CHECK(table.properties["prop()"]->annotations[0]->vals[1].valdata.num == 0);
+	BOOST_CHECK(table.properties["prop()"]->annotations[0]->vals[2].type == ANNOTATION_VAL_TYPE_NOTHING);
+	BOOST_CHECK(table.properties["prop()"]->annotations[1]->vals.size() == 3);
+	BOOST_CHECK(table.properties["prop()"]->annotations[1]->vals[0].type == ANNOTATION_VAL_TYPE_TEXT);
+	BOOST_CHECK(table.properties["prop()"]->annotations[1]->vals[0].valdata.text == string("test2"));
+	BOOST_CHECK(table.properties["prop()"]->annotations[1]->vals[1].type == ANNOTATION_VAL_TYPE_BOOL);
+	BOOST_CHECK(table.properties["prop()"]->annotations[1]->vals[1].valdata.num == 1);
+	BOOST_CHECK(table.properties["prop()"]->annotations[1]->vals[2].type == ANNOTATION_VAL_TYPE_NOTHING);
+
 }
 
 BOOST_AUTO_TEST_SUITE_END()

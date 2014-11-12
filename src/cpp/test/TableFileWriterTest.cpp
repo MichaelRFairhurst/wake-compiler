@@ -350,4 +350,139 @@ BOOST_AUTO_TEST_CASE(TestWritesOptional)
 	ASSERTCHAR(0); // annotations
 }
 
+BOOST_AUTO_TEST_CASE(TestWritesClassAnnotations)
+{
+	std::stringstream out;
+	TableFileWriter writer;
+	TypeAnalyzer tanalyzer;
+	PropertySymbolTable table(&tanalyzer);
+	table.classname = "classname";
+	vector<Type*> parameters;
+	vector<Annotation*> annotations;
+	annotations.push_back(new Annotation());
+	annotations.push_back(new Annotation());
+	annotations[0]->name = "Annotation";
+	annotations[0]->vals.push_back(new AnnotationVal());
+	annotations[0]->vals.push_back(new AnnotationVal());
+	annotations[0]->vals.push_back(new AnnotationVal());
+	annotations[0]->vals[0].type = ANNOTATION_VAL_TYPE_TEXT;
+	annotations[0]->vals[0].valdata.text = strdup("test");
+	annotations[0]->vals[1].type = ANNOTATION_VAL_TYPE_BOOL;
+	annotations[0]->vals[1].valdata.num = 0;
+	annotations[0]->vals[2].type = ANNOTATION_VAL_TYPE_NOTHING;
+	annotations[1]->name = "Annotation2";
+	annotations[1]->vals.push_back(new AnnotationVal());
+	annotations[1]->vals.push_back(new AnnotationVal());
+	annotations[1]->vals.push_back(new AnnotationVal());
+	annotations[1]->vals[0].type = ANNOTATION_VAL_TYPE_TEXT;
+	annotations[1]->vals[0].valdata.text = strdup("test2");
+	annotations[1]->vals[1].type = ANNOTATION_VAL_TYPE_BOOL;
+	annotations[1]->vals[1].valdata.num = 1;
+	annotations[1]->vals[2].type = ANNOTATION_VAL_TYPE_NOTHING;
+	table.setAnnotations(annotations);
+	writer.write(out, &table);
+
+	ASSERTLENGTH(49);
+	ASSERTCHAR(TABLE_FILE_VERSION);
+	ASSERTCHAR(9); // classname length
+	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
+	ASSERTCHAR(0); // not abstract
+	ASSERTCHAR(0); // inheritances
+	ASSERTCHAR(0); // parameters
+	ASSERTCHAR(9); // annotation length
+	ASSERTCHAR('A'); ASSERTCHAR('n'); ASSERTCHAR('n'); ASSERTCHAR('o'); ASSERTCHAR('t'); ASSERTCHAR('a'); ASSERTCHAR('t'); ASSERTCHAR('i'); ASSERTCHAR('o'); ASSERTCHAR('n');
+	ASSERTCHAR(1); // string value
+	ASSERTCHAR(4); // string value
+	ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('s'); ASSERTCHAR('t');
+	ASSERTCHAR(3); // bool value
+	ASSERTCHAR(0); // false
+	ASSERTCHAR(4); // nothing value
+	ASSERTCHAR(0); // end annotation values
+	ASSERTCHAR(10); // annotation length
+	ASSERTCHAR('A'); ASSERTCHAR('n'); ASSERTCHAR('n'); ASSERTCHAR('o'); ASSERTCHAR('t'); ASSERTCHAR('a'); ASSERTCHAR('t'); ASSERTCHAR('i'); ASSERTCHAR('o'); ASSERTCHAR('n'); ASSERTCHAR('2');
+	ASSERTCHAR(1); // string value
+	ASSERTCHAR(5); // string value
+	ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('s'); ASSERTCHAR('t'); ASSERTCHAR('2');
+	ASSERTCHAR(3); // bool value
+	ASSERTCHAR(1); // true
+	ASSERTCHAR(4); // nothing value
+	ASSERTCHAR(0); // end annotation values
+	ASSERTCHAR(0); // end annotations
+}
+
+BOOST_AUTO_TEST_CASE(TestWritesMethodAnnotations)
+{
+	std::stringstream out;
+	TableFileWriter writer;
+	TypeAnalyzer tanalyzer;
+	PropertySymbolTable table(&tanalyzer);
+	table.classname = "classname";
+	vector<Type*> parameters;
+	Type* text = MakeType(TYPE_CLASS);
+	text->typedata._class.classname = strdup("Text");
+	vector<Annotation*> annotations;
+	annotations.push_back(new Annotation());
+	annotations.push_back(new Annotation());
+	annotations[0]->name = "Annotation";
+	annotations[0]->vals.push_back(new AnnotationVal());
+	annotations[0]->vals.push_back(new AnnotationVal());
+	annotations[0]->vals.push_back(new AnnotationVal());
+	annotations[0]->vals[0].type = ANNOTATION_VAL_TYPE_TEXT;
+	annotations[0]->vals[0].valdata.text = strdup("test");
+	annotations[0]->vals[1].type = ANNOTATION_VAL_TYPE_BOOL;
+	annotations[0]->vals[1].valdata.num = 0;
+	annotations[0]->vals[2].type = ANNOTATION_VAL_TYPE_NOTHING;
+	annotations[1]->name = "Annotation2";
+	annotations[1]->vals.push_back(new AnnotationVal());
+	annotations[1]->vals.push_back(new AnnotationVal());
+	annotations[1]->vals.push_back(new AnnotationVal());
+	annotations[1]->vals[0].type = ANNOTATION_VAL_TYPE_TEXT;
+	annotations[1]->vals[0].valdata.text = strdup("test2");
+	annotations[1]->vals[1].type = ANNOTATION_VAL_TYPE_BOOL;
+	annotations[1]->vals[1].valdata.num = 1;
+	annotations[1]->vals[2].type = ANNOTATION_VAL_TYPE_NOTHING;
+	table.addProperty(text, 1, annotations);
+	writer.write(out, &table);
+
+	ASSERTLENGTH(71);
+	ASSERTCHAR(TABLE_FILE_VERSION);
+	ASSERTCHAR(9); // classname length
+	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
+	ASSERTCHAR(0); // not abstract
+	ASSERTCHAR(4); // method name length
+	ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t');
+	ASSERTCHAR(4); // casing length
+	ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t');
+	ASSERTCHAR(1); // Flagged public
+		ASSERTCHAR(TYPE_CLASS);
+		ASSERTCHAR(4); // class name ength
+		ASSERTCHAR('T'); ASSERTCHAR('e'); ASSERTCHAR('x'); ASSERTCHAR('t');
+		ASSERTCHAR(0); // parameters
+		ASSERTCHAR(0); // shadow
+		ASSERTCHAR(0); // alias length
+		ASSERTCHAR(0); // specialty length
+		ASSERTCHAR(9); // annotation length
+		ASSERTCHAR('A'); ASSERTCHAR('n'); ASSERTCHAR('n'); ASSERTCHAR('o'); ASSERTCHAR('t'); ASSERTCHAR('a'); ASSERTCHAR('t'); ASSERTCHAR('i'); ASSERTCHAR('o'); ASSERTCHAR('n');
+		ASSERTCHAR(1); // string value
+		ASSERTCHAR(4); // string value
+		ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('s'); ASSERTCHAR('t');
+		ASSERTCHAR(3); // bool value
+		ASSERTCHAR(0); // false
+		ASSERTCHAR(4); // nothing value
+		ASSERTCHAR(0); // end annotation values
+		ASSERTCHAR(10); // annotation length
+		ASSERTCHAR('A'); ASSERTCHAR('n'); ASSERTCHAR('n'); ASSERTCHAR('o'); ASSERTCHAR('t'); ASSERTCHAR('a'); ASSERTCHAR('t'); ASSERTCHAR('i'); ASSERTCHAR('o'); ASSERTCHAR('n'); ASSERTCHAR('2');
+		ASSERTCHAR(1); // string value
+		ASSERTCHAR(5); // string value
+		ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('s'); ASSERTCHAR('t'); ASSERTCHAR('2');
+		ASSERTCHAR(3); // bool value
+		ASSERTCHAR(1); // true
+		ASSERTCHAR(4); // nothing value
+		ASSERTCHAR(0); // end annotation values
+		ASSERTCHAR(0); // end annotations
+	ASSERTCHAR(0); // inheritances
+	ASSERTCHAR(0); // parameters
+	ASSERTCHAR(0); // end annotations
+}
+
 BOOST_AUTO_TEST_SUITE_END()

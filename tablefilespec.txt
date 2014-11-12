@@ -10,7 +10,7 @@ file = version (1 byte) | namelength (1 byte) | name | Properties | 0x00 | Inher
 	ListType = 0x04 | Type | levels (1 byte)
 	OptionalType = 0x05 | Type | levels (1 byte)
 	ReturnType = (0x01 | Type) or (0x00)
-	TypeCommon = arrayed | aliaslength | alias | specialtylength | specialty | optional
+	TypeCommon = aliaslength | alias | specialtylength | specialty
 	Annotation = NameLength (1 byte) | Name | AnnotationVals | 0x00
 	AnnotationVals = (StrAnnotationVal | NumAnnotationVal | BoolAnnotationVal | NothingAnnotationVal)*
 	StrAnnotationVal = 0x01 | len (1 byte) | value
@@ -24,16 +24,16 @@ Memory Layout
 
      File          Property       Classtype          Lambda      Parameterized     ListType      OptionalType     ReturnType      Typecommon      Inheritance
  ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------
-|   version  |  | namelength |  |    0x01    |  |    0x02    |  |    0x03    |  |    0x04    |  |    0x05    |  |    0x01    |  |   alias    |  | NameLength |
- ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------   |    ...     |   ------------
-| namelength |  |    name    |  | namelength |  | ReturnType |  |  labellen  |  |    Type    |  |    Type    |  |    Type    |   ------------   |    Name    |
- ------------   |    ...     |   ------------   |    ....    |   ------------   |     ...    |  |     ...    |  |     ...    |  | specialtyl |  |    ....    |
+|   version  |  | namelength |  |    0x01    |  |    0x02    |  |    0x03    |  |    0x04    |  |    0x05    |  |    0x01    |  |  aliaslen  |  | NameLength |
+ ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------
+| namelength |  |    name    |  | namelength |  | ReturnType |  |  labellen  |  |    Type    |  |    Type    |  |    Type    |  |   alias    |  |    Name    |
+ ------------   |    ...     |   ------------   |    ....    |   ------------   |     ...    |  |     ...    |  |     ...    |  |    ...     |  |    ....    |
 |    name    |   ------------   |    name    |   ------------   |    label   |   ------------    ------------    ------------    ------------    ------------
-|    ...     |  |   casingl  |  |    ....    |  |    Types   |  |     ...    |  |   levels   |  |   levels   |        OR        | specialty  |  | Bool extend|
- ------------    ------------    ------------   |    ....    |   ------------    ------------    ------------    ------------   |    ....    |   ------------
-|   0x00     |  |   casing   |  | ParamTypes |   ------------   | Type upper |  | Typecommon |  | Typecommon |  |    0x00    |   ------------
- ------------    ------------   |    ...     |  |    0x00    |  |     ...    |  |    ...     |  |    ...     |   ------------
-| Properties |  |   flags    |   ------------    ------------    ------------    ------------    ------------
+|    ...     |  |   casingl  |  |    ....    |  |    Types   |  |     ...    |  |   levels   |  |   levels   |        OR        | specialtyl |  | Bool extend|
+ ------------    ------------    ------------   |    ....    |   ------------    ------------    ------------    ------------    ------------    ------------
+|   0x00     |  |   casing   |  | ParamTypes |   ------------   | Type upper |  | Typecommon |  | Typecommon |  |    0x00    |  | specialty  |
+ ------------    ------------   |    ...     |  |    0x00    |  |     ...    |  |    ...     |  |    ...     |   ------------   |    ....    |
+| Properties |  |   flags    |   ------------    ------------    ------------    ------------    ------------                    ------------
 |    ...     |   ------------   |    0x00    |  | Typecommon |  | Type lower |
  ------------   |    Type    |   ------------   |    ...     |  |     ...    |
 |   0x00     |  |    ...     |  | Typecommon |   ------------    ------------
