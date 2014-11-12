@@ -209,21 +209,23 @@ void TableFileWriter::writeAnnotations(ostream& out, const boost::ptr_vector<Ann
 				case ANNOTATION_VAL_TYPE_TEXT:
 					dataptr[0] = (char) strlen(val->valdata.text);
 					out.write(dataptr, 1);
-					out.write(ann->name, strlen(val->valdata.text));
+					out.write(val->valdata.text, strlen(val->valdata.text));
 					break;
 
 				case ANNOTATION_VAL_TYPE_BOOL:
 					dataptr[0] = (char) (bool) val->valdata.num;
 					out.write(dataptr, 1);
+					break;
 
 				case ANNOTATION_VAL_TYPE_NUM:
 					memcpy((void*) &val->valdata.num, dataptr, sizeof(float));
 					out.write(dataptr, sizeof(float));
+					break;
 			}
-
-			dataptr[0] = (char) 0x00;
-			out.write(dataptr, 1);
 		}
+
+		dataptr[0] = (char) 0x00;
+		out.write(dataptr, 1);
 	}
 
 	dataptr[0] = (char) 0x00;

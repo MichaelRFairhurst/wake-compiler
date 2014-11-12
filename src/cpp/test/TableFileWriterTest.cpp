@@ -17,8 +17,9 @@
 #include <sstream>
 #include <string>
 #include "type.h"
+#include <boost/lexical_cast.hpp>
 
-#define ASSERTCHAR(v) BOOST_CHECK_MESSAGE(dataptr[i++] == v, "Expected " #v " in stream at pos " + string(1, i) + " got " + string(1, (unsigned char) dataptr[i]));
+#define ASSERTCHAR(v) BOOST_CHECK_MESSAGE(dataptr[i++] == v, "Expected " #v " in stream at pos " + boost::lexical_cast<string>(i) + " got " + string(1, (unsigned char) dataptr[i]));
 #define ASSERTLENGTH(l) char* dataptr = (char*) malloc(l); out.read(dataptr, l); BOOST_CHECK_MESSAGE(!out.eof(), "too short"); out.peek(); BOOST_CHECK_MESSAGE(out.eof(), "too long"); int i = 0;
 
 #define TABLE_FILE_VERSION 3
@@ -382,14 +383,15 @@ BOOST_AUTO_TEST_CASE(TestWritesClassAnnotations)
 	table.setAnnotations(annotations);
 	writer.write(out, &table);
 
-	ASSERTLENGTH(49);
+	ASSERTLENGTH(60);
 	ASSERTCHAR(TABLE_FILE_VERSION);
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
-	ASSERTCHAR(0); // inheritances
-	ASSERTCHAR(0); // parameters
-	ASSERTCHAR(9); // annotation length
+	ASSERTCHAR(0); // end properties
+	ASSERTCHAR(0); // end inheritances
+	ASSERTCHAR(0); // end parameters
+	ASSERTCHAR(10); // annotation length
 	ASSERTCHAR('A'); ASSERTCHAR('n'); ASSERTCHAR('n'); ASSERTCHAR('o'); ASSERTCHAR('t'); ASSERTCHAR('a'); ASSERTCHAR('t'); ASSERTCHAR('i'); ASSERTCHAR('o'); ASSERTCHAR('n');
 	ASSERTCHAR(1); // string value
 	ASSERTCHAR(4); // string value
@@ -398,7 +400,7 @@ BOOST_AUTO_TEST_CASE(TestWritesClassAnnotations)
 	ASSERTCHAR(0); // false
 	ASSERTCHAR(4); // nothing value
 	ASSERTCHAR(0); // end annotation values
-	ASSERTCHAR(10); // annotation length
+	ASSERTCHAR(11); // annotation length
 	ASSERTCHAR('A'); ASSERTCHAR('n'); ASSERTCHAR('n'); ASSERTCHAR('o'); ASSERTCHAR('t'); ASSERTCHAR('a'); ASSERTCHAR('t'); ASSERTCHAR('i'); ASSERTCHAR('o'); ASSERTCHAR('n'); ASSERTCHAR('2');
 	ASSERTCHAR(1); // string value
 	ASSERTCHAR(5); // string value
@@ -444,7 +446,7 @@ BOOST_AUTO_TEST_CASE(TestWritesMethodAnnotations)
 	table.addProperty(text, 1, annotations);
 	writer.write(out, &table);
 
-	ASSERTLENGTH(71);
+	ASSERTLENGTH(82);
 	ASSERTCHAR(TABLE_FILE_VERSION);
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
@@ -461,7 +463,7 @@ BOOST_AUTO_TEST_CASE(TestWritesMethodAnnotations)
 		ASSERTCHAR(0); // shadow
 		ASSERTCHAR(0); // alias length
 		ASSERTCHAR(0); // specialty length
-		ASSERTCHAR(9); // annotation length
+		ASSERTCHAR(10); // annotation length
 		ASSERTCHAR('A'); ASSERTCHAR('n'); ASSERTCHAR('n'); ASSERTCHAR('o'); ASSERTCHAR('t'); ASSERTCHAR('a'); ASSERTCHAR('t'); ASSERTCHAR('i'); ASSERTCHAR('o'); ASSERTCHAR('n');
 		ASSERTCHAR(1); // string value
 		ASSERTCHAR(4); // string value
@@ -470,7 +472,7 @@ BOOST_AUTO_TEST_CASE(TestWritesMethodAnnotations)
 		ASSERTCHAR(0); // false
 		ASSERTCHAR(4); // nothing value
 		ASSERTCHAR(0); // end annotation values
-		ASSERTCHAR(10); // annotation length
+		ASSERTCHAR(11); // annotation length
 		ASSERTCHAR('A'); ASSERTCHAR('n'); ASSERTCHAR('n'); ASSERTCHAR('o'); ASSERTCHAR('t'); ASSERTCHAR('a'); ASSERTCHAR('t'); ASSERTCHAR('i'); ASSERTCHAR('o'); ASSERTCHAR('n'); ASSERTCHAR('2');
 		ASSERTCHAR(1); // string value
 		ASSERTCHAR(5); // string value
@@ -480,8 +482,9 @@ BOOST_AUTO_TEST_CASE(TestWritesMethodAnnotations)
 		ASSERTCHAR(4); // nothing value
 		ASSERTCHAR(0); // end annotation values
 		ASSERTCHAR(0); // end annotations
-	ASSERTCHAR(0); // inheritances
-	ASSERTCHAR(0); // parameters
+	ASSERTCHAR(0); // begin inheritances
+	ASSERTCHAR(0); // end inheritances
+	ASSERTCHAR(0); // end parameters
 	ASSERTCHAR(0); // end annotations
 }
 
