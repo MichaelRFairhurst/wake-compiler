@@ -14,6 +14,7 @@
 
 import Asserts;
 
+@TestClass
 every PropertyTest is:
 
 	provides PropertyTest;
@@ -21,6 +22,7 @@ every PropertyTest is:
 	with public Num = 5;
 	with public Num six = 6;
 
+	@Test
 	~[test own properties]~(Asserts) {
 		Asserts.that(Num)Equals(5);
 		Asserts.that(six)Equals(6);
@@ -40,6 +42,7 @@ every PropertyTest is:
 		Asserts.that(this.six)Equals(4);
 	}
 
+	@Test
 	~[test others properties]~(Asserts) {
 		var PropertyTest from this;
 		Asserts.that(PropertyTest.Num)Equals(5);
@@ -49,6 +52,7 @@ every PropertyTest is:
 		Asserts.that(PropertyTest.Num)Equals(2);
 		Asserts.that(PropertyTest.six)Equals(3);
 
+	@Test
 		var $PropertyTest from this;
 		Asserts.that($PropertyTest.Num)Equals(5);
 		Asserts.that($PropertyTest.six)Equals(6);

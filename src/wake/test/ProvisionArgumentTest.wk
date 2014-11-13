@@ -3,28 +3,33 @@ import Asserts;
 every DataClass is:
 	needs public Num, public Text;
 
+@TestClass
 every ProvisionArgumentTest is:
 
 	provides DataClass <- DataClass(?Num, ?Text);
 
+	@Test
 	~[ test gotten data class has proper values in initializiation ]~(Asserts) {
 		var DataClass(5, "hello") from this;
 		Asserts.that(DataClass.Num)Equals(5);
 		Asserts.that(DataClass.Text)Equals("hello");
 	}
 
+	@Test
 	~[ test gotten data class has proper values in initializiation alias first ]~(Asserts) {
 		var some DataClass(5, "hello") from this;
 		Asserts.that(some.Num)Equals(5);
 		Asserts.that(some.Text)Equals("hello");
 	}
 
+	@Test
 	~[ test gotten data class has proper values in initializiation alias second ]~(Asserts) {
 		var DataClass here(5, "hello") from this;
 		Asserts.that(here.Num)Equals(5);
 		Asserts.that(here.Text)Equals("hello");
 	}
 
+	@Test
 	~[ test gotten data class has proper values in retrieval ]~(Asserts) {
 		var DataClass = DataClass(5, "hello") from this;
 		Asserts.that(DataClass.Num)Equals(5);

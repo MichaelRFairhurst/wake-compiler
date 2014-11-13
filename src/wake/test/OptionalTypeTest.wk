@@ -14,8 +14,10 @@
 
 import Asserts;
 
+@TestClass
 every OptionalTypeTest is:
 
+	@Test
 	~[test optional int never set]~(Asserts) {
 		var Num? = nothing;
 		if Num exists {
@@ -23,6 +25,7 @@ every OptionalTypeTest is:
 		}
 	}
 
+	@Test
 	~[test optional int set]~(Asserts) {
 		var Num? = 5;
 		if Num exists {
@@ -32,6 +35,7 @@ every OptionalTypeTest is:
 		Asserts.fail("Num should have existed");
 	}
 
+	@Test
 	~[test optional int not set will hit else]~(Asserts) {
 		var Num? = nothing;
 		if Num exists {} else {
@@ -40,6 +44,7 @@ every OptionalTypeTest is:
 		Asserts.fail("We didn't hit the else block");
 	}
 
+	@Test
 	~[test optional int set wont hit else]~(Asserts) {
 		var Num? = 5;
 		if Num exists {} else {
@@ -48,6 +53,7 @@ every OptionalTypeTest is:
 
 	}
 
+	@Test
 	~[test zero and empty string are not nothing]~(Asserts) {
 		var Num? = 0;
 		var Text? = "";

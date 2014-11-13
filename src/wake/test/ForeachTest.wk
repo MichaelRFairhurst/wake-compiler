@@ -14,8 +14,10 @@
 
 import Asserts;
 
+@TestClass
 every ForeachTest is:
 
+	@Test
 	~[ test empty loop never enters foreach ]~(Asserts) {
 		var Num[] = [];
 		var Bool = false;
@@ -27,6 +29,7 @@ every ForeachTest is:
 		Asserts.that(Bool)Equals(false);
 	}
 
+	@Test
 	~[ test loop with values executes with each once ]~(Asserts) {
 		var Num[] = [1, 2, 3];
 		var $Num[] = [];
@@ -41,6 +44,7 @@ every ForeachTest is:
 		Asserts.that($Num[2])Equals(3);
 	}
 
+	@Test
 	~[ test loop with values aren't references ]~(Asserts) {
 		var Num[] = [0, 1, 2];
 
@@ -53,6 +57,7 @@ every ForeachTest is:
 		Asserts.that(Num[2])Equals(2);
 	}
 
+	@Test
 	~[ test loop that inserts still executes with all ]~(Asserts) {
 		var Num = 0;
 		var Bool[] = [true, false, false, true];
@@ -68,6 +73,7 @@ every ForeachTest is:
 		Asserts.that(Num)Equals(8);
 	}
 
+	@Test
 	~[ test foreach over statement only happens once ]~(Asserts) {
 		var Num[] copy = [];
 		foreach(getNumArray()) {
@@ -87,12 +93,14 @@ every ForeachTest is:
 		return Num[];
 	}
 
+	@Test
 	~[ test can iterate over an array twice ]~(Asserts) {
 		var Num[] = [];
 		foreach(Num[]) { }
 		foreach(Num[]) { }
 	}
 
+	@Test
 	~[ test foreach as alias sets value properly in var ]~(Asserts) {
 		var Num[] copy = [];
 		var Num[] = [0, 1, 2];
@@ -105,6 +113,7 @@ every ForeachTest is:
 		Asserts.that(copy[2])Equals(2);
 	}
 
+	@Test
 	~[ test foreach as class sets value properly in var ]~(Asserts) {
 		var Num[] copy = [];
 		var Num[] = [0, 1, 2];
@@ -117,6 +126,7 @@ every ForeachTest is:
 		Asserts.that(copy[2])Equals(2);
 	}
 
+	@Test
 	~[ test foreach as shadow sets value properly in var ]~(Asserts) {
 		var Num[] copy = [];
 		var Num[] = [0, 1, 2];

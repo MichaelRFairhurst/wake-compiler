@@ -14,30 +14,36 @@
 
 import Asserts;
 
+@TestClass
 every ArrayTest is:
 
+	@Test
 	~[test set array index]~(Asserts) {
 		var Num[] = [5];
 		Asserts.that(Num[0])Equals(5);
 	}
 
+	@Test
 	~[test reset array index]~(Asserts) {
 		var Num[] = [5];
 		Num[0] = 3;
 		Asserts.that(Num[0])Equals(3);
 	}
 
+	@Test
 	~[test set array array index index]~(Asserts) {
 		var Num[][] = [[3]];
 		Asserts.that(Num[0][0])Equals(3);
 	}
 
+	@Test
 	~[test reset array array index index]~(Asserts) {
 		var Num[][] = [[3]];
 		Num[0][0] = 5;
 		Asserts.that(Num[0][0])Equals(5);
 	}
 
+	@Test
 	~[test set multiple array indices]~(Asserts) {
 		var Num[] = [5, 6, 7, 8];
 		Asserts.that(Num[0])Equals(5);
@@ -46,6 +52,7 @@ every ArrayTest is:
 		Asserts.that(Num[3])Equals(8);
 	}
 
+	@Test
 	~[test set multiple array array indices indices]~(Asserts) {
 		var Num[][] = [[5, 6, 7], [6, 7, 8], [6, 7, 8]];
 		Asserts.that(Num[0][0])Equals(5);

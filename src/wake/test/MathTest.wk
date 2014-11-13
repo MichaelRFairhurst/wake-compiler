@@ -14,8 +14,10 @@
 
 import Asserts;
 
+@TestClass
 every MathTest is:
 
+	@Test
 	testAddition(Asserts) {
 		Asserts.that(2 + 2)Equals(4);
 		Asserts.that(6 + 2)Equals(8);
@@ -23,18 +25,21 @@ every MathTest is:
 		Asserts.that(0 - 20 + 14)Equals(0 - 6);
 	}
 
+	@Test
 	testSubtraction(Asserts) {
 		Asserts.that(6 - 2)Equals(4);
 		Asserts.that(42 - 2)Equals(40);
 		Asserts.that(40 - 80)Equals(0 - 40);
 	}
 
+	@Test
 	testDivision(Asserts) {
 		Asserts.that(8 / 4)Equals(2);
 		Asserts.that(10 / 4)Equals(2.5);
 		Asserts.that(10 / 20)Equals(0.5);
 	}
 
+	@Test
 	testMultiplication(Asserts) {
 		Asserts.that(3 * 5)Equals(15);
 		Asserts.that(8 * 16)Equals(128);
@@ -42,6 +47,7 @@ every MathTest is:
 		Asserts.that(8 * 0.5)Equals(4);
 	}
 
+	@Test
 	testOrderOfOperations(Asserts) {
 		Asserts.that(5 + 6 * 2)Equals(17);
 		Asserts.that(5 - 6 * 2)Equals(0 - 7);

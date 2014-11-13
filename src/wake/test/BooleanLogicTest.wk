@@ -14,13 +14,16 @@
 
 import Asserts;
 
+@TestClass
 every BooleanLogicTest is:
 
+	@Test
 	testNot(Asserts) {
 		Asserts.that(!true)Equals(false);
 		Asserts.that(!false)Equals(true);
 	}
 
+	@Test
 	testOr(Asserts) {
 		Asserts.that(true  || true)Equals(true);
 		Asserts.that(false || true)Equals(true);
@@ -28,6 +31,7 @@ every BooleanLogicTest is:
 		Asserts.that(false || false)Equals(false);
 	}
 
+	@Test
 	testAnd(Asserts) {
 		Asserts.that(true  && true)Equals(true);
 		Asserts.that(false && true)Equals(false);
@@ -35,6 +39,7 @@ every BooleanLogicTest is:
 		Asserts.that(false && false)Equals(false);
 	}
 
+	@Test
 	testOrderOfOperations(Asserts) {
 		Asserts.that(true  && true  || false)Equals(true);
 		Asserts.that(true  && false || false)Equals(false);

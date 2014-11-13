@@ -14,12 +14,15 @@
 
 import Asserts;
 
+@TestClass
 every AutoboxingTest is:
 
+	@Test
 	testNumSquared(Asserts) {
 		Asserts.that(5.squared())Equals(25);
 	}
 
+	@Test
 	testAbsoluteValue(Asserts) {
 		Asserts.that(5.abs())Equals(5);
 		Asserts.that(0.abs())Equals(0);
@@ -27,12 +30,14 @@ every AutoboxingTest is:
 		// TODO...NEGATIVES
 	}
 
+	@Test
 	testMaxOfNum(Asserts) {
 		Asserts.that(5.orMaxOf(5))Equals(5);
 		Asserts.that(5.orMaxOf(4))Equals(5);
 		Asserts.that(5.orMaxOf(6))Equals(6);
 	}
 
+	@Test
 	testMaxOfNums(Asserts) {
 		var Num[] = [5];
 		Asserts.that(5.orMaxOf(Num[]))Equals(5);
@@ -42,12 +47,14 @@ every AutoboxingTest is:
 		Asserts.that(5.orMaxOf(Num[]))Equals(6);
 	}
 
+	@Test
 	testMinOfNum(Asserts) {
 		Asserts.that(5.orMinOf(5))Equals(5);
 		Asserts.that(5.orMinOf(4))Equals(4);
 		Asserts.that(5.orMinOf(6))Equals(5);
 	}
 
+	@Test
 	testMinOfNums(Asserts) {
 		var Num[] = [5];
 		Asserts.that(5.orMinOf(Num[]))Equals(5);
@@ -57,6 +64,7 @@ every AutoboxingTest is:
 		Asserts.that(5.orMinOf(Num[]))Equals(4);
 	}
 
+	@Test
 	testNumberOfDigits(Asserts) {
 		Asserts.that(123.numberOfDigits())Equals(3);
 		Asserts.that(1234.numberOfDigits())Equals(4);
@@ -65,18 +73,22 @@ every AutoboxingTest is:
 		Asserts.that(0.numberOfDigits())Equals(1);
 	}
 
+	@Test
 	testToUpper(Asserts) {
 		Asserts.that("blah".toUpper())Equals("BLAH");
 	}
 
+	@Test
 	testToLower(Asserts) {
 		Asserts.that("BLAH".toLower())Equals("blah");
 	}
 
+	@Test
 	testSwitchCase(Asserts) {
 		Asserts.that("BlAh".switchCase())Equals("bLaH");
 	}
 
+	@Test
 	testTrim(Asserts) {
 		Asserts.that("    	 blah".trim())Equals("blah");
 		Asserts.that(" blah".trim())Equals("blah");
@@ -89,6 +101,7 @@ every AutoboxingTest is:
 		Asserts.that("blah blah".trim())Equals("blah blah");
 	}
 
+	@Test
 	testArraySize(Asserts) {
 		var Num[] = [];
 		Asserts.that(Num[].getSize())Equals(0);
@@ -98,6 +111,7 @@ every AutoboxingTest is:
 		Asserts.that(Num[].getSize())Equals(2);
 	}
 
+	@Test
 	testArrayContains(Asserts) {
 		var Num[] = [];
 		var Text[] = [];
@@ -118,6 +132,7 @@ every AutoboxingTest is:
 		Asserts.isTrue(AutoboxingTest[].contains(this));
 	}
 
+	@Test
 	testTextLength(Asserts) {
 		Asserts.that("hello".getSize())Equals(5);
 		Asserts.that("h".getSize())Equals(1);
@@ -125,6 +140,7 @@ every AutoboxingTest is:
 		Asserts.that("suuuuuuuuuuuuuuuuuupa coooooooooooooooooool".getSize())Equals(43);
 	}
 
+	@Test
 	testTextSubstr(Asserts) {
 		Asserts.that("hello".substr(0))Equals("hello");
 		Asserts.that("hello".substr(0, 10))Equals("hello");
@@ -133,6 +149,7 @@ every AutoboxingTest is:
 		Asserts.that("hello".substr(1, 3))Equals("el");
 	}
 
+	@Test
 	testNumToString(Asserts) {
 		Asserts.that(5.toString())Equals("5");
 		Asserts.that(0.toString())Equals("0");
@@ -140,11 +157,13 @@ every AutoboxingTest is:
 		Asserts.that(-2020.toString())Equals("-2020");
 	}
 
+	@Test
 	testBoolToString(Asserts) {
 		Asserts.that(true.toString())Equals("true");
 		Asserts.that(false.toString())Equals("false");
 	}
 
+	@Test
 	testFloor(Asserts) {
 		Asserts.that(5.5.floor())Equals(5);
 		Asserts.that(5.1.floor())Equals(5);
@@ -156,6 +175,7 @@ every AutoboxingTest is:
 		Asserts.that((0 - 5.9).floor())Equals(-6);
 	}
 
+	@Test
 	testCeil(Asserts) {
 		Asserts.that(5.5.ceil())Equals(6);
 		Asserts.that(5.1.ceil())Equals(6);
@@ -167,6 +187,7 @@ every AutoboxingTest is:
 		Asserts.that(-5.9.ceil())Equals(-5);
 	}
 
+	@Test
 	testRound(Asserts) {
 		Asserts.that(5.5.round())Equals(6);
 		Asserts.that(5.51.round())Equals(6);
@@ -180,6 +201,7 @@ every AutoboxingTest is:
 		Asserts.that(-5.9.round())Equals(-6);
 	}
 
+	@Test
 	testModulo(Asserts) {
 		Asserts.that(5.modulo(2))Equals(1);
 		Asserts.that(10.modulo(2))Equals(0);
@@ -188,6 +210,7 @@ every AutoboxingTest is:
 		Asserts.that(12.modulo(3))Equals(0);
 	}
 
+	@Test
 	testParseNum(Asserts) {
 		it(Asserts)That("5".parseNum())ExistsAndEquals(5);
 		it(Asserts)That("54".parseNum())ExistsAndEquals(54);
@@ -215,6 +238,7 @@ every AutoboxingTest is:
 		}
 	}
 
+	@Test
 	testCharAt(Asserts) {
 		it(Asserts)That("aoeu".charAt(0))ExistsAndEquals("a");
 		it(Asserts)That("aoeu".charAt(1))ExistsAndEquals("o");
@@ -226,6 +250,7 @@ every AutoboxingTest is:
 		}
 	}
 
+	@Test
 	testSplit(Asserts) {
 		Asserts.that("hello heyo".split(" ").getSize())Equals(2);
 		Asserts.that("hello heyo".split(" ")[0])Equals("hello");
@@ -241,6 +266,7 @@ every AutoboxingTest is:
 		Asserts.that("hey man whatchoo doin".split("x")[0])Equals("hey man whatchoo doin");
 	}
 
+	@Test
 	testIndexOf(Asserts) {
 		it(Asserts)That("aoeu".indexOf("a"))ExistsAndEquals(0);
 		it(Asserts)That("aoeu".indexOf("ao"))ExistsAndEquals(0);
@@ -262,6 +288,7 @@ every AutoboxingTest is:
 		}
 	}
 
+	@Test
 	~[ test List.push(T) ]~(Asserts) {
 		var Text[] = [];
 		Text[].push("hey");
@@ -269,6 +296,7 @@ every AutoboxingTest is:
 		Asserts.that(Text[0])Equals("hey");
 	}
 
+	@Test
 	~[ test Join ]~(Asserts) {
 		var Text[] = ['hey'];
 		Asserts.that(''.join(Text[]))Equals('hey');

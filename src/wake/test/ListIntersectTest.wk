@@ -14,18 +14,22 @@
 
 import Asserts;
 
+@TestClass
 every ListIntersectTest is:
 
+	@Test
 	~[ test intersect empty num list with empty num list is empty num list ]~(Asserts) {
 		var Num[] = [];
 		Asserts.that(Num[].intersect(Num[]).getSize())Equals(0);
 	}
 
+	@Test
 	~[ test intersect empty text list with empty text list is empty text list ]~(Asserts) {
 		var Text[] = [];
 		Asserts.that(Text[].intersect(Text[]).getSize())Equals(0);
 	}
 
+	@Test
 	~[ test intersect empty num list with nonempty num list is empty num list ]~(Asserts) {
 		var Num[] = [];
 		var $Num[] = [4];
@@ -33,6 +37,7 @@ every ListIntersectTest is:
 		Asserts.that(Num[].intersect($Num[]).getSize())Equals(0);
 	}
 
+	@Test
 	~[ test intersect empty text list with nonempty text list is empty text list ]~(Asserts) {
 		var Text[] = [];
 		var $Text[] = ["hey"];
@@ -40,6 +45,7 @@ every ListIntersectTest is:
 		Asserts.that(Text[].intersect($Text[]).getSize())Equals(0);
 	}
 
+	@Test
 	~[ test intersect nonempty num list with nonempty num list is nonempty num list ]~(Asserts) {
 		var Num[] = [5];
 		var $Num[] = [5];
@@ -49,6 +55,7 @@ every ListIntersectTest is:
 		Asserts.that($Num[].intersect(Num[])[0])Equals(5);
 	}
 
+	@Test
 	~[ test intersect nonempty text list with nonempty text list is nonempty text list ]~(Asserts) {
 		var Text[] = ["hey"];
 		var $Text[] = ["hey"];
@@ -58,6 +65,7 @@ every ListIntersectTest is:
 		Asserts.that($Text[].intersect(Text[])[0])Equals("hey");
 	}
 
+	@Test
 	~[ test intersect different num lists with no commonality is empty list ]~(Asserts) {
 		var Num[] = [1, 2];
 		var $Num[] = [3, 4];
@@ -65,6 +73,7 @@ every ListIntersectTest is:
 		Asserts.that($Num[].intersect(Num[]).getSize())Equals(0);
 	}
 
+	@Test
 	~[ test intersect different text lists with no commonality is empty list ]~(Asserts) {
 		var Text[] = ["one", "two"];
 		var $Text[] = ["three", "four"];
@@ -72,6 +81,7 @@ every ListIntersectTest is:
 		Asserts.that($Text[].intersect(Text[]).getSize())Equals(0);
 	}
 
+	@Test
 	~[ test intersect same num lists but different orders returns both ]~(Asserts) {
 		var Num[] = [0, 1];
 		var $Num[] = [1, 0];
@@ -84,6 +94,7 @@ every ListIntersectTest is:
 		Asserts.that($Num[].intersect(Num[])[1])Equals(0);
 	}
 
+	@Test
 	~[ test intersect same text lists but different orders returns both ]~(Asserts) {
 		var Text[] = ["hey", "yo"];
 		var $Text[] = ["yo", "hey"];
@@ -96,6 +107,7 @@ every ListIntersectTest is:
 		Asserts.that($Text[].intersect(Text[])[1])Equals("hey");
 	}
 
+	@Test
 	~[ test intersect two common nums are kept ]~(Asserts) {
 		var Num[] = [0, 1, 2];
 		var $Num[] = [3, 1, 2];
@@ -107,6 +119,7 @@ every ListIntersectTest is:
 		Asserts.that($Num[].intersect(Num[])[1])Equals(2);
 	}
 
+	@Test
 	~[ test intersect two common texts are kept ]~(Asserts) {
 		var Text[] = ["zero", "one", "two"];
 		var $Text[] = ["three", "one", "two"];

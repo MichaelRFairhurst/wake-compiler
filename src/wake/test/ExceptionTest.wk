@@ -21,10 +21,12 @@ every SubExceptionB (an Exception) is:
 
 every SubSubExceptionA (a SubExceptionA) is:
 
+@TestClass
 every ExceptionTest is:
 
 	provides Exception, SubExceptionA, SubExceptionB, SubSubExceptionA;
 
+	@Test
 	~[ test exception not thrown never hits catch block ]~(Asserts) {
 		try {
 			// do some stuff here
@@ -37,6 +39,7 @@ every ExceptionTest is:
 		}
 	}
 
+	@Test
 	~[ test exception thrown stops executing try block ]~(Asserts) {
 		try {
 			// do some stuff here
@@ -50,6 +53,7 @@ every ExceptionTest is:
 		}
 	}
 
+	@Test
 	~[ test exception thrown executes catch block ]~(Asserts) {
 		try {
 			throw Exception from this;
@@ -63,6 +67,7 @@ every ExceptionTest is:
 		throw Exception from this;
 	}
 
+	@Test
 	~[ test exception thrown from function is caught ]~(Asserts) {
 		try {
 			functionThatThrows();
@@ -72,6 +77,7 @@ every ExceptionTest is:
 		Asserts.fail("Should not have reached here!");
 	}
 
+	@Test
 	~[ test SubExceptionA is caught as exception ]~(Asserts) {
 		try {
 			throw SubExceptionA from this;
@@ -81,6 +87,7 @@ every ExceptionTest is:
 		Asserts.fail("Should not have reached here!");
 	}
 
+	@Test
 	~[ test SubExceptionB is caught as exception ]~(Asserts) {
 		try {
 			throw SubExceptionB from this;
@@ -90,6 +97,7 @@ every ExceptionTest is:
 		Asserts.fail("Should not have reached here!");
 	}
 
+	@Test
 	~[ test SubSubExceptionA is caught as exception ]~(Asserts) {
 		return; // BROKEN
 		try {
@@ -100,6 +108,7 @@ every ExceptionTest is:
 		Asserts.fail("Should not have reached here!");
 	}
 
+	@Test
 	~[ test SubExceptionA is caught as SubExceptionA ]~(Asserts) {
 		try {
 			throw SubExceptionA from this;
@@ -109,6 +118,7 @@ every ExceptionTest is:
 		Asserts.fail("Should not have reached here!");
 	}
 
+	@Test
 	~[ test SubExceptionB is caught as SubExceptionB ]~(Asserts) {
 		try {
 			throw SubExceptionB from this;
@@ -118,6 +128,7 @@ every ExceptionTest is:
 		Asserts.fail("Should not have reached here!");
 	}
 
+	@Test
 	~[ test SubSubExceptionA is caught as SubExceptionA ]~(Asserts) {
 		try {
 			throw SubSubExceptionA from this;
@@ -127,6 +138,7 @@ every ExceptionTest is:
 		Asserts.fail("Should not have reached here!");
 	}
 
+	@Test
 	~[ test SubSubExceptionA is caught as SubSubExceptionA ]~(Asserts) {
 		try {
 			throw SubSubExceptionA from this;
@@ -136,6 +148,7 @@ every ExceptionTest is:
 		Asserts.fail("Should not have reached here!");
 	}
 
+	@Test
 	~[ test SubExceptionA is not caught as SubExceptionB ]~(Asserts) {
 		try {
 			try {
@@ -146,6 +159,7 @@ every ExceptionTest is:
 		} catch(SubExceptionA) {}
 	}
 
+	@Test
 	~[ test SubExceptionB is not caught as SubExceptionA ]~(Asserts) {
 		try {
 			try {
@@ -156,6 +170,7 @@ every ExceptionTest is:
 		} catch(SubExceptionB) {}
 	}
 
+	@Test
 	~[ test SubExceptionA is not caught as SubSubExceptionA ]~(Asserts) {
 		try {
 			try {
@@ -166,6 +181,7 @@ every ExceptionTest is:
 		} catch(SubExceptionA) {}
 	}
 
+	@Test
 	~[ test exception stack trace ]~(Asserts) {
 		try {
 			throw Exception from this;
@@ -183,6 +199,7 @@ every ExceptionTest is:
 		}
 	}
 
+	@Test
 	~[ test exception stack is replaced on each line ]~(Asserts) {
 		try {
 			recurseTilThrow(Exception from this, 1);
@@ -193,6 +210,7 @@ every ExceptionTest is:
 		}
 	}
 
+	@Test
 	~[ test undefined index exception ]~(Asserts) {
 		var $Text[] = [];
 		try {

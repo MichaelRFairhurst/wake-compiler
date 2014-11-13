@@ -14,8 +14,10 @@
 
 import Asserts;
 
+@TestClass
 every AssignmentsTest is:
 
+	@Test
 	testPlusEquals(Asserts) {
 		var Num = 5;
 		Num += 0;
@@ -26,6 +28,7 @@ every AssignmentsTest is:
 		Asserts.that(Num)Equals(11);
 	}
 
+	@Test
 	testMinusEquals(Asserts) {
 		var Num = 5;
 		Num -= 0;
@@ -36,6 +39,7 @@ every AssignmentsTest is:
 		Asserts.that(Num)Equals(0);
 	}
 
+	@Test
 	testTimesEquals(Asserts) {
 		var Num = 5;
 		Num *= 1;
@@ -46,6 +50,7 @@ every AssignmentsTest is:
 		Asserts.that(Num)Equals(0);
 	}
 
+	@Test
 	testDivideEquals(Asserts) {
 		var Num = 25;
 		Num /= 5;
@@ -56,6 +61,7 @@ every AssignmentsTest is:
 		Asserts.that(Num)Equals(1);
 	}
 
+	@Test
 	testUsingAssigmentReturnValues(Asserts) {
 		var Num = 5;
 		if((Num := 1) != 1) {
