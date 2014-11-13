@@ -48,6 +48,21 @@
 				<p>We're still in alpha status, but you can check here to see what you'll get by updating, and/or gauge our progress.</p>
 				<br/>
 
+				<h3 id="v0.0.6">v0.0.6</h3>
+				<p><b>Features</b><p>
+				<p>Better error reporting that highlights the code with the issue</p>
+				<p>Unchecked annotations on methods, needs, and classes, available for compile-time reflection</p>
+				<p>Compiler will complain about incompatible table files</p>
+				<p><b>Bugfixes</b><p>
+				<p>Fixed memory leak in table file reader</p>
+				<p>Fixed an issue using generics as anything but the first class definition</p>
+				<p>Fixed a bug requiring table files for the various primitives at link time</p>
+				<p>Fixed a bug in js std.o when running in browser</p>
+				<p>Fixed issue where parameterized type arrays required repeating parameters in variable access</p>
+				<p><b>Standard Library</b><p>
+				<p><b>Compatibility Notes</b><p>
+				<p>Table files are not backwards compatible. If you are using the seed project you must rm -rf libs, merge in the latest seed, and rebuild.</p>
+
 				<h3 id="v0.0.5">v0.0.5</h3>
 				<p><b>Features</b><p>
 				<p>Constructor arguments in provisions, arguments in behavioral provisions</p>
