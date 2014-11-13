@@ -52,7 +52,6 @@ every PropertyTest is:
 		Asserts.that(PropertyTest.Num)Equals(2);
 		Asserts.that(PropertyTest.six)Equals(3);
 
-	@Test
 		var $PropertyTest from this;
 		Asserts.that($PropertyTest.Num)Equals(5);
 		Asserts.that($PropertyTest.six)Equals(6);
