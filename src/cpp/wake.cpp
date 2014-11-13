@@ -154,6 +154,8 @@ int main(int argc, char** argv) {
 				linker.loadObject(*it);
 			}
 
+			LibraryLoader loader;
+			loader.loadStdLibToTable(&table);
 			linker.loadTables(options->tabledir, table);
 
 			try {
