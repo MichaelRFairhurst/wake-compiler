@@ -12,6 +12,10 @@ hljs.LANGUAGES.wake = {
     },
     {
       cN: 'decorator',
+      b: '@[a-zA-Z]+'
+    },
+    {
+      cN: 'decorator',
       b: '\\$+'
     },
     {

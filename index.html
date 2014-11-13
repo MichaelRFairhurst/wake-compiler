@@ -67,6 +67,7 @@
 				<li><a href="#provisionargs">- Provisions Arguments</a></li>
 				<li><a href="#behavioralprovisions">- Behavioral Provisions</a></li>
 				<li><a href="#ternaries">Ternary Operators</a></li>
+				<li><a href="#annotations">Annotations</a></li>
 				<li><a href="#entry">Program entry points</a></li>
 			</ul>
 		</div>
@@ -714,6 +715,25 @@ every PersonProvider is:
     Num -- myMethod(Bool) {
         return <span class="goodcode" title="Return 4 on the true case of our condition">4</span> if <span class="goodcode" title="The value of this Bool variable determines if we evaluate the left or right expression">Bool</span> else <span class="goodcode" title="Return 5 when our variable Bool is false">5</span>;
     };</code></pre>
+
+		<h3 id="annotations">Annotations <span class="label label-inverse">readable</span> <span class="label label-inverse">testable</span> <span class="label label-inverse">flexible</span></h3>
+		<p>Wake now has unchecked annotations. We have a plan to typecheck the values you use, in which annotations, on what parts of your source code. But for now, you can freely annotate classes, methods, and needs with values such as Texts, Bools, Nums, and even nothing. This is currently used by our unit test library, but can be used for so so much more.<p>
+			<span class="label label-info">Wake</span>
+		<pre><code class="wake"
+><span class="goodcode" title="The wUnit unit testing library can use compile-time reflection to see that this is a test class.">@TestClass</span>
+<span class="goodcode" title="Annotations are totally unrestricted. You can use reflection to find these annotated classes and do whatever you want with them">@MadeUpAnnotation("hello", false, 123, nothing)</span>
+every MyClass
+
+    needs
+        <span class="goodcode" title="Annotations are totally unrestricted. You can use reflection to find these annotated classes and do whatever you want with them">@MadeUpAnnotation("hello", false, 123, nothing)</span>
+        Printer;
+
+    <span class="goodcode" title="The wUnit unit testing library can use compile-time reflection to see that this method is a unit test.">@Test</span>
+    <span class="goodcode" title="Annotations are totally unrestricted. You can use reflection to find these annotated classes and do whatever you want with them">@MadeUpAnnotation("hello", false, 123, nothing)</span>
+    testSomething(Asserts) {
+        // ...
+    };</code></pre>
+
 		<h3 id="entry">Program Entry Points <span class="label label-inverse">flexible</span> <span class="label label-inverse">testable</span> <span class="label label-inverse">fast</span></h3>
 		<p>After compiling each Wake file, you can link the files together and choose where the program begins. This means the code you write does not guarantee any particular entry point, which in turn means your test suite can have a different entry point than your app. Without this, you would be unable to test your application's startup in unit tests.</p>
 		<p>Any class with automatically inferrable dependencies (ie, no primitives, lists, etc) can be your startup class, and any of its methods which take no arguments can be the starting method. These are provided by the compile time flags <code>-c</code> and <code>-m</code> respectively, but default to <code>Main</code> and <code>main()</code>.</p>
