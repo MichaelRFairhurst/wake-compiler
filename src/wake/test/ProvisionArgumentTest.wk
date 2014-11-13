@@ -1,8 +1,5 @@
 import Asserts;
 
-every DataClass is:
-	needs public Num, public Text;
-
 @TestClass
 every ProvisionArgumentTest is:
 
@@ -35,3 +32,6 @@ every ProvisionArgumentTest is:
 		Asserts.that(DataClass.Num)Equals(5);
 		Asserts.that(DataClass.Text)Equals("hello");
 	}
+
+every DataClass is:
+	needs public Num, public Text;

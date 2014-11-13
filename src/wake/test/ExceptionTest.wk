@@ -15,12 +15,6 @@
 import Asserts;
 import UndefinedIndexException;
 
-every SubExceptionA (an Exception) is:
-
-every SubExceptionB (an Exception) is:
-
-every SubSubExceptionA (a SubExceptionA) is:
-
 @TestClass
 every ExceptionTest is:
 
@@ -221,3 +215,9 @@ every ExceptionTest is:
 			Asserts.that(Text[2].substr(0, 73))Equals("    at [WAKE] ExceptionTest.~[ test undefined index exception ]~(Asserts)");
 		}
 	}
+
+every SubExceptionA (an Exception) is:
+
+every SubExceptionB (an Exception) is:
+
+every SubSubExceptionA (a SubExceptionA) is:
