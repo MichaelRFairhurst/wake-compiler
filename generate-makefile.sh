@@ -29,6 +29,10 @@ do
   then
     continue
   fi
+  if [ "${LINE:0:1}" == "@" ]
+  then
+    continue
+  fi
 
   deps[${#deps[@]}]="$2/$(echo $LINE | sed 's/^import \(.*\);$/\1/').table.md5"
 done < $1
