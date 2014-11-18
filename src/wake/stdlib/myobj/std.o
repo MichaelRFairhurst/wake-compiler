@@ -34,13 +34,6 @@ function$ $$A(a, b) {
 		};
 	};
 
-	~System~ = function$ ~System~() {
-		this.`exit(Num)` = function(a) {
-			if(typeof$ process!='undefined' && typeof$ process.exit!='undefined')
-				process.exit(a);
-		};
-	};
-
 	~Num~ = function$ ~Num~(a) {
 		this.`squared()` = function() {
 			return$ a * a;
