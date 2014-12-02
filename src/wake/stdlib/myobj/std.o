@@ -314,14 +314,6 @@ function$ $$A(a, b) {
 
 	};
 
-	~Argv~ = function$ ~Argv~() {
-
-		this.`getArgv()` = function() {
-			return$ process.argv;
-		};
-
-	};
-
 	~Exception~ = function$ ~Exception~(e) {
 		var$ m;
 

@@ -106,6 +106,9 @@ void SemanticErrorPrinter::print(SemanticError* e) {
 		case INVALID_CHILD_RETURN_TYPE:
 			cout << "Child class must return the same type or a supertype as their parent classes";
 			break;
+		case OPTIONAL_USE_OF_NONOPTIONAL_TYPE:
+			cout << "Using a type which is not optional as if it were optional";
+			break;
 		default:
 			cout << "bad error code provided";
 	}

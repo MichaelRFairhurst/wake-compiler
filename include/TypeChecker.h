@@ -44,7 +44,9 @@ class TypeChecker {
 		Type* typeCheckUsable(Node* n, bool forceArrayIdentifier);
 		bool exhaustiveReturns(Node* n);
 		void flowAnalysis(Node* n, bool breakable, bool caseable, bool continuable);
-		bool isValidLValue(Node* N);
+		bool isValidLValue(Node* n);
+		Type* typeCheckMemberAccess(Node* n, Type& subject, bool forceArrayIdentifier);
+		Type* typeCheckMethodInvocation(Node* n, Type& subject);
 
 		MethodSignatureParseTreeTraverser* methodanalyzer;
 		ErrorTracker* errors;

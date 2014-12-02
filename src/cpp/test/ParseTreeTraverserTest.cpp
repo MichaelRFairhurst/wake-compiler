@@ -407,7 +407,25 @@ PTT_TEST_CASE(
 		arrayAccessOnClass(MyClass my) { my[1]; }				\n\
 		arrayAccessWithClass(MyClass, Num[]) { Num[MyClass]; }	\n\
 		arrayAccessWithString(Num[]) { Num['test']; }			\n\
+		safeArrayAccessOnNum() { 9[?1]; }							\n\
+		safeArrayAccessOnString() { 'abcd'[?1]; }					\n\
+		safeArrayAccessOnBool() { true[?1]; }						\n\
+		safeArrayAccessOnNum(Num alias) { alias[?1]; }				\n\
+		safeArrayAccessOnString(Text alias) { alias[?1]; }			\n\
+		safeArrayAccessOnBool(Bool alias) { alias[?1]; }				\n\
+		safeArrayAccessOnClass(MyClass my) { my[?1]; }				\n\
+		safeArrayAccessWithClass(MyClass, Num[]) { Num[?MyClass]; }	\n\
+		safeArrayAccessWithString(Num[]) { Num[?'test']; }			\n\
 	",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -3267,5 +3285,99 @@ PTT_TEST_CASE(
 	PTT_EXPECT(TYPE_ERROR)
 );
 
+PTT_TEST_CASE(
+	TestEarlyBailoutMemberAccessNotValidOnNonOptionals,
+	"every MyClass is:											\n\
+		myMethod() {											\n\
+			1.?Text;											\n\
+			'hey'.?Text;										\n\
+			true.?Text; 										\n\
+		}",
+	PTT_EXPECT(OPTIONAL_USE_OF_NONOPTIONAL_TYPE)
+	PTT_EXPECT(OPTIONAL_USE_OF_NONOPTIONAL_TYPE)
+	PTT_EXPECT(OPTIONAL_USE_OF_NONOPTIONAL_TYPE)
+);
+
+PTT_TEST_CASE(
+	TestEarlyBailoutMethodCallNotValidOnNonOptionals,
+	"every MyClass is:											\n\
+		myMethod() {											\n\
+			1.?orMaxOf(3);										\n\
+			'hey'.?split(',');									\n\
+			true.?toString(); 									\n\
+		}",
+	PTT_EXPECT(OPTIONAL_USE_OF_NONOPTIONAL_TYPE)
+	PTT_EXPECT(OPTIONAL_USE_OF_NONOPTIONAL_TYPE)
+	PTT_EXPECT(OPTIONAL_USE_OF_NONOPTIONAL_TYPE)
+);
+
+PTT_TEST_CASE(
+	TestEarlyBailoutAccessUnknownPropertyIsUnknownProp,
+	"every MyClass is:											\n\
+		myMethod(Num?, Text?, Bool?) {							\n\
+			Num.?rrrrRRRr;										\n\
+			Text.?rrrrRRRr;										\n\
+			Bool.?rrrrRRRr; 									\n\
+		}",
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+);
+
+PTT_TEST_CASE(
+	TestEarlyBailoutCallUnknownMethodIsTypeError,
+	"every MyClass is:											\n\
+		myMethod(Num?, Text?, Bool?) {							\n\
+			Num.?rrrrRRR(3);									\n\
+			Text.?rrrrRRR(',');									\n\
+			Bool.?rrrrRRRr(); 									\n\
+		}",
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+);
+
+PTT_TEST_CASE(
+	TestEarlyBailoutAccessReturnsOptionalWrappedMemberType,
+	"every MyClass is:											\n\
+		with public Num = 1;									\n\
+		with public Text = 'hey';								\n\
+		with public Num[] = [1];								\n\
+		with public Text[] = ['hey'];							\n\
+		myMethod(MyClass?) {									\n\
+			var Num? = MyClass.?Num; 							\n\
+			var Text? = MyClass.?Text; 							\n\
+			var Num[]? = MyClass.?Num[]; 						\n\
+			var Text[]? = MyClass.?Text[]; 						\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestEarlyBailoutReturnsOptionalWrappedReturnType,
+	"every MyClass is:											\n\
+		Num -- getNum() { return 1; }							\n\
+		Text -- getText() { return 'hey'; }						\n\
+		Num[] -- getNumList() { return [1]; }					\n\
+		Text[] -- getTextList() { return ['hey']; }				\n\
+		myMethod(MyClass?) {									\n\
+			var Num? = MyClass.?getNum(); 						\n\
+			var Text? = MyClass.?getText(); 					\n\
+			var Num[]? = MyClass.?getNumList(); 				\n\
+			var Text[]? = MyClass.?getTextList(); 				\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	ValidSafeArrayIndexAccessAndReturningValidTypes,
+	"every MyClass is:															\n\
+		Num? -- intArrayBecomesNum(Num[]) { return Num[?0]; }					\n\
+		Text? -- stringArrayBecomesString(Text[]) { return Text[?1]; }			\n\
+		Text[]? -- stringArrayArrayBecomesString(Text[][]) { return Text[?1]; }	\n\
+		Num[]? -- intArrayArrayBecomesNum(Num[][]) { return Num[?1]; }			\n\
+	",
+	PTT_VALID
+);
 
 BOOST_AUTO_TEST_SUITE_END()

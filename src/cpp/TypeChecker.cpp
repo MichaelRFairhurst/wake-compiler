@@ -394,6 +394,29 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 				}
 				break;
 
+			case NT_TYPESAFE_ARRAY_ACCESS:
+				{
+					forceArrayIdentifier = false;
+					ret = typeCheckUsable(tree->node_data.nodes[0], true);
+					Type index = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier));
+					if(ret->type != TYPE_LIST && ret->type != TYPE_MATCHALL) {
+						erroneousstring = analyzer->getNameForType(ret);
+						throw string("Getting index of non-array");
+					} else if(ret->type == TYPE_LIST) { // Otherwise we're a matchall
+						Type temp = *ret->typedata.list.contained;
+						delete ret;
+						ret = new Type(TYPE_OPTIONAL);
+						ret->typedata.optional.contained = new Type(temp);
+					}
+
+					if(!analyzer->isPrimitiveTypeNum(&index) && index.type != TYPE_MATCHALL) {
+						erroneousstring = analyzer->getNameForType(&index);
+						expectedstring = "Num";
+						throw string("Array indices must be numeric");
+					}
+				}
+				break;
+
 			case NT_ARRAY_ACCESS:
 			case NT_ARRAY_ACCESS_LVAL:
 				{
@@ -538,6 +561,24 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 				}
 				break;
 
+			case NT_EARLYBAILOUT_METHOD_INVOCATION:
+				{
+					Type subject = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[0], false));
+					if(subject.type == TYPE_MATCHALL) {
+						ret = new Type(subject);
+						break;
+					} else if(subject.type != TYPE_OPTIONAL) {
+						errors->addError(new SemanticError(OPTIONAL_USE_OF_NONOPTIONAL_TYPE, "using .? on a nonoptional", tree));
+						ret = new Type(TYPE_MATCHALL);
+						break;
+					} else {
+						ret = new Type(TYPE_OPTIONAL);
+						ret->typedata.optional.contained = typeCheckMethodInvocation(tree, *subject.typedata.optional.contained);
+					}
+
+				}
+				break;
+
 			case NT_METHOD_INVOCATION:
 				{
 					Node* methodname = tree->node_data.nodes[1];
@@ -560,64 +601,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						break;
 					}
 
-					if(subject.type == TYPE_OPTIONAL) {
-						errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Calling method on optional type " + analyzer->getNameForType(&subject) + ". You must first wrap object in an exists { } clause.", tree));
-						ret = new Type(TYPE_MATCHALL);
-						break;
-					}
-
-					Type* boxedtype;
-					if(analyzer->isAutoboxedType(&subject, &boxedtype)) {
-						Node* node = tree->node_data.nodes[0];
-						tree->node_data.nodes[0] = MakeTwoBranchNode(NT_AUTOBOX, node, MakeNodeFromString(NT_COMPILER_HINT, strdup(boxedtype->typedata._class.classname), tree->loc), tree->loc);
-						subject = *boxedtype;
-						delete boxedtype;
-					}
-
-					auto_ptr<ReadOnlyPropertySymbolTable> methodtable;
-					try {
-						methodtable.reset(classestable->find(&subject));
-					} catch (SymbolNotFoundException* e) {
-						ret = MakeType(TYPE_MATCHALL);
-						errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, string("Class by name of ") + subject.typedata._class.classname + " returned by another expression has not been imported and cannot be resolved", tree));
-						break;
-					}
-					vector<pair<string, TypeArray*> > method_segments;
-
-					int i = 0;
-					while(i < methodname->subnodes) {
-						string name = methodname->node_data.nodes[i]->node_data.string;
-						TypeArray* args = MakeTypeArray();
-						i++;
-
-						if(methodname->subnodes > i) {
-							int a;
-							for(a = 0; a < methodname->node_data.nodes[i]->subnodes; a++)
-								AddTypeToTypeArray(typeCheckUsable(methodname->node_data.nodes[i]->node_data.nodes[a], forceArrayIdentifier), args);
-						}
-
-						method_segments.push_back(pair<string, TypeArray*>(name, args));
-						i++;
-					}
-
-					boost::optional<Type*> lambdatype = methodtable->find(methodtable->getSymbolNameOf(&method_segments));
-
-					if(lambdatype) {
-						if((*lambdatype)->typedata.lambda.returntype == NULL) {
-							ret = new Type(TYPE_UNUSABLE);
-						} else {
-							ret = new Type(*(*lambdatype)->typedata.lambda.returntype);
-						}
-
-						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(subject.typedata._class.classname), tree->loc));
-						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(methodtable->getAddress(methodtable->getSymbolNameOf(&method_segments)).c_str()), tree->loc));
-					} else {
-						errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Couldn't find property " + methodtable->getSymbolNameOf(&method_segments) + " on class" + subject.typedata._class.classname, tree));
-						ret = MakeType(TYPE_MATCHALL);
-					}
-
-					for(vector<pair<string, TypeArray*> >::iterator it = method_segments.begin(); it != method_segments.end(); ++it)
-						delete it->second;
+					ret = typeCheckMethodInvocation(tree, subject);
 				}
 				break;
 
@@ -768,6 +752,24 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 				}
 				break;
 
+			case NT_EARLYBAILOUT_MEMBER_ACCESS:
+				{
+					Type subject = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[0], false));
+					if(subject.type == TYPE_MATCHALL) {
+						ret = new Type(subject);
+						break;
+					} else if(subject.type != TYPE_OPTIONAL) {
+						errors->addError(new SemanticError(OPTIONAL_USE_OF_NONOPTIONAL_TYPE, "using .? on a nonoptional", tree));
+						ret = new Type(TYPE_MATCHALL);
+						break;
+					} else {
+						ret = new Type(TYPE_OPTIONAL);
+						ret->typedata.optional.contained = typeCheckMemberAccess(tree, *subject.typedata.optional.contained, forceArrayIdentifier);
+					}
+
+				}
+				break;
+
 			case NT_MEMBER_ACCESS:
 				{
 					Type subject = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[0], false));
@@ -776,39 +778,7 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						break;
 					}
 
-					Type* boxedtype;
-					if(analyzer->isAutoboxedType(&subject, &boxedtype)) {
-						Node* node = tree->node_data.nodes[0];
-						tree->node_data.nodes[0] = MakeTwoBranchNode(NT_AUTOBOX, node, MakeNodeFromString(NT_COMPILER_HINT, strdup(boxedtype->typedata._class.classname), tree->loc), tree->loc);
-						subject = *boxedtype;
-						delete boxedtype;
-					}
-
-					string name = tree->node_data.nodes[1]->node_type == NT_ALIAS
-						? tree->node_data.nodes[1]->node_data.string
-						: scopesymtable->getNameForType(tree->node_data.nodes[1]->node_data.type);
-
-					if(forceArrayIdentifier && tree->node_data.nodes[1]->node_type != NT_ALIAS) name += "[]";
-
-					if(subject.type == TYPE_OPTIONAL) {
-						errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Accessing member " + name + " on optional type " + analyzer->getNameForType(&subject) + ". You must first wrap object in an exists { } clause.", tree));
-						ret = MakeType(TYPE_MATCHALL);
-						break;
-					}
-
-					auto_ptr<ReadOnlyPropertySymbolTable> proptable(classestable->find(&subject));
-					boost::optional<Type*> variable = proptable->find(name);
-					if(!variable) {
-						ret = MakeType(TYPE_MATCHALL);
-						errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Symbol by name of " + name + " not found", tree));
-					} else {
-						Type* member = tree->node_data.nodes[1]->node_data.type;
-						if(!forceArrayIdentifier && tree->node_data.nodes[1]->node_type != NT_ALIAS && member->type == TYPE_LIST && analyzer->getArrayReferenceLevel(*member) != analyzer->getArrayReferenceLevel(**variable))
-							errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Accessed arrayed variable " + name + " with wrong number of [] brackets.", tree));
-
-						ret = copyType(*variable);
-						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(name.c_str()), tree->loc));
-					}
+					ret = typeCheckMemberAccess(tree, subject, forceArrayIdentifier);
 				}
 				break;
 
@@ -992,4 +962,113 @@ Type* TypeChecker::typeCheckUsable(Node* n, bool forceArrayIdentifier) {
 	}
 
 	return t;
+}
+
+Type* TypeChecker::typeCheckMemberAccess(Node* tree, Type& subject, bool forceArrayIdentifier) {
+	TypeAnalyzer* analyzer = classestable->getAnalyzer();
+	Type* ret;
+	Type* boxedtype;
+
+	if(analyzer->isAutoboxedType(&subject, &boxedtype)) {
+		Node* node = tree->node_data.nodes[0];
+		tree->node_data.nodes[0] = MakeTwoBranchNode(NT_AUTOBOX, node, MakeNodeFromString(NT_COMPILER_HINT, strdup(boxedtype->typedata._class.classname), tree->loc), tree->loc);
+		subject = *boxedtype;
+		delete boxedtype;
+	}
+
+	string name = tree->node_data.nodes[1]->node_type == NT_ALIAS
+		? tree->node_data.nodes[1]->node_data.string
+		: scopesymtable->getNameForType(tree->node_data.nodes[1]->node_data.type);
+
+	if(forceArrayIdentifier && tree->node_data.nodes[1]->node_type != NT_ALIAS) name += "[]";
+
+	if(subject.type == TYPE_OPTIONAL) {
+		errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Accessing property " + name + " on nonoptional type " + analyzer->getNameForType(&subject) + ". You must first wrap object in an exists { } clause.", tree));
+		ret = new Type(TYPE_MATCHALL);
+		return ret;
+	}
+
+	auto_ptr<ReadOnlyPropertySymbolTable> proptable(classestable->find(&subject));
+	boost::optional<Type*> variable = proptable->find(name);
+	if(!variable) {
+		ret = MakeType(TYPE_MATCHALL);
+		errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Symbol by name of " + name + " not found", tree));
+	} else {
+		Type* member = tree->node_data.nodes[1]->node_data.type;
+		if(!forceArrayIdentifier && tree->node_data.nodes[1]->node_type != NT_ALIAS && member->type == TYPE_LIST && analyzer->getArrayReferenceLevel(*member) != analyzer->getArrayReferenceLevel(**variable))
+			errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Accessed arrayed variable " + name + " with wrong number of [] brackets.", tree));
+
+		ret = copyType(*variable);
+		AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(name.c_str()), tree->loc));
+	}
+
+	return ret;
+}
+
+Type* TypeChecker::typeCheckMethodInvocation(Node* tree, Type& subject) {
+	TypeAnalyzer* analyzer = classestable->getAnalyzer();
+	Type* boxedtype;
+	Type* ret;
+
+	Node* methodname = tree->node_data.nodes[1];
+
+	if(subject.type == TYPE_OPTIONAL) {
+		errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Calling method on optional type " + analyzer->getNameForType(&subject) + ". You must first wrap object in an exists { } clause.", tree));
+		ret = new Type(TYPE_MATCHALL);
+		return ret;
+	}
+
+	if(analyzer->isAutoboxedType(&subject, &boxedtype)) {
+		Node* node = tree->node_data.nodes[0];
+		tree->node_data.nodes[0] = MakeTwoBranchNode(NT_AUTOBOX, node, MakeNodeFromString(NT_COMPILER_HINT, strdup(boxedtype->typedata._class.classname), tree->loc), tree->loc);
+		subject = *boxedtype;
+		delete boxedtype;
+	}
+
+	auto_ptr<ReadOnlyPropertySymbolTable> methodtable;
+	try {
+		methodtable.reset(classestable->find(&subject));
+	} catch (SymbolNotFoundException* e) {
+		ret = MakeType(TYPE_MATCHALL);
+		errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, string("Class by name of ") + subject.typedata._class.classname + " returned by another expression has not been imported and cannot be resolved", tree));
+		return ret;
+	}
+	vector<pair<string, TypeArray*> > method_segments;
+
+	int i = 0;
+	while(i < methodname->subnodes) {
+		string name = methodname->node_data.nodes[i]->node_data.string;
+		TypeArray* args = MakeTypeArray();
+		i++;
+
+		if(methodname->subnodes > i) {
+			int a;
+			for(a = 0; a < methodname->node_data.nodes[i]->subnodes; a++)
+				AddTypeToTypeArray(typeCheckUsable(methodname->node_data.nodes[i]->node_data.nodes[a], false), args);
+		}
+
+		method_segments.push_back(pair<string, TypeArray*>(name, args));
+		i++;
+	}
+
+	boost::optional<Type*> lambdatype = methodtable->find(methodtable->getSymbolNameOf(&method_segments));
+
+	if(lambdatype) {
+		if((*lambdatype)->typedata.lambda.returntype == NULL) {
+			ret = new Type(TYPE_UNUSABLE);
+		} else {
+			ret = new Type(*(*lambdatype)->typedata.lambda.returntype);
+		}
+
+		AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(subject.typedata._class.classname), tree->loc));
+		AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(methodtable->getAddress(methodtable->getSymbolNameOf(&method_segments)).c_str()), tree->loc));
+	} else {
+		errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Couldn't find property " + methodtable->getSymbolNameOf(&method_segments) + " on class" + subject.typedata._class.classname, tree));
+		ret = MakeType(TYPE_MATCHALL);
+	}
+
+	for(vector<pair<string, TypeArray*> >::iterator it = method_segments.begin(); it != method_segments.end(); ++it)
+		delete it->second;
+
+	return ret;
 }

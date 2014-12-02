@@ -100,6 +100,8 @@ from					count(); return FROM;
 \*=						count(); return SYM_MULTEQ;
 --						count(); return SYM_RETURN_DECREMENT;
 \?\?\?					count(); return SYM_CURRIER;
+\.\?					count(); return SYM_EARLYBAILOUT_DOT;
+\[\?					count(); return SYM_TYPESAFE_INDEX;
 :						count(); return ':';
 @						count(); return '@';
 \(						count(); return '(';
