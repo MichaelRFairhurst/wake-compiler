@@ -3344,11 +3344,15 @@ PTT_TEST_CASE(
 		with public Text = 'hey';								\n\
 		with public Num[] = [1];								\n\
 		with public Text[] = ['hey'];							\n\
-		myMethod(MyClass?) {									\n\
+		myMethod(MyClass?, $MyClass??) {						\n\
 			var Num? = MyClass.?Num; 							\n\
 			var Text? = MyClass.?Text; 							\n\
 			var Num[]? = MyClass.?Num[]; 						\n\
 			var Text[]? = MyClass.?Text[]; 						\n\
+			Num?? = $MyClass.?Num; 								\n\
+			Text?? = $MyClass.?Text; 							\n\
+			Num[]?? = $MyClass.?Num[]; 							\n\
+			Text[]?? = $MyClass.?Text[]; 						\n\
 		}",
 	PTT_VALID
 );
@@ -3360,11 +3364,15 @@ PTT_TEST_CASE(
 		Text -- getText() { return 'hey'; }						\n\
 		Num[] -- getNumList() { return [1]; }					\n\
 		Text[] -- getTextList() { return ['hey']; }				\n\
-		myMethod(MyClass?) {									\n\
+		myMethod(MyClass?, $MyClass?? ) {						\n\
 			var Num? = MyClass.?getNum(); 						\n\
 			var Text? = MyClass.?getText(); 					\n\
 			var Num[]? = MyClass.?getNumList(); 				\n\
 			var Text[]? = MyClass.?getTextList(); 				\n\
+			Num? = $MyClass.?getNum();							\n\
+			Text? = $MyClass.?getText();						\n\
+			Num[]? = $MyClass.?getNumList();					\n\
+			Text[]? = $MyClass.?getTextList();					\n\
 		}",
 	PTT_VALID
 );

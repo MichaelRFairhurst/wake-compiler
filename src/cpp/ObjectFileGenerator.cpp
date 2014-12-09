@@ -361,7 +361,6 @@ void ObjectFileGenerator::generate(Node* tree) {
 				string methodclass = tree->node_data.nodes[tree->subnodes - 2]->node_data.string;
 				string name = tree->node_data.nodes[tree->subnodes - 1]->node_data.string;
 
-				//file << "." << classes->find(methodclass)->getAddress(name) << "(";
 				file << ".";
 				header->addPropertyUsage(file.tellp(), name);
 				file << "(";
@@ -377,6 +376,64 @@ void ObjectFileGenerator::generate(Node* tree) {
 				}
 
 				file << ")";
+			}
+			break;
+
+		case NT_EARLYBAILOUT_METHOD_INVOCATION:
+			{
+				string methodclass = tree->node_data.nodes[tree->subnodes - 2]->node_data.string;
+				string name = tree->node_data.nodes[tree->subnodes - 1]->node_data.string;
+
+				table.pushScope();
+				Type* safechecked = MakeType(TYPE_MATCHALL);
+				std::stringstream safecheckedname;
+				safecheckedname << safechecked;
+				table.add(safecheckedname.str(), safechecked);
+
+				file << "(function(" << table.getAddress(safecheckedname.str()) << "){";
+				file << "return " << table.getAddress(safecheckedname.str()) << "===null?null:(";
+				file << table.getAddress(safecheckedname.str());
+				file << ".";
+				header->addPropertyUsage(file.tellp(), name);
+				file << "(";
+
+				int argnum = 0;
+				int i;
+				for(i = 1; i < tree->node_data.nodes[1]->subnodes; i += 2) {
+					for(int b = 0; b < tree->node_data.nodes[1]->node_data.nodes[i]->subnodes; b++) {
+						if(argnum != 0) file << ",";
+						generate(tree->node_data.nodes[1]->node_data.nodes[i]->node_data.nodes[b]);
+						argnum++;
+					}
+				}
+
+				file << "));})(";
+				generate(tree->node_data.nodes[0]);
+				file << ")";
+				table.popScope();
+			}
+			break;
+
+		case NT_EARLYBAILOUT_MEMBER_ACCESS:
+			{
+
+				table.pushScope();
+				Type* safechecked = MakeType(TYPE_MATCHALL);
+				std::stringstream safecheckedname;
+				safecheckedname << safechecked;
+				table.add(safecheckedname.str(), safechecked);
+
+				file << "(function(" << table.getAddress(safecheckedname.str()) << "){";
+				file << "return " << table.getAddress(safecheckedname.str()) << "===null?null:";
+				file << table.getAddress(safecheckedname.str());
+				file << ".";
+				string name = tree->node_data.nodes[tree->subnodes - 1]->node_data.string;
+				header->addPropertyUsage(file.tellp(), name);
+
+				file << ";})(";
+				generate(tree->node_data.nodes[0]);
+				file << ")";
+				table.popScope();
 			}
 			break;
 
@@ -512,6 +569,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_ARRAY_ACCESS_LVAL:
+		case NT_TYPESAFE_ARRAY_ACCESS:
 			file << "(";
 			forceArrayIdentifier = true;
 			generate(tree->node_data.nodes[0]);

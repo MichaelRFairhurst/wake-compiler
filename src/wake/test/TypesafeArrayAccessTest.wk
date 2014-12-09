@@ -1,0 +1,38 @@
+import Asserts;
+
+@TestClass
+every TypesafeArrayAccessTest is:
+
+	@Test
+	~[ test get existing item out of array exists ]~(Asserts) {
+		var Num[] = [0, 1, 2, 3, 4, 5];
+		var Num? = Num[?0];
+		Asserts.that(Num != nothing);
+		Num? = Num[?1];
+		Asserts.that(Num != nothing);
+		Num? = Num[?2];
+		Asserts.that(Num != nothing);
+		Num? = Num[?3];
+		Asserts.that(Num != nothing);
+		Num? = Num[?4];
+		Asserts.that(Num != nothing);
+		Num? = Num[?5];
+		Asserts.that(Num != nothing);
+	}
+
+	@Test
+	~[ test get not existing item out of array exists ]~(Asserts) {
+		var Num[] = [0, 1, 2, 3, 4, 5];
+		var Num? = Num[?6];
+		Asserts.that(Num == nothing);
+		Num? = Num[?7];
+		Asserts.that(Num == nothing);
+		Num? = Num[?8];
+		Asserts.that(Num == nothing);
+		Num? = Num[?9];
+		Asserts.that(Num == nothing);
+		Num? = Num[?10];
+		Asserts.that(Num == nothing);
+		Num? = Num[?11];
+		Asserts.that(Num == nothing);
+	}

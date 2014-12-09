@@ -1,0 +1,154 @@
+import Asserts;
+
+@TestClass
+every EarlyBailoutTest is:
+
+	provides Tree <- Tree(?Num);
+
+	@Test
+	~[ test basic member access exists ]~(Asserts) {
+		var Tree? = Tree(5) from this;
+		var Num? = Tree.?Num;
+
+		if Num exists {
+			Asserts.that(Num)Equals(5);
+		} else {
+			Asserts.fail("Num didn't exist");
+		}
+	}
+
+	@Test
+	~[ test basic method call exists ]~(Asserts) {
+		var Tree? = Tree(5) from this;
+		var Num? = Tree.?getNum();
+
+		if Num exists {
+			Asserts.that(Num)Equals(5);
+		} else {
+			Asserts.fail("Num didn't exist");
+		}
+	}
+
+	@Test
+	~[ test basic member access not exists ]~(Asserts) {
+		var Tree? = nothing;
+		var Num? = Tree.?Num;
+
+		if Num exists {
+			Asserts.fail("Num shouldn't exist");
+		}
+	}
+
+	@Test
+	~[ test basic method call not exists ]~(Asserts) {
+		var Tree? = nothing;
+		var Num? = Tree.?getNum();
+
+		if Num exists {
+			Asserts.fail("Num shouldn't exist");
+		}
+	}
+
+	@Test
+	~[ test complex member access not exists ]~(Asserts) {
+		var Tree? = nothing;
+		var Num? = Tree.?left.?Num;
+
+		if Num exists {
+			Asserts.fail("Num shouldn't exist");
+		}
+
+		Tree = Tree(5) from this;
+		Num? = Tree.?left.?Num;
+
+		if Num exists {
+			Asserts.fail("Num shouldn't exist");
+		}
+	}
+
+	@Test
+	~[ test complex method call not exists ]~(Asserts) {
+		var Tree? = nothing;
+		var Num? = Tree.?getLeft().?getNum();
+
+		if Num exists {
+			Asserts.fail("Num shouldn't exist");
+		}
+
+		Tree = Tree(5) from this;
+		Num? = Tree.?getLeft().?getNum();
+
+		if Num exists {
+			Asserts.fail("Num shouldn't exist");
+		}
+	}
+
+	@Test
+	~[ test complex member access exists ]~(Asserts) {
+		var Tree? = Tree(5) from this;
+		if Tree exists {
+			Tree.left = Tree(6) from this;
+		}
+
+		var Num? = Tree.?left.?Num;
+
+		if Num exists {
+			Asserts.that(Num)Equals(6);
+		} else {
+			Asserts.fail("Num didn't exist");
+		}
+	}
+
+	@Test
+	~[ test complex method call exists ]~(Asserts) {
+		var Tree? = Tree(5) from this;
+		if Tree exists {
+			Tree.left = Tree(6) from this;
+		}
+
+		var Num? = Tree.?getLeft().?getNum();
+
+		if Num exists {
+			Asserts.that(Num)Equals(6);
+		} else {
+			Asserts.fail("Num didn't exist");
+		}
+	}
+
+	@Test
+	~[ test early bailout doesn't cause side-effects twice when not exists ]~(Asserts) {
+		calls = 0;
+		getOptionalWithSideeffects(false).?orMaxOf(5);
+		Asserts.that(calls)Equals(1);
+	}
+
+	~[ test early bailout doesn't cause side-effects twice when exists ]~(Asserts) {
+		calls = 0;
+		getOptionalWithSideeffects(true).?orMaxOf(5);
+		Asserts.that(calls)Equals(1);
+	}
+
+	with Num calls = 0;
+
+	Num? -- getOptionalWithSideeffects(Bool returnNothing) {
+		calls += 1;
+		return nothing if returnNothing else 4;
+	}
+
+every Tree is:
+
+	needs Num;
+	with public Tree? left = nothing;
+	with public Tree? right = nothing;
+
+	Num -- getNum() {
+		return Num;
+	}
+
+	Tree? -- getLeft() {
+		return left;
+	}
+
+	Tree? -- getRight() {
+		return right;
+	}

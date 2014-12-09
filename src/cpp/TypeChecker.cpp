@@ -573,7 +573,13 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						break;
 					} else {
 						ret = new Type(TYPE_OPTIONAL);
-						ret->typedata.optional.contained = typeCheckMethodInvocation(tree, *subject.typedata.optional.contained);
+						Type* nonoptional = subject.typedata.optional.contained;
+
+						while(nonoptional->type == TYPE_OPTIONAL) {
+							nonoptional = nonoptional->typedata.optional.contained;
+						}
+
+						ret->typedata.optional.contained = typeCheckMethodInvocation(tree, *nonoptional);
 					}
 
 				}
@@ -764,7 +770,13 @@ Type* TypeChecker::typeCheck(Node* tree, bool forceArrayIdentifier) {
 						break;
 					} else {
 						ret = new Type(TYPE_OPTIONAL);
-						ret->typedata.optional.contained = typeCheckMemberAccess(tree, *subject.typedata.optional.contained, forceArrayIdentifier);
+
+						Type* nonoptional = subject.typedata.optional.contained;
+						while(nonoptional->type == TYPE_OPTIONAL) {
+							nonoptional = nonoptional->typedata.optional.contained;
+						}
+
+						ret->typedata.optional.contained = typeCheckMemberAccess(tree, *nonoptional, forceArrayIdentifier);
 					}
 
 				}
