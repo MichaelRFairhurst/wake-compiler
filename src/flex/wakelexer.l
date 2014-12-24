@@ -91,6 +91,7 @@ from					count(); return FROM;
 &&						count(); return SYM_AND;
 \|\|					count(); return SYM_OR;
 \<-						count(); return SYM_PROVIDE;
+\->						count(); return SYM_LAMBDA;
 \<=						count(); return SYM_LE;
 \>=						count(); return SYM_GE;
 :=						count(); return SYM_VALEQ;

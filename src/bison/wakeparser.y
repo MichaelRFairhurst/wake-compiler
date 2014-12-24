@@ -47,7 +47,7 @@ int wakewrap()
 /* keywords */
 %token EVERY CAPABLE A_OR_AN IS RETURN WITH PUBLIC IF ELSE WHILE IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE EXISTS VAR FOREACH IN THROW TRY CATCH FROM
 /* symbols */
-%token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT SYM_PLUSEQ SYM_VALEQ SYM_MULTEQ SYM_SUBEQ SYM_DIVEQ SYM_PROVIDE_ARGS_OPEN SYM_EARLYBAILOUT_DOT SYM_TYPESAFE_INDEX;
+%token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT SYM_PLUSEQ SYM_VALEQ SYM_MULTEQ SYM_SUBEQ SYM_DIVEQ SYM_PROVIDE_ARGS_OPEN SYM_EARLYBAILOUT_DOT SYM_TYPESAFE_INDEX SYM_LAMBDA;
 /* this too */
 %token ERRORTOKEN
 
@@ -73,13 +73,13 @@ int wakewrap()
 %token <number> BOOL
 %token <number> SYM_SHADOW
 %token <void> SYM_ARRAYED
-%type <node> imports import importtarget classes annotatedclass class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments lmethodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args annotatedtype annotatedmethod annotation annotations annotationvals annotationval
+%type <node> imports import importtarget classes annotatedclass class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments lmethodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args annotatedtype annotatedmethod annotation annotations annotationvals annotationval lambda statement_or_block expression_nolambda inferenceabletypes
 %type <type> type specializabletype shadowabletype puretype classtype fntype parameterizedtype unboundtypespecification classdeclarationtype
 %type <type_array> puretypes types unboundtypespecifications
 %start file
 
 /* 2 are from @annotations before class definitions, 1 from if/else, 1 from try/catch, 1 from exists/else */
-%expect 5
+%expect 9 /* should be 5 */
 %expect-rr 0
 %%
 
@@ -319,6 +319,7 @@ value:
 objectable:
 	PARENT																		{ $$ = MakeEmptyNode(NT_PARENT, @$); }
 	| value																		{ $$ = $1; }
+	;
 
 block:
 	'{' declarationsandstatements '}'											{ $$ = MakeOneBranchNode(NT_BLOCK, $2, @$); }
@@ -356,6 +357,18 @@ statement:
 	| existsstatement															{ $$ = $1; }
 	| throwstatement															{ $$ = $1; }
 	| trystatement																{ $$ = $1; }
+	;
+
+statement_or_block:
+	emptystatement																{ $$ = MakeEmptyNode(NT_EMPTY, @$); }
+	| labelstatement															{ $$ = $1; }
+	| selectionstatement														{ $$ = $1; }
+	| iterationstatement														{ $$ = $1; }
+	| jumpstatement																{ $$ = $1; }
+	| existsstatement															{ $$ = $1; }
+	| throwstatement															{ $$ = $1; }
+	| trystatement																{ $$ = $1; }
+	| expression_nolambda ';'													{ $$ = $1; }
 	| block																		{ $$ = $1; }
 	;
 
@@ -369,23 +382,23 @@ labelstatement:
 	;
 
 existsstatement:
-	IF shadowabletype EXISTS statement											{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromType($2, @$), $4, @$); }
-	| IF LIDENTIFIER EXISTS statement											{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromString(NT_ALIAS, $2, @$), $4, @$); }
-	| IF shadowabletype EXISTS statement ELSE statement							{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromType($2, @$), $4, @$); AddSubNode($$, $6); }
-	| IF LIDENTIFIER EXISTS statement ELSE statement							{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromString(NT_ALIAS, $2, @$), $4, @$); AddSubNode($$, $6); }
+	IF shadowabletype EXISTS statement_or_block								{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromType($2, @$), $4, @$); }
+	| IF LIDENTIFIER EXISTS statement_or_block									{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromString(NT_ALIAS, $2, @$), $4, @$); }
+	| IF shadowabletype EXISTS statement_or_block ELSE statement_or_block		{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromType($2, @$), $4, @$); AddSubNode($$, $6); }
+	| IF LIDENTIFIER EXISTS statement_or_block ELSE statement_or_block		{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromString(NT_ALIAS, $2, @$), $4, @$); AddSubNode($$, $6); }
 	;
 
 selectionstatement:
-	IF '(' expression ')' statement												{ $$ = MakeTwoBranchNode(NT_IF_ELSE, $3, $5, @$); }
-	| IF '(' expression ')' statement ELSE statement							{ $$ = MakeTwoBranchNode(NT_IF_ELSE, $3, $5, @$); AddSubNode($$, $7); }
+	IF '(' expression ')' statement_or_block									{ $$ = MakeTwoBranchNode(NT_IF_ELSE, $3, $5, @$); }
+	| IF '(' expression ')' statement_or_block ELSE statement_or_block		{ $$ = MakeTwoBranchNode(NT_IF_ELSE, $3, $5, @$); AddSubNode($$, $7); }
 	| SWITCH '(' expression ')' block											{ $$ = MakeTwoBranchNode(NT_SWITCH, $3, $5, @$); }
 	;
 
 iterationstatement:
-	WHILE '(' expression ')' statement											{ $$ = MakeTwoBranchNode(NT_WHILE, $3, $5, @$); }
-	| FOR '(' forinit forcondition forincrement ')' statement					{ $$ = MakeTwoBranchNode(NT_FOR, $3, $4, @$); AddSubNode($$, $5); AddSubNode($$, $7); }
-	| FOREACH '(' expression ')' statement										{ $$ = MakeTwoBranchNode(NT_FOREACH, $3, $5, @$); }
-	| FOREACH '(' member IN expression ')' statement							{ $$ = MakeTwoBranchNode(NT_FOREACHIN, $3, $5, @$); AddSubNode($$, $7); }
+	WHILE '(' expression ')' statement_or_block								{ $$ = MakeTwoBranchNode(NT_WHILE, $3, $5, @$); }
+	| FOR '(' forinit forcondition forincrement ')' statement_or_block			{ $$ = MakeTwoBranchNode(NT_FOR, $3, $4, @$); AddSubNode($$, $5); AddSubNode($$, $7); }
+	| FOREACH '(' expression ')' statement_or_block							{ $$ = MakeTwoBranchNode(NT_FOREACH, $3, $5, @$); }
+	| FOREACH '(' member IN expression ')' statement_or_block					{ $$ = MakeTwoBranchNode(NT_FOREACHIN, $3, $5, @$); AddSubNode($$, $7); }
 	;
 
 forinit:
@@ -500,12 +513,23 @@ assignment:
 
 expression:
 	expression_retrieval														{ $$ = $1; }
+	| lambda																	{ $$ = $1; }
 	| assignment																{ $$ = $1; }
+	;
+
+lambda:
+	'{' inferenceabletypes SYM_LAMBDA declarationsandstatements '}'							{ $$ = $2; }
 	;
 
 expression_noretrieval:
 	expression_conditional														{ $$ = $1; }
 	| assignment																{ $$ = $1; }
+	;
+
+expression_nolambda:
+	expression_retrieval														{ $$ = $1; }
+	| assignment																{ $$ = $1; }
+	;
 
 expressions:
 	expression																	{ $$ = MakeOneBranchNode(NT_EXPRESSIONS, $1, @$); }
@@ -558,6 +582,13 @@ puretypes:
 types:
 	type																		{ $$ = MakeTypeArray(); AddTypeToTypeArray($1, $$); }
 	| types ',' type															{ $$ = $1; AddTypeToTypeArray($3, $$); }
+	;
+
+inferenceabletypes:
+	type																		{ $$ = MakeTypeArray(); AddTypeToTypeArray($1, $$); }
+	| LIDENTIFIER																{ $$ = MakeTypeArray(); AddTypeToTypeArray($1, $$); }
+	| inferenceabletypes ',' type												{ $$ = $1; AddTypeToTypeArray($3, $$); }
+	| inferenceabletypes ',' LIDENTIFIER										{ $$ = $1; AddTypeToTypeArray($3, $$); }
 	;
 
 classtype:
