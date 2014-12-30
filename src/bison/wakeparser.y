@@ -73,13 +73,13 @@ int wakewrap()
 %token <number> BOOL
 %token <number> SYM_SHADOW
 %token <void> SYM_ARRAYED
-%type <node> imports import importtarget classes annotatedclass class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments lmethodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args annotatedtype annotatedmethod annotation annotations annotationvals annotationval lambda statement_or_block expression_nolambda inferenceabletypes
+%type <node> imports import importtarget classes annotatedclass class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value value_invokable method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args annotatedtype annotatedmethod annotation annotations annotationvals annotationval lambda statement_or_block expression_nolambda inferenceabletypes
 %type <type> type specializabletype shadowabletype puretype classtype fntype parameterizedtype unboundtypespecification classdeclarationtype
 %type <type_array> puretypes types unboundtypespecifications
 %start file
 
 /* 2 are from @annotations before class definitions, 1 from if/else, 1 from try/catch, 1 from exists/else */
-%expect 9 /* should be 5 */
+%expect 5
 %expect-rr 0
 %%
 
@@ -250,6 +250,7 @@ methodaccess:
 	/*empty*/																	{ $$ = MakeEmptyNode(NT_PUBLIC, @$); }
 	| PRIVATE																	{ $$ = MakeEmptyNode(NT_PRIVATE, @$); }
 	| PUBLIC																	{ $$ = MakeEmptyNode(NT_PUBLIC, @$); }
+	;
 
 methodreturn:
 	puretype SYM_RETURN_DECREMENT												{ $$ = MakeOneBranchNode(NT_METHOD_RETURN_TYPE, MakeNodeFromType($1, @$), @$); }
@@ -272,10 +273,10 @@ lumethodnamesegments:
 	| identifier '(' types ')' lumethodnamesegments								{ $$ = $5; PrependSubNode($5, MakeNodeFromTypeArray($3, @$)); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$)); }
 	;
 
-lmethodcallsegments:
-	LIDENTIFIER '(' ')'															{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$), @$); }
-	| LIDENTIFIER '(' curryableexpressions ')'									{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$), $3, @$); }
-	| LIDENTIFIER '(' curryableexpressions ')' lumethodcallsegments				{ $$ = $5; PrependSubNode($5, $3); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$)); }
+methodcallsegments:
+	'(' ')'																		{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, "CHANGE ME", @$), @$); }
+	| '(' curryableexpressions ')'												{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, "CHANGE ME", @$), $2, @$); }
+	| '(' curryableexpressions ')' lumethodcallsegments							{ $$ = $4; PrependSubNode($4, $2); PrependSubNode($4, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, "CHANGE ME", @$)); }
 	;
 
 lumethodcallsegments:
@@ -297,23 +298,26 @@ curryableexpressions:
 	;
 
 value:
-	LIDENTIFIER																	{ $$ = MakeNodeFromString(NT_ALIAS, $1, @$); }
-	| shadowabletype															{ $$ = MakeNodeFromType($1, @$); }
-	| lmethodcallsegments														{ $$ = MakeTwoBranchNode(NT_METHOD_INVOCATION, MakeEmptyNode(NT_THIS, @$), $1, @$); }
+	shadowabletype																{ $$ = MakeNodeFromType($1, @$); }
+	| value_invokable															{ $$ = $1; }
 	| THIS																		{ $$ = MakeEmptyNode(NT_THIS, @$); }
-	| value '[' expression ']'													{ $$ = MakeTwoBranchNode(NT_ARRAY_ACCESS, $1, $3, @$); }
-	| value SYM_TYPESAFE_INDEX expression ']'									{ $$ = MakeTwoBranchNode(NT_TYPESAFE_ARRAY_ACCESS, $1, $3, @$); }
-	| objectable '.' member														{ $$ = MakeTwoBranchNode(NT_MEMBER_ACCESS, $1, $3, @$); }
-	| objectable '.' lmethodcallsegments										{ $$ = MakeTwoBranchNode(NT_METHOD_INVOCATION, $1, $3, @$); }
-	| objectable SYM_EARLYBAILOUT_DOT member									{ $$ = MakeTwoBranchNode(NT_EARLYBAILOUT_MEMBER_ACCESS, $1, $3, @$); }
-	| objectable SYM_EARLYBAILOUT_DOT lmethodcallsegments						{ $$ = MakeTwoBranchNode(NT_EARLYBAILOUT_METHOD_INVOCATION, $1, $3, @$); }
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1, @$); }
 	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1, @$); }
 	| BOOL																		{ $$ = MakeNodeFromNumber(NT_BOOLLIT, $1, @$); }
-	| '(' expression ')'														{ $$ = $2; }
 	| '[' expressions ']'														{ $$ = MakeOneBranchNode(NT_ARRAY_DECLARATION, $2, @$); }
 	| SYM_ARRAYED																{ $$ = MakeEmptyNode(NT_ARRAY_DECLARATION, @$); }
 	| NOTHING																	{ $$ = MakeEmptyNode(NT_NOTHING, @$); }
+	;
+
+value_invokable:
+	LIDENTIFIER																	{ $$ = MakeNodeFromString(NT_ALIAS, $1, @$); }
+	| value '[' expression ']'													{ $$ = MakeTwoBranchNode(NT_ARRAY_ACCESS, $1, $3, @$); }
+	| value SYM_TYPESAFE_INDEX expression ']'									{ $$ = MakeTwoBranchNode(NT_TYPESAFE_ARRAY_ACCESS, $1, $3, @$); }
+	| objectable '.' LIDENTIFIER												{ $$ = MakeTwoBranchNode(NT_MEMBER_ACCESS, $1, $3, @$); } /* CHANGED! */
+	| objectable '.' shadowabletype												{ $$ = MakeTwoBranchNode(NT_MEMBER_ACCESS, $1, $3, @$); } /* CHANGED! */
+	| objectable SYM_EARLYBAILOUT_DOT member									{ $$ = MakeTwoBranchNode(NT_EARLYBAILOUT_MEMBER_ACCESS, $1, $3, @$); }
+	| '(' expression ')'														{ $$ = $2; }
+	| value_invokable methodcallsegments										{ $$ = $2; }
 	;
 
 objectable:
@@ -346,6 +350,7 @@ declaration:
 retrievalargs:
 	FROM																		{ $$ = MakeEmptyNode(NT_EMPTY, @$); }
 	| '(' expressions_noretrieval ')' FROM										{ $$ = $2; }
+	;
 
 statement:
 	emptystatement																{ $$ = MakeEmptyNode(NT_EMPTY, @$); }
@@ -569,6 +574,8 @@ shadowabletype:
 																					while(classtype->type != TYPE_CLASS)
 																						classtype = classtype->type == TYPE_OPTIONAL ? classtype->typedata.optional.contained : classtype->typedata.list.contained;
 																					classtype->typedata._class.shadow = $1; }
+	;
+
 puretype:
 	classtype																	{ $$ = $1; }
 	| fntype																	{ $$ = $1; }
