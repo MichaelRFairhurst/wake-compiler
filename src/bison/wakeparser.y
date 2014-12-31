@@ -274,20 +274,15 @@ lumethodnamesegments:
 	;
 
 methodcallsegments:
-	'(' ')'																		{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, "CHANGE ME", @$), @$); }
-	| '(' curryableexpressions ')'												{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, "CHANGE ME", @$), $2, @$); }
-	| '(' curryableexpressions ')' lumethodcallsegments							{ $$ = $4; PrependSubNode($4, $2); PrependSubNode($4, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, "CHANGE ME", @$)); }
+	'(' ')'																		{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, "CHANGE ME", @$), @$); } /* CHANGED */
+	| '(' curryableexpressions ')'												{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, "CHANGE ME", @$), $2, @$); } /* CHANGED */
+	| '(' curryableexpressions ')' lumethodcallsegments							{ $$ = $4; PrependSubNode($4, $2); PrependSubNode($4, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, "CHANGE ME", @$)); } /* CHANGED */
 	;
 
 lumethodcallsegments:
 	identifier '(' ')'															{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$), @$); }
 	| identifier '(' curryableexpressions ')'									{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$), $3, @$); }
 	| identifier '(' curryableexpressions ')' lumethodcallsegments				{ $$ = $5; PrependSubNode($5, $3); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$)); }
-	;
-
-member:
-	shadowabletype																{ $$ = MakeNodeFromType($1, @$); }
-	| LIDENTIFIER																{ $$ = MakeNodeFromString(NT_ALIAS, $1, @$); }
 	;
 
 curryableexpressions:
@@ -307,17 +302,18 @@ value:
 	| '[' expressions ']'														{ $$ = MakeOneBranchNode(NT_ARRAY_DECLARATION, $2, @$); }
 	| SYM_ARRAYED																{ $$ = MakeEmptyNode(NT_ARRAY_DECLARATION, @$); }
 	| NOTHING																	{ $$ = MakeEmptyNode(NT_NOTHING, @$); }
+	| objectable '.' shadowabletype												{ $$ = MakeTwoBranchNode(NT_MEMBER_ACCESS, $1, MakeNodeFromType($3, @3), @$); }
+	| objectable SYM_EARLYBAILOUT_DOT shadowabletype							{ $$ = MakeTwoBranchNode(NT_EARLYBAILOUT_MEMBER_ACCESS, $1, MakeNodeFromType($3, @3), @$); }
 	;
 
 value_invokable:
 	LIDENTIFIER																	{ $$ = MakeNodeFromString(NT_ALIAS, $1, @$); }
 	| value '[' expression ']'													{ $$ = MakeTwoBranchNode(NT_ARRAY_ACCESS, $1, $3, @$); }
 	| value SYM_TYPESAFE_INDEX expression ']'									{ $$ = MakeTwoBranchNode(NT_TYPESAFE_ARRAY_ACCESS, $1, $3, @$); }
-	| objectable '.' LIDENTIFIER												{ $$ = MakeTwoBranchNode(NT_MEMBER_ACCESS, $1, $3, @$); } /* CHANGED! */
-	| objectable '.' shadowabletype												{ $$ = MakeTwoBranchNode(NT_MEMBER_ACCESS, $1, $3, @$); } /* CHANGED! */
-	| objectable SYM_EARLYBAILOUT_DOT member									{ $$ = MakeTwoBranchNode(NT_EARLYBAILOUT_MEMBER_ACCESS, $1, $3, @$); }
+	| objectable '.' LIDENTIFIER												{ $$ = MakeTwoBranchNode(NT_MEMBER_ACCESS, $1, MakeNodeFromString(NT_ALIAS, $3, @3), @$); }
+	| objectable SYM_EARLYBAILOUT_DOT LIDENTIFIER								{ $$ = MakeTwoBranchNode(NT_EARLYBAILOUT_MEMBER_ACCESS, $1, MakeNodeFromString(NT_ALIAS, $3, @3), @$); }
 	| '(' expression ')'														{ $$ = $2; }
-	| value_invokable methodcallsegments										{ $$ = $2; }
+	| value_invokable methodcallsegments										{ $$ = $2; } /* NEW */
 	;
 
 objectable:
@@ -387,23 +383,27 @@ labelstatement:
 	;
 
 existsstatement:
-	IF shadowabletype EXISTS statement_or_block								{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromType($2, @$), $4, @$); }
-	| IF LIDENTIFIER EXISTS statement_or_block									{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromString(NT_ALIAS, $2, @$), $4, @$); }
+	IF shadowabletype EXISTS statement_or_block									{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromString(NT_ALIAS, $2, @$), $4, @$); }
 	| IF shadowabletype EXISTS statement_or_block ELSE statement_or_block		{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromType($2, @$), $4, @$); AddSubNode($$, $6); }
-	| IF LIDENTIFIER EXISTS statement_or_block ELSE statement_or_block		{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromString(NT_ALIAS, $2, @$), $4, @$); AddSubNode($$, $6); }
+	| IF LIDENTIFIER EXISTS statement_or_block ELSE statement_or_block			{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromString(NT_ALIAS, $2, @$), $4, @$); AddSubNode($$, $6); }
 	;
 
 selectionstatement:
 	IF '(' expression ')' statement_or_block									{ $$ = MakeTwoBranchNode(NT_IF_ELSE, $3, $5, @$); }
-	| IF '(' expression ')' statement_or_block ELSE statement_or_block		{ $$ = MakeTwoBranchNode(NT_IF_ELSE, $3, $5, @$); AddSubNode($$, $7); }
+	| IF '(' expression ')' statement_or_block ELSE statement_or_block			{ $$ = MakeTwoBranchNode(NT_IF_ELSE, $3, $5, @$); AddSubNode($$, $7); }
 	| SWITCH '(' expression ')' block											{ $$ = MakeTwoBranchNode(NT_SWITCH, $3, $5, @$); }
 	;
 
 iterationstatement:
-	WHILE '(' expression ')' statement_or_block								{ $$ = MakeTwoBranchNode(NT_WHILE, $3, $5, @$); }
+	WHILE '(' expression ')' statement_or_block									{ $$ = MakeTwoBranchNode(NT_WHILE, $3, $5, @$); }
 	| FOR '(' forinit forcondition forincrement ')' statement_or_block			{ $$ = MakeTwoBranchNode(NT_FOR, $3, $4, @$); AddSubNode($$, $5); AddSubNode($$, $7); }
-	| FOREACH '(' expression ')' statement_or_block							{ $$ = MakeTwoBranchNode(NT_FOREACH, $3, $5, @$); }
+	| FOREACH '(' expression ')' statement_or_block								{ $$ = MakeTwoBranchNode(NT_FOREACH, $3, $5, @$); }
 	| FOREACH '(' member IN expression ')' statement_or_block					{ $$ = MakeTwoBranchNode(NT_FOREACHIN, $3, $5, @$); AddSubNode($$, $7); }
+	;
+
+member:
+	shadowabletype																{ $$ = MakeNodeFromType($1, @$); }
+	| LIDENTIFIER																{ $$ = MakeNodeFromString(NT_ALIAS, $1, @$); }
 	;
 
 forinit:
@@ -523,7 +523,7 @@ expression:
 	;
 
 lambda:
-	'{' inferenceabletypes SYM_LAMBDA declarationsandstatements '}'							{ $$ = $2; }
+	'{' inferenceabletypes SYM_LAMBDA declarationsandstatements '}'				{ $$ = $2; }
 	;
 
 expression_noretrieval:
