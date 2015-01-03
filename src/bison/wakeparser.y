@@ -80,6 +80,7 @@ int wakewrap()
 
 /* 2 are from @annotations before class definitions, 1 from if/else, 1 from try/catch, 1 from exists/else */
 %expect 5
+
 %expect-rr 0
 %%
 
@@ -274,9 +275,9 @@ lumethodnamesegments:
 	;
 
 methodcallsegments:
-	'(' ')'																		{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, "CHANGE ME", @$), @$); } /* CHANGED */
-	| '(' curryableexpressions ')'												{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, "CHANGE ME", @$), $2, @$); } /* CHANGED */
-	| '(' curryableexpressions ')' lumethodcallsegments							{ $$ = $4; PrependSubNode($4, $2); PrependSubNode($4, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, "CHANGE ME", @$)); } /* CHANGED */
+	'(' ')'																		{ $$ = NULL; }
+	| '(' curryableexpressions ')'												{ $$ = MakeOneBranchNode(NT_INVOCATION_PARTS_TEMP, $2, @$); }
+	| '(' curryableexpressions ')' lumethodcallsegments							{ $$ = MakeTwoBranchNode(NT_INVOCATION_PARTS_TEMP, $2, $4, @$); }
 	;
 
 lumethodcallsegments:
@@ -313,7 +314,56 @@ value_invokable:
 	| objectable '.' LIDENTIFIER												{ $$ = MakeTwoBranchNode(NT_MEMBER_ACCESS, $1, MakeNodeFromString(NT_ALIAS, $3, @3), @$); }
 	| objectable SYM_EARLYBAILOUT_DOT LIDENTIFIER								{ $$ = MakeTwoBranchNode(NT_EARLYBAILOUT_MEMBER_ACCESS, $1, MakeNodeFromString(NT_ALIAS, $3, @3), @$); }
 	| '(' expression ')'														{ $$ = $2; }
-	| value_invokable methodcallsegments										{ $$ = $2; } /* NEW */
+	| value_invokable methodcallsegments										{
+																					if ($1->node_type == NT_ALIAS) {
+																						// Turn (NT_ALIAS) and (NT_INVOCATION_PARTS_TEMP (expressions) [NT_METHOD_NAME_SEGMENT (METHOD_NAME) (expressions)])
+																						// into (NT_METHOD_INVOCATION (NT_THIS) [NT_METHOD_NAME_SEGMENT (METHOD_NAME) (expressions)])
+																						$1->node_type == NT_METHOD_NAME_SEGMENT;
+																						$$ = MakeTwoBranchNode(NT_METHOD_INVOCATION, MakeEmptyNode(NT_THIS, @$), MakeOneBranchNode(NT_METHOD_NAME, $1, @$), @$);
+
+																						if($2 != NULL) {
+																							AddSubNode($$->node_data.nodes[1], $2->node_data.nodes[0]);
+																							if($2->subnodes == 2) {
+																								int i = 0;
+																								for(; i < $2->node_data.nodes[1]->subnodes; i++) {
+																									AddSubNode($$->node_data.nodes[1], $2->node_data.nodes[1]->node_data.nodes[i]);
+																								}
+																								//free($2->node_data.nodes[1]->node_data.nodes);
+																								//free($2->node_data.nodes[1]);
+																							}
+																							//free($2->node_data.nodes);
+																							//free($2);
+																						}
+																					} else if ($1->node_type == NT_MEMBER_ACCESS || $1->node_type == NT_EARLYBAILOUT_MEMBER_ACCESS && $1->node_data.nodes[1]->node_type == NT_ALIAS) {
+																						// Turn (NT_MEMBER_ACCESS (expression) (NT_ALIAS)) and (NT_INVOCATION_PARTS_TEMP (expressions) [NT_METHOD_NAME_SEGMENT (METHOD_NAME) (expressions)])
+																						// into (NT_METHOD_INVOCATION (expression) [NT_METHOD_NAME_SEGMENT (METHOD_NAME) (expressions)])
+																						$$ = MakeOneBranchNode($1->node_type == NT_MEMBER_ACCESS ? NT_METHOD_INVOCATION : NT_EARLYBAILOUT_METHOD_INVOCATION, $1->node_data.nodes[0], @$);
+																						AddSubNode($$, MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, strdup($1->node_data.nodes[1]->node_data.string), $1->node_data.nodes[1]->loc), @1));
+
+																						if($2 != NULL) {
+																							AddSubNode($$->node_data.nodes[1], $2->node_data.nodes[0]);
+																							if($2->subnodes == 2) {
+																								int i = 0;
+																								for(; i < $2->node_data.nodes[1]->subnodes; i++) {
+																									AddSubNode($$->node_data.nodes[1], $2->node_data.nodes[1]->node_data.nodes[i]);
+																								}
+																								//free($2->node_data.nodes[1]->node_data.nodes);
+																								//free($2->node_data.nodes[1]);
+																							}
+																							//free($2->node_data.nodes);
+																							//free($2);
+																						}
+																					} else if ($2 != NULL && $2->subnodes) {
+																						wakeerror("Cannot invoke anonymous function with named segments"); YYERROR;
+																					} else {
+																						// Turn (expression) and (NT_INVOCATION_PARTS_TEMP (expressions)
+																						// into (NT_LAMBDA_INVOCATION (expression) (expressions)
+																						$$ = MakeOneBranchNode(NT_LAMBDA_INVOCATION, $1, @$);
+																						if ($2 != NULL) {
+																							AddSubNode($$, $2->node_data.nodes[0]);
+																						}
+																					}
+																				}
 	;
 
 objectable:
@@ -383,9 +433,10 @@ labelstatement:
 	;
 
 existsstatement:
-	IF shadowabletype EXISTS statement_or_block									{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromString(NT_ALIAS, $2, @$), $4, @$); }
-	| IF shadowabletype EXISTS statement_or_block ELSE statement_or_block		{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromType($2, @$), $4, @$); AddSubNode($$, $6); }
-	| IF LIDENTIFIER EXISTS statement_or_block ELSE statement_or_block			{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromString(NT_ALIAS, $2, @$), $4, @$); AddSubNode($$, $6); }
+	IF shadowabletype EXISTS statement_or_block									{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromType($2, @2), $4, @$); }
+	| IF LIDENTIFIER EXISTS statement_or_block									{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromString(NT_ALIAS, $2, @2), $4, @$); }
+	| IF shadowabletype EXISTS statement_or_block ELSE statement_or_block		{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromType($2, @2), $4, @$); AddSubNode($$, $6); }
+	| IF LIDENTIFIER EXISTS statement_or_block ELSE statement_or_block			{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromString(NT_ALIAS, $2, @2), $4, @$); AddSubNode($$, $6); }
 	;
 
 selectionstatement:
