@@ -574,7 +574,7 @@ expression:
 	;
 
 lambda:
-	'{' inferenceabletypes SYM_LAMBDA declarationsandstatements '}'				{ $$ = $2; }
+	'{' inferenceabletypes SYM_LAMBDA declarationsandstatements '}'				{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, $2, $4, @$); }
 	;
 
 expression_noretrieval:
@@ -643,10 +643,10 @@ types:
 	;
 
 inferenceabletypes:
-	type																		{ $$ = MakeTypeArray(); AddTypeToTypeArray($1, $$); }
-	| LIDENTIFIER																{ $$ = MakeTypeArray(); AddTypeToTypeArray($1, $$); }
-	| inferenceabletypes ',' type												{ $$ = $1; AddTypeToTypeArray($3, $$); }
-	| inferenceabletypes ',' LIDENTIFIER										{ $$ = $1; AddTypeToTypeArray($3, $$); }
+	type																		{ $$ = MakeOneBranchNode(NT_INFERENCEABLE_TYPES, MakeNodeFromType($1, @1), @$); }
+	| LIDENTIFIER																{ $$ = MakeOneBranchNode(NT_INFERENCEABLE_TYPES, MakeNodeFromString(NT_ALIAS, $1, @1), @$); }
+	| inferenceabletypes ',' type												{ $$ = $1; AddSubNode($$, MakeNodeFromType($3, @3)); $$->loc = @$}
+	| inferenceabletypes ',' LIDENTIFIER										{ $$ = $1; AddSubNode($$, MakeNodeFromString(NT_ALIAS, $3, @3)); $$->loc = @$}
 	;
 
 classtype:
