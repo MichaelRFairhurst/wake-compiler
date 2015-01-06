@@ -66,7 +66,7 @@ GENOBJS=$(addprefix bin/gen/, $(GENNAMES:.c=.o))
 
 TESTNAMES=CompilerTests.cpp \
 	ClassSpaceSymbolTableTest.cpp \
-	ParseTreeTraverserTest.cpp \
+	Integration.cpp \
 	ScopeSymbolTableTest.cpp \
 	TypeAnalyzerTest.cpp \
 	PropertySymbolTableTest.cpp \
