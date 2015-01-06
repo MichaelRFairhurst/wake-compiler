@@ -20,10 +20,7 @@ every ArrayTest is:
 	@Test
 	~[test set array index]~(Asserts) {
 		var Num[] = [5];
-		Asserts.that(Num[0])Equals(5)();
-
-		({Num aa, b -> return Num < $Num; }).test();
-		Asserts.that({Num aa, b -> return Num < $Num; });
+		Asserts.that(Num[0])Equals(5);
 	}
 
 	@Test
