@@ -73,8 +73,22 @@ StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
 			return new Return(generateExpression(node->node_data.nodes[0], true), returntype, classestable->getAnalyzer());
 
 		case NT_EXISTS:
+			if(tree->node_data.nodes[0]->node_type == NT_MEMBER_ACCESS) {
+				errors->addError(new SemanticError(TYPE_ERROR, "Calling exists { } on a property is illegal as it is a shared reference and therefore might be unset amid the scope", tree));
+				return new EmptyStatement();
+			}
+			return new Exists(generateExpression(node->node_data.nodes[0], true), generateStatement(node->node_data.nodes[1]), node->subnodes == 3 ? generateStatement(node->node_data.nodes[2]) : NULL, scopesymtable, errors)
+
 		case NT_FOREACH:
+			return new Foreach(generateExpression(node->node_data.nodes[0], true), generateStatement(node->node_data.nodes[1]), node, scopesymtable);
+
 		case NT_FOREACHIN:
+			if(node->node_data.nodes[0]->node_type == NT_ALIAS) {
+				return new ForeachInAlias(generateExpression(node->node_data.nodes[1], true), generateStatement(node->node_data.nodes[2]), tree->node_data.nodes[0]->node_data.string, node, scopesymtable);
+			} else {
+				return new ForeachInExplicitType(generateExpression(node->node_data.nodes[1], true), generateStatement(node->node_data.nodes[2]),  tree->node_data.nodes[0]->node_data.type, node, scopesymtable, classestable->getAnalyzer());
+			}
+
 		case NT_SWITCH:
 		case NT_VALUES:
 		case NT_DEFAULTCASE:
