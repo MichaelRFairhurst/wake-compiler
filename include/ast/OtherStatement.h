@@ -1,3 +1,17 @@
+/**************************************************
+ * Source Code for the Original Compiler for the
+ * Programming Language Wake
+ *
+ * OtherStatement.h
+ *
+ * Licensed under the MIT license
+ * See LICENSE.TXT for details
+ *
+ * Author: Michael Fairhurst
+ * Revised By:
+ *
+ **************************************************/
+
 #ifndef AST_OTHER_STATEMENT
 #define AST_OTHER_STATEMENT
 
@@ -32,7 +46,7 @@ namespace wake {
 				Type* thiscontext;
 				vector<Type*> parameterizedtypes;
 
-		}
+		};
 
 	}
 

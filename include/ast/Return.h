@@ -1,3 +1,17 @@
+/**************************************************
+ * Source Code for the Original Compiler for the
+ * Programming Language Wake
+ *
+ * Return.h
+ *
+ * Licensed under the MIT license
+ * See LICENSE.TXT for details
+ *
+ * Author: Michael Fairhurst
+ * Revised By:
+ *
+ **************************************************/
+
 #ifndef HEADER_AST_RETURN
 #define HEADER_AST_RETURN
 
@@ -22,7 +36,7 @@ namespace wake {
 				Type* returntype;
 				TypeAnalyzer* analyzer;
 
-		}
+		};
 
 	}
 

@@ -1,3 +1,17 @@
+/**************************************************
+ * Source Code for the Original Compiler for the
+ * Programming Language Wake
+ *
+ * For.h
+ *
+ * Licensed under the MIT license
+ * See LICENSE.TXT for details
+ *
+ * Author: Michael Fairhurst
+ * Revised By:
+ *
+ **************************************************/
+
 #ifndef HEADER_AST_FOR
 #define HEADER_AST_FOR
 
@@ -24,7 +38,7 @@ namespace wake {
 				StatementNode* block;
 				ScopedSymbolTable* scopesymtable;
 				TypeAnalyzer* analyzer;
-		}
+		};
 
 	}
 

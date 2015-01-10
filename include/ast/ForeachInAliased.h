@@ -1,3 +1,17 @@
+/**************************************************
+ * Source Code for the Original Compiler for the
+ * Programming Language Wake
+ *
+ * ForeachInAliased.h
+ *
+ * Licensed under the MIT license
+ * See LICENSE.TXT for details
+ *
+ * Author: Michael Fairhurst
+ * Revised By:
+ *
+ **************************************************/
+
 #ifndef HEADER_FOREACH_IN_ALIASED
 #define HEADER_FOREACH_IN_ALIASED
 
@@ -20,7 +34,7 @@ namespace wake {
 			private:
 				char* alias;
 
-		}
+		};
 
 	}
 

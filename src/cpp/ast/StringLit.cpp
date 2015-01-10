@@ -1,2 +1,0 @@
-class StringLit : public TypeCheckableNode {
-}

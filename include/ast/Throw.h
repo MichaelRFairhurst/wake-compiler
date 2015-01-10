@@ -1,3 +1,17 @@
+/**************************************************
+ * Source Code for the Original Compiler for the
+ * Programming Language Wake
+ *
+ * Throw.h
+ *
+ * Licensed under the MIT license
+ * See LICENSE.TXT for details
+ *
+ * Author: Michael Fairhurst
+ * Revised By:
+ *
+ **************************************************/
+
 #ifndef HEADER_AST_THROW
 #define HEADER_AST_THROW
 
@@ -20,7 +34,7 @@ namespace wake {
 				ErrorTracker* errors;
 				TypeAnalyzer* analyzer;
 
-		}
+		};
 
 	}
 

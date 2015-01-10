@@ -1,9 +1,23 @@
+/**************************************************
+ * Source Code for the Original Compiler for the
+ * Programming Language Wake
+ *
+ * Catch.cpp
+ *
+ * Licensed under the MIT license
+ * See LICENSE.TXT for details
+ *
+ * Author: Michael Fairhurst
+ * Revised By:
+ *
+ **************************************************/
+
 #include "ast/Catch.h"
 #include "TypeError.h"
 #include "tree.h"
 #include "SemanticError.h"
 
-void wake::ast::typeCheck() {
+void wake::ast::Catch::typeCheck() {
 	try {
 		classestable->assertTypeIsValid(exception);
 

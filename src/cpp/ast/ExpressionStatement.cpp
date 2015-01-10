@@ -2,7 +2,7 @@
  * Source Code for the Original Compiler for the
  * Programming Language Wake
  *
- * MemberInvocationBase.h
+ * ExpressionStatement.cpp
  *
  * Licensed under the MIT license
  * See LICENSE.TXT for details
@@ -12,13 +12,8 @@
  *
  **************************************************/
 
-namespace wake::ast {
+#include "ast/ExpressionStatement.h"
 
-	class MethodInvocationBase : public ExpressionNode {
-
-		public:
-			Type* typeCheck(bool forceArrayIdentifier);
-
-	}
-
+void wake::ast::ExpressionStatement::typeCheck() {
+	delete expression->typeCheck(false);
 }

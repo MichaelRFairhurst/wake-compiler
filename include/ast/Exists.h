@@ -1,3 +1,17 @@
+/**************************************************
+ * Source Code for the Original Compiler for the
+ * Programming Language Wake
+ *
+ * Exists.h
+ *
+ * Licensed under the MIT license
+ * See LICENSE.TXT for details
+ *
+ * Author: Michael Fairhurst
+ * Revised By:
+ *
+ **************************************************/
+
 #ifndef HEADER_AST_EXISTS
 #define HEADER_AST_EXISTS
 
@@ -24,7 +38,7 @@ namespace wake {
 				ScopeSymbolTable* scopesymtable;
 				ErrorTracker* errors;
 
-		}
+		};
 
 	}
 

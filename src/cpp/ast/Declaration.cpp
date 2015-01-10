@@ -1,7 +1,22 @@
+/**************************************************
+ * Source Code for the Original Compiler for the
+ * Programming Language Wake
+ *
+ * Declaration.cpp
+ *
+ * Licensed under the MIT license
+ * See LICENSE.TXT for details
+ *
+ * Author: Michael Fairhurst
+ * Revised By:
+ *
+ **************************************************/
+
 #include "ast/Declaration.h"
 #include "TypeParameterizer.h"
 #include "TypeError.h"
 
+/*
 wake::ast::Declaration(Type* declared, ExpressionNode* value, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, ErrorTracker* errors, const vector<Type*>& parameterizedtypes) {
 	this->declared = declared;
 	this->value = value;
@@ -9,7 +24,7 @@ wake::ast::Declaration(Type* declared, ExpressionNode* value, ClassSpaceSymbolTa
 	this->scopesymtable = scopesymtable;
 	this->errors = errors;
 	this->parameterizedtypes = parameterizedtypes;
-}
+}*/
 
 void wake::ast::Declaration::typeCheck(bool forceArrayIdentifier) {
 	try {

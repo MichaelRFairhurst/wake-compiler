@@ -1,13 +1,23 @@
+/**************************************************
+ * Source Code for the Original Compiler for the
+ * Programming Language Wake
+ *
+ * OtherExpression.cpp
+ *
+ * Licensed under the MIT license
+ * See LICENSE.TXT for details
+ *
+ * Author: Michael Fairhurst
+ * Revised By:
+ *
+ **************************************************/
+
 #include "Type.h"
 #include "TypeAnalyzer.h"
 #include "TypeParameterizer.h"
 #include "ClassSpaceSymbolTable.h"
 #include "ast/ExpressionNode.h"
 #include "ast/OtherExpression.h"
-
-OtherExpression::OtherExpression(ExpressionNode** children) {
-	this->children = children;
-}
 
 Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 	TypeAnalyzer* analyzer = classestable->getAnalyzer();
