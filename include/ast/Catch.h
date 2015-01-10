@@ -16,9 +16,9 @@
 #define HEADER_AST_CATCH
 
 #include "ast/StatementNode.h"
-#include "Type.h"
+#include "type.h"
 #include "ClassSpaceSymbolTable.h"
-#include "ScopedSymbolTable.h"
+#include "ScopeSymbolTable.h"
 #include "ErrorTracker.h"
 #include "node.h"
 
@@ -29,16 +29,17 @@ namespace wake {
 		class Catch : public StatementNode {
 
 			public:
-				Catch(Type* exception, StatementNode* body, Node* node, ClassSpaceSymbolTable* classsymtable, ScopedSymbolTable* scopesymtable, ErrorTracker* errors)
-					: exception(exception), body(body), classsymtable(classsymtable), scopesymtable(scopesymtable), errors(errors);
+				Catch(Type* exception, StatementNode* body, Node* node, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, ErrorTracker* errors)
+					: exception(exception), body(body), classestable(classestable), scopesymtable(scopesymtable), errors(errors) {};
 
-				typeCheck(bool forceArrayIdentifier);
+				void typeCheck();
 
 			private:
 				Type* exception;
+				StatementNode* body;
 				Node* node;
-				ClassSpaceSymbolTable* classsymtable;
-				ScopedSymbolTable* scopesymtable;
+				ClassSpaceSymbolTable* classestable;
+				ScopeSymbolTable* scopesymtable;
 				ErrorTracker* errors;
 
 		};

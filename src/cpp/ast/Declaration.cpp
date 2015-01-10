@@ -15,6 +15,7 @@
 #include "ast/Declaration.h"
 #include "TypeParameterizer.h"
 #include "TypeError.h"
+#include "CompilationExceptions.h"
 
 /*
 wake::ast::Declaration(Type* declared, ExpressionNode* value, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, ErrorTracker* errors, const vector<Type*>& parameterizedtypes) {
@@ -26,20 +27,20 @@ wake::ast::Declaration(Type* declared, ExpressionNode* value, ClassSpaceSymbolTa
 	this->parameterizedtypes = parameterizedtypes;
 }*/
 
-void wake::ast::Declaration::typeCheck(bool forceArrayIdentifier) {
+void wake::ast::Declaration::typeCheck() {
 	try {
 		TypeParameterizer parameterizer;
 		parameterizer.writeInParameterizations(&declared, parameterizedtypes);
 		classestable->assertTypeIsValid(declared);
-		Type assignment = *auto_ptr<Type>(value->check(false));
+		Type assignment = *auto_ptr<Type>(value->typeCheck(false));
 		if(!classestable->getAnalyzer()->isASubtypeOfB(&assignment, declared)) {
-			EXPECTED	classestable->getAnalyzer->getNameForType(declared)
-			ERRONEOUS	classestable->getAnalyzer->getNameForType(&assignment)
+			EXPECTED	classestable->getAnalyzer()->getNameForType(declared)
+			ERRONEOUS	classestable->getAnalyzer()->getNameForType(&assignment)
 			THROW		("Invalid value in declaration of variable");
 		}
 		scopesymtable->add(declared);
 	} catch(SymbolNotFoundException* e) {
-		errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
+		errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, node));
 		delete e;
 	}
 }

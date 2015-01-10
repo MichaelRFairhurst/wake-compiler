@@ -13,7 +13,7 @@
  **************************************************/
 
 
-#include "ast/ExpressionUsableCatcher.h"
+#include "ast/ExpressionUsableChecker.h"
 
 Type* wake::ast::ExpressionUsableCatcher::typeCheck(bool forceArrayIdentifier) {
 	Type* t = child->typeCheck(forceArrayIdentifier);

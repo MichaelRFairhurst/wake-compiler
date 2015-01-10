@@ -12,7 +12,7 @@
  *
  **************************************************/
 
-#include "Type.h"
+#include "type.h"
 #include "TypeAnalyzer.h"
 #include "TypeParameterizer.h"
 #include "ClassSpaceSymbolTable.h"

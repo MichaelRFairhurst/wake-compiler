@@ -24,10 +24,10 @@ namespace wake {
 		class ForeachInAliased : public Foreach {
 
 			public:
-				ForeachInAliased(ExpressionNode* iterable, StatementNode* body, char* alias, Node* node, ScopeSymbolTable* scopesymtable, TypeAnalyzer* analyzer)
-					: Foreach(iterable, body, node, scopesymtable), alias(alias);
+				ForeachInAliased(ExpressionNode* iterable, StatementNode* body, char* alias, Node* node, ScopeSymbolTable* scopesymtable, ErrorTracker* errors)
+					: Foreach(iterable, body, node, scopesymtable, errors), alias(alias) {};
 
-				typeCheck();
+				void typeCheck();
 
 				Type getIterationType(Type* iterableType);
 

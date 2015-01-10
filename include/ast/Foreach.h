@@ -18,7 +18,8 @@
 #include "ast/StatementNode.h"
 #include "ast/ExpressionNode.h"
 #include "tree.h"
-#include "ScopedSymbolTable.h"
+#include "ScopeSymbolTable.h"
+#include "ErrorTracker.h"
 
 namespace wake {
 
@@ -27,10 +28,10 @@ namespace wake {
 		class Foreach : public StatementNode {
 
 			public:
-				Foreach(ExpressionNode* iterable, StatementNode* body, Node* node, ScopeSymbolTable* scopesymtable)
-					: iterable(iterable), body(body), node(node), scopesymtable(scopesymtable);
+				Foreach(ExpressionNode* iterable, StatementNode* body, Node* node, ScopeSymbolTable* scopesymtable, ErrorTracker* errors)
+					: iterable(iterable), body(body), node(node), scopesymtable(scopesymtable), errors(errors) {};
 
-				virtual typeCheck();
+				virtual void typeCheck();
 
 				virtual Type getIterationType(Type* iterableType);
 
@@ -39,6 +40,7 @@ namespace wake {
 				StatementNode* body;
 				Node* node;
 				ScopeSymbolTable* scopesymtable;
+				ErrorTracker* errors;
 
 		};
 

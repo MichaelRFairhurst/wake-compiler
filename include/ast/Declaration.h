@@ -16,6 +16,12 @@
 #define HEADER_AST_DECLARATION
 
 #include "ast/StatementNode.h"
+#include "ast/ExpressionNode.h"
+#include "ErrorTracker.h"
+#include "ClassSpaceSymbolTable.h"
+#include "ScopeSymbolTable.h"
+#include "type.h"
+#include <vector>
 
 namespace wake {
 
@@ -24,14 +30,15 @@ namespace wake {
 		class Declaration : public StatementNode {
 
 			public:
-				Declaration(Type* declared, ExpressionNode* value, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, ErrorTracker* errors, const vector<Type*>& parameterizedtypes)
-					: parameterizedtypes(parameterizedtypes);
+				Declaration(Type* declared, ExpressionNode* value, Node* node, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, ErrorTracker* errors, const vector<Type*>& parameterizedtypes)
+					: declared(declared), value(value), node(node), classestable(classestable), scopesymtable(scopesymtable), errors(errors), parameterizedtypes(parameterizedtypes) {};
 
 				void typeCheck();
 
 			private:
 				Type* declared;
 				ExpressionNode* value;
+				Node* node;
 				ClassSpaceSymbolTable* classestable;
 				ScopeSymbolTable* scopesymtable;
 				ErrorTracker* errors;

@@ -17,11 +17,11 @@
 #include <memory>
 
 void wake::ast::Throw::typeCheck() {
-	auto_ptr<Type*> exceptionType(exception->typeCheck());
+	auto_ptr<Type> exceptionType(exception->typeCheck(false));
 
 	if(!analyzer->isException(exceptionType.get())) {
 		EXPECTED	"Exception"
-		ERRONEOUS	analyzer->getNameForType(ret)
+		ERRONEOUS	analyzer->getNameForType(exceptionType.get())
 		THROW		("Can only throw subclasses of exception");
 	}
 }

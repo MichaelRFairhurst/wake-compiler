@@ -17,8 +17,8 @@
 
 #include "ast/StatementNode.h"
 #include "ast/ExpressionNode.h"
-#include "ast/TypeAnalyzer.h"
-#include "ast/Type.h"
+#include "TypeAnalyzer.h"
+#include "type.h"
 
 namespace wake {
 
@@ -28,8 +28,8 @@ namespace wake {
 
 			public:
 				Return(ExpressionNode* value, Type* returntype, TypeAnalyzer* analyzer)
-					: value(value), returntype(returntype), analyzeer(analyzer);
-				typeCheck();
+					: value(value), returntype(returntype), analyzer(analyzer) {};
+				void typeCheck();
 
 			private:
 				ExpressionNode* value;

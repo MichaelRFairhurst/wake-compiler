@@ -16,14 +16,15 @@
 #include "TypeError.h"
 #include "tree.h"
 #include "SemanticError.h"
+#include "CompilationExceptions.h"
 
 void wake::ast::Catch::typeCheck() {
 	try {
 		classestable->assertTypeIsValid(exception);
 
-		if(!analyzer->isException(exception)) {
+		if(!classestable->getAnalyzer()->isException(exception)) {
 			EXPECTED	"exception subclass"
-			ERRONEOUS	analyzer->getNameForType(exception)
+			ERRONEOUS	classestable->getAnalyzer()->getNameForType(exception)
 			THROW		("Only exceptions can be thrown");
 		}
 

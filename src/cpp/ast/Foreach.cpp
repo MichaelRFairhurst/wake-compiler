@@ -16,15 +16,15 @@
 #include "TypeError.h"
 
 void wake::ast::Foreach::typeCheck() {
-	auto_ptr<Type*> list(iterable->typeCheck(false));
+	auto_ptr<Type> list(iterable->typeCheck(false));
 
 	if(list->type == TYPE_OPTIONAL) {
 		errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Iterating over optional type. You must first wrap object in an exists { } clause.", node));
-		break;
+		return;
 	}
 
 	// no sense checking the contents of the loop if we're missing a variable
-	if(list->type == TYPE_MATCHALL) break;
+	if(list->type == TYPE_MATCHALL) return;
 
 	if(list->type != TYPE_LIST) {
 		errors->addError(new SemanticError(TYPE_ERROR, "Calling foreach over something that is not a list", node));
@@ -43,7 +43,7 @@ void wake::ast::Foreach::typeCheck() {
 	}
 }
 
-Type* wake::ast::Foreach::getIterationType(Type* iterableType) {
-	iterableType.alias = NULL;
+Type wake::ast::Foreach::getIterationType(Type* iterableType) {
+	iterableType->alias = NULL;
 	return *iterableType;
 }

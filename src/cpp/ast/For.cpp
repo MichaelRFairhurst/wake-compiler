@@ -20,7 +20,7 @@ void wake::ast::For::typeCheck() {
 	scopesymtable->pushScope();
 
 	init->typeCheck();
-	std::auto_ptr<Type*> conditionType(condition->typeCheck(false));
+	std::auto_ptr<Type> conditionType(condition->typeCheck(false));
 	incr->typeCheck();
 	block->typeCheck();
 
@@ -28,7 +28,7 @@ void wake::ast::For::typeCheck() {
 
 	if(!analyzer->isPrimitiveTypeBool(conditionType.get())) {
 		EXPECTED	"Bool"
-		ERRONEOUS	analyzer->getNameFortype(conditionType.get())
+		ERRONEOUS	analyzer->getNameForType(conditionType.get())
 		THROW		("For conditions must be Bool");
 	}
 }

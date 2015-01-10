@@ -25,7 +25,7 @@ namespace wake {
 		class ExpressionStatement : public StatementNode {
 
 			public:
-				ExpressionStatement(ExpressionNode* expression) : expression(expression);
+				ExpressionStatement(ExpressionNode* expression) : expression(expression) {};
 				void typeCheck();
 
 			private:

@@ -17,8 +17,8 @@
 
 #include "ast/StatementNode.h"
 #include "ast/ExpressionNode.h"
-#include "ast/ScopedSymbolTable.h"
-#include "ast/TypeAnalyzer.h"
+#include "ScopeSymbolTable.h"
+#include "TypeAnalyzer.h"
 
 namespace wake {
 
@@ -27,16 +27,17 @@ namespace wake {
 		class For : public StatementNode {
 
 			public:
-				For(StatementNode* init, ExpressionNode* condition, StatementNode* incr, StatementNode* block, ScopedSymbolTable* scopesymtable, TypeAnalyzer* analyzer)
-					: init(init), condition(condition), incr(incr), block(block), scopesymtable(scopesymtable), analyzer(analyzer);
-				typeCheck(bool forceArrayIdentifier);
+				For(StatementNode* init, ExpressionNode* condition, StatementNode* incr, StatementNode* block, ScopeSymbolTable* scopesymtable, TypeAnalyzer* analyzer)
+					: init(init), condition(condition), incr(incr), block(block), scopesymtable(scopesymtable), analyzer(analyzer) {};
+
+				void typeCheck();
 
 			private:
 				StatementNode* init;
 				ExpressionNode* condition;
 				StatementNode* incr;
 				StatementNode* block;
-				ScopedSymbolTable* scopesymtable;
+				ScopeSymbolTable* scopesymtable;
 				TypeAnalyzer* analyzer;
 		};
 

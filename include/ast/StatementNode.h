@@ -24,9 +24,9 @@ namespace wake {
 			public:
 				virtual void typeCheck()=0;
 
-		}
+		};
 
-	};
+	}
 
 }
 

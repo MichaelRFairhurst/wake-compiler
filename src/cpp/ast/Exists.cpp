@@ -13,23 +13,23 @@
  **************************************************/
 
 #include "ast/Exists.h"
-#include "SymbolNotFoundException.h"
+#include "CompilationExceptions.h"
 #include <memory>
 
 void wake::ast::Exists::typeCheck() {
 	try {
-		auto_ptr<Type*> existableType(existable->typeCheck(false));
+		auto_ptr<Type> existableType(existable->typeCheck(false));
 
 		if(existableType->type != TYPE_OPTIONAL) {
-			errors->addError(new SemanticError(EXISTS_ON_NONOPTIONAL_TYPE, "exists { } statement uses a nonoptional type", tree)); // @todo better error message!
-			break;
+			errors->addError(new SemanticError(EXISTS_ON_NONOPTIONAL_TYPE, "exists { } statement uses a nonoptional type", node)); // @todo better error message!
+			return;
 		}
 
 		Type real(TYPE_MATCHALL);
 		real = *existableType->typedata.optional.contained;
 		if(existableType->alias != NULL) real.alias = strdup(existableType->alias);
 
-		Type* orig = *scopesymtable->find(existableType);
+		Type* orig = *scopesymtable->find(existableType.get());
 		scopesymtable->addOverwriting(&real);
 
 		block->typeCheck();
@@ -37,10 +37,10 @@ void wake::ast::Exists::typeCheck() {
 		scopesymtable->addOverwriting(orig);
 
 		if(otherwise != NULL) {
-			otherwise->typeCheck()
+			otherwise->typeCheck();
 		}
 	} catch(SymbolNotFoundException* e) {
-		errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
+		errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, node));
 		delete e;
 	}
 }

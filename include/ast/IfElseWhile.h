@@ -26,7 +26,7 @@ namespace wake {
 		class IfElseWhile : public StatementNode {
 
 			public:
-				IfElseWhile(ExpressionNode* condition, StatementNode* block, StatementNode* otherwise, TypeAnalyzer* analyzer) : condition(condition, block(block), otherwise(otherwise), analyzer(analyzer);
+				IfElseWhile(ExpressionNode* condition, StatementNode* block, StatementNode* otherwise, TypeAnalyzer* analyzer) : condition(condition), block(block), otherwise(otherwise), analyzer(analyzer) {};
 				void typeCheck();
 
 			private:

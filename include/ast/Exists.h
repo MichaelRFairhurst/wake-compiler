@@ -17,7 +17,7 @@
 
 #include "ast/StatementNode.h"
 #include "ast/ExpressionNode.h"
-#include "ScopedSymbolTable.h"
+#include "ScopeSymbolTable.h"
 #include "ErrorTracker.h"
 
 namespace wake {
@@ -27,14 +27,15 @@ namespace wake {
 		class Exists : public StatementNode {
 
 			public:
-				Exists(ExpressionNode* existable, StatementNode* block, StatementNode* otherwise, ScopeSymbolTable* scopesymtable, ErrorTracker* errors)
-					: existable(existable), block(block), otherwise(otherwise), scopesymtable(scopesymtable), errors(errors);
-				typeCheck();
+				Exists(ExpressionNode* existable, StatementNode* block, StatementNode* otherwise, Node* node, ScopeSymbolTable* scopesymtable, ErrorTracker* errors)
+					: existable(existable), block(block), otherwise(otherwise), node(node), scopesymtable(scopesymtable), errors(errors) {};
+				void typeCheck();
 
 			private:
 				ExpressionNode* existable;
 				StatementNode* block;
 				StatementNode* otherwise;
+				Node* node;
 				ScopeSymbolTable* scopesymtable;
 				ErrorTracker* errors;
 

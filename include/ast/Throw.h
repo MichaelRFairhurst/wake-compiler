@@ -16,7 +16,8 @@
 #define HEADER_AST_THROW
 
 #include "ast/StatementNode.h"
-#include "Type.h"
+#include "ast/ExpressionNode.h"
+#include "type.h"
 #include "ErrorTracker.h"
 #include "TypeAnalyzer.h"
 
@@ -27,10 +28,11 @@ namespace wake {
 		class Throw : public StatementNode {
 
 			public:
-				Throw(ExpressionNode* exception, TypeAnalyzer* analyzer, ErrorTracker* errors) : errors(errors), analyzer(analyzer);
-				typeCheck();
+				Throw(ExpressionNode* exception, TypeAnalyzer* analyzer, ErrorTracker* errors) : exception(exception), errors(errors), analyzer(analyzer) {};
+				void typeCheck();
 
 			private:
+				ExpressionNode* exception;
 				ErrorTracker* errors;
 				TypeAnalyzer* analyzer;
 

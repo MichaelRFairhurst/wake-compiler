@@ -18,26 +18,26 @@
 
 void wake::ast::Return::typeCheck() {
 	if(returntype == NULL) {
-		if(value == NULL) break;
+		if(value == NULL) return;
 
-		auto_ptr<Type*> = value->typeCheck(false);
+		auto_ptr<Type> actualReturn(value->typeCheck(false));
 
 		EXPECTED	"VOID"
-		ERRONEOUS	analyzer->getNameForType(ret)
+		ERRONEOUS	analyzer->getNameForType(actualReturn.get())
 		THROW		("Method is not allowed to return anything");
 	}
 
 	if(value == NULL) {
 		EXPECTED	analyzer->getNameForType(returntype)
-		ERRONEOS	"VOID"
+		ERRONEOUS	"VOID"
 		THROW		("Method is not allowed to return without a value");
 	}
 
-	auto_ptr<Type*> ret = value->typeCheck(false);
+	auto_ptr<Type> actualReturn(value->typeCheck(false));
 
-	if(!analyzer->isASubtypeOfB(ret.get(), returntype)) {
+	if(!analyzer->isASubtypeOfB(actualReturn.get(), returntype)) {
 		EXPECTED	analyzer->getNameForType(returntype)
-		ERRONEOUS	analyzer->getNameForType(ret.get())
+		ERRONEOUS	analyzer->getNameForType(actualReturn.get())
 		THROW		("Return type is incompatible with method signature");
 	}
 }

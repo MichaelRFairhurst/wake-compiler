@@ -50,7 +50,21 @@ CPPNAMES= \
 	DerivedPropertySymbolTable.cpp \
 	TempPropertySymbolTable.cpp \
 	type.cpp \
-	AnnotationTreeTraverser.cpp
+	AnnotationTreeTraverser.cpp \
+	ast/Catch.cpp \
+	ast/Declaration.cpp \
+	ast/Exists.cpp \
+	ast/For.cpp \
+	ast/Foreach.cpp \
+	ast/ForeachInAliased.cpp \
+	ast/ForeachInExplicitType.cpp \
+	ast/IfElseWhile.cpp \
+	ast/OtherExpression.cpp \
+	ast/OtherStatement.cpp \
+	ast/Return.cpp \
+	ast/ExpressionUsableCatcher.cpp \
+	ast/ExpressionStatement.cpp \
+	ast/Throw.cpp
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
 
