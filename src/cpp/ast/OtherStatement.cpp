@@ -19,22 +19,7 @@
 #include "ast/StatementNode.h"
 #include "ast/OtherStatement.h"
 
-OtherStatement::OtherStatement(StatementNode** children) {
-	this->children = children;
-}
-
-Type* OtherStatement:typeCheck(bool forceArrayIdentifiers) {
-	TypeAnalyzer* analyzer = classestable->getAnalyzer();
-	Type* ret = NULL;
-	string erroneousstring;
-	string expectedstring;
-
-	// read Printer as Printer[] from ARRAY_ACCESS nodes
-	// but not if there are ANY nodes before the next TYPEDATA
-	if(forceArrayIdentifier && !(tree->node_type == NT_TYPEDATA || tree->node_type == NT_MEMBER_ACCESS)) {
-		forceArrayIdentifier = false;
-	}
-
+void wake::ast::OtherStatement::typeCheck() {
 	switch(tree->node_type) {
 		// Ignoring these for now
 		case NT_SWITCH:
@@ -59,11 +44,8 @@ Type* OtherStatement:typeCheck(bool forceArrayIdentifiers) {
 		case NT_BREAK:
 		case NT_CONTINUE:
 			try {
-				int i = 0;
-				while(i < tree->subnodes) {
-					if(i > 0) delete ret;
-					ret = typeCheck(tree->node_data.nodes[i], forceArrayIdentifier);
-					i++;
+				for(std::vector<StatementNode*>::iterator it = children.begin(); it != children.end(); ++it) {
+					(*it)->typeCheck();
 				}
 				if(tree->node_type == NT_BLOCK || tree->node_type == NT_TRY) scopesymtable->popScope();
 			} catch(SemanticError *e) {
@@ -71,6 +53,4 @@ Type* OtherStatement:typeCheck(bool forceArrayIdentifiers) {
 				throw e;
 			}
 	}
-
-	return ret;
 }

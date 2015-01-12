@@ -12,14 +12,12 @@
  *
  **************************************************/
 
-#include "type.h"
-#include "TypeAnalyzer.h"
-#include "TypeParameterizer.h"
-#include "ClassSpaceSymbolTable.h"
 #include "ast/ExpressionNode.h"
 #include "ast/OtherExpression.h"
+#include "TypeParameterizer.h"
+#include "CompilationExceptions.h"
 
-Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
+Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 	TypeAnalyzer* analyzer = classestable->getAnalyzer();
 	Type* ret = NULL;
 	string erroneousstring;
@@ -27,11 +25,11 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 
 	// read Printer as Printer[] from ARRAY_ACCESS nodes
 	// but not if there are ANY nodes before the next TYPEDATA
-	if(forceArrayIdentifier && !(tree->node_type == NT_TYPEDATA || tree->node_type == NT_MEMBER_ACCESS)) {
+	if(forceArrayIdentifier && !(node->node_type == NT_TYPEDATA || node->node_type == NT_MEMBER_ACCESS)) {
 		forceArrayIdentifier = false;
 	}
 
-	switch(tree->node_type) {
+	switch(node->node_type) {
 		// Here is where the recursion ends
 		case NT_STRINGLIT:
 			ret = MakeType(TYPE_CLASS);
@@ -50,21 +48,21 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 
 		case NT_ALIAS:
 			{
-				char* name = tree->node_data.string;
+				char* name = node->node_data.string;
 				boost::optional<Type*> variable = scopesymtable->find(name);
 				if(!variable && thiscontext != NULL) {
 					PropertySymbolTable* proptable = classestable->findModifiable(thiscontext);
 					variable = proptable->find(name);
 					if(variable) {
 						name = strdup(name);
-						tree->node_type = NT_MEMBER_ACCESS;
-						AddSubNode(tree, MakeEmptyNode(NT_THIS, tree->loc));
-						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, name, tree->loc));
+						node->node_type = NT_MEMBER_ACCESS;
+						AddSubNode(node, MakeEmptyNode(NT_THIS, node->loc));
+						AddSubNode(node, MakeNodeFromString(NT_COMPILER_HINT, name, node->loc));
 					}
 				}
 				if(!variable) {
 					ret = MakeType(TYPE_MATCHALL);
-					errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Symbol by name of " + string(name) + " not found", tree));
+					errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Symbol by name of " + string(name) + " not found", node));
 				} else {
 					ret = copyType(*variable);
 				}
@@ -74,9 +72,9 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 		case NT_TYPEDATA:
 			{
 				TypeParameterizer parameterizer;
-				parameterizer.writeInParameterizations(&tree->node_data.type, parameterizedtypes);
+				parameterizer.writeInParameterizations(&node->node_data.type, parameterizedtypes);
 
-				Type type = *tree->node_data.type;
+				Type type = *node->node_data.type;
 				if(forceArrayIdentifier) {
 					Type* wrapped = new Type(type);
 					type = Type(TYPE_LIST);
@@ -89,20 +87,20 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 					variable = proptable->find(scopesymtable->getNameForType(&type));
 					if(variable) {
 						char* propname = strdup(scopesymtable->getNameForType(&type).c_str());
-						delete tree->node_data.type; tree->node_data.nodes = NULL;
-						tree->node_type = NT_MEMBER_ACCESS;
-						AddSubNode(tree, MakeEmptyNode(NT_THIS, tree->loc));
-						AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, propname, tree->loc));
+						delete node->node_data.type; node->node_data.nodes = NULL;
+						node->node_type = NT_MEMBER_ACCESS;
+						AddSubNode(node, MakeEmptyNode(NT_THIS, node->loc));
+						AddSubNode(node, MakeNodeFromString(NT_COMPILER_HINT, propname, node->loc));
 					}
 				}
 				if(!variable) {
 					ret = MakeType(TYPE_MATCHALL);
-					errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Symbol by name of " + scopesymtable->getNameForType(&type) + " not found", tree));
+					errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Symbol by name of " + scopesymtable->getNameForType(&type) + " not found", node));
 				} else {
 					// detect if they wrote Printer[] instead of Printer[][]
 					// Either way Printer[x] would work, so if forceArrayIdentifier skip this step
 					if(!forceArrayIdentifier && type.type == TYPE_LIST && analyzer->getArrayReferenceLevel(type) != analyzer->getArrayReferenceLevel(**variable))
-						errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Accessed arrayed variable " + scopesymtable->getNameForType(&type) + " with wrong number of [] brackets.", tree));
+						errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Accessed arrayed variable " + scopesymtable->getNameForType(&type) + " with wrong number of [] brackets.", node));
 
 					ret = new Type(**variable);
 				}
@@ -128,15 +126,15 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 		 *
 		 */
 		case NT_ADD_ASSIGNMENT:
-			if(!isValidLValue(tree->node_data.nodes[0])) {
-				errors->addError(new SemanticError(INVALID_ASSIGNMENT, "", tree));
+			if(!isValidLValue(node->node_data.nodes[0])) {
+				errors->addError(new SemanticError(INVALID_ASSIGNMENT, "", node));
 					break;
 			}
 			// FALLTHROUGH
 		case NT_ADD:
 			{
-				ret = typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier);
-				Type additive = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier));
+				ret = children[0]->typeCheck(false);
+				Type additive = *auto_ptr<Type>(children[1]->typeCheck(false));
 
 				// Ensure the left operand is never a matchall when the right is
 				// this way, when ret is matchall, so we can run all typechecks by the
@@ -175,8 +173,8 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 		case NT_MULT_ASSIGNMENT:
 		case NT_DIV_ASSIGNMENT:
 		case NT_SUB_ASSIGNMENT:
-			if(!isValidLValue(tree->node_data.nodes[0])) {
-				errors->addError(new SemanticError(INVALID_ASSIGNMENT, "", tree));
+			if(!isValidLValue(node->node_data.nodes[0])) {
+				errors->addError(new SemanticError(INVALID_ASSIGNMENT, "", node));
 					break;
 			}
 			// FALLTHROUGH
@@ -184,8 +182,8 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 		case NT_DIVIDE:
 		case NT_SUBTRACT:
 			{
-				ret = typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier);
-				Type factor = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier));
+				ret = children[0]->typeCheck(false);
+				Type factor = *auto_ptr<Type>(children[1]->typeCheck(false));
 
 				if(!analyzer->isPrimitiveTypeNum(ret) || !analyzer->isPrimitiveTypeNum(&factor)) {
 					expectedstring = "Num";
@@ -212,8 +210,8 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 				ret = MakeType(TYPE_CLASS);
 				ret->typedata._class.classname = strdup("Bool");
 
-				Type a = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier));
-				Type b = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier));
+				Type a = *auto_ptr<Type>(children[0]->typeCheck(false));
+				Type b = *auto_ptr<Type>(children[1]->typeCheck(false));
 
 				if(!analyzer->isPrimitiveTypeNum(&a) || !analyzer->isPrimitiveTypeNum(&b)) {
 					expectedstring = "Num";
@@ -232,8 +230,8 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 		case NT_EQUALITY:
 		case NT_INEQUALITY:
 			{
-				Type a = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier));
-				Type b = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier));
+				Type a = *auto_ptr<Type>(children[0]->typeCheck(false));
+				Type b = *auto_ptr<Type>(children[1]->typeCheck(false));
 				ret = MakeType(TYPE_CLASS);
 				ret->typedata._class.classname = strdup("Bool");
 
@@ -248,8 +246,8 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 		case NT_AND:
 		case NT_OR:
 			{
-				ret = typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier);
-				Type cmp = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier));
+				ret = children[0]->typeCheck(false);
+				Type cmp = *auto_ptr<Type>(children[1]->typeCheck(false));
 
 				if(!analyzer->isPrimitiveTypeBool(ret) || !analyzer->isPrimitiveTypeBool(&cmp)) {
 					if(analyzer->isPrimitiveTypeBool(ret)) {
@@ -269,7 +267,7 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 			break;
 
 		case NT_INVERT:
-			ret = typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier);
+			ret = children[0]->typeCheck(false);
 
 			if(!analyzer->isPrimitiveTypeBool(ret)) {
 				expectedstring = "Bool";
@@ -283,9 +281,8 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 
 		case NT_TYPESAFE_ARRAY_ACCESS:
 			{
-				forceArrayIdentifier = false;
-				ret = typeCheckUsable(tree->node_data.nodes[0], true);
-				Type index = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier));
+				ret = children[0]->typeCheck(true);
+				Type index = *auto_ptr<Type>(children[1]->typeCheck(false));
 				if(ret->type != TYPE_LIST && ret->type != TYPE_MATCHALL) {
 					erroneousstring = analyzer->getNameForType(ret);
 					throw string("Getting index of non-array");
@@ -307,9 +304,8 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 		case NT_ARRAY_ACCESS:
 		case NT_ARRAY_ACCESS_LVAL:
 			{
-				forceArrayIdentifier = false;
-				ret = typeCheckUsable(tree->node_data.nodes[0], true);
-				Type index = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier));
+				ret = children[0]->typeCheck(true);
+				Type index = *auto_ptr<Type>(children[1]->typeCheck(false));
 				if(ret->type != TYPE_LIST && ret->type != TYPE_MATCHALL) {
 					erroneousstring = analyzer->getNameForType(ret);
 					throw string("Getting index of non-array");
@@ -330,13 +326,13 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 		case NT_VALUED_ASSIGNMENT:
 		case NT_ASSIGNMENT:
 			{
-				if(!isValidLValue(tree->node_data.nodes[0])) {
-					errors->addError(new SemanticError(INVALID_ASSIGNMENT, "", tree));
-					ret = new Type(tree->node_type == NT_ASSIGNMENT ? TYPE_UNUSABLE : TYPE_MATCHALL);
+				if(!isValidLValue(node->node_data.nodes[0])) {
+					errors->addError(new SemanticError(INVALID_ASSIGNMENT, "", node));
+					ret = new Type(node->node_type == NT_ASSIGNMENT ? TYPE_UNUSABLE : TYPE_MATCHALL);
 				} else {
-					Type subject = *auto_ptr<Type>(typeCheck(tree->node_data.nodes[0], forceArrayIdentifier));
-					ret = tree->node_type == NT_ASSIGNMENT ? new Type(TYPE_UNUSABLE) : new Type(subject);
-					Type assignment = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier));
+					Type subject = *auto_ptr<Type>(children[0]->typeCheck(false));
+					ret = node->node_type == NT_ASSIGNMENT ? new Type(TYPE_UNUSABLE) : new Type(subject);
+					Type assignment = *auto_ptr<Type>(children[1]->typeCheck(false));
 					if(!analyzer->isASubtypeOfB(&assignment, &subject)) {
 						expectedstring = analyzer->getNameForType(&subject);
 						erroneousstring = analyzer->getNameForType(&assignment);
@@ -348,7 +344,7 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 
 		case NT_LAMBDA_INVOCATION:
 			{
-				Type lambda = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier));
+				Type lambda = *auto_ptr<Type>(children[0]->typeCheck(false));
 				Type actual(TYPE_LAMBDA);
 				actual.typedata.lambda.arguments = MakeTypeArray();
 				if(lambda.typedata.lambda.returntype != NULL) {
@@ -358,10 +354,10 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 					ret = new Type(TYPE_UNUSABLE);
 				}
 
-				if(tree->subnodes == 2) {
+				if(node->subnodes == 2) {
 					int i;
-					for(i = 0; i < tree->node_data.nodes[1]->subnodes; i++) {
-						AddTypeToTypeArray(typeCheckUsable(tree->node_data.nodes[1]->node_data.nodes[i], forceArrayIdentifier), actual.typedata.lambda.arguments);
+					for(i = 0; i < node->node_data.nodes[1]->subnodes; i++) {
+						AddTypeToTypeArray(typeCheckUsable(node->node_data.nodes[1]->node_data.nodes[i], forceArrayIdentifier), actual.typedata.lambda.arguments);
 					}
 				}
 
@@ -375,12 +371,12 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 
 		case NT_EARLYBAILOUT_METHOD_INVOCATION:
 			{
-				Type subject = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[0], false));
+				Type subject = *auto_ptr<Type>(children[0]->typeCheck(false));
 				if(subject.type == TYPE_MATCHALL) {
 					ret = new Type(subject);
 					break;
 				} else if(subject.type != TYPE_OPTIONAL) {
-					errors->addError(new SemanticError(OPTIONAL_USE_OF_NONOPTIONAL_TYPE, "using .? on a nonoptional", tree));
+					errors->addError(new SemanticError(OPTIONAL_USE_OF_NONOPTIONAL_TYPE, "using .? on a nonoptional", node));
 					ret = new Type(TYPE_MATCHALL);
 					break;
 				} else {
@@ -391,7 +387,7 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 						nonoptional = nonoptional->typedata.optional.contained;
 					}
 
-					ret->typedata.optional.contained = typeCheckMethodInvocation(tree, *nonoptional);
+					ret->typedata.optional.contained = typeCheckMethodInvocation(node, *nonoptional);
 				}
 
 			}
@@ -399,9 +395,9 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 
 		case NT_METHOD_INVOCATION:
 			{
-				Node* methodname = tree->node_data.nodes[1];
+				Node* methodname = node->node_data.nodes[1];
 
-				if(tree->node_data.nodes[0]->node_type == NT_THIS && methodname->subnodes == 2) {
+				if(node->node_data.nodes[0]->node_type == NT_THIS && methodname->subnodes == 2) {
 					string name = methodname->node_data.nodes[0]->node_data.string;
 					boost::optional<Type*> variable = scopesymtable->find(name);
 					if(variable) {
@@ -412,31 +408,31 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 					}
 				}
 
-				Type subject = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[0], forceArrayIdentifier));
+				Type subject = *auto_ptr<Type>(children[0]->typeCheck(false));
 
 				if(subject.type == TYPE_MATCHALL) {
 					ret = new Type(subject);
 					break;
 				}
 
-				ret = typeCheckMethodInvocation(tree, subject);
+				ret = typeCheckMethodInvocation(node, subject);
 			}
 			break;
 
 		case NT_CAST:
 			try {
 				TypeParameterizer parameterizer;
-				parameterizer.writeInParameterizations(&tree->node_data.nodes[0]->node_data.type, parameterizedtypes);
-				ret = copyType(tree->node_data.nodes[0]->node_data.type);
+				parameterizer.writeInParameterizations(&node->node_data.nodes[0]->node_data.type, parameterizedtypes);
+				ret = copyType(node->node_data.nodes[0]->node_data.type);
 				classestable->assertTypeIsValid(ret);
-				Type casted = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[1], forceArrayIdentifier));
+				Type casted = *auto_ptr<Type>(children[1]->typeCheck(false));
 				if(!analyzer->isASubtypeOfB(&casted, ret)) {
 					expectedstring = analyzer->getNameForType(ret);
 					erroneousstring = analyzer->getNameForType(&casted);
 					throw string("Casting an object that is not a valid subtype");
 				}
 			} catch(SymbolNotFoundException* e) {
-				errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
+				errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, node));
 				delete e;
 			}
 			break;
@@ -444,17 +440,17 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 		case NT_RETRIEVAL:
 			{
 				TypeParameterizer parameterizer;
-				parameterizer.writeInParameterizations(&tree->node_data.nodes[0]->node_data.type, parameterizedtypes);
+				parameterizer.writeInParameterizations(&node->node_data.nodes[0]->node_data.type, parameterizedtypes);
 				try {
-					Type provider = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[2], forceArrayIdentifier));
-					ret = new Type(*tree->node_data.nodes[0]->node_data.type);
+					Type provider = *auto_ptr<Type>(children[2]->typeCheck(false));
+					ret = new Type(*node->node_data.nodes[0]->node_data.type);
 					classestable->assertTypeIsValid(ret);
 					vector<Type*> arguments;
 					boost::ptr_vector<Type> arguments_latch;
 
-					if(tree->node_data.nodes[1]->node_type != NT_EMPTY) {
-						for(int i = 0; i < tree->node_data.nodes[1]->subnodes; i++) {
-							Type* argtype = typeCheckUsable(tree->node_data.nodes[1]->node_data.nodes[i], forceArrayIdentifier);
+					if(node->node_data.nodes[1]->node_type != NT_EMPTY) {
+						for(int i = 0; i < node->node_data.nodes[1]->subnodes; i++) {
+							Type* argtype = typeCheckUsable(node->node_data.nodes[1]->node_data.nodes[i], forceArrayIdentifier);
 							arguments.push_back(argtype);
 							arguments_latch.push_back(argtype);
 						}
@@ -466,14 +462,14 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 						auto_ptr<ReadOnlyPropertySymbolTable> table(classestable->find(&provider));
 						boost::optional<Type*> provision = table->find(name);
 						if(!provision) {
-							errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Provision " + name + " does not exist on class " + analyzer->getNameForType(&provider), tree));
+							errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Provision " + name + " does not exist on class " + analyzer->getNameForType(&provider), node));
 						}
 					} catch(SymbolNotFoundException *e) {
 						delete e;
 					}
-					AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(name.c_str()), tree->loc));
+					AddSubNode(node, MakeNodeFromString(NT_COMPILER_HINT, strdup(name.c_str()), node->loc));
 				} catch(SymbolNotFoundException* e) {
-					errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
+					errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, node));
 					delete e;
 				}
 			}
@@ -481,15 +477,15 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 
 		case NT_ARRAY_DECLARATION:
 			// These should all be specially handled in the other cases
-			if(!tree->subnodes) {
+			if(!node->subnodes) {
 				ret = new Type(TYPE_LIST);
 				ret->typedata.list.contained = new Type(TYPE_MATCHALL);
-			} else if(tree->node_data.nodes[0]->subnodes == 1) {
+			} else if(node->node_data.nodes[0]->subnodes == 1) {
 				ret = new Type(TYPE_LIST);
-				ret->typedata.list.contained = typeCheckUsable(tree->node_data.nodes[0]->node_data.nodes[0], false);
+				ret->typedata.list.contained = typeCheckUsable(node->node_data.nodes[0]->node_data.nodes[0], false);
 			} else {
-				auto_ptr<Type> first(typeCheckUsable(tree->node_data.nodes[0]->node_data.nodes[0], false));
-				auto_ptr<Type> second(typeCheckUsable(tree->node_data.nodes[0]->node_data.nodes[1], false));
+				auto_ptr<Type> first(typeCheckUsable(node->node_data.nodes[0]->node_data.nodes[0], false));
+				auto_ptr<Type> second(typeCheckUsable(node->node_data.nodes[0]->node_data.nodes[1], false));
 				boost::optional<Type*> common;
 
 				int i = 1;
@@ -504,9 +500,9 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 					}
 
 					i++;
-					if(i == tree->node_data.nodes[0]->subnodes) break;
+					if(i == node->node_data.nodes[0]->subnodes) break;
 					first.reset(*common);
-					second.reset(typeCheckUsable(tree->node_data.nodes[0]->node_data.nodes[i], false));
+					second.reset(typeCheckUsable(node->node_data.nodes[0]->node_data.nodes[i], false));
 				}
 
 				ret = new Type(TYPE_LIST);
@@ -516,12 +512,12 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 
 		case NT_EARLYBAILOUT_MEMBER_ACCESS:
 			{
-				Type subject = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[0], false));
+				Type subject = *auto_ptr<Type>(children[0]->typeCheck(false));
 				if(subject.type == TYPE_MATCHALL) {
 					ret = new Type(subject);
 					break;
 				} else if(subject.type != TYPE_OPTIONAL) {
-					errors->addError(new SemanticError(OPTIONAL_USE_OF_NONOPTIONAL_TYPE, "using .? on a nonoptional", tree));
+					errors->addError(new SemanticError(OPTIONAL_USE_OF_NONOPTIONAL_TYPE, "using .? on a nonoptional", node));
 					ret = new Type(TYPE_MATCHALL);
 					break;
 				} else {
@@ -532,7 +528,7 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 						nonoptional = nonoptional->typedata.optional.contained;
 					}
 
-					ret->typedata.optional.contained = typeCheckMemberAccess(tree, *nonoptional, forceArrayIdentifier);
+					ret->typedata.optional.contained = typeCheckMemberAccess(node, *nonoptional, forceArrayIdentifier);
 				}
 
 			}
@@ -540,21 +536,21 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 
 		case NT_MEMBER_ACCESS:
 			{
-				Type subject = *auto_ptr<Type>(typeCheckUsable(tree->node_data.nodes[0], false));
+				Type subject = *auto_ptr<Type>(children[0]->typeCheck(false));
 				if(subject.type == TYPE_MATCHALL) {
 					ret = new Type(subject);
 					break;
 				}
 
-				ret = typeCheckMemberAccess(tree, subject, forceArrayIdentifier);
+				ret = typeCheckMemberAccess(node, subject, forceArrayIdentifier);
 			}
 			break;
 
 		case NT_IF_THEN_ELSE:
 			{
-				auto_ptr<Type> condition(typeCheckUsable(tree->node_data.nodes[1], false));
-				auto_ptr<Type> left(typeCheckUsable(tree->node_data.nodes[0], false));
-				auto_ptr<Type> right(typeCheckUsable(tree->node_data.nodes[2], false));
+				auto_ptr<Type> condition(children[1]->typeCheck(false));
+				auto_ptr<Type> left(children[0]->typeCheck(false));
+				auto_ptr<Type> right(children[2]->typeCheck(false));
 				boost::optional<Type*> common = analyzer->getCommonSubtypeOf(left.get(), right.get());
 				if(!common) {
 					ret = MakeType(TYPE_MATCHALL);
@@ -587,9 +583,9 @@ Type* OtherExpression:typeCheck(bool forceArrayIdentifiers) {
 		case NT_EXPRESSIONS:
 			try {
 				int i = 0;
-				while(i < tree->subnodes) {
+				while(i < node->subnodes) {
 					if(i > 0) delete ret;
-					ret = typeCheck(tree->node_data.nodes[i], forceArrayIdentifier);
+					ret = typeCheck(node->node_data.nodes[i], forceArrayIdentifier);
 					i++;
 				}
 			} catch(SemanticError *e) {
