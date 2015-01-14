@@ -12,18 +12,30 @@
  *
  **************************************************/
 
-namespace wake::ast {
+#ifndef HEADER_AST_EXPRESSION_ERROR_CATCHER
+#define HEADER_AST_EXPRESSION_ERROR_CATCHER
 
-	class ExpressionErrorCatcher : public ExpressionNode {
+#include "ast/ExpressionNode.h"
 
-		public:
-			ExpressionErrorCatcher(ExpressionNode* child);
-			Type* typeCheck(bool forceArrayIdentifier);
+namespace wake {
+
+	namespace ast {
+
+		class ExpressionErrorCatcher : public ExpressionNode {
+
+			public:
+				ExpressionErrorCatcher(ExpressionNode* child, Node* node) : child(child), node(node) {};
+				Type* typeCheck(bool forceArrayIdentifier);
 
 
-		private:
-			ExpressionNode* child;
+			private:
+				Node* node;
+				ExpressionNode* child;
 
-	};
+		};
+
+	}
 
 }
+
+#endif

@@ -1,11 +1,13 @@
 #ifndef HEADER_AST_CREATOR
 #define HEADER_AST_CREATOR
 
+#include "ast/StatementNode.h"
+#include "ast/ExpressionNode.h"
 #include "ErrorTracker.h"
 #include "ClassSpaceSymbolTable.h"
 #include "ScopeSymbolTable.h"
 #include "MethodSignatureParseTreeTraverser.h"
-#include "Type.h"
+#include "type.h"
 #include "node.h"
 
 namespace wake {
@@ -13,11 +15,11 @@ namespace wake {
 	class AstCreator {
 
 		public:
-			AstCreator(ErrorTracker* errors, ClassSpaceSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, MethodSignatureParseTreeTraverser* methodanalyzer, Type* returntype, Type* thiscontext, const vector<Type>& parameterizedtypes)
-				: errors(errors), objectsymtable(objectsymtable), scopesymtable(scopesymtable), methodanalyzer(methodanalyzer), returntype(returntype), thiscontext(thiscontext), parameterizedtypes(parameterizedtypes);
+			AstCreator(ErrorTracker* errors, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, MethodSignatureParseTreeTraverser* methodanalyzer, Type* returntype, Type* thiscontext, vector<Type*>& parameterizedtypes)
+				: errors(errors), classestable(classestable), scopesymtable(scopesymtable), methodanalyzer(methodanalyzer), returntype(returntype), thiscontext(thiscontext), parameterizedtypes(parameterizedtypes) {};
 
-			StatementNode* generateStatementAst(Node* node);
-			ExpressionNode* generateExpressionAst(Node* node, bool mustBeUsable);
+			ast::StatementNode* generateStatementAst(Node* node);
+			ast::ExpressionNode* generateExpressionAst(Node* node, bool mustBeUsable);
 
 		private:
 			MethodSignatureParseTreeTraverser* methodanalyzer;
@@ -26,9 +28,9 @@ namespace wake {
 			ScopeSymbolTable* scopesymtable;
 			Type* returntype;
 			Type* thiscontext;
-			vector<Type*> parameterizedtypes;
+			vector<Type*>& parameterizedtypes;
 
-	}
+	};
 
 }
 

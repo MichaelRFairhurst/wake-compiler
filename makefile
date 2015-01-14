@@ -51,6 +51,7 @@ CPPNAMES= \
 	TempPropertySymbolTable.cpp \
 	type.cpp \
 	AnnotationTreeTraverser.cpp \
+	AstCreator.cpp \
 	ast/Catch.cpp \
 	ast/Declaration.cpp \
 	ast/Exists.cpp \
