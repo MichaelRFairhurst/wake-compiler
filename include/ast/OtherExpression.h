@@ -36,6 +36,10 @@ namespace wake {
 				Type* typeCheck(bool forceArrayIdentifier);
 
 			private:
+				bool isValidLValue(Node* tree);
+				Type* typeCheckMemberAccess(Node* n, Type& subject, bool forceArrayIdentifier);
+				Type* typeCheckMethodInvocation(Node* n, Type& subject);
+
 				Node* node;
 				std::vector<ExpressionNode*> children;
 				MethodSignatureParseTreeTraverser* methodanalyzer;

@@ -63,7 +63,7 @@ CPPNAMES= \
 	ast/OtherExpression.cpp \
 	ast/OtherStatement.cpp \
 	ast/Return.cpp \
-	ast/ExpressionUsableCatcher.cpp \
+	ast/ExpressionUsabilityCatcher.cpp \
 	ast/ExpressionStatement.cpp \
 	ast/Throw.cpp
 

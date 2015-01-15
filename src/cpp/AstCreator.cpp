@@ -3,11 +3,12 @@
 #include "ast/OtherExpression.h"
 #include "ast/Declaration.h"
 #include "ast/ExpressionStatement.h"
+#include "ast/EmptyStatement.h"
 #include "ast/Catch.h"
 #include "ast/Return.h"
 #include "ast/Throw.h"
 #include "ast/ExpressionErrorCatcher.h"
-#include "ast/ExpressionUsableChecker.h"
+#include "ast/ExpressionUsabilityCatcher.h"
 #include "ast/For.h"
 #include "ast/IfElseWhile.h"
 #include "ast/Exists.h"
@@ -81,7 +82,7 @@ wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
 				errors->addError(new SemanticError(TYPE_ERROR, "Calling exists { } on a property is illegal as it is a shared reference and therefore might be unset amid the scope", node));
 				return new wake::ast::EmptyStatement();
 			}
-			return new wake::ast::Exists(generateExpressionAst(node->node_data.nodes[0], true), generateStatementAst(node->node_data.nodes[1]), node->subnodes == 3 ? generateStatementAst(node->node_data.nodes[2]) : NULL, node, scopesymtable, errors)
+			return new wake::ast::Exists(generateExpressionAst(node->node_data.nodes[0], true), generateStatementAst(node->node_data.nodes[1]), node->subnodes == 3 ? generateStatementAst(node->node_data.nodes[2]) : NULL, node, scopesymtable, errors);
 
 		case NT_FOREACH:
 			return new wake::ast::Foreach(generateExpressionAst(node->node_data.nodes[0], true), generateStatementAst(node->node_data.nodes[1]), node, scopesymtable, errors);
@@ -121,7 +122,7 @@ wake::ast::ExpressionNode* wake::AstCreator::generateExpressionAst(Node* node, b
 	}
 
 	if(mustBeUsable) {
-		return new wake::ast::ExpressionUsableChecker(new wake::ast::ExpressionErrorCatcher(new wake::ast::OtherExpression(node, subnodes, errors, classestable, scopesymtable, methodanalyzer, thiscontext, returntype, parameterizedtypes), node));
+		return new wake::ast::ExpressionUsabilityCatcher(new wake::ast::ExpressionErrorCatcher(new wake::ast::OtherExpression(node, subnodes, errors, classestable, scopesymtable, methodanalyzer, thiscontext, returntype, parameterizedtypes), node), errors, node);
 	} else {
 		return new wake::ast::ExpressionErrorCatcher(new wake::ast::OtherExpression(node, subnodes, errors, classestable, scopesymtable, methodanalyzer, thiscontext, returntype, parameterizedtypes), node);
 	}

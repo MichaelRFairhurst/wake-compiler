@@ -15,13 +15,12 @@
 #include "ast/ExpressionNode.h"
 #include "ast/OtherExpression.h"
 #include "TypeParameterizer.h"
+#include "TypeError.h"
 #include "CompilationExceptions.h"
 
 Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 	TypeAnalyzer* analyzer = classestable->getAnalyzer();
 	Type* ret = NULL;
-	string erroneousstring;
-	string expectedstring;
 
 	// read Printer as Printer[] from ARRAY_ACCESS nodes
 	// but not if there are ANY nodes before the next TYPEDATA
@@ -147,25 +146,26 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 
 				if(analyzer->isPrimitiveTypeNum(ret) || ret->type == TYPE_MATCHALL) {
 					if(!analyzer->isPrimitiveTypeNum(&additive) && ret->type != TYPE_MATCHALL) {
-						erroneousstring = analyzer->getNameForType(&additive);
-						expectedstring = "Num";
-						throw string("Addition with a non-numeral");
+						EXPECTED	"Num"
+						ERRONEOUS	analyzer->getNameForType(&additive)
+						THROW		("Addition with a non-numeral");
 					}
 
 				} else if(analyzer->isPrimitiveTypeText(ret)) {
 					if(!analyzer->isPrimitiveTypeText(&additive) && ret->type != TYPE_MATCHALL) {
-						erroneousstring = analyzer->getNameForType(&additive);
-						expectedstring = "Text";
-						throw string("Concatenation with non-Text");
+						EXPECTED	"Text"
+						ERRONEOUS	analyzer->getNameForType(&additive)
+						THROW		("Concatenation with non-Text");
 					}
 
 				} else {
-					expectedstring = "Num' or 'Text";
-					erroneousstring = analyzer->getNameForType(ret);
+					string erroneousstring = analyzer->getNameForType(ret);
 					delete ret;
 					ret = new Type(TYPE_ERROR);
 
-					throw string("Only numerics or Texts can be added/concatenated");
+					EXPECTED	"Num' or 'Text"
+					ERRONEOUS	erroneousstring
+					THROW		("Only numerics or Texts can be added/concatenated");
 				}
 			}
 			break;
@@ -186,7 +186,7 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				Type factor = *auto_ptr<Type>(children[1]->typeCheck(false));
 
 				if(!analyzer->isPrimitiveTypeNum(ret) || !analyzer->isPrimitiveTypeNum(&factor)) {
-					expectedstring = "Num";
+					string erroneousstring;
 
 					if(analyzer->isPrimitiveTypeNum(ret)) {
 						erroneousstring = analyzer->getNameForType(&factor);
@@ -197,7 +197,9 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 						ret->typedata._class.classname = strdup("Num");
 					}
 
-					throw string("Mathematical operation performed on non-numerals");
+					EXPECTED	"Num"
+					ERRONEOUS	erroneousstring
+					THROW		("Mathematical operation performed on non-numerals");
 				}
 			}
 			break;
@@ -214,7 +216,7 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				Type b = *auto_ptr<Type>(children[1]->typeCheck(false));
 
 				if(!analyzer->isPrimitiveTypeNum(&a) || !analyzer->isPrimitiveTypeNum(&b)) {
-					expectedstring = "Num";
+					string erroneousstring;
 
 					if(analyzer->isPrimitiveTypeNum(&a)) {
 						erroneousstring = analyzer->getNameForType(&b);
@@ -222,7 +224,9 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 						erroneousstring = analyzer->getNameForType(&a);
 					}
 
-					throw string("Mathematical operation performed on non-numerals");
+					EXPECTED	"Num"
+					ERRONEOUS	erroneousstring
+					THROW		("Mathematical operation performed on non-numerals");
 				}
 			}
 			break;
@@ -236,9 +240,9 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				ret->typedata._class.classname = strdup("Bool");
 
 				if(!analyzer->isASubtypeOfB(&a, &b) && !analyzer->isASubtypeOfB(&b, &a)) {
-					expectedstring = analyzer->getNameForType(&a);
-					erroneousstring = analyzer->getNameForType(&b);
-					throw string("Uncomparable types");
+					EXPECTED	analyzer->getNameForType(&a)
+					ERRONEOUS	analyzer->getNameForType(&b)
+					THROW		("Uncomparable types");
 				}
 			}
 			break;
@@ -250,6 +254,8 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				Type cmp = *auto_ptr<Type>(children[1]->typeCheck(false));
 
 				if(!analyzer->isPrimitiveTypeBool(ret) || !analyzer->isPrimitiveTypeBool(&cmp)) {
+					string erroneousstring;
+
 					if(analyzer->isPrimitiveTypeBool(ret)) {
 						erroneousstring = analyzer->getNameForType(&cmp);
 					} else {
@@ -259,9 +265,9 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 						ret->typedata._class.classname = strdup("Bool");
 					}
 
-					expectedstring = "Bool";
-
-					throw string("AND or OR comparison on non-Bool types");
+					EXPECTED	"Bool"
+					ERRONEOUS	erroneousstring
+					THROW		("AND or OR comparison on non-Bool types");
 				}
 			}
 			break;
@@ -270,12 +276,14 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 			ret = children[0]->typeCheck(false);
 
 			if(!analyzer->isPrimitiveTypeBool(ret)) {
-				expectedstring = "Bool";
-				erroneousstring = analyzer->getNameForType(ret);
+				string erroneousstring = analyzer->getNameForType(ret);
 				delete ret;
 				ret = new Type(TYPE_CLASS);
 				ret->typedata._class.classname = strdup("Bool");
-				throw string("If conditions must be Bool");
+
+				EXPECTED	"Bool"
+				ERRONEOUS	erroneousstring
+				THROW		("If conditions must be Bool");
 			}
 			break;
 
@@ -284,8 +292,9 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				ret = children[0]->typeCheck(true);
 				Type index = *auto_ptr<Type>(children[1]->typeCheck(false));
 				if(ret->type != TYPE_LIST && ret->type != TYPE_MATCHALL) {
-					erroneousstring = analyzer->getNameForType(ret);
-					throw string("Getting index of non-array");
+					EXPECTED	"A list"
+					ERRONEOUS	analyzer->getNameForType(ret)
+					THROW		("Getting index of non-array");
 				} else if(ret->type == TYPE_LIST) { // Otherwise we're a matchall
 					Type temp = *ret->typedata.list.contained;
 					delete ret;
@@ -294,9 +303,9 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				}
 
 				if(!analyzer->isPrimitiveTypeNum(&index) && index.type != TYPE_MATCHALL) {
-					erroneousstring = analyzer->getNameForType(&index);
-					expectedstring = "Num";
-					throw string("Array indices must be numeric");
+					EXPECTED	"Num"
+					ERRONEOUS	analyzer->getNameForType(&index)
+					THROW		("Array indices must be numeric");
 				}
 			}
 			break;
@@ -307,8 +316,9 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				ret = children[0]->typeCheck(true);
 				Type index = *auto_ptr<Type>(children[1]->typeCheck(false));
 				if(ret->type != TYPE_LIST && ret->type != TYPE_MATCHALL) {
-					erroneousstring = analyzer->getNameForType(ret);
-					throw string("Getting index of non-array");
+					EXPECTED	"A list"
+					ERRONEOUS	analyzer->getNameForType(ret)
+					THROW		("Getting index of non-array");
 				} else if(ret->type == TYPE_LIST) { // Otherwise we're a matchall
 					Type temp = *ret->typedata.list.contained;
 					delete ret;
@@ -316,9 +326,9 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				}
 
 				if(!analyzer->isPrimitiveTypeNum(&index) && index.type != TYPE_MATCHALL) {
-					erroneousstring = analyzer->getNameForType(&index);
-					expectedstring = "Num";
-					throw string("Array indices must be numeric");
+					EXPECTED	"Num"
+					ERRONEOUS	analyzer->getNameForType(&index)
+					THROW		("Array indices must be numeric");
 				}
 			}
 			break;
@@ -334,9 +344,9 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 					ret = node->node_type == NT_ASSIGNMENT ? new Type(TYPE_UNUSABLE) : new Type(subject);
 					Type assignment = *auto_ptr<Type>(children[1]->typeCheck(false));
 					if(!analyzer->isASubtypeOfB(&assignment, &subject)) {
-						expectedstring = analyzer->getNameForType(&subject);
-						erroneousstring = analyzer->getNameForType(&assignment);
-						throw string("Invalid type in assignment");
+						EXPECTED	analyzer->getNameForType(&subject)
+						ERRONEOUS	analyzer->getNameForType(&assignment)
+						THROW		("Invalid type in assignment");
 					}
 				}
 			}
@@ -362,9 +372,9 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				}
 
 				if(!analyzer->isASubtypeOfB(&actual, &lambda)) {
-					expectedstring = analyzer->getNameForType(&lambda);
-					erroneousstring = analyzer->getNameForType(&actual);
-					throw string("Argument lists not compatible in function invocation");
+					EXPECTED	analyzer->getNameForType(&lambda)
+					ERRONEOUS	analyzer->getNameForType(&actual)
+					THROW		("Argument lists not compatible in function invocation");
 				}
 			}
 			break;
@@ -403,7 +413,7 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 					if(variable) {
 						methodname->node_type = NT_LAMBDA_INVOCATION;
 						methodname->node_data.nodes[0]->node_type = NT_ALIAS;
-						ret = typeCheck(methodname, forceArrayIdentifier);
+						ret = children[1]->typeCheck(forceArrayIdentifier);
 						break;
 					}
 				}
@@ -427,9 +437,9 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				classestable->assertTypeIsValid(ret);
 				Type casted = *auto_ptr<Type>(children[1]->typeCheck(false));
 				if(!analyzer->isASubtypeOfB(&casted, ret)) {
-					expectedstring = analyzer->getNameForType(ret);
-					erroneousstring = analyzer->getNameForType(&casted);
-					throw string("Casting an object that is not a valid subtype");
+					EXPECTED	analyzer->getNameForType(ret)
+					ERRONEOUS	analyzer->getNameForType(&casted)
+					THROW		("Casting an object that is not a valid subtype");
 				}
 			} catch(SymbolNotFoundException* e) {
 				errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, node));
@@ -493,10 +503,13 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 					common = analyzer->getCommonSubtypeOf(first.get(), second.get());
 
 					if(!common) {
-						expectedstring = "Types with a common ancestor";
-						erroneousstring = analyzer->getNameForType(first.get()) + " and " + analyzer->getNameForType(second.get());
+						string expectedstring = "Types with a common ancestor";
+						string erroneousstring = analyzer->getNameForType(first.get()) + " and " + analyzer->getNameForType(second.get());
 						ret = new Type(TYPE_MATCHALL);
-						throw string("No common type between items in array declaration");
+
+						EXPECTED	expectedstring
+						ERRONEOUS	erroneousstring
+						THROW		("No common type between items in array declaration");
 					}
 
 					i++;
@@ -554,17 +567,17 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				boost::optional<Type*> common = analyzer->getCommonSubtypeOf(left.get(), right.get());
 				if(!common) {
 					ret = MakeType(TYPE_MATCHALL);
-					expectedstring = "Two types with a single closest common ancestor";
-					erroneousstring = analyzer->getNameForType(left.get()) + " and " + analyzer->getNameForType(right.get());
-					throw string("Only booleans can go inside a ternary operator");
+					EXPECTED	"Two types with a single closest common ancestor"
+					ERRONEOUS	analyzer->getNameForType(left.get()) + " and " + analyzer->getNameForType(right.get())
+					THROW		("Only booleans can go inside a ternary operator");
 				}
 
 				ret = *common;
 
 				if(!analyzer->isPrimitiveTypeBool(condition.get()) && !analyzer->isPrimitiveTypeNum(condition.get())) {
-					expectedstring = "Bool or Num";
-					erroneousstring = analyzer->getNameForType(condition.get());
-					throw string("Only booleans and nums can go inside a ternary operator condition");
+					EXPECTED	"Bool or Num"
+					ERRONEOUS	analyzer->getNameForType(condition.get())
+					THROW		("Only booleans and nums can go inside a ternary operator condition");
 				}
 			}
 			break;
@@ -579,8 +592,7 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 		case NT_VALUES:
 			throw string("Not supported yet");
 
-		// These have tests so can't throw, but won't compile anyway as long as switch throws
-		case NT_EXPRESSIONS:
+		/*case NT_EXPRESSIONS:
 			try {
 				int i = 0;
 				while(i < node->subnodes) {
@@ -590,8 +602,136 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				}
 			} catch(SemanticError *e) {
 				throw e;
-			}
+			}*/
 	}
+
+	return ret;
+}
+
+bool wake::ast::OtherExpression::isValidLValue(Node* n) {
+	switch(n->node_type) {
+		case NT_ALIAS:
+		case NT_TYPEDATA:
+		case NT_MEMBER_ACCESS:
+		case NT_ARRAY_ACCESS_LVAL:
+			return true;
+
+		case NT_ARRAY_ACCESS:
+			if(isValidLValue(n->node_data.nodes[0])) {
+				n->node_type = NT_ARRAY_ACCESS_LVAL;
+				return true;
+			}
+			// fall through
+		default:
+			return false;
+	}
+}
+
+Type* wake::ast::OtherExpression::typeCheckMemberAccess(Node* tree, Type& subject, bool forceArrayIdentifier) {
+	TypeAnalyzer* analyzer = classestable->getAnalyzer();
+	Type* ret;
+	Type* boxedtype;
+
+	if(analyzer->isAutoboxedType(&subject, &boxedtype)) {
+		Node* node = tree->node_data.nodes[0];
+		tree->node_data.nodes[0] = MakeTwoBranchNode(NT_AUTOBOX, node, MakeNodeFromString(NT_COMPILER_HINT, strdup(boxedtype->typedata._class.classname), tree->loc), tree->loc);
+		subject = *boxedtype;
+		delete boxedtype;
+	}
+
+	string name = tree->node_data.nodes[1]->node_type == NT_ALIAS
+		? tree->node_data.nodes[1]->node_data.string
+		: scopesymtable->getNameForType(tree->node_data.nodes[1]->node_data.type);
+
+	if(forceArrayIdentifier && tree->node_data.nodes[1]->node_type != NT_ALIAS) name += "[]";
+
+	if(subject.type == TYPE_OPTIONAL) {
+		errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Accessing property " + name + " on nonoptional type " + analyzer->getNameForType(&subject) + ". You must first wrap object in an exists { } clause.", tree));
+		ret = new Type(TYPE_MATCHALL);
+		return ret;
+	}
+
+	auto_ptr<ReadOnlyPropertySymbolTable> proptable(classestable->find(&subject));
+	boost::optional<Type*> variable = proptable->find(name);
+	if(!variable) {
+		ret = MakeType(TYPE_MATCHALL);
+		errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Symbol by name of " + name + " not found", tree));
+	} else {
+		Type* member = tree->node_data.nodes[1]->node_data.type;
+		if(!forceArrayIdentifier && tree->node_data.nodes[1]->node_type != NT_ALIAS && member->type == TYPE_LIST && analyzer->getArrayReferenceLevel(*member) != analyzer->getArrayReferenceLevel(**variable))
+			errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Accessed arrayed variable " + name + " with wrong number of [] brackets.", tree));
+
+		ret = copyType(*variable);
+		AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(name.c_str()), tree->loc));
+	}
+
+	return ret;
+}
+
+Type* wake::ast::OtherExpression::typeCheckMethodInvocation(Node* tree, Type& subject) {
+	TypeAnalyzer* analyzer = classestable->getAnalyzer();
+	Type* boxedtype;
+	Type* ret;
+
+	Node* methodname = tree->node_data.nodes[1];
+
+	if(subject.type == TYPE_OPTIONAL) {
+		errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Calling method on optional type " + analyzer->getNameForType(&subject) + ". You must first wrap object in an exists { } clause.", tree));
+		ret = new Type(TYPE_MATCHALL);
+		return ret;
+	}
+
+	if(analyzer->isAutoboxedType(&subject, &boxedtype)) {
+		Node* node = tree->node_data.nodes[0];
+		tree->node_data.nodes[0] = MakeTwoBranchNode(NT_AUTOBOX, node, MakeNodeFromString(NT_COMPILER_HINT, strdup(boxedtype->typedata._class.classname), tree->loc), tree->loc);
+		subject = *boxedtype;
+		delete boxedtype;
+	}
+
+	auto_ptr<ReadOnlyPropertySymbolTable> methodtable;
+	try {
+		methodtable.reset(classestable->find(&subject));
+	} catch (SymbolNotFoundException* e) {
+		ret = MakeType(TYPE_MATCHALL);
+		errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, string("Class by name of ") + subject.typedata._class.classname + " returned by another expression has not been imported and cannot be resolved", tree));
+		return ret;
+	}
+	vector<pair<string, TypeArray*> > method_segments;
+
+	int i = 0;
+	while(i < methodname->subnodes) {
+		string name = methodname->node_data.nodes[i]->node_data.string;
+		TypeArray* args = MakeTypeArray();
+		i++;
+
+		if(methodname->subnodes > i) {
+			int a;
+			for(a = 0; a < methodname->node_data.nodes[i]->subnodes; a++)
+				AddTypeToTypeArray(typeCheckUsable(methodname->node_data.nodes[i]->node_data.nodes[a], false), args);
+		}
+
+		method_segments.push_back(pair<string, TypeArray*>(name, args));
+		i++;
+	}
+
+	boost::optional<Type*> lambdatype = methodtable->find(methodtable->getSymbolNameOf(&method_segments));
+
+	if(lambdatype) {
+		if((*lambdatype)->typedata.lambda.returntype == NULL) {
+			ret = new Type(TYPE_UNUSABLE);
+		} else {
+			ret = new Type(*(*lambdatype)->typedata.lambda.returntype);
+		}
+
+		AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(subject.typedata._class.classname), tree->loc));
+		AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(methodtable->getAddress(methodtable->getSymbolNameOf(&method_segments)).c_str()), tree->loc));
+	} else {
+		errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Couldn't find property " + methodtable->getSymbolNameOf(&method_segments) + " on class" + subject.typedata._class.classname, tree));
+		ret = MakeType(TYPE_MATCHALL);
+	}
+
+	for(vector<pair<string, TypeArray*> >::iterator it = method_segments.begin(); it != method_segments.end(); ++it)
+		delete it->second;
 
 	return ret;
 }

@@ -2,7 +2,7 @@
  * Source Code for the Original Compiler for the
  * Programming Language Wake
  *
- * ExpressionUsableCatcher.cpp
+ * ExpressionUsabilityCatcher.cpp
  *
  * Licensed under the MIT license
  * See LICENSE.TXT for details
@@ -13,9 +13,9 @@
  **************************************************/
 
 
-#include "ast/ExpressionUsableChecker.h"
+#include "ast/ExpressionUsabilityCatcher.h"
 
-Type* wake::ast::ExpressionUsableCatcher::typeCheck(bool forceArrayIdentifier) {
+Type* wake::ast::ExpressionUsabilityCatcher::typeCheck(bool forceArrayIdentifier) {
 	Type* t = child->typeCheck(forceArrayIdentifier);
 
 	if(t == NULL) {

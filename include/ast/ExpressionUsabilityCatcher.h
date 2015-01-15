@@ -2,7 +2,7 @@
  * Source Code for the Original Compiler for the
  * Programming Language Wake
  *
- * ExpressionUsableCatcher.h
+ * ExpressionUsabilityCatcher.h
  *
  * Licensed under the MIT license
  * See LICENSE.TXT for details
@@ -22,10 +22,10 @@ namespace wake {
 
 	namespace ast {
 
-		class ExpressionUsableCatcher : public ExpressionNode {
+		class ExpressionUsabilityCatcher : public ExpressionNode {
 
 			public:
-				ExpressionUsableCatcher(ExpressionNode* child, ErrorTracker* errors, Node* node) : child(child), errors(errors), node(node) {};
+				ExpressionUsabilityCatcher(ExpressionNode* child, ErrorTracker* errors, Node* node) : child(child), errors(errors), node(node) {};
 				Type* typeCheck(bool forceArrayIdentifier);
 
 
