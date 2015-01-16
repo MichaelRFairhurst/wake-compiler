@@ -203,7 +203,7 @@ gen/lex.%.c: src/flex/%lexer.l gen/wake.tab.c gen/objectfile.tab.c
 	flex -P $* -o $@ $<
 
 loc:
-	find src -type f -print0 | xargs -0 wc -l makefile include/* js_to_wakeobj.sh
+	find src -type f -print0 | xargs -0 wc -l makefile include/* include/ast/* js_to_wakeobj.sh
 
 loo: clean
 	@echo
