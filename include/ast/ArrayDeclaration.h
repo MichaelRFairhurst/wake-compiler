@@ -12,13 +12,24 @@
  *
  **************************************************/
 
-namespace wake::ast {
+#ifndef HEADER_AST_ARRAY_DECLARATION
+#define HEADER_AST_ARRAY_DECLARATION
 
-	class ArrayDeclaration : public ExpressionNode {
+#include "ast/ExpressionNode.h"
 
-		public:
-			Type* typeCheck(bool forceArrayIdentifier);
+namespace wake {
+
+	namespace ast {
+
+		class ArrayDeclaration : public ExpressionNode {
+
+			public:
+				Type* typeCheck(bool forceArrayIdentifier);
+
+		};
 
 	}
 
 }
+
+#endif

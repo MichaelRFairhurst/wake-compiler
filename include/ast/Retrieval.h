@@ -12,13 +12,40 @@
  *
  **************************************************/
 
-namespace wake::ast {
+#ifndef HEADER_AST_RETRIEVAL
+#define HEADER_AST_RETRIEVAL
 
-	class Retrieval : public ExpressionNode {
+#include "ast/ExpressionNode.h"
+#include <vector>
+#include "ClassSpaceSymbolTable.h"
+#include "TypeAnalyzer.h"
+#include "ErrorTracker.h"
 
-		public:
-			Type* typeCheck(bool forceArrayIdentifier);
+namespace wake {
+
+	namespace ast {
+
+		class Retrieval : public ExpressionNode {
+
+			public:
+				Retrieval(ExpressionNode* providerExp, Type* retrievalType, std::vector<ExpressionNode*> argumentExprs, Node* node, ClassSpaceSymbolTable* classestable, TypeAnalyzer* analyzer, ErrorTracker* errors)
+					: providerExp(providerExp), retrievalType(retrievalType), argumentExprs(argumentExprs), node(node), classestable(classestable), analyzer(analyzer), errors(errors) {};
+
+				Type* typeCheck(bool forceArrayIdentifier);
+
+			private:
+				ExpressionNode* providerExp;
+				Type* retrievalType;
+				std::vector<ExpressionNode*> argumentExprs;
+				Node* node;
+				ClassSpaceSymbolTable* classestable;
+				TypeAnalyzer* analyzer;
+				ErrorTracker* errors;
+
+		};
 
 	}
 
 }
+
+#endif

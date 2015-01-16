@@ -300,7 +300,7 @@ value:
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1, @$); }
 	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1, @$); }
 	| BOOL																		{ $$ = MakeNodeFromNumber(NT_BOOLLIT, $1, @$); }
-	| '[' expressions ']'														{ $$ = MakeOneBranchNode(NT_ARRAY_DECLARATION, $2, @$); }
+	| '[' expressions ']'														{ $$ = $2; $$->loc = @$; $$->node_type = NT_ARRAY_DECLARATION; }
 	| SYM_ARRAYED																{ $$ = MakeEmptyNode(NT_ARRAY_DECLARATION, @$); }
 	| NOTHING																	{ $$ = MakeEmptyNode(NT_NOTHING, @$); }
 	| objectable '.' shadowabletype												{ $$ = MakeTwoBranchNode(NT_MEMBER_ACCESS, $1, MakeNodeFromType($3, @3), @$); }

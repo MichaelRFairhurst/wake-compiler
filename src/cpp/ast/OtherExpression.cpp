@@ -447,55 +447,17 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 			}
 			break;
 
-		case NT_RETRIEVAL:
-			{
-				TypeParameterizer parameterizer;
-				parameterizer.writeInParameterizations(&node->node_data.nodes[0]->node_data.type, parameterizedtypes);
-				try {
-					Type provider = *auto_ptr<Type>(children[2]->typeCheck(false));
-					ret = new Type(*node->node_data.nodes[0]->node_data.type);
-					classestable->assertTypeIsValid(ret);
-					vector<Type*> arguments;
-					boost::ptr_vector<Type> arguments_latch;
-
-					if(node->node_data.nodes[1]->node_type != NT_EMPTY) {
-						for(int i = 0; i < node->node_data.nodes[1]->subnodes; i++) {
-							Type* argtype = typeCheckUsable(node->node_data.nodes[1]->node_data.nodes[i], forceArrayIdentifier);
-							arguments.push_back(argtype);
-							arguments_latch.push_back(argtype);
-						}
-					}
-
-					string name = analyzer->getProvisionSymbol(ret, arguments);
-
-					try {
-						auto_ptr<ReadOnlyPropertySymbolTable> table(classestable->find(&provider));
-						boost::optional<Type*> provision = table->find(name);
-						if(!provision) {
-							errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Provision " + name + " does not exist on class " + analyzer->getNameForType(&provider), node));
-						}
-					} catch(SymbolNotFoundException *e) {
-						delete e;
-					}
-					AddSubNode(node, MakeNodeFromString(NT_COMPILER_HINT, strdup(name.c_str()), node->loc));
-				} catch(SymbolNotFoundException* e) {
-					errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, node));
-					delete e;
-				}
-			}
-			break;
-
 		case NT_ARRAY_DECLARATION:
 			// These should all be specially handled in the other cases
 			if(!node->subnodes) {
 				ret = new Type(TYPE_LIST);
 				ret->typedata.list.contained = new Type(TYPE_MATCHALL);
-			} else if(node->node_data.nodes[0]->subnodes == 1) {
+			} else if(node->subnodes == 1) {
 				ret = new Type(TYPE_LIST);
-				ret->typedata.list.contained = typeCheckUsable(node->node_data.nodes[0]->node_data.nodes[0], false);
+				ret->typedata.list.contained = children[0]->typeCheck(false);;
 			} else {
-				auto_ptr<Type> first(typeCheckUsable(node->node_data.nodes[0]->node_data.nodes[0], false));
-				auto_ptr<Type> second(typeCheckUsable(node->node_data.nodes[0]->node_data.nodes[1], false));
+				auto_ptr<Type> first(children[0]->typeCheck(false));
+				auto_ptr<Type> second(children[1]->typeCheck(false));
 				boost::optional<Type*> common;
 
 				int i = 1;
@@ -513,9 +475,9 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 					}
 
 					i++;
-					if(i == node->node_data.nodes[0]->subnodes) break;
+					if(i == node->subnodes) break;
 					first.reset(*common);
-					second.reset(typeCheckUsable(node->node_data.nodes[0]->node_data.nodes[i], false));
+					second.reset(children[i]->typeCheck(false));
 				}
 
 				ret = new Type(TYPE_LIST);
