@@ -1,3 +1,17 @@
+/**************************************************
+ * Source Code for the Original Compiler for the
+ * Programming Language Wake
+ *
+ * AnnotationTreeTraverser.cpp
+ *
+ * Licensed under the MIT license
+ * See LICENSE.TXT for details
+ *
+ * Author: Michael Fairhurst
+ * Revised By:
+ *
+ **************************************************/
+
 #include "AnnotationTreeTraverser.h"
 
 vector<Annotation*> AnnotationTreeTraverser::getAnnotations(Node* tree) {
