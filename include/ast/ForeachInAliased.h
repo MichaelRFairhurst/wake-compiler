@@ -27,8 +27,6 @@ namespace wake {
 				ForeachInAliased(ExpressionNode* iterable, StatementNode* body, char* alias, Node* node, ScopeSymbolTable* scopesymtable, ErrorTracker* errors)
 					: Foreach(iterable, body, node, scopesymtable, errors), alias(alias) {};
 
-				void typeCheck();
-
 				Type getIterationType(Type* iterableType);
 
 			private:

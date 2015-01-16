@@ -28,8 +28,6 @@ namespace wake {
 				ForeachInExplicitType(ExpressionNode* iterable, StatementNode* body, Type* explicitType, Node* node, ScopeSymbolTable* scopesymtable, ErrorTracker* errors, TypeAnalyzer* analyzer)
 					: Foreach(iterable, body, node, scopesymtable, errors), analyzer(analyzer), explicitType(explicitType) {};
 
-				void typeCheck();
-
 				Type getIterationType(Type* iterableType);
 
 			private:

@@ -31,7 +31,7 @@ namespace wake {
 				Foreach(ExpressionNode* iterable, StatementNode* body, Node* node, ScopeSymbolTable* scopesymtable, ErrorTracker* errors)
 					: iterable(iterable), body(body), node(node), scopesymtable(scopesymtable), errors(errors) {};
 
-				virtual void typeCheck();
+				void typeCheck();
 
 				virtual Type getIterationType(Type* iterableType);
 

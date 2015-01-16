@@ -138,9 +138,9 @@ wake::ast::ExpressionNode* wake::AstCreator::generateExpressionAst(Node* node, b
 	}
 
 	if(mustBeUsable) {
-		return new wake::ast::ExpressionUsabilityCatcher(new wake::ast::ExpressionErrorCatcher(created, node), errors, node);
+		return new wake::ast::ExpressionUsabilityCatcher(new wake::ast::ExpressionErrorCatcher(created, node, errors), errors, node);
 	} else {
-		return new wake::ast::ExpressionErrorCatcher(created, node);
+		return new wake::ast::ExpressionErrorCatcher(created, node, errors);
 	}
 
 }

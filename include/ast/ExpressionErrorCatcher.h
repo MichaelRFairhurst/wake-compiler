@@ -16,6 +16,7 @@
 #define HEADER_AST_EXPRESSION_ERROR_CATCHER
 
 #include "ast/ExpressionNode.h"
+#include "ErrorTracker.h"
 
 namespace wake {
 
@@ -24,13 +25,13 @@ namespace wake {
 		class ExpressionErrorCatcher : public ExpressionNode {
 
 			public:
-				ExpressionErrorCatcher(ExpressionNode* child, Node* node) : child(child), node(node) {};
+				ExpressionErrorCatcher(ExpressionNode* child, Node* node, ErrorTracker* errors) : child(child), node(node), errors(errors) {};
 				Type* typeCheck(bool forceArrayIdentifier);
-
 
 			private:
 				Node* node;
 				ExpressionNode* child;
+				ErrorTracker* errors;
 
 		};
 
