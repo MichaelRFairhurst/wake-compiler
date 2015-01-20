@@ -17,7 +17,7 @@
 #include <memory>
 
 void wake::ast::IfElseWhile::typeCheck() {
-	auto_ptr<Type> conditionType(condition->typeCheck(true));
+	auto_ptr<Type> conditionType(condition->typeCheck(false));
 	block->typeCheck();
 
 	if(otherwise.get() != NULL) {
