@@ -16,6 +16,7 @@
 #include "ast/OtherExpression.h"
 #include "TypeParameterizer.h"
 #include "TypeError.h"
+#include <iostream>
 #include "CompilationExceptions.h"
 
 Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {

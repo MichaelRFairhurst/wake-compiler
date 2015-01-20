@@ -21,8 +21,6 @@ Type* wake::ast::Invocation::typeCheck(bool forceArrayLiteral) {
 	actual.typedata.lambda.arguments = MakeTypeArray();
 	if(lambda.typedata.lambda.returntype != NULL) {
 		actual.typedata.lambda.returntype = new Type(*lambda.typedata.lambda.returntype);
-	} else {
-		return new Type(TYPE_UNUSABLE);
 	}
 
 	for(boost::ptr_vector<ExpressionNode>::iterator it = argumentExprs.begin(); it != argumentExprs.end(); ++it) {
@@ -35,5 +33,5 @@ Type* wake::ast::Invocation::typeCheck(bool forceArrayLiteral) {
 		THROW		("Argument lists not compatible in function invocation");
 	}
 
-	return new Type(*lambda.typedata.lambda.returntype);
+	return lambda.typedata.lambda.returntype ? new Type(*lambda.typedata.lambda.returntype) : new Type(TYPE_UNUSABLE);
 }
