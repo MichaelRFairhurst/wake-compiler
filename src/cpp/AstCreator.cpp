@@ -29,6 +29,7 @@
 #include "ast/ForeachInAliased.h"
 #include "ast/ForeachInExplicitType.h"
 #include "ast/Retrieval.h"
+#include "ast/Invocation.h"
 #include <vector>
 
 wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
@@ -110,6 +111,16 @@ wake::ast::ExpressionNode* wake::AstCreator::generateExpressionAst(Node* node, b
 		}
 		wake::ast::ExpressionNode* provider = generateExpressionAst(node->node_data.nodes[2], true);
 		created = new wake::ast::Retrieval(provider, node->node_data.nodes[0]->node_data.type, arguments, node, classestable, classestable->getAnalyzer(), errors);
+	} else if(node->node_type == NT_LAMBDA_INVOCATION) {
+		std::vector<wake::ast::ExpressionNode*> arguments;
+		if(node->subnodes == 2) {
+			int i;
+			for(i = 0; i < node->node_data.nodes[1]->subnodes; i++) {
+				arguments.push_back(generateExpressionAst(node->node_data.nodes[1]->node_data.nodes[i], true));
+			}
+		}
+		wake::ast::ExpressionNode* lambda = generateExpressionAst(node->node_data.nodes[0], true);
+		created = new wake::ast::Invocation(lambda, arguments, node, classestable->getAnalyzer(), errors);
 	} else {
 
 		std::vector<wake::ast::ExpressionNode*> subnodes;

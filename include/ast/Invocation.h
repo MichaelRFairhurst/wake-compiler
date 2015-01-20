@@ -12,13 +12,41 @@
  *
  **************************************************/
 
-namespace wake::ast {
+#ifndef HEADER_AST_INVOCATION
+#define HEADER_AST_INVOCATION
 
-	class Invocation : public ExpressionNode {
+#include "ExpressionNode.h"
+#include "TypeAnalyzer.h"
+#include "node.h"
+#include "ErrorTracker.h"
+#include <boost/ptr_container/ptr_vector.hpp>
 
-		public:
-			Type* typeCheck(bool forceArrayIdentifier);
+namespace wake {
+
+	namespace ast {
+
+		class Invocation : public ExpressionNode {
+
+			public:
+				Invocation(ExpressionNode* lambdaExpr, std::vector<ExpressionNode*> argumentExprs, Node* node, TypeAnalyzer* analyzer, ErrorTracker* errors)
+					: lambdaExpr(lambdaExpr), node(node), analyzer(analyzer), errors(errors) {
+						for(std::vector<ExpressionNode*>::iterator it = argumentExprs.begin(); it != argumentExprs.end(); ++it) this->argumentExprs.push_back(*it);
+				};
+
+				Type* typeCheck(bool forceArrayIdentifier);
+
+
+			private:
+				std::auto_ptr<ExpressionNode> lambdaExpr;
+				boost::ptr_vector<ExpressionNode> argumentExprs;
+				Node* node;
+				TypeAnalyzer* analyzer;
+				ErrorTracker* errors;
+
+		};
 
 	}
 
 }
+
+#endif

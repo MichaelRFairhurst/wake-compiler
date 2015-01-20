@@ -352,33 +352,6 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 			}
 			break;
 
-		case NT_LAMBDA_INVOCATION:
-			{
-				Type lambda = *auto_ptr<Type>(children[0].typeCheck(false));
-				Type actual(TYPE_LAMBDA);
-				actual.typedata.lambda.arguments = MakeTypeArray();
-				if(lambda.typedata.lambda.returntype != NULL) {
-					actual.typedata.lambda.returntype = new Type(*lambda.typedata.lambda.returntype);
-					ret = new Type(*lambda.typedata.lambda.returntype);
-				} else {
-					ret = new Type(TYPE_UNUSABLE);
-				}
-
-				if(node->subnodes == 2) {
-					int i;
-					for(i = 0; i < node->node_data.nodes[1]->subnodes; i++) {
-						//AddTypeToTypeArray(typeCheckUsable(node->node_data.nodes[1]->node_data.nodes[i], forceArrayIdentifier), actual.typedata.lambda.arguments);
-					}
-				}
-
-				if(!analyzer->isASubtypeOfB(&actual, &lambda)) {
-					EXPECTED	analyzer->getNameForType(&lambda)
-					ERRONEOUS	analyzer->getNameForType(&actual)
-					THROW		("Argument lists not compatible in function invocation");
-				}
-			}
-			break;
-
 		case NT_EARLYBAILOUT_METHOD_INVOCATION:
 			{
 				Type subject = *auto_ptr<Type>(children[0].typeCheck(false));
