@@ -32,48 +32,63 @@
 #include "ast/Invocation.h"
 #include "ast/MethodInvocation.h"
 #include "ast/EarlyBailoutMethodInvocation.h"
+#include "ast/StatementErrorCatcher.h"
 #include <vector>
 
 wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
+	wake::ast::StatementNode* created;
+
 	switch(node->node_type) {
 		case NT_DECLARATION:
-			return new wake::ast::Declaration(&node->node_data.nodes[0]->node_data.type, generateExpressionAst(node->node_data.nodes[1], true), node, classestable, scopesymtable, errors, parameterizedtypes);
+			created = new wake::ast::Declaration(&node->node_data.nodes[0]->node_data.type, generateExpressionAst(node->node_data.nodes[1], true), node, classestable, scopesymtable, errors, parameterizedtypes);
+			break;
 
 		case NT_CATCH:
-			return new wake::ast::Catch(node->node_data.nodes[0]->node_data.type, generateStatementAst(node->node_data.nodes[1]), node, classestable, scopesymtable, errors);
+			created = new wake::ast::Catch(node->node_data.nodes[0]->node_data.type, generateStatementAst(node->node_data.nodes[1]), node, classestable, scopesymtable, errors);
+			break;
 
 		case NT_THROW:
-			return new wake::ast::Throw(generateExpressionAst(node->node_data.nodes[0], true), classestable->getAnalyzer(), errors);
+			created = new wake::ast::Throw(generateExpressionAst(node->node_data.nodes[0], true), classestable->getAnalyzer(), errors);
+			break;
 
 		case NT_IF_ELSE:
 		case NT_WHILE:
-			return new wake::ast::IfElseWhile(generateExpressionAst(node->node_data.nodes[0], true), generateStatementAst(node->node_data.nodes[1]), node->subnodes == 3 ? generateStatementAst(node->node_data.nodes[2]) : NULL, classestable->getAnalyzer());
+			created = new wake::ast::IfElseWhile(generateExpressionAst(node->node_data.nodes[0], true), generateStatementAst(node->node_data.nodes[1]), node->subnodes == 3 ? generateStatementAst(node->node_data.nodes[2]) : NULL, classestable->getAnalyzer());
+			break;
 
 		case NT_FOR:
-			return new wake::ast::For(generateStatementAst(node->node_data.nodes[0]), generateExpressionAst(node->node_data.nodes[1], true), generateStatementAst(node->node_data.nodes[2]), generateStatementAst(node->node_data.nodes[3]), scopesymtable, classestable->getAnalyzer());
+			created = new wake::ast::For(generateStatementAst(node->node_data.nodes[0]), generateExpressionAst(node->node_data.nodes[1], true), generateStatementAst(node->node_data.nodes[2]), generateStatementAst(node->node_data.nodes[3]), scopesymtable, classestable->getAnalyzer());
+			break;
 
 		case NT_RETURN:
 			if(node->subnodes) {
-				return new wake::ast::Return(generateExpressionAst(node->node_data.nodes[0], true), returntype, classestable->getAnalyzer());
+				created = new wake::ast::Return(generateExpressionAst(node->node_data.nodes[0], true), returntype, classestable->getAnalyzer());
+				break;
 			} else {
-				return new wake::ast::Return(NULL, returntype, classestable->getAnalyzer());
+				created = new wake::ast::Return(NULL, returntype, classestable->getAnalyzer());
+				break;
 			}
 
 		case NT_EXISTS:
 			if(node->node_data.nodes[0]->node_type == NT_MEMBER_ACCESS) {
 				errors->addError(new SemanticError(TYPE_ERROR, "Calling exists { } on a property is illegal as it is a shared reference and therefore might be unset amid the scope", node));
-				return new wake::ast::EmptyStatement();
+				created = new wake::ast::EmptyStatement();
+				break;
 			}
-			return new wake::ast::Exists(generateExpressionAst(node->node_data.nodes[0], true), generateStatementAst(node->node_data.nodes[1]), node->subnodes == 3 ? generateStatementAst(node->node_data.nodes[2]) : NULL, node, scopesymtable, errors);
+			created = new wake::ast::Exists(generateExpressionAst(node->node_data.nodes[0], true), generateStatementAst(node->node_data.nodes[1]), node->subnodes == 3 ? generateStatementAst(node->node_data.nodes[2]) : NULL, node, scopesymtable, errors);
+			break;
 
 		case NT_FOREACH:
-			return new wake::ast::Foreach(generateExpressionAst(node->node_data.nodes[0], true), generateStatementAst(node->node_data.nodes[1]), node, scopesymtable, errors);
+			created = new wake::ast::Foreach(generateExpressionAst(node->node_data.nodes[0], true), generateStatementAst(node->node_data.nodes[1]), node, scopesymtable, errors);
+			break;
 
 		case NT_FOREACHIN:
 			if(node->node_data.nodes[0]->node_type == NT_ALIAS) {
-				return new wake::ast::ForeachInAliased(generateExpressionAst(node->node_data.nodes[1], true), generateStatementAst(node->node_data.nodes[2]), node->node_data.nodes[0]->node_data.string, node, scopesymtable, errors);
+				created = new wake::ast::ForeachInAliased(generateExpressionAst(node->node_data.nodes[1], true), generateStatementAst(node->node_data.nodes[2]), node->node_data.nodes[0]->node_data.string, node, scopesymtable, errors);
+				break;
 			} else {
-				return new wake::ast::ForeachInExplicitType(generateExpressionAst(node->node_data.nodes[1], true), generateStatementAst(node->node_data.nodes[2]),  node->node_data.nodes[0]->node_data.type, node, scopesymtable, errors, classestable->getAnalyzer());
+				created = new wake::ast::ForeachInExplicitType(generateExpressionAst(node->node_data.nodes[1], true), generateStatementAst(node->node_data.nodes[2]),  node->node_data.nodes[0]->node_data.type, node, scopesymtable, errors, classestable->getAnalyzer());
+				break;
 			}
 
 		case NT_SWITCH:
@@ -93,13 +108,16 @@ wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
 					subnodes.push_back(generateStatementAst(node->node_data.nodes[i]));
 				}
 
-				return new wake::ast::OtherStatement(node, subnodes, scopesymtable);
+				created = new wake::ast::OtherStatement(node, subnodes, scopesymtable);
+				break;
 			}
 
 		default:
 			return new wake::ast::ExpressionStatement(generateExpressionAst(node, false));
 
 	}
+
+	return new wake::ast::StatementErrorCatcher(created, node, errors);
 }
 
 wake::ast::ExpressionNode* wake::AstCreator::generateExpressionAst(Node* node, bool mustBeUsable) {
