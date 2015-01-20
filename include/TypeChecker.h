@@ -40,13 +40,8 @@ class TypeChecker {
 		void setParameterizedTypes(const vector<Type*>& types);
 
 	private:
-		Type* typeCheck(Node* n, bool forceArrayIdentifier);
-		Type* typeCheckUsable(Node* n, bool forceArrayIdentifier);
 		bool exhaustiveReturns(Node* n);
 		void flowAnalysis(Node* n, bool breakable, bool caseable, bool continuable);
-		bool isValidLValue(Node* n);
-		Type* typeCheckMemberAccess(Node* n, Type& subject, bool forceArrayIdentifier);
-		Type* typeCheckMethodInvocation(Node* n, Type& subject);
 
 		MethodSignatureParseTreeTraverser* methodanalyzer;
 		ErrorTracker* errors;
