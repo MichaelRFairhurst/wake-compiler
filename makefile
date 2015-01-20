@@ -70,6 +70,7 @@ CPPNAMES= \
 	ast/Invocation.cpp \
 	ast/MethodInvocationBase.cpp \
 	ast/MethodInvocation.cpp \
+	ast/EarlyBailoutMethodInvocation.cpp \
 	ast/Retrieval.cpp
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))

@@ -352,30 +352,6 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 			}
 			break;
 
-		/*case NT_EARLYBAILOUT_METHOD_INVOCATION:
-			{
-				Type subject = *auto_ptr<Type>(children[0].typeCheck(false));
-				if(subject.type == TYPE_MATCHALL) {
-					ret = new Type(subject);
-					break;
-				} else if(subject.type != TYPE_OPTIONAL) {
-					errors->addError(new SemanticError(OPTIONAL_USE_OF_NONOPTIONAL_TYPE, "using .? on a nonoptional", node));
-					ret = new Type(TYPE_MATCHALL);
-					break;
-				} else {
-					ret = new Type(TYPE_OPTIONAL);
-					Type* nonoptional = subject.typedata.optional.contained;
-
-					while(nonoptional->type == TYPE_OPTIONAL) {
-						nonoptional = nonoptional->typedata.optional.contained;
-					}
-
-					ret->typedata.optional.contained = typeCheckMethodInvocation(node, *nonoptional);
-				}
-
-			}
-			break;*/
-
 		case NT_CAST:
 			try {
 				TypeParameterizer parameterizer;

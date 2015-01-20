@@ -12,13 +12,31 @@
  *
  **************************************************/
 
-namespace wake::ast {
+#ifndef HEADER_AST_EARLYBAILOUT_METHOD_INVOCATION
+#define HEADER_AST_EARLYBAILOUT_METHOD_INVOCATION
 
-	class EarlyBailoutMethodInvocation : public MethodInvocationBase {
+#include "ast/MethodInvocationBase.h"
+#include "ast/ExpressionNode.h"
 
-		public:
-			Type* typeCheck(bool forceArrayIdentifier);
+namespace wake {
 
-	};
+	namespace ast {
+
+		class EarlyBailoutMethodInvocation : public MethodInvocationBase {
+
+			public:
+				EarlyBailoutMethodInvocation(ExpressionNode* subjectExpr, vector<MethodSegment*> methodSegments, Node* node, ClassSpaceSymbolTable* classestable, ErrorTracker* errors)
+				: subjectExpr(subjectExpr), MethodInvocationBase(methodSegments, node, classestable, errors) {};
+
+				Type* typeCheck(bool forceArrayIdentifier);
+
+			private:
+				auto_ptr<ExpressionNode> subjectExpr;
+
+		};
+
+	}
 
 }
+
+#endif

@@ -30,8 +30,8 @@
 #include "ast/ForeachInExplicitType.h"
 #include "ast/Retrieval.h"
 #include "ast/Invocation.h"
-#include "ast/MethodInvocationBase.h"
 #include "ast/MethodInvocation.h"
+#include "ast/EarlyBailoutMethodInvocation.h"
 #include <vector>
 
 wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
@@ -143,7 +143,11 @@ wake::ast::ExpressionNode* wake::AstCreator::generateExpressionAst(Node* node, b
 			i++;
 		}
 
-		created = new wake::ast::MethodInvocation(generateExpressionAst(node->node_data.nodes[0], true), methodSegments, node, this, scopesymtable, classestable, errors);
+		if(node->node_type == NT_METHOD_INVOCATION) {
+			created = new wake::ast::MethodInvocation(generateExpressionAst(node->node_data.nodes[0], true), methodSegments, node, this, scopesymtable, classestable, errors);
+		} else {
+			created = new wake::ast::EarlyBailoutMethodInvocation(generateExpressionAst(node->node_data.nodes[0], true), methodSegments, node, classestable, errors);
+		}
 
 	} else {
 
