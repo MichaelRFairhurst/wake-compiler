@@ -41,6 +41,7 @@ void wake::ast::OtherStatement::typeCheck() {
 			scopesymtable->pushScope();
 			// FALL THROUGH!
 		case NT_RETRIEVALS_STATEMENTS:
+		case NT_EXPRESSIONS:
 		case NT_BREAK:
 		case NT_CONTINUE:
 			try {
