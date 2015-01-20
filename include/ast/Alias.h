@@ -2,7 +2,7 @@
  * Source Code for the Original Compiler for the
  * Programming Language Wake
  *
- * StringLit.h
+ * Alias.h
  *
  * Licensed under the MIT license
  * See LICENSE.TXT for details
@@ -21,7 +21,7 @@
 
 namespace wake::ast {
 
-	class StringLit : public ExpressionNode {
+	class Alias : public ExpressionNode {
 
 		public:
 			Type* typeCheck(bool forceArrayIdentifier);

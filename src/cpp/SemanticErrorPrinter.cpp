@@ -95,7 +95,7 @@ void SemanticErrorPrinter::print(SemanticError* e) {
 			cout << "Calling T exists { } on a nonoptional type, statement does nothing";
 			break;
 		case USE_OF_ASSIGNMENT_VALUE:
-			cout << "Using the result of an assignment as a value. Use ':=' if you didn't intend to compare with ==.";
+			cout << "Using a void method return, or the result of an assignment, as a value. (Use ':=' if you didn't intend to compare with '==')";
 			break;
 		case INVALID_GENERIC_TYPE:
 			cout << "Using a non-generic type as a generic, a generic type as a non-generic, or wrong number of types used in generic. @TODO split these up...";

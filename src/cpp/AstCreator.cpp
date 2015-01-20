@@ -143,7 +143,7 @@ wake::ast::ExpressionNode* wake::AstCreator::generateExpressionAst(Node* node, b
 			i++;
 		}
 
-		created = new wake::ast::MethodInvocation(generateExpressionAst(node->node_data.nodes[0], true), methodSegments, node, scopesymtable, classestable, errors);
+		created = new wake::ast::MethodInvocation(generateExpressionAst(node->node_data.nodes[0], true), methodSegments, node, this, scopesymtable, classestable, errors);
 
 	} else {
 

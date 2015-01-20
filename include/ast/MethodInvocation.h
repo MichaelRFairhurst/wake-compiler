@@ -19,18 +19,21 @@
 
 namespace wake {
 
+	class AstCreator;
+
 	namespace ast {
 
 		class MethodInvocation : public MethodInvocationBase {
 
 			public:
-				MethodInvocation(ExpressionNode* subjectExpr, std::vector<MethodSegment*> methodSegments, Node* node, ScopeSymbolTable* scopesymtable, ClassSpaceSymbolTable* classestable, ErrorTracker* errors)
-				: subjectExpr(subjectExpr), scopesymtable(scopesymtable), MethodInvocationBase(methodSegments, node, classestable, errors) {};
+				MethodInvocation(ExpressionNode* subjectExpr, std::vector<MethodSegment*> methodSegments, Node* node, AstCreator* astCreator, ScopeSymbolTable* scopesymtable, ClassSpaceSymbolTable* classestable, ErrorTracker* errors)
+				: subjectExpr(subjectExpr), astCreator(astCreator), scopesymtable(scopesymtable), MethodInvocationBase(methodSegments, node, classestable, errors) {};
 
 				Type* typeCheck(bool forceArrayIdentifier);
 
 			private:
 				auto_ptr<ExpressionNode> subjectExpr;
+				AstCreator* astCreator;
 				ScopeSymbolTable* scopesymtable;
 
 		};

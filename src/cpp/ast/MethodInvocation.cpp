@@ -13,6 +13,8 @@
  **************************************************/
 
 #include "ast/MethodInvocation.h"
+#include "ast/Invocation.h"
+#include "AstCreator.h"
 
 Type* wake::ast::MethodInvocation::typeCheck(bool forceArrayIdentifier) {
 	Node* methodname = node->node_data.nodes[1];
@@ -22,9 +24,10 @@ Type* wake::ast::MethodInvocation::typeCheck(bool forceArrayIdentifier) {
 		boost::optional<Type*> variable = scopesymtable->find(name);
 
 		if(variable) {
-			methodname->node_type = NT_LAMBDA_INVOCATION;
-			methodname->node_data.nodes[0]->node_type = NT_ALIAS;
-			return MakeType(TYPE_MATCHALL);//children[1].typeCheck(forceArrayIdentifier); // ??? is this a bug introduced in splitting up the AST ???
+			methodname->node_type = NT_LAMBDA_INVOCATION; // for codegen step
+			methodname->node_data.nodes[0]->node_type = NT_ALIAS; // for codegen step
+			auto_ptr<ExpressionNode> lambda(astCreator->generateExpressionAst(methodname, false)); // Don't ensure its a usable type -- this node will have such a wrapper already if it matters
+			return lambda->typeCheck(false);
 		}
 	}
 
