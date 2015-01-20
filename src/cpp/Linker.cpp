@@ -86,7 +86,7 @@ void Linker::write(ostream& outfile) {
 		std::vector<char> buffer(f_size);
 		ifs.read(buffer.data(), f_size);
 
-		char* seq = "%-END-%\n";
+		const char* seq = "%-END-%\n";
 		std::vector<char>::iterator it;
 
 		/* get the starting point of code */

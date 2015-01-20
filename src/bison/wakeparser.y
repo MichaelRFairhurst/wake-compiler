@@ -645,8 +645,8 @@ types:
 inferenceabletypes:
 	type																		{ $$ = MakeOneBranchNode(NT_INFERENCEABLE_TYPES, MakeNodeFromType($1, @1), @$); }
 	| LIDENTIFIER																{ $$ = MakeOneBranchNode(NT_INFERENCEABLE_TYPES, MakeNodeFromString(NT_ALIAS, $1, @1), @$); }
-	| inferenceabletypes ',' type												{ $$ = $1; AddSubNode($$, MakeNodeFromType($3, @3)); $$->loc = @$}
-	| inferenceabletypes ',' LIDENTIFIER										{ $$ = $1; AddSubNode($$, MakeNodeFromString(NT_ALIAS, $3, @3)); $$->loc = @$}
+	| inferenceabletypes ',' type												{ $$ = $1; AddSubNode($$, MakeNodeFromType($3, @3)); $$->loc = @$; }
+	| inferenceabletypes ',' LIDENTIFIER										{ $$ = $1; AddSubNode($$, MakeNodeFromString(NT_ALIAS, $3, @3)); $$->loc = @$; }
 	;
 
 classtype:

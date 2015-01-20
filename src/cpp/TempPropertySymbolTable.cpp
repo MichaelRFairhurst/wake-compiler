@@ -12,7 +12,7 @@
  *
  **************************************************/
 
-#include "TempPropertySymbolTable.h";
+#include "TempPropertySymbolTable.h"
 
 boost::optional<Type*> TempPropertySymbolTable::find(string name) {
 	return table.find(name);

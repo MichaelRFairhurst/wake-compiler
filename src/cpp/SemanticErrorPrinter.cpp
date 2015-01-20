@@ -14,7 +14,7 @@
 
 #include <iostream>
 #include "SemanticErrorPrinter.h"
-#include "error.h";
+#include "error.h"
 
 void SemanticErrorPrinter::print(SemanticError* e) {
 
