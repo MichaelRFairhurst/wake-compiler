@@ -70,11 +70,6 @@ wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
 			}
 
 		case NT_EXISTS:
-			if(node->node_data.nodes[0]->node_type == NT_MEMBER_ACCESS) {
-				errors->addError(new SemanticError(TYPE_ERROR, "Calling exists { } on a property is illegal as it is a shared reference and therefore might be unset amid the scope", node));
-				created = new wake::ast::EmptyStatement();
-				break;
-			}
 			created = new wake::ast::Exists(generateExpressionAst(node->node_data.nodes[0], true), generateStatementAst(node->node_data.nodes[1]), node->subnodes == 3 ? generateStatementAst(node->node_data.nodes[2]) : NULL, node, scopesymtable, errors);
 			break;
 
