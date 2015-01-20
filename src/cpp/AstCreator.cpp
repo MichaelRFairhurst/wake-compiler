@@ -30,6 +30,8 @@
 #include "ast/ForeachInExplicitType.h"
 #include "ast/Retrieval.h"
 #include "ast/Invocation.h"
+#include "ast/MethodInvocationBase.h"
+#include "ast/MethodInvocation.h"
 #include <vector>
 
 wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
@@ -121,6 +123,28 @@ wake::ast::ExpressionNode* wake::AstCreator::generateExpressionAst(Node* node, b
 		}
 		wake::ast::ExpressionNode* lambda = generateExpressionAst(node->node_data.nodes[0], true);
 		created = new wake::ast::Invocation(lambda, arguments, node, classestable->getAnalyzer(), errors);
+	} else if(node->node_type == NT_METHOD_INVOCATION || node->node_type == NT_EARLYBAILOUT_METHOD_INVOCATION) {
+
+		Node* methodname = node->node_data.nodes[1];
+		vector<wake::ast::MethodSegment*> methodSegments;
+		int i = 0;
+		while(i < methodname->subnodes) {
+			string name = methodname->node_data.nodes[i]->node_data.string;
+			vector<wake::ast::ExpressionNode*> argExprs;
+			i++;
+
+			if(methodname->subnodes > i) {
+				int a;
+				for(a = 0; a < methodname->node_data.nodes[i]->subnodes; a++)
+					argExprs.push_back(generateExpressionAst(methodname->node_data.nodes[i]->node_data.nodes[a], true));
+			}
+
+			methodSegments.push_back(new wake::ast::MethodSegment(name, argExprs));
+			i++;
+		}
+
+		created = new wake::ast::MethodInvocation(generateExpressionAst(node->node_data.nodes[0], true), methodSegments, node, scopesymtable, classestable, errors);
+
 	} else {
 
 		std::vector<wake::ast::ExpressionNode*> subnodes;

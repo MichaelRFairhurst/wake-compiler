@@ -12,13 +12,41 @@
  *
  **************************************************/
 
-namespace wake::ast {
+#ifndef HEADER_AST_METHOD_INVOCATION_BASE
+#define HEADER_AST_METHOD_INVOCATION_BASE
 
-	class MethodInvocationBase : public ExpressionNode {
+#include "ast/ExpressionNode.h"
+#include "ErrorTracker.h"
+#include "node.h"
+#include "ClassSpaceSymbolTable.h"
+#include "ast/MethodSegment.h"
 
-		public:
-			Type* typeCheck(bool forceArrayIdentifier);
+namespace wake {
+
+	namespace ast {
+
+		class MethodInvocationBase : public ExpressionNode {
+
+			public:
+				MethodInvocationBase(std::vector<MethodSegment*> methodSegments, Node* node, ClassSpaceSymbolTable* classestable, ErrorTracker* errors)
+				: errors(errors), node(node), classestable(classestable) {
+					for(std::vector<MethodSegment*>::iterator it = methodSegments.begin(); it != methodSegments.end(); ++it) this->methodSegments.push_back(*it);
+				}
+
+				virtual Type* typeCheck(bool forceArrayIdentifier)=0;
+				virtual ~MethodInvocationBase(){};
+				Type* typeCheckMethodInvocation(Type& subject);
+
+			protected:
+				boost::ptr_vector<MethodSegment> methodSegments;
+				ErrorTracker* errors;
+				ClassSpaceSymbolTable* classestable;
+				Node* node;
+
+		};
 
 	}
 
 }
+
+#endif

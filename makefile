@@ -67,6 +67,9 @@ CPPNAMES= \
 	ast/ExpressionStatement.cpp \
 	ast/Throw.cpp \
 	ast/ExpressionErrorCatcher.cpp \
+	ast/Invocation.cpp \
+	ast/MethodInvocationBase.cpp \
+	ast/MethodInvocation.cpp \
 	ast/Retrieval.cpp
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))

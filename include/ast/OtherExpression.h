@@ -62,7 +62,6 @@ namespace wake {
 			private:
 				bool isValidLValue(Node* tree);
 				Type* typeCheckMemberAccess(Node* n, Type& subject, bool forceArrayIdentifier);
-				Type* typeCheckMethodInvocation(Node* n, Type& subject);
 
 				Node* node;
 				boost::ptr_vector<ExpressionNode> children;

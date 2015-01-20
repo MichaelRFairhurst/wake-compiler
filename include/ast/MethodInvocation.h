@@ -12,13 +12,31 @@
  *
  **************************************************/
 
-namespace wake::ast {
+#ifndef HEADER_AST_METHOD_INVOCATION
+#define HEADER_AST_METHOD_INVOCATION
 
-	class MethodInvocation : public MethodInvocationBase {
+#include "ast/MethodInvocationBase.h"
 
-		public:
-			Type* typeCheck(bool forceArrayIdentifier);
+namespace wake {
+
+	namespace ast {
+
+		class MethodInvocation : public MethodInvocationBase {
+
+			public:
+				MethodInvocation(ExpressionNode* subjectExpr, std::vector<MethodSegment*> methodSegments, Node* node, ScopeSymbolTable* scopesymtable, ClassSpaceSymbolTable* classestable, ErrorTracker* errors)
+				: subjectExpr(subjectExpr), scopesymtable(scopesymtable), MethodInvocationBase(methodSegments, node, classestable, errors) {};
+
+				Type* typeCheck(bool forceArrayIdentifier);
+
+			private:
+				auto_ptr<ExpressionNode> subjectExpr;
+				ScopeSymbolTable* scopesymtable;
+
+		};
 
 	}
 
 }
+
+#endif

@@ -352,7 +352,7 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 			}
 			break;
 
-		case NT_EARLYBAILOUT_METHOD_INVOCATION:
+		/*case NT_EARLYBAILOUT_METHOD_INVOCATION:
 			{
 				Type subject = *auto_ptr<Type>(children[0].typeCheck(false));
 				if(subject.type == TYPE_MATCHALL) {
@@ -374,33 +374,7 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				}
 
 			}
-			break;
-
-		case NT_METHOD_INVOCATION:
-			{
-				Node* methodname = node->node_data.nodes[1];
-
-				if(node->node_data.nodes[0]->node_type == NT_THIS && methodname->subnodes == 2) {
-					string name = methodname->node_data.nodes[0]->node_data.string;
-					boost::optional<Type*> variable = scopesymtable->find(name);
-					if(variable) {
-						methodname->node_type = NT_LAMBDA_INVOCATION;
-						methodname->node_data.nodes[0]->node_type = NT_ALIAS;
-						ret = children[1].typeCheck(forceArrayIdentifier);
-						break;
-					}
-				}
-
-				Type subject = *auto_ptr<Type>(children[0].typeCheck(false));
-
-				if(subject.type == TYPE_MATCHALL) {
-					ret = new Type(subject);
-					break;
-				}
-
-				ret = typeCheckMethodInvocation(node, subject);
-			}
-			break;
+			break;*/
 
 		case NT_CAST:
 			try {
@@ -603,70 +577,3 @@ Type* wake::ast::OtherExpression::typeCheckMemberAccess(Node* tree, Type& subjec
 	return ret;
 }
 
-Type* wake::ast::OtherExpression::typeCheckMethodInvocation(Node* tree, Type& subject) {
-	TypeAnalyzer* analyzer = classestable->getAnalyzer();
-	Type* boxedtype;
-	Type* ret;
-
-	Node* methodname = tree->node_data.nodes[1];
-
-	if(subject.type == TYPE_OPTIONAL) {
-		errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Calling method on optional type " + analyzer->getNameForType(&subject) + ". You must first wrap object in an exists { } clause.", tree));
-		ret = new Type(TYPE_MATCHALL);
-		return ret;
-	}
-
-	if(analyzer->isAutoboxedType(&subject, &boxedtype)) {
-		Node* node = tree->node_data.nodes[0];
-		tree->node_data.nodes[0] = MakeTwoBranchNode(NT_AUTOBOX, node, MakeNodeFromString(NT_COMPILER_HINT, strdup(boxedtype->typedata._class.classname), tree->loc), tree->loc);
-		subject = *boxedtype;
-		delete boxedtype;
-	}
-
-	auto_ptr<ReadOnlyPropertySymbolTable> methodtable;
-	try {
-		methodtable.reset(classestable->find(&subject));
-	} catch (SymbolNotFoundException* e) {
-		ret = MakeType(TYPE_MATCHALL);
-		errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, string("Class by name of ") + subject.typedata._class.classname + " returned by another expression has not been imported and cannot be resolved", tree));
-		return ret;
-	}
-	vector<pair<string, TypeArray*> > method_segments;
-
-	int i = 0;
-	while(i < methodname->subnodes) {
-		string name = methodname->node_data.nodes[i]->node_data.string;
-		TypeArray* args = MakeTypeArray();
-		i++;
-
-		if(methodname->subnodes > i) {
-			int a;
-			for(a = 0; a < methodname->node_data.nodes[i]->subnodes; a++)
-				;//AddTypeToTypeArray(typeCheckUsable(methodname->node_data.nodes[i]->node_data.nodes[a], false), args);
-		}
-
-		method_segments.push_back(pair<string, TypeArray*>(name, args));
-		i++;
-	}
-
-	boost::optional<Type*> lambdatype = methodtable->find(methodtable->getSymbolNameOf(&method_segments));
-
-	if(lambdatype) {
-		if((*lambdatype)->typedata.lambda.returntype == NULL) {
-			ret = new Type(TYPE_UNUSABLE);
-		} else {
-			ret = new Type(*(*lambdatype)->typedata.lambda.returntype);
-		}
-
-		AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(subject.typedata._class.classname), tree->loc));
-		AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(methodtable->getAddress(methodtable->getSymbolNameOf(&method_segments)).c_str()), tree->loc));
-	} else {
-		errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Couldn't find property " + methodtable->getSymbolNameOf(&method_segments) + " on class" + subject.typedata._class.classname, tree));
-		ret = MakeType(TYPE_MATCHALL);
-	}
-
-	for(vector<pair<string, TypeArray*> >::iterator it = method_segments.begin(); it != method_segments.end(); ++it)
-		delete it->second;
-
-	return ret;
-}
