@@ -30,6 +30,8 @@ namespace wake {
 
 				Type getIterationType(Type* iterableType);
 
+				~ForeachInExplicitType(){};
+
 			private:
 				Type* explicitType;
 				TypeAnalyzer* analyzer;

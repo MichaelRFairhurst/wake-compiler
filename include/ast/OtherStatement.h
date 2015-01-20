@@ -15,7 +15,6 @@
 #ifndef AST_OTHER_STATEMENT
 #define AST_OTHER_STATEMENT
 
-#include <vector>
 #include "ast/StatementNode.h"
 #include "ErrorTracker.h"
 #include "ClassSpaceSymbolTable.h"
@@ -23,6 +22,8 @@
 #include "MethodSignatureParseTreeTraverser.h"
 #include "type.h"
 #include "node.h"
+#include <boost/ptr_container/ptr_vector.hpp>
+#include <vector>
 
 namespace wake {
 
@@ -32,12 +33,17 @@ namespace wake {
 
 			public:
 				OtherStatement(Node* tree, std::vector<StatementNode*> children, ScopeSymbolTable* scopesymtable)
-					: tree(tree), children(children), scopesymtable(scopesymtable) {};
+					: tree(tree), scopesymtable(scopesymtable) {
+						for(std::vector<StatementNode*>::iterator it = children.begin(); it != children.end(); ++it) this->children.push_back(*it);
+					};
+
 				void typeCheck();
+
+				~OtherStatement(){};
 
 			private:
 				Node* tree;
-				std::vector<StatementNode*> children;
+				boost::ptr_vector<StatementNode> children;
 				ScopeSymbolTable* scopesymtable;
 
 		};

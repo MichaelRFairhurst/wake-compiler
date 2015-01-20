@@ -29,6 +29,8 @@ namespace wake {
 
 				Type getIterationType(Type* iterableType);
 
+				~ForeachInAliased(){};
+
 			private:
 				char* alias;
 

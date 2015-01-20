@@ -19,6 +19,7 @@
 #include "ast/ExpressionNode.h"
 #include "ScopeSymbolTable.h"
 #include "TypeAnalyzer.h"
+#include <memory>
 
 namespace wake {
 
@@ -32,11 +33,13 @@ namespace wake {
 
 				void typeCheck();
 
+				~For(){};
+
 			private:
-				StatementNode* init;
-				ExpressionNode* condition;
-				StatementNode* incr;
-				StatementNode* block;
+				std::auto_ptr<StatementNode> init;
+				std::auto_ptr<ExpressionNode> condition;
+				std::auto_ptr<StatementNode> incr;
+				std::auto_ptr<StatementNode> block;
 				ScopeSymbolTable* scopesymtable;
 				TypeAnalyzer* analyzer;
 		};

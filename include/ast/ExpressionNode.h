@@ -30,6 +30,7 @@ namespace wake {
 
 			public:
 				virtual Type* typeCheck(bool forceArrayIdentifier)=0;
+				virtual ~ExpressionNode(){};
 
 			private:
 		};

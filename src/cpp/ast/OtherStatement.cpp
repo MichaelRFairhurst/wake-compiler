@@ -44,8 +44,8 @@ void wake::ast::OtherStatement::typeCheck() {
 		case NT_BREAK:
 		case NT_CONTINUE:
 			try {
-				for(std::vector<StatementNode*>::iterator it = children.begin(); it != children.end(); ++it) {
-					(*it)->typeCheck();
+				for(boost::ptr_vector<StatementNode>::iterator it = children.begin(); it != children.end(); ++it) {
+					it->typeCheck();
 				}
 				if(tree->node_type == NT_BLOCK || tree->node_type == NT_TRY) scopesymtable->popScope();
 			} catch(SemanticError *e) {

@@ -20,6 +20,7 @@
 #include "type.h"
 #include "ErrorTracker.h"
 #include "TypeAnalyzer.h"
+#include <memory>
 
 namespace wake {
 
@@ -29,10 +30,13 @@ namespace wake {
 
 			public:
 				Throw(ExpressionNode* exception, TypeAnalyzer* analyzer, ErrorTracker* errors) : exception(exception), errors(errors), analyzer(analyzer) {};
+
 				void typeCheck();
 
+				~Throw(){};
+
 			private:
-				ExpressionNode* exception;
+				std::auto_ptr<ExpressionNode> exception;
 				ErrorTracker* errors;
 				TypeAnalyzer* analyzer;
 

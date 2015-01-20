@@ -19,6 +19,7 @@
 #include "ast/ExpressionNode.h"
 #include "TypeAnalyzer.h"
 #include "type.h"
+#include <memory>
 
 namespace wake {
 
@@ -29,10 +30,13 @@ namespace wake {
 			public:
 				Return(ExpressionNode* value, Type* returntype, TypeAnalyzer* analyzer)
 					: value(value), returntype(returntype), analyzer(analyzer) {};
+
 				void typeCheck();
 
+				~Return(){};
+
 			private:
-				ExpressionNode* value;
+				std::auto_ptr<ExpressionNode> value;
 				Type* returntype;
 				TypeAnalyzer* analyzer;
 

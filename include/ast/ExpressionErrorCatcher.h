@@ -17,6 +17,7 @@
 
 #include "ast/ExpressionNode.h"
 #include "ErrorTracker.h"
+#include <memory>
 
 namespace wake {
 
@@ -26,11 +27,14 @@ namespace wake {
 
 			public:
 				ExpressionErrorCatcher(ExpressionNode* child, Node* node, ErrorTracker* errors) : child(child), node(node), errors(errors) {};
+
 				Type* typeCheck(bool forceArrayIdentifier);
+
+				~ExpressionErrorCatcher(){};
 
 			private:
 				Node* node;
-				ExpressionNode* child;
+				std::auto_ptr<ExpressionNode> child;
 				ErrorTracker* errors;
 
 		};

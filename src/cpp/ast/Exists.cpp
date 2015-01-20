@@ -36,7 +36,7 @@ void wake::ast::Exists::typeCheck() {
 
 		scopesymtable->addOverwriting(orig);
 
-		if(otherwise != NULL) {
+		if(otherwise.get() != NULL) {
 			otherwise->typeCheck();
 		}
 	} catch(SymbolNotFoundException* e) {

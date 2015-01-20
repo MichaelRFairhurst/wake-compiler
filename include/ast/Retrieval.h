@@ -16,10 +16,12 @@
 #define HEADER_AST_RETRIEVAL
 
 #include "ast/ExpressionNode.h"
-#include <vector>
 #include "ClassSpaceSymbolTable.h"
 #include "TypeAnalyzer.h"
 #include "ErrorTracker.h"
+#include <memory>
+#include <vector>
+#include <boost/ptr_container/ptr_vector.hpp>
 
 namespace wake {
 
@@ -29,14 +31,18 @@ namespace wake {
 
 			public:
 				Retrieval(ExpressionNode* providerExp, Type* retrievalType, std::vector<ExpressionNode*> argumentExprs, Node* node, ClassSpaceSymbolTable* classestable, TypeAnalyzer* analyzer, ErrorTracker* errors)
-					: providerExp(providerExp), retrievalType(retrievalType), argumentExprs(argumentExprs), node(node), classestable(classestable), analyzer(analyzer), errors(errors) {};
+					: providerExp(providerExp), retrievalType(retrievalType), node(node), classestable(classestable), analyzer(analyzer), errors(errors) {
+						for(std::vector<ExpressionNode*>::iterator it = argumentExprs.begin(); it != argumentExprs.end(); ++it) this->argumentExprs.push_back(*it);
+					};
+
+				~Retrieval(){};
 
 				Type* typeCheck(bool forceArrayIdentifier);
 
 			private:
-				ExpressionNode* providerExp;
+				std::auto_ptr<ExpressionNode> providerExp;
 				Type* retrievalType;
-				std::vector<ExpressionNode*> argumentExprs;
+				boost::ptr_vector<ExpressionNode> argumentExprs;
 				Node* node;
 				ClassSpaceSymbolTable* classestable;
 				TypeAnalyzer* analyzer;

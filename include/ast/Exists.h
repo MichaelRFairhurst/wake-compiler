@@ -19,6 +19,7 @@
 #include "ast/ExpressionNode.h"
 #include "ScopeSymbolTable.h"
 #include "ErrorTracker.h"
+#include <memory>
 
 namespace wake {
 
@@ -29,12 +30,15 @@ namespace wake {
 			public:
 				Exists(ExpressionNode* existable, StatementNode* block, StatementNode* otherwise, Node* node, ScopeSymbolTable* scopesymtable, ErrorTracker* errors)
 					: existable(existable), block(block), otherwise(otherwise), node(node), scopesymtable(scopesymtable), errors(errors) {};
+
 				void typeCheck();
 
+				~Exists() {};
+
 			private:
-				ExpressionNode* existable;
-				StatementNode* block;
-				StatementNode* otherwise;
+				std::auto_ptr<ExpressionNode> existable;
+				std::auto_ptr<StatementNode> block;
+				std::auto_ptr<StatementNode> otherwise;
 				Node* node;
 				ScopeSymbolTable* scopesymtable;
 				ErrorTracker* errors;

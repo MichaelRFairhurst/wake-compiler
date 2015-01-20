@@ -18,7 +18,7 @@
 
 void wake::ast::Return::typeCheck() {
 	if(returntype == NULL) {
-		if(value == NULL) return;
+		if(value.get() == NULL) return;
 
 		auto_ptr<Type> actualReturn(value->typeCheck(false));
 
@@ -27,7 +27,7 @@ void wake::ast::Return::typeCheck() {
 		THROW		("Method is not allowed to return anything");
 	}
 
-	if(value == NULL) {
+	if(value.get() == NULL) {
 		EXPECTED	analyzer->getNameForType(returntype)
 		ERRONEOUS	"VOID"
 		THROW		("Method is not allowed to return without a value");

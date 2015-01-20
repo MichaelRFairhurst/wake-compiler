@@ -22,6 +22,7 @@
 #include "ScopeSymbolTable.h"
 #include "type.h"
 #include <vector>
+#include <memory>
 
 namespace wake {
 
@@ -35,9 +36,11 @@ namespace wake {
 
 				void typeCheck();
 
+				~Declaration(){};
+
 			private:
 				Type** declared;
-				ExpressionNode* value;
+				std::auto_ptr<ExpressionNode> value;
 				Node* node;
 				ClassSpaceSymbolTable* classestable;
 				ScopeSymbolTable* scopesymtable;

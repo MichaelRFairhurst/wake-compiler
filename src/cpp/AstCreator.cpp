@@ -29,6 +29,7 @@
 #include "ast/ForeachInAliased.h"
 #include "ast/ForeachInExplicitType.h"
 #include "ast/Retrieval.h"
+#include <vector>
 
 wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
 	switch(node->node_type) {
@@ -83,7 +84,7 @@ wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
 		case NT_BREAK:
 		case NT_CONTINUE:
 			{
-				vector<wake::ast::StatementNode*> subnodes;
+				std::vector<wake::ast::StatementNode*> subnodes;
 
 				for(int i = 0; i < node->subnodes; i++) {
 					subnodes.push_back(generateStatementAst(node->node_data.nodes[i]));
@@ -111,7 +112,7 @@ wake::ast::ExpressionNode* wake::AstCreator::generateExpressionAst(Node* node, b
 		created = new wake::ast::Retrieval(provider, node->node_data.nodes[0]->node_data.type, arguments, node, classestable, classestable->getAnalyzer(), errors);
 	} else {
 
-		vector<wake::ast::ExpressionNode*> subnodes;
+		std::vector<wake::ast::ExpressionNode*> subnodes;
 
 		for(int i = 0; i < node->subnodes; i++) {
 			subnodes.push_back(generateExpressionAst(node->node_data.nodes[i], true));

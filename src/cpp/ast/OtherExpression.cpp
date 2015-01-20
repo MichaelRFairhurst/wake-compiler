@@ -132,8 +132,8 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 			// FALLTHROUGH
 		case NT_ADD:
 			{
-				ret = children[0]->typeCheck(false);
-				Type additive = *auto_ptr<Type>(children[1]->typeCheck(false));
+				ret = children[0].typeCheck(false);
+				Type additive = *auto_ptr<Type>(children[1].typeCheck(false));
 
 				// Ensure the left operand is never a matchall when the right is
 				// this way, when ret is matchall, so we can run all typechecks by the
@@ -182,8 +182,8 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 		case NT_DIVIDE:
 		case NT_SUBTRACT:
 			{
-				ret = children[0]->typeCheck(false);
-				Type factor = *auto_ptr<Type>(children[1]->typeCheck(false));
+				ret = children[0].typeCheck(false);
+				Type factor = *auto_ptr<Type>(children[1].typeCheck(false));
 
 				if(!analyzer->isPrimitiveTypeNum(ret) || !analyzer->isPrimitiveTypeNum(&factor)) {
 					string erroneousstring;
@@ -212,8 +212,8 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				ret = MakeType(TYPE_CLASS);
 				ret->typedata._class.classname = strdup("Bool");
 
-				Type a = *auto_ptr<Type>(children[0]->typeCheck(false));
-				Type b = *auto_ptr<Type>(children[1]->typeCheck(false));
+				Type a = *auto_ptr<Type>(children[0].typeCheck(false));
+				Type b = *auto_ptr<Type>(children[1].typeCheck(false));
 
 				if(!analyzer->isPrimitiveTypeNum(&a) || !analyzer->isPrimitiveTypeNum(&b)) {
 					string erroneousstring;
@@ -234,8 +234,8 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 		case NT_EQUALITY:
 		case NT_INEQUALITY:
 			{
-				Type a = *auto_ptr<Type>(children[0]->typeCheck(false));
-				Type b = *auto_ptr<Type>(children[1]->typeCheck(false));
+				Type a = *auto_ptr<Type>(children[0].typeCheck(false));
+				Type b = *auto_ptr<Type>(children[1].typeCheck(false));
 				ret = MakeType(TYPE_CLASS);
 				ret->typedata._class.classname = strdup("Bool");
 
@@ -250,8 +250,8 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 		case NT_AND:
 		case NT_OR:
 			{
-				ret = children[0]->typeCheck(false);
-				Type cmp = *auto_ptr<Type>(children[1]->typeCheck(false));
+				ret = children[0].typeCheck(false);
+				Type cmp = *auto_ptr<Type>(children[1].typeCheck(false));
 
 				if(!analyzer->isPrimitiveTypeBool(ret) || !analyzer->isPrimitiveTypeBool(&cmp)) {
 					string erroneousstring;
@@ -273,7 +273,7 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 			break;
 
 		case NT_INVERT:
-			ret = children[0]->typeCheck(false);
+			ret = children[0].typeCheck(false);
 
 			if(!analyzer->isPrimitiveTypeBool(ret)) {
 				string erroneousstring = analyzer->getNameForType(ret);
@@ -289,8 +289,8 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 
 		case NT_TYPESAFE_ARRAY_ACCESS:
 			{
-				ret = children[0]->typeCheck(true);
-				Type index = *auto_ptr<Type>(children[1]->typeCheck(false));
+				ret = children[0].typeCheck(true);
+				Type index = *auto_ptr<Type>(children[1].typeCheck(false));
 				if(ret->type != TYPE_LIST && ret->type != TYPE_MATCHALL) {
 					EXPECTED	"A list"
 					ERRONEOUS	analyzer->getNameForType(ret)
@@ -313,8 +313,8 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 		case NT_ARRAY_ACCESS:
 		case NT_ARRAY_ACCESS_LVAL:
 			{
-				ret = children[0]->typeCheck(true);
-				Type index = *auto_ptr<Type>(children[1]->typeCheck(false));
+				ret = children[0].typeCheck(true);
+				Type index = *auto_ptr<Type>(children[1].typeCheck(false));
 				if(ret->type != TYPE_LIST && ret->type != TYPE_MATCHALL) {
 					EXPECTED	"A list"
 					ERRONEOUS	analyzer->getNameForType(ret)
@@ -340,9 +340,9 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 					errors->addError(new SemanticError(INVALID_ASSIGNMENT, "", node));
 					ret = new Type(node->node_type == NT_ASSIGNMENT ? TYPE_UNUSABLE : TYPE_MATCHALL);
 				} else {
-					Type subject = *auto_ptr<Type>(children[0]->typeCheck(false));
+					Type subject = *auto_ptr<Type>(children[0].typeCheck(false));
 					ret = node->node_type == NT_ASSIGNMENT ? new Type(TYPE_UNUSABLE) : new Type(subject);
-					Type assignment = *auto_ptr<Type>(children[1]->typeCheck(false));
+					Type assignment = *auto_ptr<Type>(children[1].typeCheck(false));
 					if(!analyzer->isASubtypeOfB(&assignment, &subject)) {
 						EXPECTED	analyzer->getNameForType(&subject)
 						ERRONEOUS	analyzer->getNameForType(&assignment)
@@ -354,7 +354,7 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 
 		case NT_LAMBDA_INVOCATION:
 			{
-				Type lambda = *auto_ptr<Type>(children[0]->typeCheck(false));
+				Type lambda = *auto_ptr<Type>(children[0].typeCheck(false));
 				Type actual(TYPE_LAMBDA);
 				actual.typedata.lambda.arguments = MakeTypeArray();
 				if(lambda.typedata.lambda.returntype != NULL) {
@@ -367,7 +367,7 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				if(node->subnodes == 2) {
 					int i;
 					for(i = 0; i < node->node_data.nodes[1]->subnodes; i++) {
-						AddTypeToTypeArray(typeCheckUsable(node->node_data.nodes[1]->node_data.nodes[i], forceArrayIdentifier), actual.typedata.lambda.arguments);
+						//AddTypeToTypeArray(typeCheckUsable(node->node_data.nodes[1]->node_data.nodes[i], forceArrayIdentifier), actual.typedata.lambda.arguments);
 					}
 				}
 
@@ -381,7 +381,7 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 
 		case NT_EARLYBAILOUT_METHOD_INVOCATION:
 			{
-				Type subject = *auto_ptr<Type>(children[0]->typeCheck(false));
+				Type subject = *auto_ptr<Type>(children[0].typeCheck(false));
 				if(subject.type == TYPE_MATCHALL) {
 					ret = new Type(subject);
 					break;
@@ -413,12 +413,12 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 					if(variable) {
 						methodname->node_type = NT_LAMBDA_INVOCATION;
 						methodname->node_data.nodes[0]->node_type = NT_ALIAS;
-						ret = children[1]->typeCheck(forceArrayIdentifier);
+						ret = children[1].typeCheck(forceArrayIdentifier);
 						break;
 					}
 				}
 
-				Type subject = *auto_ptr<Type>(children[0]->typeCheck(false));
+				Type subject = *auto_ptr<Type>(children[0].typeCheck(false));
 
 				if(subject.type == TYPE_MATCHALL) {
 					ret = new Type(subject);
@@ -435,7 +435,7 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				parameterizer.writeInParameterizations(&node->node_data.nodes[0]->node_data.type, parameterizedtypes);
 				ret = copyType(node->node_data.nodes[0]->node_data.type);
 				classestable->assertTypeIsValid(ret);
-				Type casted = *auto_ptr<Type>(children[1]->typeCheck(false));
+				Type casted = *auto_ptr<Type>(children[1].typeCheck(false));
 				if(!analyzer->isASubtypeOfB(&casted, ret)) {
 					EXPECTED	analyzer->getNameForType(ret)
 					ERRONEOUS	analyzer->getNameForType(&casted)
@@ -454,10 +454,10 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				ret->typedata.list.contained = new Type(TYPE_MATCHALL);
 			} else if(node->subnodes == 1) {
 				ret = new Type(TYPE_LIST);
-				ret->typedata.list.contained = children[0]->typeCheck(false);;
+				ret->typedata.list.contained = children[0].typeCheck(false);;
 			} else {
-				auto_ptr<Type> first(children[0]->typeCheck(false));
-				auto_ptr<Type> second(children[1]->typeCheck(false));
+				auto_ptr<Type> first(children[0].typeCheck(false));
+				auto_ptr<Type> second(children[1].typeCheck(false));
 				boost::optional<Type*> common;
 
 				int i = 1;
@@ -477,7 +477,7 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 					i++;
 					if(i == node->subnodes) break;
 					first.reset(*common);
-					second.reset(children[i]->typeCheck(false));
+					second.reset(children[i].typeCheck(false));
 				}
 
 				ret = new Type(TYPE_LIST);
@@ -487,7 +487,7 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 
 		case NT_EARLYBAILOUT_MEMBER_ACCESS:
 			{
-				Type subject = *auto_ptr<Type>(children[0]->typeCheck(false));
+				Type subject = *auto_ptr<Type>(children[0].typeCheck(false));
 				if(subject.type == TYPE_MATCHALL) {
 					ret = new Type(subject);
 					break;
@@ -511,7 +511,7 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 
 		case NT_MEMBER_ACCESS:
 			{
-				Type subject = *auto_ptr<Type>(children[0]->typeCheck(false));
+				Type subject = *auto_ptr<Type>(children[0].typeCheck(false));
 				if(subject.type == TYPE_MATCHALL) {
 					ret = new Type(subject);
 					break;
@@ -523,9 +523,9 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 
 		case NT_IF_THEN_ELSE:
 			{
-				auto_ptr<Type> condition(children[1]->typeCheck(false));
-				auto_ptr<Type> left(children[0]->typeCheck(false));
-				auto_ptr<Type> right(children[2]->typeCheck(false));
+				auto_ptr<Type> condition(children[1].typeCheck(false));
+				auto_ptr<Type> left(children[0].typeCheck(false));
+				auto_ptr<Type> right(children[2].typeCheck(false));
 				boost::optional<Type*> common = analyzer->getCommonSubtypeOf(left.get(), right.get());
 				if(!common) {
 					ret = MakeType(TYPE_MATCHALL);
@@ -669,7 +669,7 @@ Type* wake::ast::OtherExpression::typeCheckMethodInvocation(Node* tree, Type& su
 		if(methodname->subnodes > i) {
 			int a;
 			for(a = 0; a < methodname->node_data.nodes[i]->subnodes; a++)
-				AddTypeToTypeArray(typeCheckUsable(methodname->node_data.nodes[i]->node_data.nodes[a], false), args);
+				;//AddTypeToTypeArray(typeCheckUsable(methodname->node_data.nodes[i]->node_data.nodes[a], false), args);
 		}
 
 		method_segments.push_back(pair<string, TypeArray*>(name, args));

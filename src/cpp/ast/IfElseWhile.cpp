@@ -20,7 +20,7 @@ void wake::ast::IfElseWhile::typeCheck() {
 	auto_ptr<Type> conditionType(condition->typeCheck(true));
 	block->typeCheck();
 
-	if(otherwise != NULL) {
+	if(otherwise.get() != NULL) {
 		otherwise->typeCheck();
 	}
 

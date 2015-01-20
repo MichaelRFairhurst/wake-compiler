@@ -21,6 +21,7 @@
 #include "ScopeSymbolTable.h"
 #include "ErrorTracker.h"
 #include "node.h"
+#include <memory>
 
 namespace wake {
 
@@ -34,9 +35,11 @@ namespace wake {
 
 				void typeCheck();
 
+				~Catch(){};
+
 			private:
 				Type* exceptionType;
-				StatementNode* body;
+				std::auto_ptr<StatementNode> body;
 				Node* node;
 				ClassSpaceSymbolTable* classestable;
 				ScopeSymbolTable* scopesymtable;

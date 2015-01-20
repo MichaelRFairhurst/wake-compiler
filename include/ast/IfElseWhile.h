@@ -18,6 +18,7 @@
 #include "ast/StatementNode.h"
 #include "ast/ExpressionNode.h"
 #include "TypeAnalyzer.h"
+#include <memory>
 
 namespace wake {
 
@@ -27,12 +28,15 @@ namespace wake {
 
 			public:
 				IfElseWhile(ExpressionNode* condition, StatementNode* block, StatementNode* otherwise, TypeAnalyzer* analyzer) : condition(condition), block(block), otherwise(otherwise), analyzer(analyzer) {};
+
 				void typeCheck();
 
+				~IfElseWhile(){};
+
 			private:
-				ExpressionNode* condition;
-				StatementNode* block;
-				StatementNode* otherwise;
+				std::auto_ptr<ExpressionNode> condition;
+				std::auto_ptr<StatementNode> block;
+				std::auto_ptr<StatementNode> otherwise;
 				TypeAnalyzer* analyzer;
 
 		};

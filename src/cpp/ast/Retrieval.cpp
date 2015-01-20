@@ -26,8 +26,8 @@ Type* wake::ast::Retrieval::typeCheck(bool forceArrayIdentifier) {
 		vector<Type*> arguments;
 		boost::ptr_vector<Type> arguments_latch;
 
-		for(std::vector<wake::ast::ExpressionNode*>::iterator it = argumentExprs.begin(); it != argumentExprs.end(); ++it) {
-			arguments_latch.push_back((*it)->typeCheck(false));
+		for(boost::ptr_vector<wake::ast::ExpressionNode>::iterator it = argumentExprs.begin(); it != argumentExprs.end(); ++it) {
+			arguments_latch.push_back((*it).typeCheck(false));
 			arguments.push_back(&arguments_latch[arguments_latch.size() - 1]);
 		}
 

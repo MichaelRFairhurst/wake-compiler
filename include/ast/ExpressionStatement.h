@@ -17,6 +17,7 @@
 
 #include "ast/StatementNode.h"
 #include "ast/ExpressionNode.h"
+#include <memory>
 
 namespace wake {
 
@@ -28,8 +29,10 @@ namespace wake {
 				ExpressionStatement(ExpressionNode* expression) : expression(expression) {};
 				void typeCheck();
 
+				~ExpressionStatement(){};
+
 			private:
-				ExpressionNode* expression;
+				std::auto_ptr<ExpressionNode> expression;
 
 		};
 

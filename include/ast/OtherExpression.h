@@ -23,6 +23,8 @@
 #include "MethodSignatureParseTreeTraverser.h"
 #include "type.h"
 #include "node.h"
+#include <memory>
+#include <boost/ptr_container/ptr_vector.hpp>
 
 namespace wake {
 
@@ -31,9 +33,31 @@ namespace wake {
 		class OtherExpression : public ExpressionNode {
 
 			public:
-				OtherExpression(Node* node, std::vector<ExpressionNode*> children, ErrorTracker* errors, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, MethodSignatureParseTreeTraverser* methodanalyzer, Type* thiscontext, Type* returntype, const vector<Type*>& parameterizedtypes)
-					: node(node), children(children), errors(errors), classestable(classestable), scopesymtable(scopesymtable), methodanalyzer(methodanalyzer), returntype(returntype), thiscontext(thiscontext), parameterizedtypes(parameterizedtypes) {};
+				OtherExpression(
+					Node* node,
+					std::vector<ExpressionNode*> children,
+					ErrorTracker* errors,
+					ClassSpaceSymbolTable* classestable,
+					ScopeSymbolTable* scopesymtable,
+					MethodSignatureParseTreeTraverser* methodanalyzer,
+					Type* thiscontext,
+					Type* returntype,
+					const vector<Type*>& parameterizedtypes
+				) : node(node),
+					errors(errors),
+					classestable(classestable),
+					scopesymtable(scopesymtable),
+					methodanalyzer(methodanalyzer),
+					returntype(returntype),
+					thiscontext(thiscontext),
+					parameterizedtypes(parameterizedtypes
+				) {
+					for(std::vector<ExpressionNode*>::iterator it = children.begin(); it != children.end(); ++it) this->children.push_back(*it);
+				};
+
 				Type* typeCheck(bool forceArrayIdentifier);
+
+				~OtherExpression(){};
 
 			private:
 				bool isValidLValue(Node* tree);
@@ -41,7 +65,7 @@ namespace wake {
 				Type* typeCheckMethodInvocation(Node* n, Type& subject);
 
 				Node* node;
-				std::vector<ExpressionNode*> children;
+				boost::ptr_vector<ExpressionNode> children;
 				MethodSignatureParseTreeTraverser* methodanalyzer;
 				ErrorTracker* errors;
 				ClassSpaceSymbolTable* classestable;

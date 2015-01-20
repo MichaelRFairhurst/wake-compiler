@@ -20,6 +20,7 @@
 #include "tree.h"
 #include "ScopeSymbolTable.h"
 #include "ErrorTracker.h"
+#include <memory>
 
 namespace wake {
 
@@ -35,9 +36,11 @@ namespace wake {
 
 				virtual Type getIterationType(Type* iterableType);
 
+				virtual ~Foreach(){};
+
 			private:
-				ExpressionNode* iterable;
-				StatementNode* body;
+				std::auto_ptr<ExpressionNode> iterable;
+				std::auto_ptr<StatementNode> body;
 				Node* node;
 				ScopeSymbolTable* scopesymtable;
 				ErrorTracker* errors;

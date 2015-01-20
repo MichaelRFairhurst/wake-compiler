@@ -23,6 +23,7 @@ namespace wake {
 
 			public:
 				virtual void typeCheck()=0;
+				virtual ~StatementNode(){};
 
 		};
 
