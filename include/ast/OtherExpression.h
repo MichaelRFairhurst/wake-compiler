@@ -31,7 +31,7 @@ namespace wake {
 		class OtherExpression : public ExpressionNode {
 
 			public:
-				OtherExpression(Node* node, std::vector<ExpressionNode*> children, ErrorTracker* errors, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, MethodSignatureParseTreeTraverser* methodanalyzer, Type* returntype, Type* thiscontext, const vector<Type*>& parameterizedtypes)
+				OtherExpression(Node* node, std::vector<ExpressionNode*> children, ErrorTracker* errors, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, MethodSignatureParseTreeTraverser* methodanalyzer, Type* thiscontext, Type* returntype, const vector<Type*>& parameterizedtypes)
 					: node(node), children(children), errors(errors), classestable(classestable), scopesymtable(scopesymtable), methodanalyzer(methodanalyzer), returntype(returntype), thiscontext(thiscontext), parameterizedtypes(parameterizedtypes) {};
 				Type* typeCheck(bool forceArrayIdentifier);
 

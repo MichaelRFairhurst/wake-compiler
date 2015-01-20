@@ -29,13 +29,13 @@ namespace wake {
 		class Catch : public StatementNode {
 
 			public:
-				Catch(Type* exception, StatementNode* body, Node* node, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, ErrorTracker* errors)
-					: exception(exception), body(body), classestable(classestable), scopesymtable(scopesymtable), errors(errors) {};
+				Catch(Type* exceptionType, StatementNode* body, Node* node, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, ErrorTracker* errors)
+					: exceptionType(exceptionType), body(body), classestable(classestable), scopesymtable(scopesymtable), errors(errors), node(node) {};
 
 				void typeCheck();
 
 			private:
-				Type* exception;
+				Type* exceptionType;
 				StatementNode* body;
 				Node* node;
 				ClassSpaceSymbolTable* classestable;

@@ -30,13 +30,13 @@ namespace wake {
 		class Declaration : public StatementNode {
 
 			public:
-				Declaration(Type* declared, ExpressionNode* value, Node* node, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, ErrorTracker* errors, const vector<Type*>& parameterizedtypes)
+				Declaration(Type** declared, ExpressionNode* value, Node* node, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, ErrorTracker* errors, const vector<Type*>& parameterizedtypes)
 					: declared(declared), value(value), node(node), classestable(classestable), scopesymtable(scopesymtable), errors(errors), parameterizedtypes(parameterizedtypes) {};
 
 				void typeCheck();
 
 			private:
-				Type* declared;
+				Type** declared;
 				ExpressionNode* value;
 				Node* node;
 				ClassSpaceSymbolTable* classestable;

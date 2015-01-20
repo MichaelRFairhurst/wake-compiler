@@ -32,49 +32,8 @@
 
 wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
 	switch(node->node_type) {
-		case NT_STRINGLIT:
-		case NT_NUMBERLIT:
-		case NT_BOOLLIT:
-		case NT_ALIAS:
-		case NT_TYPEDATA:
-		case NT_THIS:
-		case NT_NOTHING:
-		case NT_PARENT:
-		case NT_ADD_ASSIGNMENT:
-		case NT_ADD:
-		case NT_MULT_ASSIGNMENT:
-		case NT_DIV_ASSIGNMENT:
-		case NT_SUB_ASSIGNMENT:
-		case NT_LESSTHAN:
-		case NT_LESSTHANEQUAL:
-		case NT_GREATERTHAN:
-		case NT_GREATERTHANEQUAL:
-		case NT_EQUALITY:
-		case NT_INEQUALITY:
-		case NT_AND:
-		case NT_OR:
-		case NT_INVERT:
-		case NT_TYPESAFE_ARRAY_ACCESS:
-		case NT_ARRAY_ACCESS:
-		case NT_ARRAY_ACCESS_LVAL:
-		case NT_VALUED_ASSIGNMENT:
-		case NT_ASSIGNMENT:
-		case NT_LAMBDA_INVOCATION:
-		case NT_EARLYBAILOUT_METHOD_INVOCATION:
-		case NT_METHOD_INVOCATION:
-		case NT_CAST:
-		case NT_RETRIEVAL:
-		case NT_ARRAY_DECLARATION:
-		case NT_EARLYBAILOUT_MEMBER_ACCESS:
-		case NT_MEMBER_ACCESS:
-		case NT_IF_THEN_ELSE:
-		case NT_INCREMENT:
-		case NT_DECREMENT:
-		case NT_CURRIED:
-			return new wake::ast::ExpressionStatement(generateExpressionAst(node, false));
-
 		case NT_DECLARATION:
-			return new wake::ast::Declaration(node->node_data.nodes[0]->node_data.type, generateExpressionAst(node->node_data.nodes[1], true), node, classestable, scopesymtable, errors, parameterizedtypes);
+			return new wake::ast::Declaration(&node->node_data.nodes[0]->node_data.type, generateExpressionAst(node->node_data.nodes[1], true), node, classestable, scopesymtable, errors, parameterizedtypes);
 
 		case NT_CATCH:
 			return new wake::ast::Catch(node->node_data.nodes[0]->node_data.type, generateStatementAst(node->node_data.nodes[1]), node, classestable, scopesymtable, errors);
@@ -90,7 +49,11 @@ wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
 			return new wake::ast::For(generateStatementAst(node->node_data.nodes[0]), generateExpressionAst(node->node_data.nodes[1], true), generateStatementAst(node->node_data.nodes[2]), generateStatementAst(node->node_data.nodes[3]), scopesymtable, classestable->getAnalyzer());
 
 		case NT_RETURN:
-			return new wake::ast::Return(generateExpressionAst(node->node_data.nodes[0], true), returntype, classestable->getAnalyzer());
+			if(node->subnodes) {
+				return new wake::ast::Return(generateExpressionAst(node->node_data.nodes[0], true), returntype, classestable->getAnalyzer());
+			} else {
+				return new wake::ast::Return(NULL, returntype, classestable->getAnalyzer());
+			}
 
 		case NT_EXISTS:
 			if(node->node_data.nodes[0]->node_type == NT_MEMBER_ACCESS) {
@@ -119,13 +82,19 @@ wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
 		case NT_RETRIEVALS_STATEMENTS:
 		case NT_BREAK:
 		case NT_CONTINUE:
-			vector<wake::ast::StatementNode*> subnodes;
+			{
+				vector<wake::ast::StatementNode*> subnodes;
 
-			for(int i = 0; i < node->subnodes; i++) {
-				subnodes.push_back(generateStatementAst(node->node_data.nodes[0]));
+				for(int i = 0; i < node->subnodes; i++) {
+					subnodes.push_back(generateStatementAst(node->node_data.nodes[i]));
+				}
+
+				return new wake::ast::OtherStatement(node, subnodes, scopesymtable);
 			}
 
-			return new wake::ast::OtherStatement(node, subnodes, scopesymtable);
+		default:
+			return new wake::ast::ExpressionStatement(generateExpressionAst(node, false));
+
 	}
 }
 
@@ -145,7 +114,7 @@ wake::ast::ExpressionNode* wake::AstCreator::generateExpressionAst(Node* node, b
 		vector<wake::ast::ExpressionNode*> subnodes;
 
 		for(int i = 0; i < node->subnodes; i++) {
-			subnodes.push_back(generateExpressionAst(node->node_data.nodes[0], true));
+			subnodes.push_back(generateExpressionAst(node->node_data.nodes[i], true));
 		}
 
 		created = new wake::ast::OtherExpression(node, subnodes, errors, classestable, scopesymtable, methodanalyzer, thiscontext, returntype, parameterizedtypes);

@@ -20,18 +20,18 @@
 
 void wake::ast::Catch::typeCheck() {
 	try {
-		classestable->assertTypeIsValid(exception);
+		classestable->assertTypeIsValid(exceptionType);
 
-		if(!classestable->getAnalyzer()->isException(exception)) {
-			EXPECTED	"exception subclass"
-			ERRONEOUS	classestable->getAnalyzer()->getNameForType(exception)
+		if(!classestable->getAnalyzer()->isException(exceptionType)) {
+			EXPECTED	"exceptionType subclass"
+			ERRONEOUS	classestable->getAnalyzer()->getNameForType(exceptionType)
 			THROW		("Only exceptions can be thrown");
 		}
 
-		AddSubNode(node, MakeNodeFromString(NT_COMPILER_HINT, strdup(exception->typedata._class.classname), node->loc));
+		AddSubNode(node, MakeNodeFromString(NT_COMPILER_HINT, strdup(exceptionType->typedata._class.classname), node->loc));
 
 		scopesymtable->pushScope();
-		scopesymtable->add(exception);
+		scopesymtable->add(exceptionType);
 
 		body->typeCheck();
 
