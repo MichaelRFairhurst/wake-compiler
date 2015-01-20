@@ -12,6 +12,13 @@
  *
  **************************************************/
 
+// THIS FILE IS NOT YET USED!
+// this ast node is represented in the old ast/new ast crossover
+// see OtherExpression for the real code!
+//
+// and maybe take this as an opportunity to convert this node
+// from the compatibility layer to the new typesafe OO ast
+
 namespace wake::ast {
 
 	class MemberAccess : public ExpressionNode {
