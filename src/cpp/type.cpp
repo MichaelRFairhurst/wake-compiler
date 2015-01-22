@@ -73,6 +73,10 @@ Type::Type(const Type& other) {
 	deepCopy(other);
 }
 
+Type::Type(Type* other) {
+	deepCopy(*other);
+}
+
 void Type::deepCopy(const Type& other) {
 	type = other.type;
 	switch(type) {

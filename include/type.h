@@ -59,6 +59,7 @@ typedef struct Type {
 		~Type();
 		Type(int type);
 		Type(const Type& other);
+		Type(Type* other);
 		Type& operator=(const Type& other);
 	private:
 		void releaseData();

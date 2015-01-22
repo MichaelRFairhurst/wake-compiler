@@ -94,3 +94,51 @@ PTT_TEST_CASE(
 	",
 	PTT_VALID
 )
+
+PTT_TEST_CASE(
+	LambdaDeclarationBodyIsTypechecked,
+	"every MyClass is:																	\n\
+		myMethod() {																	\n\
+			{ -> 5 + 'error'; };														\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	LambdaDeclarationArgsAreAvailable,
+	"every MyClass is:																	\n\
+		myMethod() {																	\n\
+			{ Num -> 5 + Num; };														\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	LambdaDeclarationEnclosedVariables,
+	"every MyClass is:																	\n\
+		myMethod() {																	\n\
+			var Num = 5;																\n\
+			{ $Num -> $Num + Num; };													\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	LambdaDeclarationPropertiesAreAvailable,
+	"every MyClass is:																	\n\
+		with Num = 5;																	\n\
+		myMethod() {																	\n\
+			{ $Num -> $Num + Num; };													\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	LambdaVarsDontLivePastScope,
+	"every MyClass is:																	\n\
+		myMethod() {																	\n\
+			{ Num -> Num; };															\n\
+			Num;																		\n\
+		}",
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
+);

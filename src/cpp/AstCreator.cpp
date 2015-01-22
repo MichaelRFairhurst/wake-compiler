@@ -33,6 +33,7 @@
 #include "ast/MethodInvocation.h"
 #include "ast/EarlyBailoutMethodInvocation.h"
 #include "ast/StatementErrorCatcher.h"
+#include "ast/Lambda.h"
 #include <vector>
 
 wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
@@ -162,6 +163,23 @@ wake::ast::ExpressionNode* wake::AstCreator::generateExpressionAst(Node* node, b
 			created = new wake::ast::EarlyBailoutMethodInvocation(generateExpressionAst(node->node_data.nodes[0], true), methodSegments, node, classestable, errors);
 		}
 
+	} else if(node->node_type == NT_LAMBDA_DECLARATION) {
+		std::vector<std::pair<boost::optional<std::string>, boost::optional<Type> > > arguments;
+
+		for(int i = 0; i < node->node_data.nodes[0]->subnodes; i++)
+		if(node->node_data.nodes[0]->node_data.nodes[i]->node_type == NT_ALIAS) {
+			boost::optional<std::string> alias(node->node_data.nodes[0]->node_data.nodes[i]->node_data.string);
+			boost::optional<Type> notype;
+
+			arguments.push_back(std::pair<boost::optional<std::string>, boost::optional<Type> >(alias, notype));
+		} else {
+			boost::optional<std::string> noalias;
+			boost::optional<Type> type(node->node_data.nodes[0]->node_data.nodes[i]->node_data.type);
+
+			arguments.push_back(std::pair<boost::optional<std::string>, boost::optional<Type> >(noalias, type));
+		}
+
+		created = new wake::ast::Lambda(arguments, generateStatementAst(node->node_data.nodes[1]), scopesymtable, classestable->getAnalyzer());
 	} else {
 
 		std::vector<wake::ast::ExpressionNode*> subnodes;

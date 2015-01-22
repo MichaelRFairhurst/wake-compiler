@@ -51,6 +51,7 @@ CPPNAMES= \
 	TempPropertySymbolTable.cpp \
 	type.cpp \
 	AnnotationTreeTraverser.cpp \
+	UnifyingType.cpp \
 	AstCreator.cpp \
 	ast/Catch.cpp \
 	ast/Declaration.cpp \
@@ -72,6 +73,8 @@ CPPNAMES= \
 	ast/MethodInvocation.cpp \
 	ast/EarlyBailoutMethodInvocation.cpp \
 	ast/StatementErrorCatcher.cpp \
+	ast/Lambda.cpp \
+	ast/LambdaReturn.cpp \
 	ast/Retrieval.cpp
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
@@ -114,6 +117,8 @@ install: bin/wake
 	#install -m 0644 bin/wakeobj/std.o $(prefix)/share/wake/stdobj
 
 .PHONY: install
+
+src/cpp/test/Integration.cpp: $(wildcard src/cpp/test/integration/*)
 
 windowsbuildready: $(GENOBJS) $(WAKETABLEINCLUDES) bin/wakeobj/std.o
 	zip windowsbuildready -r .
