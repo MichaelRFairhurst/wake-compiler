@@ -142,3 +142,37 @@ PTT_TEST_CASE(
 		}",
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 );
+
+PTT_TEST_CASE(
+	AssignLambdaDeclarationToLambdaValid,
+	"every MyClass is:																	\n\
+		myMethod() {																	\n\
+			var noargs fn() = { -> ; };													\n\
+			var onearg fn(Num) = { Num -> Num; };										\n\
+			var twoarg fn(Num, Text) = { Num, Text -> Num; };							\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	AssignLambdaDeclarationToLambdaInvalid,
+	"every MyClass is:																	\n\
+		myMethod() {																	\n\
+			var noargs fn() = { Num -> ; };												\n\
+			var noargs2 fn() = { Num, Text -> ; };										\n\
+			var onearg fn(Num) = { -> Num; };											\n\
+			var onearg2 fn(Num) = { Num, Text -> Num; };								\n\
+			var noargs3 fn() = { Num, Text -> Num; };									\n\
+			var twoarg fn(Num, Text) = { -> Num; };										\n\
+			var twoarg2 fn(Num, Text) = { Num -> Num; };								\n\
+			var twoarg3 fn(Num, Text) = { Text, Num -> Num; };							\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+);
