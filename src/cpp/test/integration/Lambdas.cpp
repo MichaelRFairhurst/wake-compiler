@@ -229,3 +229,39 @@ PTT_TEST_CASE(
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 );
+
+PTT_TEST_CASE(
+	LambdasExhaustiveReturnsValid,
+	"every MyClass is:				\n\
+		myMethod() {				\n\
+			{ -> ; };				\n\
+			{ -> return; };			\n\
+			{ -> return 4; };		\n\
+			{ ->					\n\
+				if(true) {			\n\
+					return 4;		\n\
+				} else {			\n\
+					return 2;		\n\
+				}					\n\
+			};						\n\
+			{ ->					\n\
+				if(true) {			\n\
+					return;			\n\
+				}					\n\
+			};						\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	LambdasExhaustiveReturnsInvalid,
+	"every MyClass is:				\n\
+		myMethod() {				\n\
+			{ ->					\n\
+				if(true) {			\n\
+					return 4;		\n\
+				}					\n\
+			};						\n\
+		}",
+	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
+);

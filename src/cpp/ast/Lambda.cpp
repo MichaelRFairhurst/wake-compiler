@@ -42,7 +42,6 @@ Type* wake::ast::Lambda::typeCheck(bool forceArrayIdentifier) {
 	scopesymtable->popScope();
 
 	if(returntype->getUnificationFailure1() != NULL) {
-
 		errors->addError(new SemanticError(TYPE_INFERENCE_FAILURE,
 			"Unification failed for lambda returned types: Partially inferred type "
 			+ analyzer->getNameForType(returntype->getUnificationFailure1())
@@ -54,6 +53,10 @@ Type* wake::ast::Lambda::typeCheck(bool forceArrayIdentifier) {
 
 	} else if(returntype->getCurrentUnification() && returntype->getCurrentUnification() != NULL && returntype->getCurrentUnification()->type != TYPE_UNUSABLE) {
 		lambdaType->typedata.lambda.returntype = new Type(returntype->getCurrentUnification());
+
+		if(!body->exhaustiveReturns()) {
+			errors->addError(new SemanticError(INEXHAUSTIVE_RETURNS, "Lambda declaration has an inferred return type, but not every execution path returns a value", node));
+		}
 	}
 
 	return new Type(lambdaType.get());
