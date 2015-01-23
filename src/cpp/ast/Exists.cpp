@@ -49,3 +49,11 @@ void wake::ast::Exists::typeCheck() {
 		delete e;
 	}
 }
+
+bool wake::ast::Exists::exhaustiveReturns() {
+	if(otherwise.get() == NULL) {
+		return false;
+	}
+
+	return block->exhaustiveReturns() && otherwise->exhaustiveReturns();
+}

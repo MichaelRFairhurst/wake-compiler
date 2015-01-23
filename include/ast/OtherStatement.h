@@ -39,6 +39,8 @@ namespace wake {
 
 				void typeCheck();
 
+				bool exhaustiveReturns();
+
 				~OtherStatement(){};
 
 			private:

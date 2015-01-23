@@ -40,7 +40,6 @@ class TypeChecker {
 		void setParameterizedTypes(const vector<Type*>& types);
 
 	private:
-		bool exhaustiveReturns(Node* n);
 		void flowAnalysis(Node* n, bool breakable, bool caseable, bool continuable);
 
 		MethodSignatureParseTreeTraverser* methodanalyzer;

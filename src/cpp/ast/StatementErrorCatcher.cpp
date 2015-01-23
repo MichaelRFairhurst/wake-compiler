@@ -30,3 +30,7 @@ void wake::ast::StatementErrorCatcher::typeCheck() {
 		delete error;
 	}
 }
+
+bool wake::ast::StatementErrorCatcher::exhaustiveReturns() {
+	return wrapped->exhaustiveReturns();
+}

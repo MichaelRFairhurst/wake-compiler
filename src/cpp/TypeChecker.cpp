@@ -35,55 +35,8 @@ void TypeChecker::check(Node* tree) {
 	ast->typeCheck();
 
 	flowAnalysis(tree, false, false, false);
-	if(returntype != NULL && !exhaustiveReturns(tree))
+	if(returntype != NULL && !ast->exhaustiveReturns())
 		errors->addError(new SemanticError(INEXHAUSTIVE_RETURNS, "", tree));
-}
-
-bool TypeChecker::exhaustiveReturns(Node* tree) {
-	switch(tree->node_type) {
-		case NT_SWITCH:
-			//not yet supported
-			return false;
-
-		case NT_FOR:
-		case NT_WHILE:
-			// Loops are always conditional and therefore never exhaustive
-			return false;
-
-		case NT_EXISTS:
-		case NT_IF_ELSE:
-			// If no else, then not exhaustive
-			if(tree->subnodes == 2) return false;
-			// Returns are exhaustive if both the if and else statements are exhaustive
-			return exhaustiveReturns(tree->node_data.nodes[1]) && exhaustiveReturns(tree->node_data.nodes[2]);
-
-		case NT_TRY:
-			// If no breok, then not exhaustive
-			if(tree->subnodes == 1) return false;
-			// Returns are exhaustive if both the try and catch statements are exhaustive
-			return exhaustiveReturns(tree->node_data.nodes[0]) && exhaustiveReturns(tree->node_data.nodes[1]);
-
-		case NT_RETURN:
-		case NT_THROW:
-			return true;
-
-		case NT_CATCH:
-		case NT_BLOCK:
-		case NT_RETRIEVALS_STATEMENTS:
-			{
-				int i;
-				// Statement lists which contain a return are exhaustive
-				for(i = 0; i < tree->subnodes; i++)
-					if(exhaustiveReturns(tree->node_data.nodes[i])) return true;
-				return false;
-			}
-
-		case NT_ABSTRACT_METHOD:
-			return true;
-
-		default:
-			return false;
-	}
 }
 
 void TypeChecker::flowAnalysis(Node* tree, bool breakable, bool caseable, bool continuable) {

@@ -41,3 +41,7 @@ void wake::ast::Catch::typeCheck() {
 		delete e;
 	}
 }
+
+bool wake::ast::Catch::exhaustiveReturns() {
+	return body->exhaustiveReturns();
+}

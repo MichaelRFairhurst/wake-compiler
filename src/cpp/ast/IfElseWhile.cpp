@@ -30,3 +30,11 @@ void wake::ast::IfElseWhile::typeCheck() {
 		THROW		("If/While conditions must be Bool or Num");
 	}
 }
+
+bool wake::ast::IfElseWhile::exhaustiveReturns() {
+	if(otherwise.get() == NULL) {
+		return false;
+	}
+
+	return block->exhaustiveReturns() && otherwise->exhaustiveReturns();
+}

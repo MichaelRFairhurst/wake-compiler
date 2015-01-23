@@ -32,3 +32,7 @@ void wake::ast::For::typeCheck() {
 		THROW		("For conditions must be Bool");
 	}
 }
+
+bool wake::ast::For::exhaustiveReturns() {
+	return false; // all loops are conditional
+}

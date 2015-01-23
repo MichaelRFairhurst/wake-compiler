@@ -41,3 +41,7 @@ void wake::ast::Return::typeCheck() {
 		THROW		("Return type is incompatible with method signature");
 	}
 }
+
+bool wake::ast::Return::exhaustiveReturns() {
+	return true;
+}

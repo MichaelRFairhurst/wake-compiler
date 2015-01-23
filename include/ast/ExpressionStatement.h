@@ -27,7 +27,10 @@ namespace wake {
 
 			public:
 				ExpressionStatement(ExpressionNode* expression) : expression(expression) {};
+
 				void typeCheck();
+
+				bool exhaustiveReturns();
 
 				~ExpressionStatement(){};
 

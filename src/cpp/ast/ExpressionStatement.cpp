@@ -17,3 +17,7 @@
 void wake::ast::ExpressionStatement::typeCheck() {
 	delete expression->typeCheck(false);
 }
+
+bool wake::ast::ExpressionStatement::exhaustiveReturns() {
+	return false;
+}

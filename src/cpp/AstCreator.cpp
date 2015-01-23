@@ -105,6 +105,7 @@ wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
 		case NT_RETRIEVALS_STATEMENTS:
 		case NT_BREAK:
 		case NT_CONTINUE:
+		case NT_ABSTRACT_METHOD:
 			{
 				std::vector<wake::ast::StatementNode*> subnodes;
 

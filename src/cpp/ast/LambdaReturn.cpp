@@ -25,3 +25,7 @@ void wake::ast::LambdaReturn::typeCheck() {
 		returntype->unifyWith(returnType.get());
 	}
 }
+
+bool wake::ast::LambdaReturn::exhaustiveReturns() {
+	return true;
+}

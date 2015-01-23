@@ -55,3 +55,34 @@ void wake::ast::OtherStatement::typeCheck() {
 			}
 	}
 }
+
+bool wake::ast::OtherStatement::exhaustiveReturns() {
+	switch(tree->node_type) {
+		case NT_SWITCH:
+			//not yet supported
+			return false;
+
+		case NT_TRY:
+			// If no breok, then not exhaustive
+			if(tree->subnodes == 1) return false;
+			// Returns are exhaustive if both the try and catch statements are exhaustive
+			return children[0].exhaustiveReturns() && children[1].exhaustiveReturns();
+
+		case NT_BLOCK:
+		case NT_RETRIEVALS_STATEMENTS:
+			{
+				for(boost::ptr_vector<StatementNode>::iterator it = children.begin(); it != children.end(); ++it)
+				if(it->exhaustiveReturns()) {
+					return true;
+				}
+
+				return false;
+			}
+
+		case NT_ABSTRACT_METHOD:
+			return true;
+
+		default:
+			return false;
+	}
+}

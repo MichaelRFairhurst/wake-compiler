@@ -47,3 +47,7 @@ Type wake::ast::Foreach::getIterationType(Type* iterableType) {
 	iterableType->alias = NULL;
 	return *iterableType;
 }
+
+bool wake::ast::Foreach::exhaustiveReturns() {
+	return false; // might be 0 items
+}

@@ -37,3 +37,7 @@ void wake::ast::Declaration::typeCheck() {
 		delete e;
 	}
 }
+
+bool wake::ast::Declaration::exhaustiveReturns() {
+	return false;
+}

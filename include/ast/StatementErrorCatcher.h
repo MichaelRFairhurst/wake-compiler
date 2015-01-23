@@ -30,6 +30,8 @@ namespace wake {
 
 				void typeCheck();
 
+				bool exhaustiveReturns();
+
 				~StatementErrorCatcher(){};
 
 			private:

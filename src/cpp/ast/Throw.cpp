@@ -25,3 +25,7 @@ void wake::ast::Throw::typeCheck() {
 		THROW		("Can only throw subclasses of exception");
 	}
 }
+
+bool wake::ast::Throw::exhaustiveReturns() {
+	return true;
+}
