@@ -442,7 +442,7 @@ bool TypeAnalyzer::isException(Type* type) {
 string TypeAnalyzer::getNameForType(Type* type) {
 	string name;
 
-	if(type == NULL) {
+	if(type == NULL || type->type == TYPE_UNUSABLE) {
 		name = "VOID";
 		return name;
 	}

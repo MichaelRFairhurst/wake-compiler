@@ -109,6 +109,9 @@ void SemanticErrorPrinter::print(SemanticError* e) {
 		case OPTIONAL_USE_OF_NONOPTIONAL_TYPE:
 			cout << "Using a type which is not optional as if it were optional";
 			break;
+		case TYPE_INFERENCE_FAILURE:
+			cout << "Type inference failed";
+			break;
 		default:
 			cout << "bad error code provided";
 	}

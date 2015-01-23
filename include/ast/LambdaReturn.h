@@ -17,7 +17,6 @@
 
 #include "ast/StatementNode.h"
 #include "ast/ExpressionNode.h"
-#include "TypeAnalyzer.h"
 #include "UnifyingType.h"
 #include "type.h"
 #include <memory>
@@ -29,8 +28,8 @@ namespace wake {
 		class LambdaReturn : public StatementNode {
 
 			public:
-				LambdaReturn(ExpressionNode* value, UnifyingType* returntype, TypeAnalyzer* analyzer)
-					: value(value), returntype(returntype), analyzer(analyzer) {};
+				LambdaReturn(ExpressionNode* value, UnifyingType* returntype)
+					: value(value), returntype(returntype) {};
 
 				void typeCheck();
 
@@ -39,7 +38,6 @@ namespace wake {
 			private:
 				std::auto_ptr<ExpressionNode> value;
 				UnifyingType* returntype;
-				TypeAnalyzer* analyzer;
 
 		};
 

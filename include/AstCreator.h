@@ -23,6 +23,7 @@
 #include "MethodSignatureParseTreeTraverser.h"
 #include "type.h"
 #include "node.h"
+#include "UnifyingType.h"
 
 namespace wake {
 
@@ -30,7 +31,7 @@ namespace wake {
 
 		public:
 			AstCreator(ErrorTracker* errors, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, MethodSignatureParseTreeTraverser* methodanalyzer, Type* returntype, Type* thiscontext, vector<Type*>& parameterizedtypes)
-				: errors(errors), classestable(classestable), scopesymtable(scopesymtable), methodanalyzer(methodanalyzer), returntype(returntype), thiscontext(thiscontext), parameterizedtypes(parameterizedtypes) {};
+				: errors(errors), classestable(classestable), scopesymtable(scopesymtable), methodanalyzer(methodanalyzer), returntype(returntype), thiscontext(thiscontext), parameterizedtypes(parameterizedtypes), lambdaReturnType(NULL) {};
 
 			ast::StatementNode* generateStatementAst(Node* node);
 			ast::ExpressionNode* generateExpressionAst(Node* node, bool mustBeUsable);
@@ -43,6 +44,7 @@ namespace wake {
 			Type* returntype;
 			Type* thiscontext;
 			vector<Type*>& parameterizedtypes;
+			UnifyingType* lambdaReturnType;
 
 	};
 

@@ -52,6 +52,7 @@ enum SemanticErrorCode {
 	BAD_IMPORT,							// Import sanhutohesuntho;
 	INVALID_CHILD_RETURN_TYPE,			// Child class overrides/implements a method without a contravariant return type
 	OPTIONAL_USE_OF_NONOPTIONAL_TYPE,	// 1.?orMaxOf(blah)
+	TYPE_INFERENCE_FAILURE,				// return 9001; else return "confuse the compiler";
 };
 
 class SemanticError {

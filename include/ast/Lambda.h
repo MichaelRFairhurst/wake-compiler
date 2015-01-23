@@ -28,16 +28,18 @@ namespace wake {
 
 		class Lambda : public ExpressionNode {
 			public:
-				Lambda(std::vector<std::pair<boost::optional<std::string>, boost::optional<Type> > > arguments, StatementNode* body, ScopeSymbolTable* scopesymtable, TypeAnalyzer* analyzer)
-				: analyzer(analyzer), arguments(arguments), body(body), scopesymtable(scopesymtable), returntype(analyzer) {};
+				Lambda(std::vector<std::pair<boost::optional<std::string>, boost::optional<Type> > > arguments, StatementNode* body, UnifyingType* returntype, ScopeSymbolTable* scopesymtable, ErrorTracker* errors, Node* node, TypeAnalyzer* analyzer)
+				: analyzer(analyzer), arguments(arguments), body(body), scopesymtable(scopesymtable), errors(errors), returntype(returntype), node(node) {};
 
 				Type* typeCheck(bool forceArrayIdentifier);
 
 			private:
-				UnifyingType returntype;
+				std::auto_ptr<UnifyingType> returntype;
 				std::vector<std::pair<boost::optional<std::string>, boost::optional<Type> > > arguments;
 				std::auto_ptr<StatementNode> body;
 				ScopeSymbolTable* scopesymtable;
+				ErrorTracker* errors;
+				Node* node;
 				TypeAnalyzer* analyzer;
 
 		};

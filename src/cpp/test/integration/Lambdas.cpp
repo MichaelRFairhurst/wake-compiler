@@ -160,10 +160,10 @@ PTT_TEST_CASE(
 		myMethod() {																	\n\
 			var noargs fn() = { Num -> ; };												\n\
 			var noargs2 fn() = { Num, Text -> ; };										\n\
-			var onearg fn(Num) = { -> Num; };											\n\
+			var onearg fn(Num) = { -> ; };												\n\
 			var onearg2 fn(Num) = { Num, Text -> Num; };								\n\
 			var noargs3 fn() = { Num, Text -> Num; };									\n\
-			var twoarg fn(Num, Text) = { -> Num; };										\n\
+			var twoarg fn(Num, Text) = { -> ; };										\n\
 			var twoarg2 fn(Num, Text) = { Num -> Num; };								\n\
 			var twoarg3 fn(Num, Text) = { Text, Num -> Num; };							\n\
 		}",
@@ -173,6 +173,59 @@ PTT_TEST_CASE(
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	LambdasReturnTypesValid,
+	"every LowestClass is:												\n\
+	every LeftClass (a LowestClass) is:									\n\
+	every RightClass (a LowestClass) is:								\n\
+	every MyClass is:													\n\
+		myMethod(LeftClass, RightClass) {								\n\
+			var LeftClass -- fn() left = { -> return LeftClass; };		\n\
+			var RightClass -- fn() right = { -> return RightClass; };	\n\
+			var fn() void = { -> return; };								\n\
+			var LowestClass -- fn() lowest = { ->						\n\
+				if(true) {												\n\
+					return LeftClass;									\n\
+				} else {												\n\
+					return RightClass;									\n\
+				}														\n\
+			};															\n\
+			lowest = { -> return LeftClass; };							\n\
+			lowest = { -> return RightClass; };							\n\
+			void = { -> return LeftClass; };							\n\
+			void = { -> return RightClass; };							\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	LambdasReturnTypesInvalid,
+	"every LowestClass is:												\n\
+	every LeftClass (a LowestClass) is:									\n\
+	every RightClass (a LowestClass) is:								\n\
+	every MyClass is:													\n\
+		myMethod(LeftClass, RightClass, LowestClass) {					\n\
+			var LeftClass -- fn() left = { -> return LowestClass; };	\n\
+			var RightClass -- fn() right = { -> return LowestClass; };	\n\
+			var LowestClass -- fn() lowest = { ->						\n\
+				if(true) {												\n\
+					return;												\n\
+				} else {												\n\
+					return RightClass;									\n\
+				}														\n\
+			};															\n\
+			var LeftClass -- fn() left2 = { -> return; };				\n\
+			var RightClass -- fn() right2 = { -> return; };				\n\
+			var LowestClass -- fn() lowest2 = { -> return; };			\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_INFERENCE_FAILURE)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 );

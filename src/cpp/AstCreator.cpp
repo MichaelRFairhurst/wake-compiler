@@ -34,6 +34,7 @@
 #include "ast/EarlyBailoutMethodInvocation.h"
 #include "ast/StatementErrorCatcher.h"
 #include "ast/Lambda.h"
+#include "ast/LambdaReturn.h"
 #include <vector>
 
 wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
@@ -63,12 +64,19 @@ wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
 
 		case NT_RETURN:
 			if(node->subnodes) {
-				created = new wake::ast::Return(generateExpressionAst(node->node_data.nodes[0], true), returntype, classestable->getAnalyzer());
-				break;
+				if(lambdaReturnType) {
+					created = new wake::ast::LambdaReturn(generateExpressionAst(node->node_data.nodes[0], true), lambdaReturnType);
+				} else {
+					created = new wake::ast::Return(generateExpressionAst(node->node_data.nodes[0], true), returntype, classestable->getAnalyzer());
+				}
 			} else {
-				created = new wake::ast::Return(NULL, returntype, classestable->getAnalyzer());
-				break;
+				if(lambdaReturnType) {
+					created = new wake::ast::LambdaReturn(NULL, lambdaReturnType);
+				} else {
+					created = new wake::ast::Return(NULL, returntype, classestable->getAnalyzer());
+				}
 			}
+			break;
 
 		case NT_EXISTS:
 			created = new wake::ast::Exists(generateExpressionAst(node->node_data.nodes[0], true), generateStatementAst(node->node_data.nodes[1]), node->subnodes == 3 ? generateStatementAst(node->node_data.nodes[2]) : NULL, node, scopesymtable, errors);
@@ -179,7 +187,11 @@ wake::ast::ExpressionNode* wake::AstCreator::generateExpressionAst(Node* node, b
 			arguments.push_back(std::pair<boost::optional<std::string>, boost::optional<Type> >(noalias, type));
 		}
 
-		created = new wake::ast::Lambda(arguments, generateStatementAst(node->node_data.nodes[1]), scopesymtable, classestable->getAnalyzer());
+		UnifyingType* lastLambdaReturn = lambdaReturnType;
+		lambdaReturnType = new UnifyingType(classestable->getAnalyzer());
+		created = new wake::ast::Lambda(arguments, generateStatementAst(node->node_data.nodes[1]), lambdaReturnType, scopesymtable, errors, node, classestable->getAnalyzer());
+		lambdaReturnType = lastLambdaReturn;
+
 	} else {
 
 		std::vector<wake::ast::ExpressionNode*> subnodes;

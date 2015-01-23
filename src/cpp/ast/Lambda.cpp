@@ -2,7 +2,7 @@
  * Source Code for the Original Compiler for the
  * Programming Language Wake
  *
- * Lambda.h
+ * Lambda.cpp
  *
  * Licensed under the MIT license
  * See LICENSE.TXT for details
@@ -13,6 +13,8 @@
  **************************************************/
 
 #include "ast/Lambda.h"
+#include "TypeError.h"
+#include "SemanticError.h"
 
 Type* wake::ast::Lambda::typeCheck(bool forceArrayIdentifier) {
 	scopesymtable->pushScope();
@@ -38,6 +40,21 @@ Type* wake::ast::Lambda::typeCheck(bool forceArrayIdentifier) {
 	body->typeCheck();
 
 	scopesymtable->popScope();
+
+	if(returntype->getUnificationFailure1() != NULL) {
+
+		errors->addError(new SemanticError(TYPE_INFERENCE_FAILURE,
+			"Unification failed for lambda returned types: Partially inferred type "
+			+ analyzer->getNameForType(returntype->getUnificationFailure1())
+			+ " and next type "
+			+ analyzer->getNameForType(returntype->getUnificationFailure2()),
+			node));
+
+		lambdaType->typedata.lambda.returntype = new Type(TYPE_MATCHALL);
+
+	} else if(returntype->getCurrentUnification() && returntype->getCurrentUnification() != NULL && returntype->getCurrentUnification()->type != TYPE_UNUSABLE) {
+		lambdaType->typedata.lambda.returntype = new Type(returntype->getCurrentUnification());
+	}
 
 	return new Type(lambdaType.get());
 }
