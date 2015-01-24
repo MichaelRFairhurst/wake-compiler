@@ -17,10 +17,13 @@
 
 #include "ast/StatementNode.h"
 #include "ast/ExpressionNode.h"
-#include "tree.h"
 #include "ScopeSymbolTable.h"
 #include "ErrorTracker.h"
 #include <memory>
+
+extern "C" {
+	#include "tree.h"
+}
 
 namespace wake {
 

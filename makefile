@@ -54,6 +54,7 @@ CPPNAMES= \
 	UnifyingType.cpp \
 	AstCreator.cpp \
 	ast/Catch.cpp \
+	ast/MethodSegment.cpp \
 	ast/Declaration.cpp \
 	ast/Exists.cpp \
 	ast/For.cpp \

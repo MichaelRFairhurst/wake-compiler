@@ -16,6 +16,7 @@
 #define HEADER_AST_METHOD_INVOCATION
 
 #include "ast/MethodInvocationBase.h"
+#include "ScopeSymbolTable.h"
 
 namespace wake {
 

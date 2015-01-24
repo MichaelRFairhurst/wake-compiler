@@ -2,7 +2,7 @@
  * Source Code for the Original Compiler for the
  * Programming Language Wake
  *
- * ExpressionNode.h
+ * ExpectedTypeExpression.h
  *
  * Licensed under the MIT license
  * See LICENSE.TXT for details
@@ -12,8 +12,8 @@
  *
  **************************************************/
 
-#ifndef HEADER_EXPRESSION_NODE
-#define HEADER_EXPRESSION_NODE
+#ifndef HEADER_EXPECTED_TYPE_EXPRESSION
+#define HEADER_EXPECTED_TYPE_EXPRESSION
 
 #include "type.h"
 
@@ -21,13 +21,11 @@ namespace wake {
 
 	namespace ast {
 
-		class ExpressionNode {
+		class ExpectedTypeExpression {
 
 			public:
-				virtual Type* typeCheck(bool forceArrayIdentifier)=0;
-				virtual ~ExpressionNode(){};
-
-			private:
+				virtual bool typeCheckExpecting(Type* hint)=0;
+				virtual ~ExpectedTypeExpression(){};
 		};
 
 	}

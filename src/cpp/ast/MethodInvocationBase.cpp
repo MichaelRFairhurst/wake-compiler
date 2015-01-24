@@ -49,8 +49,10 @@ Type* wake::ast::MethodInvocationBase::typeCheckMethodInvocation(Type& subject) 
 		methodSegmentsLatch.push_back(args);
 		methodSegmentTypes.push_back(pair<string, TypeArray*>(it->name, args));
 
-		for(boost::ptr_vector<wake::ast::ExpressionNode>::iterator argExprIt = it->arguments.begin(); argExprIt != it->arguments.end(); ++argExprIt) {
-			AddTypeToTypeArray(argExprIt->typeCheck(false), args);
+		for(std::vector<std::pair<wake::ast::ExpressionNode*, wake::ast::ExpectedTypeExpression*> >::iterator argExprIt = it->arguments.begin(); argExprIt != it->arguments.end(); ++argExprIt) {
+			if(argExprIt->first) {
+				AddTypeToTypeArray(argExprIt->first->typeCheck(false), args);
+			}
 		}
 
 	}

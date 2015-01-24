@@ -14,6 +14,7 @@
 
 #include "ast/Exists.h"
 #include "CompilationExceptions.h"
+#include "tree.h"
 #include <memory>
 
 void wake::ast::Exists::typeCheck() {

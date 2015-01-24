@@ -153,13 +153,15 @@ wake::ast::ExpressionNode* wake::AstCreator::generateExpressionAst(Node* node, b
 		int i = 0;
 		while(i < methodname->subnodes) {
 			string name = methodname->node_data.nodes[i]->node_data.string;
-			vector<wake::ast::ExpressionNode*> argExprs;
+			std::vector<std::pair<wake::ast::ExpressionNode*, wake::ast::ExpectedTypeExpression*> > argExprs;
 			i++;
 
-			if(methodname->subnodes > i) {
-				int a;
-				for(a = 0; a < methodname->node_data.nodes[i]->subnodes; a++)
-					argExprs.push_back(generateExpressionAst(methodname->node_data.nodes[i]->node_data.nodes[a], true));
+			if(methodname->subnodes > i)
+			for(int a = 0; a < methodname->node_data.nodes[i]->subnodes; a++)
+			if(methodname->node_data.nodes[i]->node_data.nodes[a]->node_type == NT_LAMBDA_DECLARATION) {
+				argExprs.push_back(std::pair<wake::ast::ExpressionNode*, wake::ast::ExpectedTypeExpression*>(NULL, generateLambda(methodname->node_data.nodes[i]->node_data.nodes[a])));
+			} else {
+				argExprs.push_back(std::pair<wake::ast::ExpressionNode*, wake::ast::ExpectedTypeExpression*>(generateExpressionAst(methodname->node_data.nodes[i]->node_data.nodes[a], true), NULL));
 			}
 
 			methodSegments.push_back(new wake::ast::MethodSegment(name, argExprs));
@@ -173,26 +175,7 @@ wake::ast::ExpressionNode* wake::AstCreator::generateExpressionAst(Node* node, b
 		}
 
 	} else if(node->node_type == NT_LAMBDA_DECLARATION) {
-		std::vector<std::pair<boost::optional<std::string>, boost::optional<Type> > > arguments;
-
-		for(int i = 0; i < node->node_data.nodes[0]->subnodes; i++)
-		if(node->node_data.nodes[0]->node_data.nodes[i]->node_type == NT_ALIAS) {
-			boost::optional<std::string> alias(node->node_data.nodes[0]->node_data.nodes[i]->node_data.string);
-			boost::optional<Type> notype;
-
-			arguments.push_back(std::pair<boost::optional<std::string>, boost::optional<Type> >(alias, notype));
-		} else {
-			boost::optional<std::string> noalias;
-			boost::optional<Type> type(node->node_data.nodes[0]->node_data.nodes[i]->node_data.type);
-
-			arguments.push_back(std::pair<boost::optional<std::string>, boost::optional<Type> >(noalias, type));
-		}
-
-		UnifyingType* lastLambdaReturn = lambdaReturnType;
-		lambdaReturnType = new UnifyingType(classestable->getAnalyzer());
-		created = new wake::ast::Lambda(arguments, generateStatementAst(node->node_data.nodes[1]), lambdaReturnType, scopesymtable, errors, node, classestable->getAnalyzer());
-		lambdaReturnType = lastLambdaReturn;
-
+		created = generateLambda(node);
 	} else {
 
 		std::vector<wake::ast::ExpressionNode*> subnodes;
@@ -210,4 +193,28 @@ wake::ast::ExpressionNode* wake::AstCreator::generateExpressionAst(Node* node, b
 		return new wake::ast::ExpressionErrorCatcher(created, node, errors);
 	}
 
+}
+
+wake::ast::Lambda* wake::AstCreator::generateLambda(Node* node) {
+	std::vector<std::pair<boost::optional<std::string>, boost::optional<Type> > > arguments;
+
+	for(int i = 0; i < node->node_data.nodes[0]->subnodes; i++)
+	if(node->node_data.nodes[0]->node_data.nodes[i]->node_type == NT_ALIAS) {
+		boost::optional<std::string> alias(node->node_data.nodes[0]->node_data.nodes[i]->node_data.string);
+		boost::optional<Type> notype;
+
+		arguments.push_back(std::pair<boost::optional<std::string>, boost::optional<Type> >(alias, notype));
+	} else {
+		boost::optional<std::string> noalias;
+		boost::optional<Type> type(node->node_data.nodes[0]->node_data.nodes[i]->node_data.type);
+
+		arguments.push_back(std::pair<boost::optional<std::string>, boost::optional<Type> >(noalias, type));
+	}
+
+	UnifyingType* lastLambdaReturn = lambdaReturnType;
+	lambdaReturnType = new UnifyingType(classestable->getAnalyzer());
+	wake::ast::Lambda* toReturn = new wake::ast::Lambda(arguments, generateStatementAst(node->node_data.nodes[1]), lambdaReturnType, scopesymtable, errors, node, classestable->getAnalyzer());
+	lambdaReturnType = lastLambdaReturn;
+
+	return toReturn;
 }

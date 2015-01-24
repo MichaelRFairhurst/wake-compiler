@@ -17,7 +17,9 @@
 
 #include "ast/StatementNode.h"
 #include "ast/ExpressionNode.h"
+#include "ast/ExpectedTypeExpression.h"
 #include "UnifyingType.h"
+#include "ErrorTracker.h"
 #include "TypeAnalyzer.h"
 #include "ScopeSymbolTable.h"
 #include <memory>
@@ -26,12 +28,14 @@ namespace wake {
 
 	namespace ast {
 
-		class Lambda : public ExpressionNode {
+		class Lambda : public ExpressionNode, public ExpectedTypeExpression {
 			public:
 				Lambda(std::vector<std::pair<boost::optional<std::string>, boost::optional<Type> > > arguments, StatementNode* body, UnifyingType* returntype, ScopeSymbolTable* scopesymtable, ErrorTracker* errors, Node* node, TypeAnalyzer* analyzer)
 				: analyzer(analyzer), arguments(arguments), body(body), scopesymtable(scopesymtable), errors(errors), returntype(returntype), node(node) {};
 
 				Type* typeCheck(bool forceArrayIdentifier);
+				bool typeCheckExpecting(Type* hint);
+				Type* typeCheckCommon(Type* hint);
 
 			private:
 				std::auto_ptr<UnifyingType> returntype;

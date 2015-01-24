@@ -16,8 +16,9 @@
 #define HEADER_AST_METHOD_SEGMENT
 
 #include <string>
-#include <boost/ptr_container/ptr_vector.hpp>
+#include <vector>
 #include "ast/ExpressionNode.h"
+#include "ast/ExpectedTypeExpression.h"
 
 namespace wake {
 
@@ -26,13 +27,13 @@ namespace wake {
 		class MethodSegment {
 
 			public:
-				MethodSegment(string name, std::vector<ExpressionNode*> arguments)
-				: name(name) {
-					for(std::vector<ExpressionNode*>::iterator it = arguments.begin(); it != arguments.end(); ++it) this->arguments.push_back(*it);
-				};
+				MethodSegment(std::string name, std::vector<std::pair<ExpressionNode*, ExpectedTypeExpression*> > arguments)
+				: name(name), arguments(arguments) {};
 
-				string name;
-				boost::ptr_vector<ExpressionNode> arguments;
+				~MethodSegment();
+
+				std::string name;
+				std::vector<std::pair<ExpressionNode*, ExpectedTypeExpression*> > arguments;
 		};
 
 	}

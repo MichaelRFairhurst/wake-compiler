@@ -17,6 +17,15 @@
 #include "SemanticError.h"
 
 Type* wake::ast::Lambda::typeCheck(bool forceArrayIdentifier) {
+	return typeCheckCommon(NULL);
+}
+
+bool wake::ast::Lambda::typeCheckExpecting(Type* hint) {
+	auto_ptr<Type> discovered(typeCheckCommon(hint));
+	return analyzer->isASubtypeOfB(discovered.get(), hint);
+}
+
+Type* wake::ast::Lambda::typeCheckCommon(Type* hint) {
 	scopesymtable->pushScope();
 	auto_ptr<Type> lambdaType(new Type(TYPE_LAMBDA));
 

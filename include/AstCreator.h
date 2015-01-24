@@ -17,6 +17,7 @@
 
 #include "ast/StatementNode.h"
 #include "ast/ExpressionNode.h"
+#include "ast/Lambda.h"
 #include "ErrorTracker.h"
 #include "ClassSpaceSymbolTable.h"
 #include "ScopeSymbolTable.h"
@@ -37,6 +38,8 @@ namespace wake {
 			ast::ExpressionNode* generateExpressionAst(Node* node, bool mustBeUsable);
 
 		private:
+			ast::Lambda* generateLambda(Node* node);
+
 			MethodSignatureParseTreeTraverser* methodanalyzer;
 			ErrorTracker* errors;
 			ClassSpaceSymbolTable* classestable;
