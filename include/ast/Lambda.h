@@ -16,7 +16,6 @@
 #define HEADER_AST_LAMBDA
 
 #include "ast/StatementNode.h"
-#include "ast/ExpressionNode.h"
 #include "ast/ExpectedTypeExpression.h"
 #include "UnifyingType.h"
 #include "ErrorTracker.h"
@@ -28,7 +27,7 @@ namespace wake {
 
 	namespace ast {
 
-		class Lambda : public ExpressionNode, public ExpectedTypeExpression {
+		class Lambda : public ExpectedTypeExpression {
 			public:
 				Lambda(std::vector<std::pair<boost::optional<std::string>, boost::optional<Type> > > arguments, StatementNode* body, UnifyingType* returntype, ScopeSymbolTable* scopesymtable, ErrorTracker* errors, Node* node, TypeAnalyzer* analyzer)
 				: analyzer(analyzer), arguments(arguments), body(body), scopesymtable(scopesymtable), errors(errors), returntype(returntype), node(node) {};

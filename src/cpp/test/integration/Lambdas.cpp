@@ -265,3 +265,67 @@ PTT_TEST_CASE(
 		}",
 	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
 );
+
+PTT_TEST_CASE(
+	LambdasNoMethodFoundByCasingInvalid,
+	"every MyClass is:					\n\
+		inferringMethod() {				\n\
+			hintingMethod({ one, two ->	\n\
+				5 + one + two;			\n\
+			});							\n\
+		}",
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(TYPE_INFERENCE_FAILURE)
+	PTT_EXPECT(TYPE_INFERENCE_FAILURE)
+);
+
+PTT_TEST_CASE(
+	LambdasInferAliasedVars,
+	"every MyClass is:						\n\
+		hintingMethod(alias fn(Num, Num)) {	\n\
+		}									\n\
+		inferringMethod() {					\n\
+			hintingMethod({ one, two ->		\n\
+				5 + one + two;				\n\
+			});								\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	LambdaDeclarationNotLambdaArgumentFails,
+	"every MyClass is:						\n\
+		hintingMethod(Num) {				\n\
+		}									\n\
+		inferringMethod() {					\n\
+			hintingMethod({ one, two ->		\n\
+				5 + one + two;				\n\
+			});								\n\
+		}",
+	PTT_EXPECT(TYPE_INFERENCE_FAILURE)
+	PTT_EXPECT(TYPE_INFERENCE_FAILURE)
+);
+
+PTT_TEST_CASE(
+	LambdaDeclarationArgumentHasNoArgumentsFails,
+	"every MyClass is:						\n\
+		hintingMethod(fn() myfun) {			\n\
+		}									\n\
+		inferringMethod() {					\n\
+			hintingMethod({ two ->			\n\
+			});								\n\
+		}",
+	PTT_EXPECT(TYPE_INFERENCE_FAILURE)
+);
+
+PTT_TEST_CASE(
+	LambdaDeclarationArgumentHasTooFewArgumentsFails,
+	"every MyClass is:						\n\
+		hintingMethod(fn(Num) myfun) {		\n\
+		}									\n\
+		inferringMethod() {					\n\
+			hintingMethod({ one, two ->		\n\
+			});								\n\
+		}",
+	PTT_EXPECT(TYPE_INFERENCE_FAILURE)
+);

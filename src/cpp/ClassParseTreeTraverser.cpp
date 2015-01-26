@@ -18,6 +18,7 @@
 #include "AnnotationTreeTraverser.h"
 #include "Annotation.h"
 #include <memory>
+#include <boost/lexical_cast.hpp>
 
 /**
  * This class makes several passes to have the proper type info at the proper times.
@@ -429,7 +430,10 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 				// Begin Method Scope For Type Analysis
 				scopesymtable->pushScope();
 				int i;
-				for(i = 0; i < method->typedata.lambda.arguments->typecount; i++) {
+				for(i = 0; i < method->typedata.lambda.arguments->typecount; i++)
+				if(method->typedata.lambda.arguments->types[i]->type == TYPE_LAMBDA && method->typedata.lambda.arguments->types[i]->alias == NULL) {
+					errors->addError(new SemanticError(ALIAS_REQUIRED, "Argument number " + boost::lexical_cast<string>(i + 1) + " must be aliased"));
+				} else {
 					scopesymtable->add(method->typedata.lambda.arguments->types[i]);
 				}
 

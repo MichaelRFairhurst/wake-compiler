@@ -15,17 +15,19 @@
 #ifndef HEADER_EXPECTED_TYPE_EXPRESSION
 #define HEADER_EXPECTED_TYPE_EXPRESSION
 
-#include "type.h"
+#include "ExpressionNode.h"
 
 namespace wake {
 
 	namespace ast {
 
-		class ExpectedTypeExpression {
+		class ExpectedTypeExpression : public ExpressionNode {
 
 			public:
 				virtual bool typeCheckExpecting(Type* hint)=0;
+				virtual Type* typeCheck(bool forceArrayIdentifier)=0;
 				virtual ~ExpectedTypeExpression(){};
+
 		};
 
 	}

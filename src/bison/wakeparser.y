@@ -576,6 +576,7 @@ expression:
 lambda:
 	'{' SYM_LAMBDA declarationsandstatements '}'								{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, MakeEmptyNode(NT_INFERENCEABLE_TYPES, @2), $3, @$); }
 	| '{' inferenceabletypes SYM_LAMBDA declarationsandstatements '}'			{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, $2, $4, @$); }
+	| '{' inferenceabletypes SYM_LAMBDA '}'										{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, $2, MakeEmptyNode(NT_EMPTY, @3), @$); }
 	;
 
 expression_noretrieval:
