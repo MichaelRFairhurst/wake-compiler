@@ -41,10 +41,9 @@ bool MockSemanticErrorPrinter::passed() {
 
 	if(expectations.size()) {
 		cout << "this error SHOULD have been raised:" << endl;
-		Node* n = new Node;
-		n->line = 0;
-		n->col = 0;
+		Node* n = 0;
 		SemanticErrorPrinter::print(new SemanticError(expectations[0], "this error should have been raised", n));
+
 	}
 
 	return false;
