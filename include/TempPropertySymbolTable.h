@@ -36,6 +36,7 @@ class TempPropertySymbolTable : public ReadOnlyPropertySymbolTable {
 	public:
 		TempPropertySymbolTable(PropertySymbolTable& table) : table(table) {};
 		boost::optional<Type*> find(string name);
+		boost::optional<ObjectProperty*> findByCasing(string casing);
 		bool isPublic(string name);
 		string getAddress(string name);
 		string getProvisionSymbol(Type* provided, vector<Type*> &arguments);

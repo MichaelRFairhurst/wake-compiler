@@ -22,6 +22,25 @@ boost::optional<Type*> DerivedPropertySymbolTable::find(string name) {
 	else return boost::optional<Type*>(searcher->second->type);
 }
 
+	//@TODO not duplicate code from PropertySymbolTable
+boost::optional<ObjectProperty*> DerivedPropertySymbolTable::findByCasing(string casing) {
+	ObjectProperty* found = NULL;
+
+	for(std::map<string, ObjectProperty*>::iterator it = properties->begin(); it != properties->end(); ++it)
+	if(it->second->casing == casing)
+	if(found == NULL) {
+		found = it->second;
+	} else {
+		return boost::optional<ObjectProperty*>();
+	}
+
+	if(found) {
+		return boost::optional<ObjectProperty*>(found);
+	} else {
+		return boost::optional<ObjectProperty*>();
+	}
+}
+
 bool DerivedPropertySymbolTable::isPublic(string name) {
 	return properties->find(name)->second->flags & PROPERTY_PUBLIC;
 }

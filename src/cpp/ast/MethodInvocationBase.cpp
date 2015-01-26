@@ -15,6 +15,7 @@
 #include "ast/MethodInvocationBase.h"
 #include "CompilationExceptions.h"
 #include "TypeError.h"
+#include <boost/lexical_cast.hpp>
 
 Type* wake::ast::MethodInvocationBase::typeCheckMethodInvocation(Type& subject) {
 	TypeAnalyzer* analyzer = classestable->getAnalyzer();
@@ -44,24 +45,57 @@ Type* wake::ast::MethodInvocationBase::typeCheckMethodInvocation(Type& subject) 
 	vector<pair<string, TypeArray*> > methodSegmentTypes;
 	boost::ptr_vector<TypeArray> methodSegmentsLatch;
 
+	string casing;
+	string name;
 	for(boost::ptr_vector<MethodSegment>::iterator it = methodSegments.begin(); it != methodSegments.end(); ++it) {
-		TypeArray* args = MakeTypeArray();
-		methodSegmentsLatch.push_back(args);
-		methodSegmentTypes.push_back(pair<string, TypeArray*>(it->name, args));
-
+		casing += it->name + "(";
 		for(std::vector<std::pair<wake::ast::ExpressionNode*, wake::ast::ExpectedTypeExpression*> >::iterator argExprIt = it->arguments.begin(); argExprIt != it->arguments.end(); ++argExprIt) {
-			if(argExprIt->first) {
+			casing += "#";
+		}
+		casing += ")";
+	}
+
+	boost::optional<ObjectProperty*> lambdaprop = methodtable->findByCasing(casing);
+	boost::optional<Type*> lambdatype;
+
+	int i = 0;
+	if(lambdaprop) {
+		lambdatype = (*lambdaprop)->type;
+		name = (*lambdaprop)->address;
+		for(boost::ptr_vector<MethodSegment>::iterator it = methodSegments.begin(); it != methodSegments.end(); ++it, i++)
+		for(std::vector<std::pair<wake::ast::ExpressionNode*, wake::ast::ExpectedTypeExpression*> >::iterator argExprIt = it->arguments.begin(); argExprIt != it->arguments.end(); ++argExprIt)
+		if(argExprIt->first) {
+			auto_ptr<Type> argType(argExprIt->first->typeCheck(false));
+			if(argType->type != TYPE_MATCHALL && !analyzer->isASubtypeOfB(argType.get(), (*lambdatype)->typedata.lambda.arguments->types[i])) {
+				errors->addError(new SemanticError(TYPE_ERROR, "Argument number "
+					+ boost::lexical_cast<std::string>(i + 1)
+					+ " has invalid type. Expected "
+					+ analyzer->getNameForType((*lambdatype)->typedata.lambda.arguments->types[i])
+					+ ", actual was "
+					+ analyzer->getNameForType(argType.get())
+				));
+			}
+		} else {
+			argExprIt->second->typeCheckExpecting((*lambdatype)->typedata.lambda.arguments->types[i]);
+		}
+	} else {
+		for(boost::ptr_vector<MethodSegment>::iterator it = methodSegments.begin(); it != methodSegments.end(); ++it) {
+			TypeArray* args = MakeTypeArray();
+			methodSegmentsLatch.push_back(args);
+			methodSegmentTypes.push_back(pair<string, TypeArray*>(it->name, args));
+
+			for(std::vector<std::pair<wake::ast::ExpressionNode*, wake::ast::ExpectedTypeExpression*> >::iterator argExprIt = it->arguments.begin(); argExprIt != it->arguments.end(); ++argExprIt) {
 				AddTypeToTypeArray(argExprIt->first->typeCheck(false), args);
 			}
 		}
 
+		name = methodtable->getSymbolNameOf(&methodSegmentTypes);
+		lambdatype = methodtable->find(name);
 	}
-
-	boost::optional<Type*> lambdatype = methodtable->find(methodtable->getSymbolNameOf(&methodSegmentTypes));
 
 	if(lambdatype) {
 		AddSubNode(node, MakeNodeFromString(NT_COMPILER_HINT, strdup(subject.typedata._class.classname), node->loc));
-		AddSubNode(node, MakeNodeFromString(NT_COMPILER_HINT, strdup(methodtable->getAddress(methodtable->getSymbolNameOf(&methodSegmentTypes)).c_str()), node->loc));
+		AddSubNode(node, MakeNodeFromString(NT_COMPILER_HINT, strdup(methodtable->getAddress(name).c_str()), node->loc));
 
 		if((*lambdatype)->typedata.lambda.returntype == NULL) {
 			return new Type(TYPE_UNUSABLE);

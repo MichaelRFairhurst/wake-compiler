@@ -206,7 +206,7 @@ wake::ast::Lambda* wake::AstCreator::generateLambda(Node* node) {
 		arguments.push_back(std::pair<boost::optional<std::string>, boost::optional<Type> >(alias, notype));
 	} else {
 		boost::optional<std::string> noalias;
-		boost::optional<Type> type(node->node_data.nodes[0]->node_data.nodes[i]->node_data.type);
+		boost::optional<Type> type(new Type(node->node_data.nodes[0]->node_data.nodes[i]->node_data.type));
 
 		arguments.push_back(std::pair<boost::optional<std::string>, boost::optional<Type> >(noalias, type));
 	}

@@ -116,6 +116,24 @@ boost::optional<Type*> PropertySymbolTable::find(string name) {
 	return boost::optional<Type*>(properties.find(name)->second->type);
 }
 
+boost::optional<ObjectProperty*> PropertySymbolTable::findByCasing(string casing) {
+	ObjectProperty* found = NULL;
+
+	for(std::map<string, ObjectProperty*>::iterator it = properties.begin(); it != properties.end(); ++it)
+	if(it->second->casing == casing)
+	if(found == NULL) {
+		found = it->second;
+	} else {
+		return boost::optional<ObjectProperty*>();
+	}
+
+	if(found) {
+		return boost::optional<ObjectProperty*>(found);
+	} else {
+		return boost::optional<ObjectProperty*>();
+	}
+}
+
 string PropertySymbolTable::getAddress(string name) {
 	return properties.find(name)->second->address;
 }

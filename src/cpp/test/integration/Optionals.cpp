@@ -65,6 +65,19 @@ PTT_TEST_CASE(
 		}						\n\
 		real(MyClass) {			\n\
 		}",
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	ArgumentOfOptionalTypeAsRealTypeOnOverloadedMethodIsError,
+	"every MyClass is:			\n\
+		optional(MyClass?) {	\n\
+			real(MyClass);		\n\
+		}						\n\
+		real(Num) {				\n\
+		}						\n\
+		real(MyClass) {			\n\
+		}",
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 );
 
@@ -120,6 +133,17 @@ PTT_TEST_CASE(
 	"every MyClass is:		\n\
 		real(MyClass) {		\n\
 			real(nothing);	\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	NullArgumentOfOverloadedRealArgumentIsError,
+	"every MyClass is:		\n\
+		real(MyClass) {		\n\
+			real(nothing);	\n\
+		}					\n\
+		real(Num) {		\n\
 		}",
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 );
@@ -207,7 +231,7 @@ PTT_TEST_CASE(
 	PTT_EXPECT(DIRECT_USE_OF_OPTIONAL_TYPE)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
-	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(TYPE_ERROR)
 );
 
 PTT_TEST_CASE(

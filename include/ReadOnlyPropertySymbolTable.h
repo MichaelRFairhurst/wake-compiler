@@ -37,6 +37,7 @@ using namespace std;
 class ReadOnlyPropertySymbolTable {
 	public:
 		virtual boost::optional<Type*> find(string name)=0;
+		virtual boost::optional<ObjectProperty*> findByCasing(string casing)=0;
 		virtual bool isPublic(string name)=0;
 		virtual string getAddress(string name)=0;
 		virtual string getProvisionSymbol(Type* provided, vector<Type*> &arguments)=0;

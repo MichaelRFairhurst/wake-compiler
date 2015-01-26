@@ -18,6 +18,10 @@ boost::optional<Type*> TempPropertySymbolTable::find(string name) {
 	return table.find(name);
 }
 
+boost::optional<ObjectProperty*> TempPropertySymbolTable::findByCasing(string casing) {
+	return table.findByCasing(casing);
+}
+
 bool TempPropertySymbolTable::isPublic(string name) {
 	return table.isPublic(name);
 }

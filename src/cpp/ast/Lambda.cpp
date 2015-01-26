@@ -35,13 +35,12 @@ Type* wake::ast::Lambda::typeCheckCommon(Type* hint) {
 			lambdaType->typedata.lambda.arguments = MakeTypeArray();
 		}
 
-		boost::optional<Type> type = it->second;
-		boost::optional<std::string> alias = it->first;
-
-		if(type) {
-			scopesymtable->add(&*type);
+		if(it->second) {
+			boost::optional<Type> type(*it->second);
+			scopesymtable->add(new Type(*type));
 			AddTypeToTypeArray(new Type(*type), lambdaType->typedata.lambda.arguments);
 		} else {
+			boost::optional<std::string> alias(*it->first);
 			// try type inference
 		}
 	}

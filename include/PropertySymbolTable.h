@@ -40,6 +40,7 @@ class PropertySymbolTable : public ReadOnlyPropertySymbolTable {
 		PropertySymbolTable(TypeAnalyzer* tanalyzer);
 		~PropertySymbolTable();
 		boost::optional<Type*> find(string name);
+		boost::optional<ObjectProperty*> findByCasing(string casing);
 		bool isPublic(string name);
 		string getAddress(string name);
 		string getProvisionSymbol(Type* provided, vector<Type*> &arguments);
