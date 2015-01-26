@@ -195,3 +195,9 @@ PTT_TEST_CASE(
 	PTT_VALID
 );
 
+PTT_TEST_CASE(
+	TestMethodWithLambdaArgumentAndNoAliasIsError,
+	"every MyClass is: myMethod(fn()) {}",
+	PTT_EXPECT(ALIAS_REQUIRED)
+);
+

@@ -46,6 +46,9 @@ void SemanticErrorPrinter::print(SemanticError* e) {
 		case CLASSNAME_NOT_FOUND:
 			cout << "Class by this name not found";
 			break;
+		case ALIAS_REQUIRED:
+			cout << "Variable cannot be referenced by type and requires an alias";
+			break;
 		case SYMBOL_ALREADY_DEFINED:
 			cout << "Variable declaration would overwrite previous. Either use a new alias, or shadow this declaration, or shadow the previous declaration";
 			break;

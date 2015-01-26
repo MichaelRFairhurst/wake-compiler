@@ -30,6 +30,7 @@ enum SemanticErrorCode {
 	MORE_THAN_ONE_SUBCLASS,				// A extends B and C
 	MULTIPLE_INHERITANCE,				// A inherits from B twice
 	MULTIPLE_METHOD_DEFINITION,			// A.methodA() defined twice
+	ALIAS_REQUIRED,						// accepting, extending, providing, or instantiating an unknown type
 	CLASSNAME_NOT_FOUND,				// accepting, extending, providing, or instantiating an unknown type
 	SYMBOL_ALREADY_DEFINED,				// declaring a variable twice
 	SYMBOL_NOT_DEFINED,					// using an unknown alias, shadow, or classname with no known instance
@@ -43,9 +44,9 @@ enum SemanticErrorCode {
 	MISMATCHED_INJECTION,				// provides HasThreeArgs <- HasThreeArgs(Only, Two);
 	DUPLICATE_PROPERTY_DEFINITION,		// provides AClass, AClass;
 	CIRCULAR_DEPENDENCIES,				// A needs B, B needs C, C needs A, shit for everyone. Or A needs A.
-	INVALID_ASSIGNMENT,					// @it.doIt() = 5; is pushing it, bro
+	INVALID_ASSIGNMENT,					// it.doIt() = 5; is pushing it, bro
 	ABSTRACT_PROVISION,					// Providing a class directly that doesn't implement all of its methods
-	DIRECT_USE_OF_OPTIONAL_TYPE,		// :Printer = nothing;
+	DIRECT_USE_OF_OPTIONAL_TYPE,		// var Printer = nothing;
 	EXISTS_ON_NONOPTIONAL_TYPE,			// needs Printer; Printer exists { }
 	USE_OF_ASSIGNMENT_VALUE,			// a = b = c; --- should be a = b := c;
 	INVALID_GENERIC_TYPE,				// Printer{Int} or List or List{String, String} etc
