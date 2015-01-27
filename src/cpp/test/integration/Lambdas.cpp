@@ -331,3 +331,110 @@ PTT_TEST_CASE(
 		}",
 	PTT_EXPECT(TYPE_INFERENCE_FAILURE)
 );
+
+PTT_TEST_CASE(
+	EqualLambdaTypesHaveCommonSubtypeOfThemselves,
+	"every MyClass is:														\n\
+		myMethod(MyClass -- fn(MyClass) one, MyClass -- fn(MyClass) two) {	\n\
+			var MyClass -- fn(MyClass) common = [one, two][0];				\n\
+		}																	\n\
+		myMethod(MyClass -- fn() one, MyClass -- fn() two) {				\n\
+			var MyClass -- fn() common = [one, two][0];						\n\
+		}																	\n\
+		myMethod(fn(MyClass) one, fn(MyClass) two) {						\n\
+			var fn(MyClass) common = [one, two][0];							\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	LambdaVoidNonVoidTypesHaveCommonSubtypeOfVoid,
+	"every MyClass is:											\n\
+		myMethod(MyClass -- fn(MyClass) one, fn(MyClass) two) {	\n\
+			var MyClass -- fn(MyClass) common = [one, two][0];	\n\
+			var MyClass -- fn(MyClass) again = [two, one][0];	\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	LambdaNonVoidTypesHaveCommonSubtypeOfReturn,
+	"every ParentClass is:												\n\
+	every ChildClass1 (a ParentClass) is:								\n\
+	every ChildClass2 (a ParentClass) is:								\n\
+		myMethod(ChildClass1 -- fn() one, ChildClass2 -- fn() two) {	\n\
+			var ParentClass -- fn() common = [one, two][0];				\n\
+			common = [two, one][0];										\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	LambdaSameNumberOfArgumentTypesNoCommonSubtype,
+	"every ParentClass is:										\n\
+	every ChildClass1 (a ParentClass) is:						\n\
+	every ChildClass2 (a ParentClass) is:						\n\
+		myMethod(fn(ChildClass1) one, fn(ChildClass2) two) {	\n\
+			[one, two];											\n\
+			[two, one];											\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	LambdaDifferentNumberOfArgumentTypesNoCommonSubtype,
+	"every MyClass is:													\n\
+		myMethod(fn() one, fn(MyClass) two, fn(MyClass, Num) three) {	\n\
+			[one, two];													\n\
+			[one, three];												\n\
+			[two, one];													\n\
+			[two, three];												\n\
+			[three, one];												\n\
+			[three, two];												\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	LambdasNoCommonReturnTypeIsVoidReturn,
+	"every MyClass is:															\n\
+		myMethod(Text -- fn() one, Num -- fn() two, MyClass -- fn() three) {	\n\
+			var Num -- fn() blah = [one, two][0];								\n\
+			var Num -- fn() blahh = [two, one][0];								\n\
+			var Text -- fn() blahhh = [one, two][0];							\n\
+			var Text -- fn() blahhhh = [two, one][0];							\n\
+			var Num -- fn() blahhhhh = [one, three][0];							\n\
+			var Num -- fn() blahhhhhh = [three, one][0];						\n\
+			var MyClass -- fn() blahhhhhhh = [one, three][0];					\n\
+			var MyClass -- fn() blahhhhhhhh = [three, one][0];					\n\
+			var Text -- fn() blahhhhhhhh = [two, three][0];						\n\
+			var Text -- fn() blahhhhhhhhh = [three, two][0];					\n\
+			var MyClass -- fn() blahhhhhhhhhh = [two, three][0];				\n\
+			var MyClass -- fn() blahhhhhhhhhhh = [three, two][0];				\n\
+			var fn() blahhhhhhhhhhhh = [one, two][0];							\n\
+			var fn() blahhhhhhhhhhhhh = [two, one][0];							\n\
+			var fn() blahhhhhhhhhhhhhh = [one, three][0];						\n\
+			var fn() blahhhhhhhhhhhhhhh = [three, one][0];						\n\
+			var fn() blahhhhhhhhhhhhhhhh = [two, three][0];						\n\
+			var fn() blahhhhhhhhhhhhhhhhh = [three, two][0];					\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+);

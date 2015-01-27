@@ -14,23 +14,30 @@
 
 #include "ast/Invocation.h"
 #include "TypeError.h"
+#include <boost/lexical_cast.hpp>
 
 Type* wake::ast::Invocation::typeCheck(bool forceArrayLiteral) {
 	Type lambda = *auto_ptr<Type>(lambdaExpr->typeCheck(false));
-	Type actual(TYPE_LAMBDA);
-	actual.typedata.lambda.arguments = MakeTypeArray();
-	if(lambda.typedata.lambda.returntype != NULL) {
-		actual.typedata.lambda.returntype = new Type(*lambda.typedata.lambda.returntype);
+
+	int realArgCount = 0;
+	if(lambda.typedata.lambda.arguments) {
+		realArgCount = lambda.typedata.lambda.arguments->typecount;
 	}
 
-	for(boost::ptr_vector<ExpressionNode>::iterator it = argumentExprs.begin(); it != argumentExprs.end(); ++it) {
-		AddTypeToTypeArray(it->typeCheck(false), actual.typedata.lambda.arguments);
+	if(argumentExprs.size() != realArgCount) {
+		EXPECTED	"function to be called with " + boost::lexical_cast<string>(realArgCount)
+		ERRONEOUS	"function was called with " + boost::lexical_cast<string>(argumentExprs.size())
+		THROW 		("Wrong number of arguments in lambda invocation");
 	}
 
-	if(!analyzer->isASubtypeOfB(&actual, &lambda)) {
-		EXPECTED	analyzer->getNameForType(&lambda)
-		ERRONEOUS	analyzer->getNameForType(&actual)
-		THROW		("Argument lists not compatible in function invocation");
+	int i = 0;
+	for(boost::ptr_vector<ExpressionNode>::iterator it = argumentExprs.begin(); it != argumentExprs.end(); ++it, ++i) {
+		auto_ptr<Type> actual(it->typeCheck(false));
+		if(!analyzer->isASubtypeOfB(actual.get(), lambda.typedata.lambda.arguments->types[i])) {
+			EXPECTED	analyzer->getNameForType(lambda.typedata.lambda.arguments->types[i])
+			ERRONEOUS	analyzer->getNameForType(actual.get())
+			THROW		("Argument lists not compatible in function invocation");
+		}
 	}
 
 	return lambda.typedata.lambda.returntype ? new Type(*lambda.typedata.lambda.returntype) : new Type(TYPE_UNUSABLE);

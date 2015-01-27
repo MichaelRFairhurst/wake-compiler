@@ -48,7 +48,7 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 
 	if(a->type == TYPE_LAMBDA) {
 
-		// if one or the other is a pointer
+		// if one or the other is a null pointer, or has no args, and the other one has arguments.
 		if((a->typedata.lambda.arguments == NULL || !a->typedata.lambda.arguments->typecount) != (b->typedata.lambda.arguments == NULL || !b->typedata.lambda.arguments->typecount))
 			return false;
 
@@ -56,7 +56,7 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 		// however, void --fn() is not a subtype of Bool -- fn() as you probably guessed
 		if(a->typedata.lambda.returntype == NULL && b->typedata.lambda.returntype != NULL)
 			return false;
-		else if(b->typedata.lambda.returntype != NULL && !isASubtypeOfB(a->typedata.lambda.returntype, b->typedata.lambda.returntype))
+		else if(b->typedata.lambda.returntype != NULL && !isASubtypeOfB(a->typedata.lambda.returntype, b->typedata.lambda.returntype)) // ChildClass -- fn() is a subtype of ParentClass -- fn()
 			return false;
 
 		if(a->typedata.lambda.arguments != NULL && a->typedata.lambda.arguments->typecount) {
@@ -66,7 +66,7 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 
 			int i;
 			for(i = 0; i < a->typedata.lambda.arguments->typecount; i++)
-			if(!isASubtypeOfB(a->typedata.lambda.arguments->types[i], b->typedata.lambda.arguments->types[i]))
+			if(!isASubtypeOfB(b->typedata.lambda.arguments->types[i], a->typedata.lambda.arguments->types[i])) // fn(ParentClass) is a subtype of fn(ChildClass), but not vice versa! (contravariance)
 				return false;
 		}
 
@@ -265,32 +265,49 @@ boost::optional<Type*> TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
 	}
 
 	if(a->type == TYPE_LAMBDA) {
-		return boost::optional<Type*>();
-	/*
-		// if one or the other is a pointer
-		if((a->typedata.lambda.arguments == NULL) != (b->typedata.lambda.arguments == NULL))
-			return false;
 
-		// Bool -- fn() is a subtype of void -- fn(), since the subtype will simply ignore the returnval
-		// however, void --fn() is not a subtype of Bool -- fn() as you probably guessed
-		if(a->typedata.lambda.returntype == NULL && b->typedata.lambda.returntype != NULL)
-			return false;
-		else if(b->typedata.lambda.returntype != NULL && !isASubtypeOfB(a->typedata.lambda.returntype, b->typedata.lambda.returntype))
-			return false;
+		// if one or the other is a null, and the other one has arguments
+		if((a->typedata.lambda.arguments == NULL || !a->typedata.lambda.arguments->typecount) != (b->typedata.lambda.arguments == NULL || !b->typedata.lambda.arguments->typecount))
+			return boost::optional<Type*>();
 
-		if(a->typedata.lambda.arguments != NULL) {
+		if(a->typedata.lambda.arguments != NULL && a->typedata.lambda.arguments->typecount) {
 			// A fn taking 3 arguments is not a subtype of a fn taking 2 or 4
 			if(a->typedata.lambda.arguments->typecount != b->typedata.lambda.arguments->typecount)
-				return false;
+				return boost::optional<Type*>();
 
 			int i;
 			for(i = 0; i < a->typedata.lambda.arguments->typecount; i++)
-			if(!isASubtypeOfB(a->typedata.lambda.arguments->types[i], b->typedata.lambda.arguments->types[i]))
-				return false;
+			if(!isAExactlyB(a->typedata.lambda.arguments->types[i], b->typedata.lambda.arguments->types[i]))
+				return boost::optional<Type*>();
 		}
 
-		return true;
-	*/
+		// Bool -- fn() is a subtype of void -- fn(), since the subtype will simply ignore the returnval
+		// however, void --fn() is not a subtype of Bool -- fn() as you probably guessed
+		if(a->typedata.lambda.returntype == NULL || b->typedata.lambda.returntype == NULL) {
+			Type* newlambda = new Type(a);
+
+			if(newlambda->typedata.lambda.returntype) {
+				delete newlambda->typedata.lambda.returntype;
+			}
+
+			newlambda->typedata.lambda.returntype = NULL;
+			return boost::optional<Type*>(newlambda);
+		}
+
+
+		boost::optional<Type*> commonReturn = getCommonSubtypeOf(a->typedata.lambda.returntype, b->typedata.lambda.returntype);
+		if(!commonReturn) {
+			Type* newlambda = new Type(a);
+			delete newlambda->typedata.lambda.returntype;
+			newlambda->typedata.lambda.returntype = NULL;
+			return boost::optional<Type*>(newlambda);
+		}
+
+		Type* newlambda = new Type(a);
+		delete newlambda->typedata.lambda.returntype;
+		newlambda->typedata.lambda.returntype = *commonReturn;;
+		return boost::optional<Type*>(newlambda);
+
 	}
 }
 
