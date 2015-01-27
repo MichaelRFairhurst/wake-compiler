@@ -19,14 +19,23 @@
 Type* wake::ast::MethodInvocation::typeCheck(bool forceArrayIdentifier) {
 	Node* methodname = node->node_data.nodes[1];
 
-	if(node->node_data.nodes[0]->node_type == NT_THIS && methodname->subnodes == 2) {
+	if(node->node_data.nodes[0]->node_type == NT_THIS && methodname->subnodes < 3) {
 		string name = methodname->node_data.nodes[0]->node_data.string;
 		boost::optional<Type*> variable = scopesymtable->find(name);
 
 		if(variable) {
-			methodname->node_type = NT_LAMBDA_INVOCATION; // for codegen step
-			methodname->node_data.nodes[0]->node_type = NT_ALIAS; // for codegen step
-			auto_ptr<ExpressionNode> lambda(astCreator->generateExpressionAst(methodname, false)); // Don't ensure its a usable type -- this node will have such a wrapper already if it matters
+			node->node_type = NT_LAMBDA_INVOCATION; // for codegen step
+			node->node_data.nodes[0] = methodname->node_data.nodes[0];
+			if(methodname->subnodes == 2) {
+				node->node_data.nodes[1] = methodname->node_data.nodes[1];
+			} else {
+				node->subnodes = 1;
+			}
+			methodname->subnodes = 0;
+			freeNode(methodname);
+
+			node->node_data.nodes[0]->node_type = NT_ALIAS; // for codegen step
+			auto_ptr<ExpressionNode> lambda(astCreator->generateExpressionAst(node, false)); // Don't ensure its a usable type -- this node will have such a wrapper already if it matters
 			return lambda->typeCheck(false);
 		}
 	}

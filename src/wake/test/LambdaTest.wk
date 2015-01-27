@@ -1,0 +1,67 @@
+#>
+# Source Code for the Original Compiler for the
+# Programming Language Wake
+#
+# LambdaTest.wk
+#
+# Licensed under the MIT license
+# See LICENSE.TXT for details
+#
+# Author: Michael Fairhurst
+# Revised By:
+#
+##
+
+import Asserts;
+
+@TestClass
+every LambdaTest is:
+
+	@Test
+	~[test declared lambdas are not invoked ]~(Asserts) {
+		{ Text ->
+			Asserts.fail("Did not expect to run lambda with arg " + Text);
+		};
+	}
+
+	@Test
+	~[test self invoking lambda runs ]~(Asserts) {
+		var Bool ran = false;
+		({ ->
+			ran = true;
+		})();
+
+		Asserts.that(ran)Equals(true);
+	}
+
+	@Test
+	~[test declared lambda runs ]~(Asserts) {
+		var Bool ran = false;
+		var fn() lambda = { ->
+			ran = true;
+		};
+		lambda();
+
+		Asserts.that(ran)Equals(true);
+	}
+
+	@Test
+	~[test run lambda with args ]~(Asserts) {
+		var Bool ran = false;
+
+		({ Bool ->
+			Asserts.that(Bool)Equals(true);
+		})(true);
+
+		({ Bool ->
+			Asserts.that(Bool)Equals(false);
+		})(false);
+
+		({ Text ->
+			Asserts.that(Text)Equals('hey');
+		})('hey');
+
+		({ Text, $Text ->
+			Asserts.that(Text)Equals($Text);
+		})('hey', 'hey');
+	}

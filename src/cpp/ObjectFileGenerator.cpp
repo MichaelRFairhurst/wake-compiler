@@ -77,7 +77,6 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_PROVISIONS:
 		case NT_CTOR:
 		case NT_PARENT:
-		case NT_LAMBDA_INVOCATION:
 		case NT_INJECTION:
 			{
 				int i;
@@ -323,8 +322,8 @@ void ObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_METHOD_DECLARATION:
-			table.pushScope();
 			{
+				table.pushScope();
 				string name = tree->node_data.nodes[tree->subnodes - 1]->node_data.string;
 				TypeArray* arguments = (*classes->find(classname)->find(name))->typedata.lambda.arguments;
 				int i;
@@ -349,6 +348,46 @@ void ObjectFileGenerator::generate(Node* tree) {
 				table.popScope();
 			}
 
+			break;
+
+		case NT_LAMBDA_DECLARATION:
+			{
+				table.pushScope();
+
+				file << "(function(";
+				for(int i = 0; i < tree->node_data.nodes[0]->subnodes; i++)
+				if(tree->node_data.nodes[0]->node_data.nodes[i]->node_type == NT_TYPEDATA) {
+					if(i != 0) file << ",";
+					table.add(tree->node_data.nodes[0]->node_data.nodes[i]->node_data.type);
+					file << table.getAddress(tree->node_data.nodes[0]->node_data.nodes[i]->node_data.type);
+				} else {
+					if(i != 0) file << ",";
+					table.add(string(tree->node_data.nodes[0]->node_data.nodes[i]->node_data.string), new Type(TYPE_MATCHALL));
+					file << table.getAddress(string(tree->node_data.nodes[0]->node_data.nodes[i]->node_data.string));
+				}
+
+				file << "){";
+				generate(tree->node_data.nodes[1]);
+				file << "}).bind(this)";
+				table.popScope();
+			}
+			break;
+
+		case NT_LAMBDA_INVOCATION:
+			{
+				file << "(";
+				generate(tree->node_data.nodes[0]);
+
+				file << ")(";
+				if(tree->subnodes == 2)
+				for(int i = 0; i < tree->node_data.nodes[1]->subnodes; i++) {
+					if(i != 0) {
+						file << ",";
+					}
+					generate(tree->node_data.nodes[1]->node_data.nodes[i]);
+				}
+				file << ")";
+			}
 			break;
 
 		//case NT_METHOD_RETURN_TYPE:

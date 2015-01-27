@@ -49,7 +49,7 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 	if(a->type == TYPE_LAMBDA) {
 
 		// if one or the other is a pointer
-		if((a->typedata.lambda.arguments == NULL) != (b->typedata.lambda.arguments == NULL))
+		if((a->typedata.lambda.arguments == NULL || !a->typedata.lambda.arguments->typecount) != (b->typedata.lambda.arguments == NULL || !b->typedata.lambda.arguments->typecount))
 			return false;
 
 		// Bool -- fn() is a subtype of void -- fn(), since the subtype will simply ignore the returnval
@@ -59,7 +59,7 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 		else if(b->typedata.lambda.returntype != NULL && !isASubtypeOfB(a->typedata.lambda.returntype, b->typedata.lambda.returntype))
 			return false;
 
-		if(a->typedata.lambda.arguments != NULL) {
+		if(a->typedata.lambda.arguments != NULL && a->typedata.lambda.arguments->typecount) {
 			// A fn taking 3 arguments is not a subtype of a fn taking 2 or 4
 			if(a->typedata.lambda.arguments->typecount != b->typedata.lambda.arguments->typecount)
 				return false;

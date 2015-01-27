@@ -48,6 +48,8 @@ PTT_TEST_CASE(
 	"every ParentClass is:																								\n\
 	every MyClass (a ParentClass) is:																					\n\
 																														\n\
+		call(fn() lambda)WithNoArgs() { lambda(); }																		\n\
+																														\n\
 		call(fn(Text) lambda)WithText() { lambda('test'); }																\n\
 																														\n\
 		call(fn(Bool) lambda)WithBool() { lambda(true); }																\n\

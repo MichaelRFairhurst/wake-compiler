@@ -353,7 +353,7 @@ value_invokable:
 																							//free($2->node_data.nodes);
 																							//free($2);
 																						}
-																					} else if ($2 != NULL && $2->subnodes) {
+																					} else if ($2 != NULL && $2->subnodes > 1) {
 																						wakeerror("Cannot invoke anonymous function with named segments"); YYERROR;
 																					} else {
 																						// Turn (expression) and (NT_INVOCATION_PARTS_TEMP (expressions)
