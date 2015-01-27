@@ -111,6 +111,7 @@ void TableFileWriter::writeType(ostream& out, Type* type) {
 			out.write(dataptr, 1);
 		}
 
+		if(type->typedata.lambda.arguments)
 		for(int i = 0; i < type->typedata.lambda.arguments->typecount; i++) {
 			writeType(out, type->typedata.lambda.arguments->types[i]);
 		}

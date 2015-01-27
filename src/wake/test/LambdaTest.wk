@@ -65,3 +65,44 @@ every LambdaTest is:
 			Asserts.that(Text)Equals($Text);
 		})('hey', 'hey');
 	}
+
+	with Bool lambdaFunctionRan = false;
+	methodNotesLambdaRan() {
+		lambdaFunctionRan = true;
+	}
+
+	@Test
+	~[test call function within lambda ]~(Asserts) {
+		lambdaFunctionRan = false;
+		({ ->
+			methodNotesLambdaRan();
+		})();
+		Asserts.that(lambdaFunctionRan)Equals(true);
+	}
+
+	@Test
+	~[test use property within lambda ]~(Asserts) {
+		lambdaFunctionRan = false;
+		({ ->
+			lambdaFunctionRan = true;
+		})();
+		Asserts.that(lambdaFunctionRan)Equals(true);
+	}
+
+	@Test
+	~[test lambda return value ]~(Asserts) {
+		Asserts.that(({ -> return true; })())Equals(true);
+		Asserts.that(({ Bool -> return Bool; })(true))Equals(true);
+		Asserts.that(({ -> return false; })())Equals(false);
+		Asserts.that(({ Bool -> return Bool; })(false))Equals(false);
+	}
+
+	call(some fn()) {
+		some();
+	}
+
+	~[test method is called in other function]~(Asserts) {
+		var Bool = false;
+		call({ -> Bool = true; });
+		Asserts.that(Bool)Equals(true);
+	}
