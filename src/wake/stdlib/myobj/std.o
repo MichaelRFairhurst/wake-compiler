@@ -167,8 +167,22 @@ function$ $$A(a, b) {
 
 		this.`push(T)` = function(b) {
 			a.push(b);
-		}
+		};
 
+		this.`filter(Bool--(T))` = function(b) {
+			return$ a.filter(b);
+		};
+
+		this.`any(Bool--(T))` = function(b) {
+			for(var$ i = a.length - 1; i > -1; --i)
+			if(b(a[i])) return$ true;
+
+			return$ false;
+		};
+
+		this.`sort(Num--(T,T))` = function(b) {
+			a.sort(b);
+		}
 	};
 
 	~FileSystem~ = function$ ~FileSystem~() {

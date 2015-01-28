@@ -19,5 +19,8 @@ every List{T} is:
 
 	Num -- getSize() { return 0; }
 	Bool -- contains(T) { return false; }
-	T[] -- intersect(T[]) { return T[]; }
+	T[] -- intersect(T[]) { return []; }
+	T[] -- filter(Bool -- fn(T) filterer) { return []; }
+	Bool -- any(Bool -- fn(T) checker) { return true; }
+	sort(Num -- fn(T,T) sorter) {}
 	push(T) { }

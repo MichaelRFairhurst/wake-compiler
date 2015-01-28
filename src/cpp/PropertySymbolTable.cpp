@@ -259,7 +259,7 @@ ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<Type*
 	TypeParameterizer parameterizer;
 	map<string, ObjectProperty*>* newprops = new map<string, ObjectProperty*>();
 	for(map<string, ObjectProperty*>::iterator it = properties.begin(); it != properties.end(); ++it) {
-		string casing, oldcasing = it->second->casing;
+		string newname, oldcasing = it->second->casing;
 		ObjectProperty* newprop = new ObjectProperty();
 		newprop->type = copyType(it->second->type);
 		newprop->flags = it->second->flags;
@@ -268,15 +268,15 @@ ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<Type*
 		int i = 0, c = 0;
 		while(c < oldcasing.length()) {
 			if(oldcasing.at(c) == '#') {
-				casing += analyzer->getNameForType(newprop->type->typedata.lambda.arguments->types[i]);
+				newname += analyzer->getNameForType(newprop->type->typedata.lambda.arguments->types[i]);
 				i++;
 			} else {
-				casing += oldcasing.at(c);
+				newname += oldcasing.at(c);
 			}
 			c++;
 		}
-		newprop->casing = casing;
-		(*newprops)[casing] = newprop;
+		newprop->casing = oldcasing;
+		(*newprops)[newname] = newprop;
 	}
 
 	vector<Type*>* newneeds = new vector<Type*>();

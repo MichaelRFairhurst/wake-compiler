@@ -46,7 +46,7 @@ Type* wake::ast::MethodInvocationBase::typeCheckMethodInvocation(Type& subject) 
 	boost::ptr_vector<TypeArray> methodSegmentsLatch;
 
 	string casing;
-	string name;
+	string address;
 	for(boost::ptr_vector<MethodSegment>::iterator it = methodSegments.begin(); it != methodSegments.end(); ++it) {
 		casing += it->name + "(";
 		for(std::vector<std::pair<wake::ast::ExpressionNode*, wake::ast::ExpectedTypeExpression*> >::iterator argExprIt = it->arguments.begin(); argExprIt != it->arguments.end(); ++argExprIt) {
@@ -61,7 +61,7 @@ Type* wake::ast::MethodInvocationBase::typeCheckMethodInvocation(Type& subject) 
 	int i = 0;
 	if(lambdaprop) {
 		lambdatype = (*lambdaprop)->type;
-		name = (*lambdaprop)->address;
+		address = (*lambdaprop)->address;
 		for(boost::ptr_vector<MethodSegment>::iterator it = methodSegments.begin(); it != methodSegments.end(); ++it, i++)
 		for(std::vector<std::pair<wake::ast::ExpressionNode*, wake::ast::ExpectedTypeExpression*> >::iterator argExprIt = it->arguments.begin(); argExprIt != it->arguments.end(); ++argExprIt)
 		if(argExprIt->first) {
@@ -92,13 +92,16 @@ Type* wake::ast::MethodInvocationBase::typeCheckMethodInvocation(Type& subject) 
 			}
 		}
 
-		name = methodtable->getSymbolNameOf(&methodSegmentTypes);
+		string name = methodtable->getSymbolNameOf(&methodSegmentTypes);
 		lambdatype = methodtable->find(name);
+		if(lambdatype) {
+			address = methodtable->getAddress(name);
+		}
 	}
 
 	if(lambdatype) {
 		AddSubNode(node, MakeNodeFromString(NT_COMPILER_HINT, strdup(subject.typedata._class.classname), node->loc));
-		AddSubNode(node, MakeNodeFromString(NT_COMPILER_HINT, strdup(methodtable->getAddress(name).c_str()), node->loc));
+		AddSubNode(node, MakeNodeFromString(NT_COMPILER_HINT, strdup(address.c_str()), node->loc));
 
 		if((*lambdatype)->typedata.lambda.returntype == NULL) {
 			return new Type(TYPE_UNUSABLE);
