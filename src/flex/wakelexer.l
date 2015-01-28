@@ -48,7 +48,8 @@ void count();
 
 every					count(); return EVERY;
 capable					count(); return CAPABLE;
-an?						count(); return A_OR_AN;
+a						count(); return A;
+an						count(); return AN;
 is						count(); return IS;
 return					count(); return RETURN;
 foreach					count(); return FOREACH;

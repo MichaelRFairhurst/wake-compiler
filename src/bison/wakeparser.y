@@ -45,7 +45,7 @@ int wakewrap()
 %}
 
 /* keywords */
-%token EVERY CAPABLE A_OR_AN IS RETURN WITH PUBLIC IF ELSE WHILE IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE EXISTS VAR FOREACH IN THROW TRY CATCH FROM
+%token EVERY CAPABLE A AN IS RETURN WITH PUBLIC IF ELSE WHILE IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE EXISTS VAR FOREACH IN THROW TRY CATCH FROM
 /* symbols */
 %token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT SYM_PLUSEQ SYM_VALEQ SYM_MULTEQ SYM_SUBEQ SYM_DIVEQ SYM_PROVIDE_ARGS_OPEN SYM_EARLYBAILOUT_DOT SYM_TYPESAFE_INDEX SYM_LAMBDA;
 /* this too */
@@ -76,6 +76,7 @@ int wakewrap()
 %type <node> imports import importtarget classes annotatedclass class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value value_invokable method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args annotatedtype annotatedmethod annotation annotations annotationvals annotationval lambda statement_or_block expression_nolambda inferenceabletypes
 %type <type> type specializabletype shadowabletype puretype classtype fntype parameterizedtype unboundtypespecification classdeclarationtype
 %type <type_array> puretypes types unboundtypespecifications
+%type <string> alias
 %start file
 
 /* 2 are from @annotations before class definitions, 1 from if/else, 1 from try/catch, 1 from exists/else */
@@ -153,7 +154,8 @@ inheritances:
 
 inheritance:
 	CAPABLE parameterizedtype													{ $$ = MakeOneBranchNode(NT_INTERFACE, MakeNodeFromType($2, @$), @$); }
-	| A_OR_AN parameterizedtype													{ $$ = MakeOneBranchNode(NT_SUBCLASS, MakeNodeFromType($2, @$), @$); }
+	| A parameterizedtype														{ $$ = MakeOneBranchNode(NT_SUBCLASS, MakeNodeFromType($2, @$), @$); }
+	| AN parameterizedtype														{ $$ = MakeOneBranchNode(NT_SUBCLASS, MakeNodeFromType($2, @$), @$); }
 	;
 
 classbody:
@@ -245,6 +247,10 @@ annotatedmethod:
 method:
 	methodaccess methodreturn lmethodnamesegments methodbody					{ $$ = MakeTwoBranchNode(NT_METHOD_DECLARATION, $1, $2, @$); AddSubNode($$, $3); AddSubNode($$, $4); }
 	| methodaccess lmethodnamesegments methodbody								{ $$ = MakeTwoBranchNode(NT_METHOD_DECLARATION, $1, $2, @$); AddSubNode($$, $3); }
+	| methodaccess '{' unboundtypespecifications '}'
+		methodreturn lmethodnamesegments methodbody								{ $$ = MakeTwoBranchNode(NT_METHOD_DECLARATION, $1, $5, @$); AddSubNode($$, $6); AddSubNode($$, $7); AddSubNode($$, MakeNodeFromTypeArray($3, @3)); }
+	| methodaccess '{' unboundtypespecifications '}'
+		lmethodnamesegments methodbody											{ $$ = MakeTwoBranchNode(NT_METHOD_DECLARATION, $1, $5, @$); AddSubNode($$, $6); AddSubNode($$, MakeNodeFromTypeArray($3, @3)); }
 	;
 
 methodaccess:
@@ -263,9 +269,9 @@ methodbody:
 	;
 
 lmethodnamesegments:
-	LIDENTIFIER '(' ')'															{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$), @$); }
-	| LIDENTIFIER '(' types ')'													{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$), MakeNodeFromTypeArray($3, @$), @$); }
-	| LIDENTIFIER '(' types ')' lumethodnamesegments							{ $$ = $5; PrependSubNode($5, MakeNodeFromTypeArray($3, @$)); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$)); }
+	alias '(' ')'																{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$), @$); }
+	| alias '(' types ')'														{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$), MakeNodeFromTypeArray($3, @$), @$); }
+	| alias '(' types ')' lumethodnamesegments									{ $$ = $5; PrependSubNode($5, MakeNodeFromTypeArray($3, @$)); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$)); }
 	;
 
 lumethodnamesegments:
@@ -308,11 +314,11 @@ value:
 	;
 
 value_invokable:
-	LIDENTIFIER																	{ $$ = MakeNodeFromString(NT_ALIAS, $1, @$); }
+	alias																		{ $$ = MakeNodeFromString(NT_ALIAS, $1, @$); }
 	| value '[' expression ']'													{ $$ = MakeTwoBranchNode(NT_ARRAY_ACCESS, $1, $3, @$); }
 	| value SYM_TYPESAFE_INDEX expression ']'									{ $$ = MakeTwoBranchNode(NT_TYPESAFE_ARRAY_ACCESS, $1, $3, @$); }
-	| objectable '.' LIDENTIFIER												{ $$ = MakeTwoBranchNode(NT_MEMBER_ACCESS, $1, MakeNodeFromString(NT_ALIAS, $3, @3), @$); }
-	| objectable SYM_EARLYBAILOUT_DOT LIDENTIFIER								{ $$ = MakeTwoBranchNode(NT_EARLYBAILOUT_MEMBER_ACCESS, $1, MakeNodeFromString(NT_ALIAS, $3, @3), @$); }
+	| objectable '.' alias														{ $$ = MakeTwoBranchNode(NT_MEMBER_ACCESS, $1, MakeNodeFromString(NT_ALIAS, $3, @3), @$); }
+	| objectable SYM_EARLYBAILOUT_DOT alias										{ $$ = MakeTwoBranchNode(NT_EARLYBAILOUT_MEMBER_ACCESS, $1, MakeNodeFromString(NT_ALIAS, $3, @3), @$); }
 	| '(' expression ')'														{ $$ = $2; }
 	| value_invokable methodcallsegments										{
 																					if ($1->node_type == NT_ALIAS) {
@@ -434,9 +440,9 @@ labelstatement:
 
 existsstatement:
 	IF shadowabletype EXISTS statement_or_block									{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromType($2, @2), $4, @$); }
-	| IF LIDENTIFIER EXISTS statement_or_block									{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromString(NT_ALIAS, $2, @2), $4, @$); }
+	| IF alias EXISTS statement_or_block										{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromString(NT_ALIAS, $2, @2), $4, @$); }
 	| IF shadowabletype EXISTS statement_or_block ELSE statement_or_block		{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromType($2, @2), $4, @$); AddSubNode($$, $6); }
-	| IF LIDENTIFIER EXISTS statement_or_block ELSE statement_or_block			{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromString(NT_ALIAS, $2, @2), $4, @$); AddSubNode($$, $6); }
+	| IF alias EXISTS statement_or_block ELSE statement_or_block				{ $$ = MakeTwoBranchNode(NT_EXISTS, MakeNodeFromString(NT_ALIAS, $2, @2), $4, @$); AddSubNode($$, $6); }
 	;
 
 selectionstatement:
@@ -454,7 +460,7 @@ iterationstatement:
 
 member:
 	shadowabletype																{ $$ = MakeNodeFromType($1, @$); }
-	| LIDENTIFIER																{ $$ = MakeNodeFromString(NT_ALIAS, $1, @$); }
+	| alias																		{ $$ = MakeNodeFromString(NT_ALIAS, $1, @$); }
 	;
 
 forinit:
@@ -601,7 +607,13 @@ expressions_noretrieval:
 
 identifier:
 	UIDENTIFIER																	{ $$ = $1; }
-	| LIDENTIFIER																{ $$ = $1; }
+	| alias																		{ $$ = $1; }
+	;
+
+alias:
+	LIDENTIFIER																	{ $$ = $1; }
+	| A																			{ $$ = strdup("a"); }
+	| AN																		{ $$ = strdup("an"); }
 	;
 
 annotatedtype:
@@ -610,8 +622,8 @@ annotatedtype:
 	;
 
 type:
-	LIDENTIFIER specializabletype												{ $$ = $2; $$->alias = $1; }
-	| specializabletype LIDENTIFIER												{ $$ = $1; $$->alias = $2; }
+	alias specializabletype														{ $$ = $2; $$->alias = $1; }
+	| specializabletype alias													{ $$ = $1; $$->alias = $2; }
 	| specializabletype															{ $$ = $1; }
 	;
 
@@ -646,9 +658,9 @@ types:
 
 inferenceabletypes:
 	type																		{ $$ = MakeOneBranchNode(NT_INFERENCEABLE_TYPES, MakeNodeFromType($1, @1), @$); }
-	| LIDENTIFIER																{ $$ = MakeOneBranchNode(NT_INFERENCEABLE_TYPES, MakeNodeFromString(NT_ALIAS, $1, @1), @$); }
+	| alias																		{ $$ = MakeOneBranchNode(NT_INFERENCEABLE_TYPES, MakeNodeFromString(NT_ALIAS, $1, @1), @$); }
 	| inferenceabletypes ',' type												{ $$ = $1; AddSubNode($$, MakeNodeFromType($3, @3)); $$->loc = @$; }
-	| inferenceabletypes ',' LIDENTIFIER										{ $$ = $1; AddSubNode($$, MakeNodeFromString(NT_ALIAS, $3, @3)); $$->loc = @$; }
+	| inferenceabletypes ',' alias												{ $$ = $1; AddSubNode($$, MakeNodeFromString(NT_ALIAS, $3, @3)); $$->loc = @$; }
 	;
 
 classtype:
