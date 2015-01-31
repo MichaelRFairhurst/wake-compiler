@@ -17,7 +17,7 @@
 void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 	char* dataptr = (char*) malloc(1);
 
-	dataptr[0] = (char) 3; //version
+	dataptr[0] = (char) 4; //version
 	out.write(dataptr, 1);
 
 	dataptr[0] = (char) table->classname.size();

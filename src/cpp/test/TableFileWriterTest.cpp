@@ -22,7 +22,7 @@
 #define ASSERTCHAR(v) BOOST_CHECK_MESSAGE(dataptr[i++] == v, "Expected " #v " in stream at pos " + boost::lexical_cast<string>(i) + " got " + string(1, (unsigned char) dataptr[i]));
 #define ASSERTLENGTH(l) char* dataptr = (char*) malloc(l); out.read(dataptr, l); BOOST_CHECK_MESSAGE(!out.eof(), "too short"); out.peek(); BOOST_CHECK_MESSAGE(out.eof(), "too long"); int i = 0;
 
-#define TABLE_FILE_VERSION 3
+#define TABLE_FILE_VERSION 4
 
 BOOST_AUTO_TEST_SUITE(TableFileWriterTest)
 

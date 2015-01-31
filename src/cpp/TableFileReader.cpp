@@ -19,7 +19,7 @@
 void TableFileReader::read(PropertySymbolTable* table, istream& s) {
 	//@TODO work rom tablefile
 	int version = readUInt8(s);
-	if(version != 3) throw string("Can not read table file, it has an unsupported version");
+	if(version < 3 || version > 4) throw string("Can not read table file, it has an unsupported version");
 	table->classname = readString(s);
 	table->abstract = readUInt8(s);
 	unsigned char tag;
