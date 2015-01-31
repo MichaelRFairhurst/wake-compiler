@@ -106,7 +106,7 @@ bool TypeAnalyzer::isASubtypeOfB(Type* a, Type* b) {
 		}
 
 		return false;
-	} else if(a->type == TYPE_PARAMETERIZED) {
+	} else if(a->type == TYPE_PARAMETERIZED || a->type == TYPE_PARAMETERIZED_ARG) {
 		if(a->typedata.parameterized.label == string(b->typedata.parameterized.label)) return true;
 		// TODO: lower/upper bounds comparison
 		return false;
@@ -132,7 +132,7 @@ bool TypeAnalyzer::isAExactlyB(Type* a, Type* b) {
 			if(!isAExactlyB(a->typedata._class.parameters->types[i], b->typedata._class.parameters->types[i]))
 				return false;
 		}
-	} else if(a->type == TYPE_PARAMETERIZED) {
+	} else if(a->type == TYPE_PARAMETERIZED || a->type == TYPE_PARAMETERIZED_ARG) {
 		// no need to check lower/upper bound, should always be the same for all labels
 		return a->typedata.parameterized.label == string(b->typedata.parameterized.label);
 	} else if(a->type == TYPE_LAMBDA) {
@@ -258,7 +258,7 @@ boost::optional<Type*> TypeAnalyzer::getCommonSubtypeOf(Type* a, Type* b) {
 		} else {
 			return boost::optional<Type*>(common->second);
 		}
-	} else if(a->type == TYPE_PARAMETERIZED) {
+	} else if(a->type == TYPE_PARAMETERIZED || a->type == TYPE_PARAMETERIZED_ARG) {
 		if(a->typedata.parameterized.label == string(b->typedata.parameterized.label)) return boost::optional<Type*>(new Type(*a));
 		// TODO: lower/upper bounds comparison
 		return boost::optional<Type*>();
@@ -464,7 +464,7 @@ string TypeAnalyzer::getNameForType(Type* type) {
 		return name;
 	}
 
-	if(type->type == TYPE_PARAMETERIZED) {
+	if(type->type == TYPE_PARAMETERIZED || type->type == TYPE_PARAMETERIZED_ARG) {
 		name = type->typedata.parameterized.label;
 	}
 
@@ -526,7 +526,7 @@ string TypeAnalyzer::getNameForTypeAsProperty(Type* type) {
 			return getNameForTypeAsProperty(noList_noOpt) + "[]";
 		} else if(type->type == TYPE_OPTIONAL) {
 			return getNameForTypeAsProperty(type->typedata.optional.contained);
-		} else if(type->type == TYPE_PARAMETERIZED) {
+		} else if(type->type == TYPE_PARAMETERIZED || type->type == TYPE_PARAMETERIZED_ARG) {
 			return string(type->typedata.parameterized.shadow, '$') + type->typedata.parameterized.label;
 		}
 	}
@@ -551,4 +551,43 @@ int TypeAnalyzer::getArrayReferenceLevel(Type& type) {
 	if(type.type == TYPE_LIST) return 1 + getArrayReferenceLevel(*type.typedata.list.contained);
 	if(type.type == TYPE_OPTIONAL) return getArrayReferenceLevel(*type.typedata.optional.contained);
 	return 0;
+}
+
+bool TypeAnalyzer::hasArgParameterization(Type* type) {
+	if(type == NULL) return false;
+	switch(type->type) {
+		case TYPE_OPTIONAL:
+			return hasArgParameterization(type->typedata.optional.contained);
+
+		case TYPE_LIST:
+			return hasArgParameterization(type->typedata.list.contained);
+
+		case TYPE_PARAMETERIZED_ARG:
+			return true;
+
+		case TYPE_CLASS:
+			return hasArgParameterization(type->typedata._class.parameters);
+
+		case TYPE_LAMBDA:
+			if(hasArgParameterization(type->typedata.lambda.arguments)) {
+				return true;
+			}
+			return type->typedata.lambda.returntype != NULL && hasArgParameterization(type->typedata.lambda.returntype);
+
+		default:
+			return false;
+	}
+}
+
+bool TypeAnalyzer::hasArgParameterization(TypeArray* typearray) {
+	if(typearray == NULL) {
+		return false;
+	}
+
+	for(int i = 0; i < typearray->typecount; i++)
+	if(hasArgParameterization(typearray->types[i])) {
+		return true;
+	}
+
+	return false;
 }

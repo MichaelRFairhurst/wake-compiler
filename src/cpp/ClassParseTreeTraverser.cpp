@@ -103,7 +103,25 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 					annotations = traverser.getAnnotations(tree->node_data.nodes[1]);
 					tree = tree->node_data.nodes[0];
 				}
-				methodanalyzer->convertParameterizedTypes(tree, propertysymtable->getParameters());
+				vector<Type*> parameterizedtypes = propertysymtable->getParameters();
+
+				Node* lastnode = tree->node_data.nodes[tree->subnodes - 1];
+				vector<string> usedGenericNames;
+				for(std::vector<Type*>::iterator it = parameterizedtypes.begin(); it != parameterizedtypes.end(); ++it) {
+					usedGenericNames.push_back((*it)->typedata.parameterized.label);
+				}
+
+				if(lastnode->node_type == NT_TYPE_ARRAY)
+				for(int i = 0; i < lastnode->node_data.typearray->typecount; i++)
+				if(std::find(usedGenericNames.begin(), usedGenericNames.end(), lastnode->node_data.typearray->types[i]->typedata.parameterized.label) == usedGenericNames.end()) {
+					lastnode->node_data.typearray->types[i]->type = TYPE_PARAMETERIZED_ARG;
+					parameterizedtypes.push_back(lastnode->node_data.typearray->types[i]);
+					usedGenericNames.push_back(lastnode->node_data.typearray->types[i]->typedata.parameterized.label);
+				} else {
+					errors->addError(new SemanticError(GENERIC_TYPE_COLLISION, string("Generic type with label ") + lastnode->node_data.typearray->types[i]->typedata.parameterized.label + " is declared more than once", tree));
+				}
+
+				methodanalyzer->convertParameterizedTypes(tree, parameterizedtypes);
 				vector<pair<string, TypeArray*> >* methodname = methodanalyzer->getName(tree);
 
 				boost::optional<SemanticError*> error = propertysymtable->addMethod(methodanalyzer->getReturn(tree), methodname, methodanalyzer->getFlags(tree), annotations);
@@ -122,7 +140,7 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 		case NT_PROPERTY:
 			try {
 				TypeParameterizer parameterizer;
-				parameterizer.writeInParameterizations(&tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type, propertysymtable->getParameters());
+				parameterizer.rewriteClasstypesToParameterizedtypeByLabel(&tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type, propertysymtable->getParameters());
 				Type prop = *tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type;
 				classestable->assertTypeIsValid(&prop);
 				boost::optional<SemanticError*> error = propertysymtable->addProperty(new Type(prop), tree->subnodes == 2 ? PROPERTY_PUBLIC : 0, vector<Annotation*>());
@@ -198,7 +216,7 @@ void ClassParseTreeTraverser::checkCtorArgs(Node* tree) {
 							typeNode = needNode->node_data.nodes[0];
 						}
 
-						parameterizer.writeInParameterizations(&typeNode->node_data.type, propertysymtable->getParameters());
+						parameterizer.rewriteClasstypesToParameterizedtypeByLabel(&typeNode->node_data.type, propertysymtable->getParameters());
 						Type* needtype = typeNode->node_data.type;
 						classestable->assertTypeIsValid(needtype);
 						//classestable->getAnalyzer()->assertNeedIsNotCircular(classname, needtype); DISABLED because we can't tell without importing everything
@@ -426,6 +444,16 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 
 				errors->pushContext("In declaration of 'every " + classname + "' method " + name);
 				AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(name.c_str()), tree->loc));
+
+				vector<Type*> parameterizedtypes = propertysymtable->getParameters();
+
+				Node* lastnode = tree->node_data.nodes[tree->subnodes - 1];
+				if(lastnode->node_type == NT_TYPE_ARRAY)
+				for(int i = 0; i < lastnode->node_data.typearray->typecount; i++) {
+					parameterizedtypes.push_back(lastnode->node_data.typearray->types[i]);
+				}
+
+				typechecker->setParameterizedTypes(parameterizedtypes);
 
 				// Begin Method Scope For Type Analysis
 				scopesymtable->pushScope();

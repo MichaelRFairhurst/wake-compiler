@@ -118,8 +118,8 @@ void TableFileWriter::writeType(ostream& out, Type* type) {
 
 		dataptr[0] = 0x00;
 		out.write(dataptr, 1);
-	} else if(type->type == TYPE_PARAMETERIZED) {
-		dataptr[0] = TYPE_PARAMETERIZED;
+	} else if(type->type == TYPE_PARAMETERIZED || type->type == TYPE_PARAMETERIZED_ARG) {
+		dataptr[0] = type->type;
 		out.write(dataptr, 1);
 
 		dataptr[0] = (char) strlen(type->typedata.parameterized.label);

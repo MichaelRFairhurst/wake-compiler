@@ -23,7 +23,7 @@ void MethodSignatureParseTreeTraverser::convertParameterizedTypes(Node* methodde
 
 	if(methoddef->node_data.nodes[1]->node_type == NT_METHOD_RETURN_TYPE) {
 		methodname = methoddef->node_data.nodes[2];
-		parameterizer.writeInParameterizations(&methoddef->node_data.nodes[1]->node_data.nodes[0]->node_data.type, parameterizedtypes);
+		parameterizer.rewriteClasstypesToParameterizedtypeByLabel(&methoddef->node_data.nodes[1]->node_data.nodes[0]->node_data.type, parameterizedtypes);
 	} else {
 		methodname = methoddef->node_data.nodes[1];
 	}
@@ -35,7 +35,8 @@ void MethodSignatureParseTreeTraverser::convertParameterizedTypes(Node* methodde
 		if(i < methodname->subnodes) {
 			args = methodname->node_data.nodes[i]->node_data.typearray;
 			for(int b = 0; b < args->typecount; b++) {
-				parameterizer.writeInParameterizations(&args->types[b], parameterizedtypes);
+				parameterizer.rewriteClasstypesToParameterizedtypeByLabel(&args->types[b], parameterizedtypes);
+
 			}
 		}
 	}

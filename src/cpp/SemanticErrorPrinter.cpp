@@ -115,6 +115,9 @@ void SemanticErrorPrinter::print(SemanticError* e) {
 		case TYPE_INFERENCE_FAILURE:
 			cout << "Type inference failed";
 			break;
+		case GENERIC_TYPE_COLLISION:
+			cout << "Multiple generics have been defined with the same name that share a context (class or method)";
+			break;
 		default:
 			cout << "bad error code provided";
 	}

@@ -76,7 +76,7 @@ string ScopeSymbolTable::getNameForType(Type* type) {
 	if(type->alias != NULL) {
 		return type->alias;
 	} else {
-		if(type->type == TYPE_PARAMETERIZED){
+		if(type->type == TYPE_PARAMETERIZED || type->type == TYPE_PARAMETERIZED_ARG){
 			return string(type->typedata.parameterized.shadow, '$') + type->typedata.parameterized.label;
 		} else if(type->type == TYPE_CLASS) {
 			return string(type->typedata._class.shadow, '$') + type->typedata._class.classname;

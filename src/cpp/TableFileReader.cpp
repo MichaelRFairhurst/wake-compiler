@@ -101,8 +101,8 @@ Type* TableFileReader::readTypeByTag(int tag, istream& s) {
 		return readClassType(s);
 	} else if(tag == TYPE_LAMBDA) {
 		return readLambdaType(s);
-	} else if(tag == TYPE_PARAMETERIZED) {
-		return readParameterizedType(s);
+	} else if(tag == TYPE_PARAMETERIZED || tag == TYPE_PARAMETERIZED_ARG) {
+		return readParameterizedType(s, tag);
 	} else if(tag == TYPE_LIST) {
 		return readListType(s);
 	} else if(tag == TYPE_OPTIONAL) {
@@ -158,8 +158,8 @@ Type* TableFileReader::readLambdaType(istream& s) {
 	return type;
 }
 
-Type* TableFileReader::readParameterizedType(istream& s) {
-	Type* type = MakeType(TYPE_PARAMETERIZED);
+Type* TableFileReader::readParameterizedType(istream& s, int paramdtype) {
+	Type* type = MakeType(paramdtype);
 	type->typedata.parameterized.label = readCString(s);
 	int tag = readUInt8(s);
 	if(tag != 0x00) {

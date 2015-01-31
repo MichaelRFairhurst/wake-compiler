@@ -28,7 +28,7 @@ void Type::releaseData() {
 	} else if(type == TYPE_CLASS) {
 		free(typedata._class.classname);
 		delete typedata._class.parameters;
-	} else if(type == TYPE_PARAMETERIZED) {
+	} else if(type == TYPE_PARAMETERIZED || type == TYPE_PARAMETERIZED_ARG) {
 		free(typedata.parameterized.label);
 		delete typedata.parameterized.upperbound;
 		delete typedata.parameterized.lowerbound;
@@ -56,6 +56,7 @@ Type::Type(int type) {
 			typedata.lambda.arguments = NULL;//MakeTypeArray();
 			break;
 		case TYPE_PARAMETERIZED:
+		case TYPE_PARAMETERIZED_ARG:
 			typedata.parameterized.shadow = 0;
 			typedata.parameterized.upperbound = NULL;
 			typedata.parameterized.lowerbound = NULL;
@@ -102,6 +103,7 @@ void Type::deepCopy(const Type& other) {
 			}
 			break;
 		case TYPE_PARAMETERIZED:
+		case TYPE_PARAMETERIZED_ARG:
 			typedata.parameterized.shadow = other.typedata.parameterized.shadow;
 			if(other.typedata.parameterized.upperbound != NULL) {
 				typedata.parameterized.upperbound = new Type(*other.typedata.parameterized.upperbound);

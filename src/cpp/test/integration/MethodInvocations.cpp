@@ -32,8 +32,7 @@ PTT_TEST_CASE(
 		Text -- argIsInvalidReturn(MyClass c, Num) { return c.argIsInvalidType(c, 5); }							\n\
 		MyClass -- argIsInvalidArgumentCount(MyClass c, Num) { return c.argIsInvalidType(c); }					\n\
 	",
-	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
-	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
@@ -59,8 +58,7 @@ PTT_TEST_CASE(
 		Text -- argIsInvalidReturn(MyClass c, Num) { return argIsInvalidType(c, 5); }							\n\
 		MyClass -- argIsInvalidArgumentCount(MyClass c, Num) { return argIsInvalidType(c); }					\n\
 	",
-	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
-	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
@@ -86,8 +84,7 @@ PTT_TEST_CASE(
 		Text -- argIsInvalidReturn(MyClass c, Num) { return this.argIsInvalidType(c, 5); }							\n\
 		MyClass -- argIsInvalidArgumentCount(MyClass c, Num) { return this.argIsInvalidType(c); }					\n\
 	",
-	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
-	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)

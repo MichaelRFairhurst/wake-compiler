@@ -33,7 +33,7 @@ namespace wake {
 				: analyzer(analyzer), arguments(arguments), body(body), scopesymtable(scopesymtable), errors(errors), returntype(returntype), node(node) {};
 
 				Type* typeCheck(bool forceArrayIdentifier);
-				bool typeCheckExpecting(Type* hint);
+				Type* typeCheckExpecting(Type* hint);
 				Type* typeCheckCommon(Type* hint);
 
 			private:

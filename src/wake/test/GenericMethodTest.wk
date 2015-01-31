@@ -1,0 +1,23 @@
+import Asserts;
+
+every GenericMethodTest is:
+
+	{T} Bool -- checkExists(T?) {
+		if T exists {
+			return true;
+		}
+
+		return false;
+	}
+
+	@Test
+	~[test checkExists() ]~(Asserts) {
+		var Num? = 4;
+		var Text? = 'hey';
+		Asserts.that(checkExists(Num))Equals(true);
+		Asserts.that(checkExists(Text))Equals(true);
+		Num = nothing;
+		Text = nothing;
+		Asserts.that(checkExists(Num))Equals(false);
+		Asserts.that(checkExists(Text))Equals(false);
+	}

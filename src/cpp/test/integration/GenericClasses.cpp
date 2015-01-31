@@ -332,3 +332,8 @@ PTT_TEST_CASE(
 	PTT_VALID
 );
 
+PTT_TEST_CASE(
+	TestDoubleDeclarationOfClassGenericIsError,
+	"every MyClass{T, T} is:",
+	PTT_EXPECT(GENERIC_TYPE_COLLISION)
+);

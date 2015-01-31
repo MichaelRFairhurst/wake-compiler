@@ -20,7 +20,7 @@
 void wake::ast::Declaration::typeCheck() {
 	try {
 		TypeParameterizer parameterizer;
-		parameterizer.writeInParameterizations(declared, parameterizedtypes);
+		parameterizer.rewriteClasstypesToParameterizedtypeByLabel(declared, parameterizedtypes);
 		classestable->assertTypeIsValid(*declared);
 		Type assignment = *auto_ptr<Type>(value->typeCheck(false));
 		if(!classestable->getAnalyzer()->isASubtypeOfB(&assignment, *declared)) {

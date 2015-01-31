@@ -438,3 +438,25 @@ PTT_TEST_CASE(
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 );
+
+PTT_TEST_CASE(
+	LambdasPassedIntoNonLambdaArgsDoesntTryToInfer,
+	"every MyClass is:				\n\
+		myMethod(Num) { }			\n\
+		otherMethod() {				\n\
+			myMethod({ t -> ;});	\n\
+		}",
+	PTT_EXPECT(TYPE_INFERENCE_FAILURE)
+);
+
+PTT_TEST_CASE(
+	LambdaArgsAreHandledLastForBindingMethodGennerics,
+	"every MyClass is:																			\n\
+		{R, A, B, C, D} R -- callfour(R -- fn(A, B, C, D) callme, A, B, C, D) {					\n\
+			return callme(A, B, C, D);															\n\
+		}																						\n\
+		MyClass -- useIt() {																	\n\
+			return callfour({a, b, c, d -> a + b; c + d; return this; }, 1, 2, 'hey', 'man');	\n\
+		}",
+	PTT_VALID
+);

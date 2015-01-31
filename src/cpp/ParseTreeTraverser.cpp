@@ -70,12 +70,17 @@ void ParseTreeTraverser::traverse(Node* tree) {
 
 				Type* classtype = tree->node_data.nodes[0]->node_data.type;
 				vector<Type*>* parameters = new vector<Type*>();
-				if(classtype->typedata._class.parameters != NULL) {
-					int i;
-					for(i = 0; i < classtype->typedata._class.parameters->typecount; i++) {
-						parameters->push_back(classtype->typedata._class.parameters->types[i]);
-					}
+
+				vector<string> usedGenericNames;
+				if(classtype->typedata._class.parameters != NULL)
+				for(int i = 0; i < classtype->typedata._class.parameters->typecount; i++)
+				if(std::find(usedGenericNames.begin(), usedGenericNames.end(), classtype->typedata._class.parameters->types[i]->typedata.parameterized.label) == usedGenericNames.end()) {
+					parameters->push_back(classtype->typedata._class.parameters->types[i]);
+					usedGenericNames.push_back(classtype->typedata._class.parameters->types[i]->typedata.parameterized.label);
+				} else {
+					errors.addError(new SemanticError(GENERIC_TYPE_COLLISION, string("Generic type with label ") + classtype->typedata._class.parameters->types[i]->typedata.parameterized.label + " is declared more than once", tree));
 				}
+
 				proptable->setParameters(parameters);
 
 				traverse(tree->node_data.nodes[1]);

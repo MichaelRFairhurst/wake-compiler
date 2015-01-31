@@ -72,7 +72,7 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 		case NT_TYPEDATA:
 			{
 				TypeParameterizer parameterizer;
-				parameterizer.writeInParameterizations(&node->node_data.type, parameterizedtypes);
+				parameterizer.rewriteClasstypesToParameterizedtypeByLabel(&node->node_data.type, parameterizedtypes);
 
 				Type type = *node->node_data.type;
 				if(forceArrayIdentifier) {
@@ -356,7 +356,7 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 		case NT_CAST:
 			try {
 				TypeParameterizer parameterizer;
-				parameterizer.writeInParameterizations(&node->node_data.nodes[0]->node_data.type, parameterizedtypes);
+				parameterizer.rewriteClasstypesToParameterizedtypeByLabel(&node->node_data.nodes[0]->node_data.type, parameterizedtypes);
 				ret = copyType(node->node_data.nodes[0]->node_data.type);
 				classestable->assertTypeIsValid(ret);
 				Type casted = *auto_ptr<Type>(children[1].typeCheck(false));

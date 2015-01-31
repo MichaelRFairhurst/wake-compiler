@@ -44,6 +44,8 @@ class TypeAnalyzer {
 		bool isPrimitiveTypeBool(Type* theint);
 		bool isAutoboxedType(Type* type, Type** boxedtype);
 		bool isException(Type* type);
+		bool hasArgParameterization(Type* type);
+		bool hasArgParameterization(TypeArray* typearray);
 
 		/**
 		 * Text[][] -- 2

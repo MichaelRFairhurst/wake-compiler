@@ -64,6 +64,7 @@ BOOST_AUTO_TEST_SUITE( ParseTreeTraverserTest )
 #include "../src/cpp/test/integration/MethodInvocations.cpp"
 #include "../src/cpp/test/integration/AbstractClasses.cpp"
 #include "../src/cpp/test/integration/GenericClasses.cpp"
+#include "../src/cpp/test/integration/GenericMethods.cpp"
 #include "../src/cpp/test/integration/ClassDefinitions.cpp"
 #include "../src/cpp/test/integration/Provisions.cpp"
 #include "../src/cpp/test/integration/MethodDeclarations.cpp"

@@ -40,7 +40,7 @@ class TableFileReader {
 		Type* readTypeByTag(int tag, istream& s);
 		Type* readClassType(istream& s);
 		Type* readLambdaType(istream& s);
-		Type* readParameterizedType(istream& s);
+		Type* readParameterizedType(istream& s, int tag);
 		Type* readListType(istream& s);
 		Type* readOptionalType(istream& s);
 		vector<Annotation*> readAnnotations(istream& s);
