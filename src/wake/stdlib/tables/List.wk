@@ -24,3 +24,7 @@ every List{T} is:
 	Bool -- any(Bool -- fn(T) checker) { return true; }
 	sort(Num -- fn(T,T) sorter) {}
 	push(T) { }
+	{R} R[] -- map(R -- fn(T) mapper) { return []; }
+	{R} R -- foldl(R -- fn(T, R) mapper, R acc) { return [][0]; }
+	{R} R -- foldr(R -- fn(T, R) mapper, R acc) { return [][0]; }
+	T -- reduce(T -- fn(T, T) reducer) { return [][0]; }

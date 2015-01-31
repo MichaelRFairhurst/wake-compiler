@@ -108,7 +108,7 @@ every LambdaTest is:
 	}
 
 	@Test
-	~[test array filter]~(Asserts) {
+	~[test list.filter]~(Asserts) {
 		Asserts.that(["hey", "hey", "man"].filter({ t -> return true; }).getSize())Equals(3);
 		Asserts.that(["hey", "hey", "man"].filter({ t -> return false; }).getSize())Equals(0);
 		Asserts.that(["hey", "hello", "man"].filter({ t -> return t == "hey"; }).getSize())Equals(1);
@@ -119,7 +119,7 @@ every LambdaTest is:
 	}
 
 	@Test
-	~[test array any]~(Asserts) {
+	~[test list.any]~(Asserts) {
 		var runtimes Num = 0;
 		Asserts.that(["hey", "hey", "man"].any({ t -> runtimes += 1; return true; }))Equals(true);
 		Asserts.that(runtimes)Equals(1);
@@ -134,7 +134,7 @@ every LambdaTest is:
 	}
 
 	@Test
-	~[test array sort]~(Asserts) {
+	~[test list.sort]~(Asserts) {
 		var Text[] = ["zap", "goop", "pickle", "aardvark"];
 
 		Text[].sort({ a, b -> return 1 if a.getSize() < b.getSize() else -1; });
@@ -157,4 +157,41 @@ every LambdaTest is:
 		Asserts.that(Text[2])Equals("pickle");
 		Asserts.that(Text[1])Equals("goop");
 		Asserts.that(Text[0])Equals("zap");
+	}
+
+	@Test
+	~[test list.map]~(Asserts) {
+		var Text[] = ["blah", "happy", "blappy"];
+
+		var Text[] res = Text[].map({ t -> return t.toUpper(); });
+		var Num[] = Text[].map({ t -> return t.getSize(); });
+
+		Asserts.that(res.getSize())Equals(3);
+		Asserts.that(res[0])Equals("BLAH");
+		Asserts.that(res[1])Equals("HAPPY");
+		Asserts.that(res[2])Equals("BLAPPY");
+
+		Asserts.that(Num[].getSize())Equals(3);
+		Asserts.that(Num[0])Equals(4);
+		Asserts.that(Num[1])Equals(5);
+		Asserts.that(Num[2])Equals(6);
+	}
+
+	@Test
+	~[test list.reduce]~(Asserts) {
+		var Num[] = [1, 2, 3];
+
+		Asserts.that(Num[].reduce({ n, acc -> return acc + n; }))Equals(6);
+		Asserts.that(Num[].reduce({ n, acc -> return acc - n; }))Equals(-4);
+		Asserts.that(Num[].reduce({ n, acc -> return (acc + 1) * n; }))Equals(15);
+	}
+
+	@Test
+	~[test list.foldr and foldl]~(Asserts) {
+		var Num[] = [1, 2, 3];
+
+		Asserts.that(Num[].foldr({ n, acc -> return acc + n.toString(); }, ""))Equals("123");
+		Asserts.that(Num[].foldl({ n, acc -> return acc + n.toString(); }, ""))Equals("321");
+		Asserts.that(Num[].foldr({ n, acc -> return acc + n.toString(); }, "start"))Equals("start123");
+		Asserts.that(Num[].foldl({ n, acc -> return acc + n.toString(); }, "start"))Equals("start321");
 	}
