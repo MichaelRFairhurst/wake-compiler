@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   id="svg3055"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   width="600"
+   height="600"
+   sodipodi:docname="wake.png">
+  <metadata
+     id="metadata3061">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <defs
+     id="defs3059" />
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1920"
+     inkscape:window-height="1080"
+     id="namedview3057"
+     showgrid="false"
+     inkscape:zoom="1.525"
+     inkscape:cx="216.72131"
+     inkscape:cy="300"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg3055" />
+  <path
+     sodipodi:type="arc"
+     style="fill:#00aeef;fill-opacity:1;stroke:#ffffff;stroke-width:1;stroke-miterlimit:4;stroke-opacity:0.47154475;stroke-dasharray:none"
+     id="path3069"
+     sodipodi:cx="300.32788"
+     sodipodi:cy="278.68854"
+     sodipodi:rx="98.360657"
+     sodipodi:ry="98.360657"
+     d="m 398.68854,278.68854 a 98.360657,98.360657 0 1 1 -196.72132,0 98.360657,98.360657 0 1 1 196.72132,0 z"
+     transform="translate(-0.32788086,21.311462)" />
+  <path
+     id="rect3071-1"
+     style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.00094401;stroke-miterlimit:4;stroke-opacity:0.47154475;stroke-dasharray:none"
+     d="m 271.49936,261.8764 44.21875,74.75 9.78125,0 1.78125,0 44.21876,-74.75 -19.78125,0 -30.21876,51.09375 -30.21875,-51.09375 -19.78125,0 z m -0.5,0.5 0,75.75 0,-75.75 z m -42.49873,-0.50281 19.77217,0 44.22531,74.75158 -19.77217,0 z"
+     inkscape:connector-curvature="0" />
+  <text
+     xml:space="preserve"
+     style="font-size:24px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+     x="268.22461"
+     y="372.77051"
+     id="text3148"
+     sodipodi:linespacing="125%"><tspan
+       sodipodi:role="line"
+       id="tspan3150"
+       x="268.22461"
+       y="372.77051"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Meera;-inkscape-font-specification:Meera">WAKE</tspan></text>
+</svg>
