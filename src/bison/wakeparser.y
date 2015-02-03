@@ -172,7 +172,9 @@ classprop:
 
 property:
 	WITH PUBLIC property_value ';'												{ $$ = MakeTwoBranchNode(NT_PROPERTY, $3, MakeEmptyNode(NT_PUBLIC, @$), @$); }
+	| annotations WITH PUBLIC property_value ';'								{ $$ = MakeTwoBranchNode(NT_ANNOTATED_PROPERTY, MakeTwoBranchNode(NT_ANNOTATED_PROPERTY, $4, MakeEmptyNode(NT_PUBLIC, @$), @$), $1, @$); }
 	| WITH property_value ';'													{ $$ = MakeOneBranchNode(NT_PROPERTY, $2, @$); }
+	| annotations WITH property_value ';'										{ $$ = MakeTwoBranchNode(NT_ANNOTATED_PROPERTY, MakeOneBranchNode(NT_PROPERTY, $3, @$), $1, @$); }
 	;
 
 property_value:
@@ -189,7 +191,9 @@ provisions:
 
 provision:
 	type																		{ $$ = MakeOneBranchNode(NT_PROVISION, MakeNodeFromType($1, @$), @$); }
+	| annotations type															{ $$ = MakeTwoBranchNode(NT_ANNOTATED_PROVISION, MakeOneBranchNode(NT_PROVISION, MakeNodeFromType($2, @$), @$), $1, @$); }
 	| type SYM_PROVIDE providable												{ $$ = MakeTwoBranchNode(NT_PROVISION, MakeNodeFromType($1, @$), $3, @$); }
+	| annotations type SYM_PROVIDE providable									{ $$ = MakeTwoBranchNode(NT_ANNOTATED_PROVISION, MakeTwoBranchNode(NT_PROVISION, MakeNodeFromType($2, @$), $4, @$), $1, @$); }
 	;
 
 providable:

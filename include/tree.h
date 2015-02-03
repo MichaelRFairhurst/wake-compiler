@@ -143,6 +143,8 @@
 #define NT_ANNOTATED_METHOD 98
 #define NT_ANNOTATION_NAME 99
 #define NT_ANNOTATION_VALS 101
+#define NT_ANNOTATED_PROPERTY 109
+#define NT_ANNOTATED_PROVISION 110
 
 void AddSubNode(Node* parent, Node* child);
 

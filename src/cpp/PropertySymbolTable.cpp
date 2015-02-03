@@ -85,7 +85,7 @@ boost::optional<SemanticError*> PropertySymbolTable::addProperty(Type* property,
 	return boost::optional<SemanticError*>();
 }
 
-boost::optional<SemanticError*> PropertySymbolTable::addProvision(Type* provided, vector<Type*> &arguments, int flags) {
+boost::optional<SemanticError*> PropertySymbolTable::addProvision(Type* provided, vector<Type*> &arguments, int flags, vector<Annotation*> annotations) {
 	string name = getProvisionSymbol(provided, arguments);
 
 	if(properties.count(name)) {
@@ -103,6 +103,8 @@ boost::optional<SemanticError*> PropertySymbolTable::addProvision(Type* provided
 	prop->casing = name;
 	prop->address = name;
 	prop->flags = flags;
+	for(vector<Annotation*>::iterator annit = annotations.begin(); annit != annotations.end(); ++annit)
+		prop->annotations.push_back(*annit);
 
 	properties[name] = prop;
 	return boost::optional<SemanticError*>();

@@ -62,8 +62,15 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 			}
 			break;
 
+		case NT_ANNOTATED_PROVISION:
 		case NT_PROVISION:
 			try {
+				vector<Annotation*> annotations;
+				if(tree->node_type == NT_ANNOTATED_PROVISION) {
+					AnnotationTreeTraverser traverser;
+					annotations = traverser.getAnnotations(tree->node_data.nodes[1]);
+					tree = tree->node_data.nodes[0];
+				}
 				int flags = 0;
 				std::vector<Type*> arguments;
 				if(tree->subnodes > 1 && tree->node_data.nodes[1]->node_type == NT_PROVISION_BEHAVIOR) {
@@ -81,7 +88,7 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 						}
 					}
 				}
-				boost::optional<SemanticError*> error = propertysymtable->addProvision(tree->node_data.nodes[0]->node_data.type, arguments, flags);
+				boost::optional<SemanticError*> error = propertysymtable->addProvision(tree->node_data.nodes[0]->node_data.type, arguments, flags, annotations);
 				AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(classestable->getAnalyzer()->getProvisionSymbol(tree->node_data.nodes[0]->node_data.type, arguments).c_str()), tree->loc));
 				if(error) {
 					(*error)->token = tree;
@@ -137,13 +144,20 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 			}
 			break;
 
+		case NT_ANNOTATED_PROPERTY:
 		case NT_PROPERTY:
 			try {
+				vector<Annotation*> annotations;
+				if(tree->node_type == NT_ANNOTATED_PROPERTY) {
+					AnnotationTreeTraverser traverser;
+					annotations = traverser.getAnnotations(tree->node_data.nodes[1]);
+					tree = tree->node_data.nodes[0];
+				}
 				TypeParameterizer parameterizer;
 				parameterizer.rewriteClasstypesToParameterizedtypeByLabel(&tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type, propertysymtable->getParameters());
 				Type prop = *tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type;
 				classestable->assertTypeIsValid(&prop);
-				boost::optional<SemanticError*> error = propertysymtable->addProperty(new Type(prop), tree->subnodes == 2 ? PROPERTY_PUBLIC : 0, vector<Annotation*>());
+				boost::optional<SemanticError*> error = propertysymtable->addProperty(new Type(prop), tree->subnodes == 2 ? PROPERTY_PUBLIC : 0, annotations);
 				if(error) {
 					(*error)->token = tree;
 					errors->addError(*error);
@@ -245,6 +259,10 @@ void ClassParseTreeTraverser::typeCheckProperties(Node* tree) {
 			}
 			break;
 
+		case NT_ANNOTATED_PROPERTY:
+			typeCheckProperties(tree->node_data.nodes[0]);
+			break;
+
 		case NT_PROPERTY:
 			scopesymtable->pushScope();
 			try {
@@ -279,6 +297,10 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 					i++;
 				}
 			}
+			break;
+
+		case NT_ANNOTATED_PROVISION:
+			typeCheckMethods(tree->node_data.nodes[0]);
 			break;
 
 		case NT_PROVISION:

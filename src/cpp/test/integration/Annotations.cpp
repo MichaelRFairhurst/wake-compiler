@@ -33,7 +33,7 @@ PTT_TEST_CASE(
 );
 
 PTT_TEST_CASE(
-	TestAnnotatedMethodsNeedsClassesParseAndTypeCheck,
+	TestAnnotatedMethodsNeedsPropertiesClassesParseAndTypeCheck,
 	"@Annotated													\n\
 	@AnnotatedVal(true)											\n\
 	@AnnotatedParams('test', 123)								\n\
@@ -47,9 +47,41 @@ PTT_TEST_CASE(
 		@Annotated												\n\
 		@AnnotatedVal(true)										\n\
 		@AnnotatedParams('test', 123)							\n\
+		with Text = 'hey';										\n\
+																\n\
+		@Annotated												\n\
+		@AnnotatedVal(true)										\n\
+		@AnnotatedParams('test', 123)							\n\
+		with public $Num = 0;									\n\
+																\n\
+		@Annotated												\n\
+		@AnnotatedVal(true)										\n\
+		@AnnotatedParams('test', 123)							\n\
 		myTypecheckedMethod() {									\n\
-			Num + 'test';										\n\
+			Num + Text;											\n\
+			Text + $Num;										\n\
 		}",
+	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 );
 
+PTT_TEST_CASE(
+	TestAnnotatedProvisions,
+	"@Annotated													\n\
+	@AnnotatedVal(true)											\n\
+	@AnnotatedParams('test', 123)								\n\
+	every MyClass is:											\n\
+		provides												\n\
+			@Annotated											\n\
+			@AnnotatedVal(true)									\n\
+			@AnnotatedParams('test', 123)						\n\
+			Num:hello <- 4;										\n\
+																\n\
+		@Annotated												\n\
+		@AnnotatedVal(true)										\n\
+		@AnnotatedParams('test', 123)							\n\
+		myMethod() {											\n\
+			var Num:hello from this;							\n\
+		}",
+	PTT_VALID
+);
