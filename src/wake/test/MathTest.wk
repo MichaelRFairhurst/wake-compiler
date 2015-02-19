@@ -22,14 +22,14 @@ every MathTest is:
 		Asserts.that(2 + 2)Equals(4);
 		Asserts.that(6 + 2)Equals(8);
 		Asserts.that(60000 + 20000)Equals(80000);
-		Asserts.that(0 - 20 + 14)Equals(0 - 6);
+		Asserts.that(- 20 + 14)Equals(- 6);
 	}
 
 	@Test
 	testSubtraction(Asserts) {
 		Asserts.that(6 - 2)Equals(4);
 		Asserts.that(42 - 2)Equals(40);
-		Asserts.that(40 - 80)Equals(0 - 40);
+		Asserts.that(40 - 80)Equals(- 40);
 	}
 
 	@Test
@@ -57,4 +57,26 @@ every MathTest is:
 		Asserts.that(6 * 2 - 5)Equals(7);
 		Asserts.that(6 / 2 + 5)Equals(8);
 		Asserts.that(6 / 2 - 5)Equals(0 - 2);
+	}
+
+	@Test
+	testNegation(Asserts) {
+		var Num a = 3;
+		var Num b = 2;
+		Asserts.that(-a - -b)Equals(-1);
+		Asserts.that(a - -b)Equals(5);
+		Asserts.that(a + -b)Equals(1);
+		Asserts.that(-a + b)Equals(-1);
+		Asserts.that(-a - b)Equals(-5);
+		Asserts.that(-a * -b)Equals(6);
+		Asserts.that(a * -b)Equals(-6);
+		Asserts.that(-a * b)Equals(-6);
+	}
+
+	@Test
+	testDecimals(Asserts) {
+		Asserts.that(.3)Equals(0.3);
+		Asserts.that(.4)Equals(0.4);
+		Asserts.that(.0)Equals(0.0);
+		Asserts.that(.555)Equals(0.555);
 	}
