@@ -60,3 +60,24 @@ PTT_TEST_CASE(
 	PTT_VALID
 );
 
+PTT_TEST_CASE(
+	TestExternClassWithMethodsIsRejected,
+	"extern MyClass is:						\n\
+		provides MyClass:test <- MyClass,	\n\
+			MyClass <- { return this; };	\n\
+		myMethod() {						\n\
+		}",
+	PTT_EXPECT(EXTERN_METHOD_BODY)
+	PTT_EXPECT(EXTERN_METHOD_BODY)
+	PTT_EXPECT(EXTERN_METHOD_BODY)
+);
+
+
+PTT_TEST_CASE(
+	TestExternClassValid,
+	"extern MyClass is:			\n\
+		needs Num;				\n\
+		provides MyClass;		\n\
+		myMethod();",
+	PTT_VALID
+);

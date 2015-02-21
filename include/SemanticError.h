@@ -55,6 +55,7 @@ enum SemanticErrorCode {
 	OPTIONAL_USE_OF_NONOPTIONAL_TYPE,	// 1.?orMaxOf(blah)
 	TYPE_INFERENCE_FAILURE,				// return 9001; else return "confuse the compiler";
 	GENERIC_TYPE_COLLISION,				// every MyClass{T, T} is: {T, T} myMethod() {}
+	EXTERN_METHOD_BODY,					// defining a method on an extern class
 };
 
 class SemanticError {

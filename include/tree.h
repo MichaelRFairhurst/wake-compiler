@@ -31,6 +31,7 @@
 #define NT_IMPORTPATH 5
 
 #define NT_CLASS 6
+#define NT_CLASS_EXTERN 108
 #define NT_CLASSSET 7
 #define NT_CLASSBODY 8
 

@@ -180,7 +180,7 @@ void TypeAnalyzer::assertClassCanProvide(string provider, Type* binding) {
 	string symname = getNameForType(binding) + "<-";
 	if(binding->specialty != NULL) symname += binding->specialty;
 	if(!reference->find(provider)->find(symname))
-		throw new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, symname + "not found on class" + provider);
+		throw new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, symname + " not found on class " + provider);
 
 	if(reference->findModifiable(provider)->isBehavioralProvision(symname)) return;
 

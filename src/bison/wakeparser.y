@@ -45,7 +45,7 @@ int wakewrap()
 %}
 
 /* keywords */
-%token EVERY CAPABLE A AN IS RETURN WITH PUBLIC IF ELSE WHILE IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE EXISTS VAR FOREACH IN THROW TRY CATCH FROM
+%token EVERY EXTERN CAPABLE A AN IS RETURN WITH PUBLIC IF ELSE WHILE IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE EXISTS VAR FOREACH IN THROW TRY CATCH FROM
 /* symbols */
 %token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT SYM_PLUSEQ SYM_VALEQ SYM_MULTEQ SYM_SUBEQ SYM_DIVEQ SYM_PROVIDE_ARGS_OPEN SYM_EARLYBAILOUT_DOT SYM_TYPESAFE_INDEX SYM_LAMBDA;
 /* this too */
@@ -79,8 +79,8 @@ int wakewrap()
 %type <string> alias
 %start file
 
-/* 2 are from @annotations before class definitions, 1 from if/else, 1 from try/catch, 1 from exists/else */
-%expect 5
+/* 3 are from @annotations before class definitions, 1 from if/else, 1 from try/catch, 1 from exists/else */
+%expect 6
 
 %expect-rr 0
 %%
@@ -140,6 +140,8 @@ annotatedclass:
 class:
 	EVERY classdeclarationtype parentage IS ':'									{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromType($2, @$), $3, @$); }
 	| EVERY classdeclarationtype parentage IS ':' classbody						{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromType($2, @$), $3, @$); AddSubNode($$, $6); }
+	| EXTERN classdeclarationtype parentage IS ':'								{ $$ = MakeTwoBranchNode(NT_CLASS_EXTERN, MakeNodeFromType($2, @$), $3, @$); }
+	| EXTERN classdeclarationtype parentage IS ':' classbody					{ $$ = MakeTwoBranchNode(NT_CLASS_EXTERN, MakeNodeFromType($2, @$), $3, @$); AddSubNode($$, $6); }
 	;
 
 parentage:

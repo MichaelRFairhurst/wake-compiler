@@ -118,6 +118,9 @@ void SemanticErrorPrinter::print(SemanticError* e) {
 		case GENERIC_TYPE_COLLISION:
 			cout << "Multiple generics have been defined with the same name that share a context (class or method)";
 			break;
+		case EXTERN_METHOD_BODY:
+			cout << "Defining the behavior of a method or provision on an extern class. Extern classes should define the interface only.";
+			break;
 		default:
 			cout << "bad error code provided";
 	}

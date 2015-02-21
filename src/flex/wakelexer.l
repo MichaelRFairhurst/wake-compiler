@@ -47,6 +47,7 @@ void count();
 `[^`]*`					count();
 
 every					count(); return EVERY;
+extern					count(); return EXTERN;
 capable					count(); return CAPABLE;
 a						count(); return A;
 an						count(); return AN;

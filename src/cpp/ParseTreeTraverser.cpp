@@ -56,6 +56,7 @@ void ParseTreeTraverser::traverse(Node* tree) {
 			traverse(tree->node_data.nodes[0]);
 			break;
 
+		case NT_CLASS_EXTERN:
 		case NT_CLASS:
 			{
 				errors.pushContext("In declaration of 'every " + string(tree->node_data.nodes[0]->node_data.type->typedata._class.classname) + "'");
@@ -114,6 +115,7 @@ void ParseTreeTraverser::secondPass(Node* tree) {
 
 		case NT_ANNOTATED_CLASS:
 		case NT_CLASS:
+		case NT_CLASS_EXTERN:
 			{
 				vector<Annotation*> annotations;
 				if(tree->node_type == NT_ANNOTATED_CLASS) {
@@ -124,12 +126,12 @@ void ParseTreeTraverser::secondPass(Node* tree) {
 
 				Type* classtype = tree->node_data.nodes[0]->node_data.type;
 				string classname = classtype->typedata._class.classname;
-				errors.pushContext("In declaration of 'every " + classname + "'");
+				errors.pushContext("In declaration of '" + string(tree->node_type == NT_CLASS ? "every" : "extern") + " " + classname + "'");
 
 				PropertySymbolTable* proptable = objectsymtable->findModifiable(classname);
 				proptable->setAnnotations(annotations);
 
-				ClassParseTreeTraverser classtraverser(&errors, objectsymtable, &scopesymtable, classname, &typechecker, &methodanalyzer, proptable);
+				ClassParseTreeTraverser classtraverser(&errors, objectsymtable, &scopesymtable, classname, &typechecker, &methodanalyzer, proptable, tree->node_type == NT_CLASS_EXTERN);
 
 				secondPass(tree->node_data.nodes[1]);
 				if(tree->subnodes > 2) classtraverser.firstPass(tree->node_data.nodes[2]);
@@ -168,12 +170,13 @@ void ParseTreeTraverser::thirdPass(Node* tree) {
 			break;
 
 		case NT_CLASS:
+		case NT_CLASS_EXTERN:
 			{
 				Type* classtype = tree->node_data.nodes[0]->node_data.type;
 				string classname = classtype->typedata._class.classname;
-				errors.pushContext("In declaration of 'every " + classname + "'");
+				errors.pushContext("In declaration of '" + string(tree->node_type == NT_CLASS ? "every" : "extern") + " " + classname + "'");
 
-				ClassParseTreeTraverser classtraverser(&errors, objectsymtable, &scopesymtable, classname, &typechecker, &methodanalyzer, objectsymtable->findModifiable(classname));
+				ClassParseTreeTraverser classtraverser(&errors, objectsymtable, &scopesymtable, classname, &typechecker, &methodanalyzer, objectsymtable->findModifiable(classname), tree->node_type == NT_CLASS_EXTERN);
 
 				thirdPass(tree->node_data.nodes[1]);
 				if(tree->subnodes > 2) classtraverser.secondPass(tree->node_data.nodes[2]);

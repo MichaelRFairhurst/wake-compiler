@@ -35,7 +35,7 @@ using namespace std;
 
 class ClassParseTreeTraverser {
 	public:
-		ClassParseTreeTraverser(ErrorTracker* errors, ClassSpaceSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, string classname, TypeChecker* typechecker, MethodSignatureParseTreeTraverser* methodanalyzer, PropertySymbolTable* propertysymtable);
+		ClassParseTreeTraverser(ErrorTracker* errors, ClassSpaceSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, string classname, TypeChecker* typechecker, MethodSignatureParseTreeTraverser* methodanalyzer, PropertySymbolTable* propertysymtable, bool is_extern);
 		void firstPass(Node* tree);
 		void secondPass(Node* tree);
 
@@ -49,6 +49,7 @@ class ClassParseTreeTraverser {
 
 		string classname;
 
+		bool is_extern;
 		MethodSignatureParseTreeTraverser* methodanalyzer;
 		TypeChecker* typechecker;
 		ErrorTracker* errors;
