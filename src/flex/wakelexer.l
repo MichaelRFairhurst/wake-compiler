@@ -49,7 +49,7 @@ void count();
 every					count(); return EVERY;
 extern					count(); return EXTERN;
 capable					count(); return CAPABLE;
-a						count(); return A;
+a						count(); return KEYWORD_A;
 an						count(); return AN;
 is						count(); return IS;
 return					count(); return RETURN;
