@@ -45,7 +45,7 @@ int wakewrap()
 %}
 
 /* keywords */
-%token EVERY EXTERN CAPABLE A AN IS RETURN WITH PUBLIC IF ELSE WHILE IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE EXISTS VAR FOREACH IN THROW TRY CATCH FROM
+%token EVERY EXTERN CAPABLE KEYWORD_A AN IS RETURN WITH PUBLIC IF ELSE WHILE IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE EXISTS VAR FOREACH IN THROW TRY CATCH FROM
 /* symbols */
 %token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT SYM_PLUSEQ SYM_VALEQ SYM_MULTEQ SYM_SUBEQ SYM_DIVEQ SYM_PROVIDE_ARGS_OPEN SYM_EARLYBAILOUT_DOT SYM_TYPESAFE_INDEX SYM_LAMBDA;
 /* this too */
@@ -156,7 +156,7 @@ inheritances:
 
 inheritance:
 	CAPABLE parameterizedtype													{ $$ = MakeOneBranchNode(NT_INTERFACE, MakeNodeFromType($2, @$), @$); }
-	| A parameterizedtype														{ $$ = MakeOneBranchNode(NT_SUBCLASS, MakeNodeFromType($2, @$), @$); }
+	| KEYWORD_A parameterizedtype														{ $$ = MakeOneBranchNode(NT_SUBCLASS, MakeNodeFromType($2, @$), @$); }
 	| AN parameterizedtype														{ $$ = MakeOneBranchNode(NT_SUBCLASS, MakeNodeFromType($2, @$), @$); }
 	;
 
@@ -623,7 +623,7 @@ identifier:
 
 alias:
 	LIDENTIFIER																	{ $$ = $1; }
-	| A																			{ $$ = strdup("a"); }
+	| KEYWORD_A																			{ $$ = strdup("a"); }
 	| AN																		{ $$ = strdup("an"); }
 	;
 
