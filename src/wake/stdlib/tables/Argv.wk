@@ -14,6 +14,6 @@
 
 import Text;
 
-every Argv is:
+extern Argv is:
 
-	Text[] -- getArgv() { var Text[] = []; return Text[]; }
+	Text[] -- getArgv();

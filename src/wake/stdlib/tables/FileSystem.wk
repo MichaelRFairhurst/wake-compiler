@@ -16,12 +16,12 @@ import Text;
 import Num;
 import FilePath;
 
-every FileSystem is:
+extern FileSystem is:
 
-	FilePath -- getPath(Text) { var FilePath[] = []; return FilePath[0]; }
+	FilePath -- getPath(Text);
 
-	FilePath[] -- listRoots() { var FilePath[] = []; return FilePath[]; }
+	FilePath[] -- listRoots();
 
-	Text -- getPathSeparator() { return ""; }
+	Text -- getPathSeparator();
 
-	FilePath -- getTempFile(Text prefix, Text suffix, FilePath) { return FilePath; }
+	FilePath -- getTempFile(Text prefix, Text suffix, FilePath);

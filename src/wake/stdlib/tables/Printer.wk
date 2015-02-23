@@ -19,9 +19,9 @@ import Num;
 # This only defines the signatures, and will be used to
 # generate an importable .table file
 ##
-every Printer is:
+extern Printer is:
 
-	print(Text) {}
-	printLine(Text) {}
-	print(Num) {}
-	printLine(Num) {}
+	print(Text);
+	printLine(Text);
+	print(Num);
+	printLine(Num);

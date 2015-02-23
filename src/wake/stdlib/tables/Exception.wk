@@ -15,12 +15,12 @@
 import Bool;
 import Text;
 
-every Exception is:
+extern Exception is:
 
-	Text -- getMessage() { return ""; }
+	Text -- getMessage();
 
-	Text -- getStacktrace() { return ""; }
+	Text -- getStacktrace();
 
-	preThrow() {}
+	preThrow();
 
-	Bool -- isExceptionType(Text) { return true; }
+	Bool -- isExceptionType(Text);
