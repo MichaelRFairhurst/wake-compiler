@@ -152,7 +152,7 @@ Node* MakeNodeFromString(int nodetype, char* mystring, YYLTYPE loc) {
 	return mynode;
 }
 
-Node* MakeNodeFromNumber(int nodetype, float number, YYLTYPE loc) {
+Node* MakeNodeFromNumber(int nodetype, double number, YYLTYPE loc) {
 	Node* mynode = NodeFactory(nodetype, loc);
 	mynode->node_data.number = number;
 	return mynode;

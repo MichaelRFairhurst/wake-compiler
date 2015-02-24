@@ -25,7 +25,7 @@ typedef struct Node {
 	int subnodes;
 	union {
 		char* string;
-		float number;
+		double number;
 		struct Node** nodes;
 		struct Type* type;
 		struct TypeArray* typearray;
