@@ -55,7 +55,7 @@ int wakewrap()
 
 %union
 {
-        float number;
+        double number;
         char *string;
         Node *node;
         Type *type;

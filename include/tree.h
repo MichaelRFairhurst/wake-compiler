@@ -159,7 +159,7 @@ Node* MakeNodeFromTypeArray(TypeArray* thearray, YYLTYPE loc);
 
 Node* MakeNodeFromString(int nodetype, char* mystring, YYLTYPE loc);
 
-Node* MakeNodeFromNumber(int nodetype, float number, YYLTYPE loc);
+Node* MakeNodeFromNumber(int nodetype, double number, YYLTYPE loc);
 
 Node* MakeTwoBranchNode(int nodetype, Node* a, Node* b, YYLTYPE loc);
 

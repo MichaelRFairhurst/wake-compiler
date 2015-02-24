@@ -219,8 +219,8 @@ void TableFileWriter::writeAnnotations(ostream& out, const boost::ptr_vector<Ann
 					break;
 
 				case ANNOTATION_VAL_TYPE_NUM:
-					memcpy((void*) &val->valdata.num, dataptr, sizeof(float));
-					out.write(dataptr, sizeof(float));
+					memcpy((void*) &val->valdata.num, dataptr, sizeof(double));
+					out.write(dataptr, sizeof(double));
 					break;
 			}
 		}

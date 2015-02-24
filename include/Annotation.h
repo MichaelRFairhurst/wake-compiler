@@ -26,7 +26,7 @@ struct AnnotationVal {
 	int type;
 	union {
 		char* text;
-		float num;
+		double num;
 	} valdata;
 	~AnnotationVal() {
 		if(type == ANNOTATION_VAL_TYPE_TEXT) free(valdata.text);

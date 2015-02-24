@@ -82,11 +82,11 @@ unsigned char TableFileReader::readUInt8(istream& s) {
 	return uint8;
 }
 
-float TableFileReader::readNum64(istream& s) {
+double TableFileReader::readNum64(istream& s) {
 	char buffer[4] = {0};
 	s.read(buffer, 4);
-	float num64 = 0;
-	memcpy(buffer, &num64, sizeof(float));
+	double num64 = 0;
+	memcpy(buffer, &num64, sizeof(double));
 	return num64;
 }
 
