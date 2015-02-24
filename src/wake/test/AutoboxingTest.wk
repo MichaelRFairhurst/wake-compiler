@@ -226,7 +226,7 @@ every AutoboxingTest is:
 		if Num exists {
 			Asserts.that(Num)Equals($Num);
 		} else {
-			Asserts.fail("Num should have equaled" + $Num.toString() + ", but didn't exist.");
+			Asserts.fail("Num should have equaled " + $Num.toString() + ", but didn't exist.");
 		}
 	}
 
