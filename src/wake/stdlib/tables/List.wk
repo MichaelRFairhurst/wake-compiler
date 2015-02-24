@@ -15,16 +15,16 @@
 import Num;
 import Bool;
 
-every List{T} is:
+extern List{T} is:
 
-	Num -- getSize() { return 0; }
-	Bool -- contains(T) { return false; }
-	T[] -- intersect(T[]) { return []; }
-	T[] -- filter(Bool -- fn(T) filterer) { return []; }
-	Bool -- any(Bool -- fn(T) checker) { return true; }
-	sort(Num -- fn(T,T) sorter) {}
-	push(T) { }
-	{R} R[] -- map(R -- fn(T) mapper) { return []; }
-	{R} R -- foldl(R -- fn(T, R) mapper, R acc) { return [][0]; }
-	{R} R -- foldr(R -- fn(T, R) mapper, R acc) { return [][0]; }
-	T -- reduce(T -- fn(T, T) reducer) { return [][0]; }
+	Num -- getSize();
+	Bool -- contains(T);
+	T[] -- intersect(T[]);
+	T[] -- filter(Bool -- fn(T) filterer);
+	Bool -- any(Bool -- fn(T) checker);
+	sort(Num -- fn(T,T) sorter);
+	push(T);
+	{R} R[] -- map(R -- fn(T) mapper);
+	{R} R -- foldl(R -- fn(T, R) mapper, R acc);
+	{R} R -- foldr(R -- fn(T, R) mapper, R acc);
+	T -- reduce(T -- fn(T, T) reducer);

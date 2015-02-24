@@ -16,52 +16,51 @@ import Text;
 import Num;
 import Bool;
 
-every FilePath is:
+extern FilePath is:
 
 	needs Text:DoNotUse filename;
 
-	provides File,
-		FilePath <- { return this; };
+	provides File;
 
-	Text -- getPath() { return filename; }
+	Text -- getPath();
 
-	Text -- getBasename() { return ""; }
+	Text -- getBasename();
 
-	Text -- getDirname() { return ""; }
+	Text -- getDirname();
 
-	Bool -- isFile() { return true; }
+	Bool -- isFile();
 
-	Bool -- isDirectory() { return true; }
+	Bool -- isDirectory();
 
-	Bool -- fileExists() { return true; }
+	Bool -- fileExists();
 
-	makeDirectory() { }
+	makeDirectory();
 
-	FilePath[] -- getChildren() { var FilePath[] = []; return FilePath[]; }
+	FilePath[] -- getChildren();
 
-	FilePath? -- getParent() { return nothing; }
+	FilePath? -- getParent();
 
-	delete() { }
+	delete();
 
 
-every File is:
+extern File is:
 
 	needs FilePath;
 
-	FilePath -- getPath() { return FilePath; }
+	FilePath -- getPath();
 
-	Text -- read(Num) { return ""; }
+	Text -- read(Num);
 
-	Num -- readUnsignedChar() { return 0; }
+	Num -- readUnsignedChar();
 
-	write(Text) { }
+	write(Text);
 
-	writeUnsignedChar(Num) { }
+	writeUnsignedChar(Num);
 
-	close() { }
+	close();
 
-	Num -- tell() { return 0; }
+	Num -- tell();
 
-	seek(Num) { }
+	seek(Num);
 
-	Bool -- eof() { return true; }
+	Bool -- eof();
