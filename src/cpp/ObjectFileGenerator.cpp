@@ -14,6 +14,8 @@
 
 #include "ObjectFileGenerator.h"
 #include <sstream>
+#include <iomanip>
+#include <limits>
 
 void ObjectFileGenerator::generate(Node* tree) {
 	if(forceArrayIdentifier && tree->node_type != NT_TYPEDATA) {
@@ -835,7 +837,10 @@ void ObjectFileGenerator::generate(Node* tree) {
 			file << ")";
 			break;
 
-		case NT_NUMBERLIT: file << tree->node_data.number; break;
+		case NT_NUMBERLIT:
+			file << std::setprecision (std::numeric_limits<double>::digits10 + 1) << tree->node_data.number;
+			break;
+
 		case NT_BOOLLIT: file << (tree->node_data.number ? "1" : "0"); break;
 		case NT_STRINGLIT:
 			file << '"';

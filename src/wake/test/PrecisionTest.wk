@@ -1,0 +1,20 @@
+import Asserts;
+
+@TestClass
+every PrecisionTest is:
+
+	@Test
+	testDoublePrecisionIsAvailable(Asserts) {
+		Asserts.that(3.211111118482222.toString())Equals("3.211111118482222");
+	}
+
+	@Test
+	testParseNumUsesDoublePrecision(Asserts) {
+		var Text = "3.211111118482222";
+		var Num? = Text.parseNum();
+		if Num exists {
+			Asserts.that(Num)Equals(3.211111118482222);
+		} else {
+			Asserts.fail("couldn't parse double from " + Text);
+		}
+	}

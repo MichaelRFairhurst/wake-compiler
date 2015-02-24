@@ -126,7 +126,7 @@ function$ $$A(a, b) {
 		};
 
 		this.`parseNum()` = function() {
-			return$ /^(\-|\+)?([0-9].(\.[0-9]+)?)$$/.test(a) ? Number(a) : null;
+			return$ /^(\-|\+)?([0-9]+(\.[0-9]+)?)$$/.test(a) ? parseFloat(a) : null;
 		};
 
 		this.`charAt(Num)` = function(b) {
