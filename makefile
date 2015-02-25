@@ -163,12 +163,6 @@ bin/waketable/UndefinedIndexException.table: src/wake/stdlib/external/UndefinedI
 bin/wakeobj/UndefinedIndexException.o: src/wake/stdlib/external/UndefinedIndexException.o
 	cp $< $@
 
-bin/waketable/System.table: src/wake/stdlib/external/System.table
-	cp $< $@
-
-bin/wakeobj/System.o: src/wake/stdlib/external/System.o
-	cp $< $@
-
 bin/waketable/FilePath.table: bin/waketable/File.table bin/waketable/Text.table bin/waketable/Num.table bin/waketable/Bool.table
 	echo this overrides the wildcard that doesnt work
 

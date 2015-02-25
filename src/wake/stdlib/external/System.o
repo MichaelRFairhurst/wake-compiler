@@ -1,2 +1,0 @@
-%-CLASSES-% 9 %System% %-PROPERTIES-% 17 %exit(Num)% 27 %exit(Num)% %-END-%
-function (){this.=function (a){return a.exit.apply(a,arguments)};}
