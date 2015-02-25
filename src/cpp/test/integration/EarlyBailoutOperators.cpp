@@ -71,7 +71,7 @@ PTT_TEST_CASE(
 		with public Text = 'hey';								\n\
 		with public Num[] = [1];								\n\
 		with public Text[] = ['hey'];							\n\
-		myMethod(MyClass?, $MyClass??) {						\n\
+		myMethod(MyClass?, $MyClass?? ) {						\n\
 			var Num? = MyClass.?Num; 							\n\
 			var Text? = MyClass.?Text; 							\n\
 			var Num[]? = MyClass.?Num[]; 						\n\
