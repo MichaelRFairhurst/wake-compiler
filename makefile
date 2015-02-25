@@ -80,7 +80,7 @@ CPPNAMES= \
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
 
-WAKETABLENAMES=Printer.wk List.wk Text.wk Num.wk Bool.wk File.wk FilePath.wk FileSystem.wk Argv.wk Exception.wk
+WAKETABLENAMES=Printer.wk List.wk Text.wk Num.wk Bool.wk File.wk FilePath.wk FileSystem.wk Argv.wk Exception.wk System.wk
 WAKETABLEOBJS=$(addprefix bin/waketable/, $(WAKETABLENAMES:.wk=.table))
 WAKETABLEINCLUDES=$(addprefix gen/, $(WAKETABLENAMES:.wk=.table.h))
 

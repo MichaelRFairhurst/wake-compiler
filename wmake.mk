@@ -8,7 +8,7 @@ SOURCEFILES := $(wildcard $(SRCDIR)/*.wk)
 DEPFILES := ${SOURCEFILES:.wk=.d}
 OBJECTFILES := $(subst $(SRCDIR),$(OBJECTDIR),${SOURCEFILES:.wk=.o})
 TABLEFILES := $(subst $(SRCDIR),$(TABLEDIR),${SOURCEFILES:.wk=.table})
-LIBRARYFILES := bin/wakeobj/std.o bin/wakeobj/UndefinedIndexException.o bin/wakeobj/System.o
+LIBRARYFILES := bin/wakeobj/std.o bin/wakeobj/UndefinedIndexException.o
 WUNITLIBRARYROOT := ../wUnit/bin/wakeobj
 WUNITTABLEROOT := ../wUnit/bin/waketable
 TESTLIBRARYFILES := $(WUNITLIBRARYROOT)/TestResultReporter.o $(WUNITLIBRARYROOT)/Asserts.o
@@ -23,7 +23,7 @@ endif
 tests: bin/$(PROGRAM)-test
 	node bin/$(PROGRAM)-test
 
-bin/$(PROGRAM)-test: $(OBJECTFILES) $(TESTLIBRARYFILES) $(LIBRARYFILES) $(TABLEFILES) bin/waketable/System.table
+bin/$(PROGRAM)-test: $(OBJECTFILES) $(TESTLIBRARYFILES) $(LIBRARYFILES) $(TABLEFILES)
 	wunit-compiler
 	bin/wake bin/TestSuite.wk -d $(TABLEDIR) -o bin/TestSuite.o
 	bin/wake -l -d $(TABLEDIR) $(OBJECTFILES) $(TESTLIBRARYFILES) $(LIBRARYFILES) bin/TestSuite.o -o bin/$(PROGRAM)-test -c TestSuite -m 'tests()'
