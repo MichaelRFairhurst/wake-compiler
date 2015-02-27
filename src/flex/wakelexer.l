@@ -123,6 +123,8 @@ from					count(); return FROM;
 \/						count(); return '/';
 \\						count(); return '\\';
 #						count(); return '#';
+&						count(); return '&';
+\^						count(); return '^';
 \|						count(); return '|';
 \*						count(); return '*';
 !						count(); return '!';

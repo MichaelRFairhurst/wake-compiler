@@ -836,6 +836,30 @@ void ObjectFileGenerator::generate(Node* tree) {
 			generate(tree->node_data.nodes[1]);
 			file << ")";
 			break;
+		
+		case NT_BITAND:
+			file << "(";
+			generate(tree->node_data.nodes[0]);
+			file << "&";
+			generate(tree->node_data.nodes[1]);
+			file << ")";
+			break;
+		
+		case NT_BITXOR:
+			file << "(";
+			generate(tree->node_data.nodes[0]);
+			file << "^";
+			generate(tree->node_data.nodes[1]);
+			file << ")";
+			break;
+		
+		case NT_BITOR:
+			file << "(";
+			generate(tree->node_data.nodes[0]);
+			file << "|";
+			generate(tree->node_data.nodes[1]);
+			file << ")";
+			break;
 
 		case NT_AND:
 			file << "(";

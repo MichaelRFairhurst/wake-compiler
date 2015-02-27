@@ -149,6 +149,9 @@
 
 #define NT_BITSHIFTLEFT 111
 #define NT_BITSHIFTRIGHT 112
+#define NT_BITAND 113
+#define NT_BITXOR 114
+#define NT_BITOR 115
 
 void AddSubNode(Node* parent, Node* child);
 
