@@ -9,7 +9,7 @@
  * See LICENSE.TXT for details
  *
  * Author: Michael Fairhurst
- * Revised By:
+ * Revised By: Nathan Fairhurst
  *
  **************************************************/
 
@@ -47,7 +47,7 @@ int wakewrap()
 /* keywords */
 %token EVERY EXTERN CAPABLE KEYWORD_A AN IS RETURN WITH PUBLIC IF ELSE WHILE IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE EXISTS VAR FOREACH IN THROW TRY CATCH FROM
 /* symbols */
-%token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT SYM_PLUSEQ SYM_VALEQ SYM_MULTEQ SYM_SUBEQ SYM_DIVEQ SYM_PROVIDE_ARGS_OPEN SYM_EARLYBAILOUT_DOT SYM_TYPESAFE_INDEX SYM_LAMBDA;
+%token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT SYM_PLUSEQ SYM_VALEQ SYM_MULTEQ SYM_SUBEQ SYM_DIVEQ SYM_PROVIDE_ARGS_OPEN SYM_EARLYBAILOUT_DOT SYM_TYPESAFE_INDEX SYM_LAMBDA SYM_BITSHIFTLEFT SYM_BITSHIFTRIGHT;
 /* this too */
 %token ERRORTOKEN
 
@@ -73,7 +73,7 @@ int wakewrap()
 %token <number> BOOL
 %token <number> SYM_SHADOW
 %token <void> SYM_ARRAYED
-%type <node> imports import importtarget classes annotatedclass class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value value_invokable method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_negative expression_relational expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args annotatedtype annotatedmethod annotation annotations annotationvals annotationval lambda statement_or_block expression_nolambda inferenceabletypes
+%type <node> imports import importtarget classes annotatedclass class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value value_invokable method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_bitshift expression_negative expression_relational expression_bitand expression_bitxor expression_bitor expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args annotatedtype annotatedmethod annotation annotations annotationvals annotationval lambda statement_or_block expression_nolambda inferenceabletypes
 %type <type> type specializabletype shadowabletype puretype classtype fntype parameterizedtype unboundtypespecification classdeclarationtype
 %type <type_array> puretypes types unboundtypespecifications
 %type <string> alias
@@ -540,13 +540,19 @@ expression_add:
 	| expression_add '+' expression_multiply									{ $$ = MakeTwoBranchNode(NT_ADD, $1, $3, @$); }
 	| expression_add '-' expression_multiply									{ $$ = MakeTwoBranchNode(NT_SUBTRACT, $1, $3, @$); }
 	;
+	
+expression_bitshift:
+	expression_add																{ $$ = $1; }
+	| expression_bitshift SYM_BITSHIFTLEFT expression_add						{ $$ = MakeTwoBranchNode(NT_BITSHIFTLEFT, $1, $3, @$); }
+	| expression_bitshift SYM_BITSHIFTRIGHT expression_add						{ $$ = MakeTwoBranchNode(NT_BITSHIFTRIGHT, $1, $3, @$); }
+	;
 
 expression_relational:
-	expression_add																{ $$ = $1; }
-	| expression_relational '<' expression_add									{ $$ = MakeTwoBranchNode(NT_LESSTHAN, $1, $3, @$); }
-	| expression_relational '>' expression_add									{ $$ = MakeTwoBranchNode(NT_GREATERTHAN, $1, $3, @$); }
-	| expression_relational SYM_LE expression_add								{ $$ = MakeTwoBranchNode(NT_LESSTHANEQUAL, $1, $3, @$); }
-	| expression_relational SYM_GE expression_add								{ $$ = MakeTwoBranchNode(NT_GREATERTHANEQUAL, $1, $3, @$); }
+	expression_bitshift															{ $$ = $1; }
+	| expression_relational '<' expression_bitshift								{ $$ = MakeTwoBranchNode(NT_LESSTHAN, $1, $3, @$); }
+	| expression_relational '>' expression_bitshift								{ $$ = MakeTwoBranchNode(NT_GREATERTHAN, $1, $3, @$); }
+	| expression_relational SYM_LE expression_bitshift							{ $$ = MakeTwoBranchNode(NT_LESSTHANEQUAL, $1, $3, @$); }
+	| expression_relational SYM_GE expression_bitshift							{ $$ = MakeTwoBranchNode(NT_GREATERTHANEQUAL, $1, $3, @$); }
 	;
 
 expression_equality:
@@ -554,10 +560,26 @@ expression_equality:
 	| expression_equality SYM_EQ expression_relational							{ $$ = MakeTwoBranchNode(NT_EQUALITY, $1, $3, @$); }
 	| expression_equality SYM_NE expression_relational							{ $$ = MakeTwoBranchNode(NT_INEQUALITY, $1, $3, @$); }
 	;
+	
+expression_bitand:
+	expression_equality															{ $$ = $1; }
+	| expression_bitand '&' expression_equality									{ $$ = MakeTwoBranchNode(NT_BITAND, $1, $3, @$); }
+	;
+	
+expression_bitxor:
+	expression_bitand															{ $$ = $1; }
+	| expression_bitxor '^' expression_bitand									{ $$ = MakeTwoBranchNode(NT_BITXOR, $1, $3, @$); }
+	;
+	
+expression_bitor:
+	expression_bitxor															{ $$ = $1; }
+	| expression_bitor '|' expression_bitxor										{ $$ = MakeTwoBranchNode(NT_BITOR, $1, $3, @$); }
+	;
+	
 
 expression_conditionaland:
-	expression_equality															{ $$ = $1; }
-	| expression_conditionaland SYM_AND expression_equality						{ $$ = MakeTwoBranchNode(NT_AND, $1, $3, @$); }
+	expression_bitor															{ $$ = $1; }
+	| expression_conditionaland SYM_AND expression_bitor						{ $$ = MakeTwoBranchNode(NT_AND, $1, $3, @$); }
 	;
 
 expression_conditionalor:

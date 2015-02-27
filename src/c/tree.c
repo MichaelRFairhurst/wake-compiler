@@ -8,7 +8,7 @@
  * See LICENSE.TXT for details
  *
  * Author: Michael Fairhurst
- * Revised By:
+ * Revised By: Nathan Fairhurst
  *
  **************************************************/
 
@@ -90,6 +90,9 @@ void initTreeTypes() {
 	nodenames[NT_GREATERTHANEQUAL] = "NT_GREATERTHANEQUAL";
 	nodenames[NT_EQUALITY] = "NT_EQUALITY";
 	nodenames[NT_INEQUALITY] = "NT_INEQUALITY";
+	nodenames[NT_BITAND] = "NT_BITAND";
+	nodenames[NT_BITXOR] = "NT_BITXOR";
+	nodenames[NT_BITOR] = "NT_BITOR";
 	nodenames[NT_AND] = "NT_AND";
 	nodenames[NT_OR] = "NT_OR";
 	nodenames[NT_IF_THEN_ELSE] = "NT_IF_THEN_ELSE";
@@ -99,6 +102,8 @@ void initTreeTypes() {
 	nodenames[NT_PROPERTY] = "NT_PROPERTY";
 	nodenames[NT_CAST] = "NT_CAST";
 	nodenames[NT_COMPILER_HINT] = "NT_COMPILER_HINT";
+	nodenames[NT_BITSHIFTLEFT] = "NT_BITSHIFTLEFT";
+	nodenames[NT_BITSHIFTRIGHT] = "NT_BITSHIFTRIGHT";
 	treeTypesInited = 1;
 }
 

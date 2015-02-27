@@ -181,6 +181,11 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 			// FALLTHROUGH
 		case NT_MULTIPLY:
 		case NT_DIVIDE:
+		case NT_BITSHIFTLEFT:
+		case NT_BITSHIFTRIGHT:
+		case NT_BITAND:
+		case NT_BITXOR:
+		case NT_BITOR:
 		case NT_SUBTRACT:
 			{
 				ret = children[0].typeCheck(false);
