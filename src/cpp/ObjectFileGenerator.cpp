@@ -8,7 +8,7 @@
  * See LICENSE.TXT for details
  *
  * Author: Michael Fairhurst
- * Revised By:
+ * Revised By: Nathan Fairhurst
  *
  **************************************************/
 
@@ -769,6 +769,22 @@ void ObjectFileGenerator::generate(Node* tree) {
 			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << "-";
+			generate(tree->node_data.nodes[1]);
+			file << ")";
+			break;
+		
+		case NT_BITSHIFTLEFT:
+			file << "(";
+			generate(tree->node_data.nodes[0]);
+			file << "<<";
+			generate(tree->node_data.nodes[1]);
+			file << ")";
+			break;
+		
+		case NT_BITSHIFTRIGHT:
+			file << "(";
+			generate(tree->node_data.nodes[0]);
+			file << ">>";
 			generate(tree->node_data.nodes[1]);
 			file << ")";
 			break;

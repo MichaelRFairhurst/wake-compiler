@@ -8,7 +8,7 @@
  * See LICENSE.TXT for details
  *
  * Author: Michael Fairhurst
- * Revised By:
+ * Revised By: Nathan Fairhurst
  *
  **************************************************/
 
@@ -146,6 +146,9 @@
 #define NT_ANNOTATION_VALS 101
 #define NT_ANNOTATED_PROPERTY 109
 #define NT_ANNOTATED_PROVISION 110
+
+#define NT_BITSHIFTLEFT 111
+#define NT_BITSHIFTRIGHT 112
 
 void AddSubNode(Node* parent, Node* child);
 

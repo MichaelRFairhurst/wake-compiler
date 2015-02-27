@@ -9,7 +9,7 @@
  * See LICENSE.TXT for details
  *
  * Author: Michael Fairhurst
- * Revised By:
+ * Revised By: Nathan Fairhurst
  *
  **************************************************/
 
@@ -105,6 +105,8 @@ from					count(); return FROM;
 \?\?\?					count(); return SYM_CURRIER;
 \.\?					count(); return SYM_EARLYBAILOUT_DOT;
 \[\?					count(); return SYM_TYPESAFE_INDEX;
+\<\<					count(); return SYM_BITSHIFTLEFT;
+\>\>					count(); return SYM_BITSHIFTRIGHT;
 :						count(); return ':';
 @						count(); return '@';
 \(						count(); return '(';
