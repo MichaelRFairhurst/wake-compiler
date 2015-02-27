@@ -11,15 +11,15 @@
  * Revised By:
  *
  **************************************************/
- 
+
 PTT_TEST_CASE(
  	BitshiftleftNumsAndAnythingElseIsTypeError,
 	"every MyClass is:															\n\
-		multiplyNumByString() { 5 << 'test'; }									\n\
-		multiplyStringByNum() { 'test' << 5; }									\n\
-		multiplyNumByObject(MyClass) { 5 << MyClass; }							\n\
-		multiplyObjectByNum(MyClass) { MyClass << 5; }							\n\
-		multiplyLambdaByNum(MyClass --fn(MyClass) lambda) { lambda << 5; }		\n\
+		bitshiftLeftNumByString() { 5 << 'test'; }									\n\
+		bitshiftLeftStringByNum() { 'test' << 5; }									\n\
+		bitshiftLeftNumByObject(MyClass) { 5 << MyClass; }							\n\
+		bitshiftLeftObjectByNum(MyClass) { MyClass << 5; }							\n\
+		bitshiftLeftLambdaByNum(MyClass --fn(MyClass) lambda) { lambda << 5; }		\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -31,11 +31,11 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
  	BitshiftrightNumsAndAnythingElseIsTypeError,
 	"every MyClass is:															\n\
-		multiplyNumByString() { 5 >> 'test'; }									\n\
-		multiplyStringByNum() { 'test' >> 5; }									\n\
-		multiplyNumByObject(MyClass) { 5 >> MyClass; }							\n\
-		multiplyObjectByNum(MyClass) { MyClass >> 5; }							\n\
-		multiplyLambdaByNum(MyClass --fn(MyClass) lambda) { lambda >> 5; }		\n\
+		bitshiftRightNumByString() { 5 >> 'test'; }									\n\
+		bitshiftRightStringByNum() { 'test' >> 5; }									\n\
+		bitshiftRightNumByObject(MyClass) { 5 >> MyClass; }							\n\
+		bitshiftRightObjectByNum(MyClass) { MyClass >> 5; }							\n\
+		bitshiftRightLambdaByNum(MyClass --fn(MyClass) lambda) { lambda >> 5; }		\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -47,11 +47,11 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
  	BitandNumsAndAnythingElseIsTypeError,
 	"every MyClass is:															\n\
-		multiplyNumByString() { 5 & 'test'; }									\n\
-		multiplyStringByNum() { 'test' & 5; }									\n\
-		multiplyNumByObject(MyClass) { 5 & MyClass; }							\n\
-		multiplyObjectByNum(MyClass) { MyClass & 5; }							\n\
-		multiplyLambdaByNum(MyClass --fn(MyClass) lambda) { lambda & 5; }		\n\
+		bitwiseAndNumByString() { 5 & 'test'; }									\n\
+		bitwiseAndStringByNum() { 'test' & 5; }									\n\
+		bitwiseAndNumByObject(MyClass) { 5 & MyClass; }							\n\
+		bitwiseAndObjectByNum(MyClass) { MyClass & 5; }							\n\
+		bitwiseAndLambdaByNum(MyClass --fn(MyClass) lambda) { lambda & 5; }		\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -63,11 +63,11 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
  	BitxorNumsAndAnythingElseIsTypeError,
 	"every MyClass is:															\n\
-		multiplyNumByString() { 5 ^ 'test'; }									\n\
-		multiplyStringByNum() { 'test' ^ 5; }									\n\
-		multiplyNumByObject(MyClass) { 5 ^ MyClass; }							\n\
-		multiplyObjectByNum(MyClass) { MyClass ^ 5; }							\n\
-		multiplyLambdaByNum(MyClass --fn(MyClass) lambda) { lambda ^ 5; }		\n\
+		bitwiseXorNumByString() { 5 ^ 'test'; }									\n\
+		bitwiseXorStringByNum() { 'test' ^ 5; }									\n\
+		bitwiseXorNumByObject(MyClass) { 5 ^ MyClass; }							\n\
+		bitwiseXorObjectByNum(MyClass) { MyClass ^ 5; }							\n\
+		bitwiseXorLambdaByNum(MyClass --fn(MyClass) lambda) { lambda ^ 5; }		\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -79,11 +79,11 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
  	BitorNumsAndAnythingElseIsTypeError,
 	"every MyClass is:															\n\
-		multiplyNumByString() { 5 | 'test'; }									\n\
-		multiplyStringByNum() { 'test' | 5; }									\n\
-		multiplyNumByObject(MyClass) { 5 | MyClass; }							\n\
-		multiplyObjectByNum(MyClass) { MyClass | 5; }							\n\
-		multiplyLambdaByNum(MyClass --fn(MyClass) lambda) { lambda | 5; }		\n\
+		bitwiseOrNumByString() { 5 | 'test'; }									\n\
+		bitwiseOrStringByNum() { 'test' | 5; }									\n\
+		bitwiseOrNumByObject(MyClass) { 5 | MyClass; }							\n\
+		bitwiseOrObjectByNum(MyClass) { MyClass | 5; }							\n\
+		bitwiseOrLambdaByNum(MyClass --fn(MyClass) lambda) { lambda | 5; }		\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
