@@ -52,6 +52,7 @@ CPPNAMES= \
 	type.cpp \
 	AnnotationTreeTraverser.cpp \
 	UnifyingType.cpp \
+	JavascriptPropertyMangler.cpp \
 	AstCreator.cpp \
 	ast/Catch.cpp \
 	ast/MethodSegment.cpp \

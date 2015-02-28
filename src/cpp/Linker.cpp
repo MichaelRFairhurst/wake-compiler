@@ -34,6 +34,8 @@ extern "C" {
 	extern FILE *objectfilein;
 }
 
+#include "JavascriptPropertyMangler.h"
+
 void Linker::loadTables(string dirname, ClassSpaceSymbolTable& table) {
 	if (!exists(dirname)) throw string("Directory " + dirname + " does not exist");
 
@@ -99,12 +101,16 @@ void Linker::write(ostream& outfile) {
 		std::vector<std::pair<int, std::string> > propUsages = (*file)->getPropertyUsages();
 		for(i = 0, classusei = 0, propusei = 0; it != buffer.end(); ++it, i++) {
 			if(classusei < classUsages.size() && classUsages[classusei].first == i) {
-				if(!classTable.symbolExists(classUsages[classusei].second)) classTable.addSymbol(classUsages[classusei].second);
-				outfile << "_" << classTable.getAddress(classUsages[classusei].second);
+				//if(!classTable.symbolExists(classUsages[classusei].second)) classTable.addSymbol(classUsages[classusei].second);
+				//outfile << "_" << classTable.getAddress(classUsages[classusei].second);
+				outfile << classUsages[classusei].second;
 				classusei++;
 			} else if(propusei < (*file)->getPropertyUsages().size() && (*file)->getPropertyUsages()[propusei].first == i) {
-				if(!propertyTable.symbolExists(propUsages[propusei].second)) propertyTable.addSymbol(propUsages[propusei].second);
-				outfile << propertyTable.getAddress(propUsages[propusei].second);
+				//if(!propertyTable.symbolExists(propUsages[propusei].second)) propertyTable.addSymbol(propUsages[propusei].second);
+				//outfile << propertyTable.getAddress(propUsages[propusei].second);
+
+				wake::JavascriptPropertyMangler mangler;
+				outfile << mangler.mangle(propUsages[propusei].second);
 				propusei++;
 			}
 
@@ -133,19 +139,20 @@ void Linker::writeDebugSymbols(ostream& outfile) {
 }
 
 void Linker::setMain(ostream& file, string classname, string methodname, ClassSpaceSymbolTable& table) {
+	wake::JavascriptPropertyMangler mangler;
 	file << "try{";
 
 	file << "(";
 	generateRecursiveConstructors(file, classname, table);
 	file << ").";
-	file << propertyTable.getAddress(methodname);
+	file << mangler.mangle(methodname); // propertyTable.getAddress(methodname);
 	file << "();";
 
 	file << "}catch(e){";
 	file << "if(e.";
-	file << propertyTable.getAddress("getStacktrace()");
+	file << mangler.mangle("getStackTrace()"); //propertyTable.getAddress("getStacktrace()");
 	file << ")console.log(e.";
-	file << propertyTable.getAddress("getStacktrace()");
+	file << mangler.mangle("getStackTrace()"); //propertyTable.getAddress("getStacktrace()");
 	file << "());else throw e;}";
 
 	file << "})();";
@@ -153,7 +160,7 @@ void Linker::setMain(ostream& file, string classname, string methodname, ClassSp
 
 void Linker::generateRecursiveConstructors(ostream& file, string ctedclass, ClassSpaceSymbolTable& table) {
 	file << "new ";
-	file << "_" << classTable.getAddress(ctedclass);
+	file << ctedclass; // "_" << classTable.getAddress(ctedclass);
 	file << "(";
 
 	vector<Type*>* needs = table.find(ctedclass)->getNeeds();
