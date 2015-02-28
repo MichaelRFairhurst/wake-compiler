@@ -216,6 +216,26 @@ every ExceptionTest is:
 		}
 	}
 
+	@Test
+	~[ test undefined index exception with gap ]~(Asserts) {
+		var $Text[] = [];
+		$Text[1] = "hello";
+		$Text[1].getSize(); // better not throw!
+		try {
+			$Text[0].getSize();
+		} catch(UndefinedIndexException) {
+			var Text[] = UndefinedIndexException.getStacktrace().split("\n");
+			Asserts.that(Text[0])Equals("Accessing undefined index 0 of a list");
+			Asserts.that(Text[2].substr(0, 73))Equals("    at [WAKE] ExceptionTest.~[ test undefined index exception ]~(Asserts)");
+		}
+	}
+
+	@Test
+	~[ test no undefined index exception with optional ]~(Asserts) {
+		var $Text?[] = [nothing];
+		$Text[0];
+	}
+
 every SubExceptionA (an Exception) is:
 
 every SubExceptionB (an Exception) is:
