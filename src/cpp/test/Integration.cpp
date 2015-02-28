@@ -52,6 +52,7 @@ BOOST_AUTO_TEST_SUITE( ParseTreeTraverserTest )
 #include "../src/cpp/test/integration/Arithmetic.cpp"
 #include "../src/cpp/test/integration/Lists.cpp"
 #include "../src/cpp/test/integration/Booleans.cpp"
+#include "../src/cpp/test/integration/Bitwise.cpp"
 #include "../src/cpp/test/integration/Lambdas.cpp"
 #include "../src/cpp/test/integration/Assignments.cpp"
 #include "../src/cpp/test/integration/MethodReturns.cpp"
