@@ -6,3 +6,4 @@ chivvy
 *.swa
 *.swo
 *.d
+.DS_Store
