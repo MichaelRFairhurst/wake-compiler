@@ -539,6 +539,14 @@ expression_add:
 	expression_multiply															{ $$ = $1; }
 	| expression_add '+' expression_multiply									{ $$ = MakeTwoBranchNode(NT_ADD, $1, $3, @$); }
 	| expression_add '-' expression_multiply									{ $$ = MakeTwoBranchNode(NT_SUBTRACT, $1, $3, @$); }
+	| expression_add NUMBER														{ 
+																					if ($2 > 0) { 
+																						wakeerror("Number follows expression without an operator.");
+																						YYERROR; 
+																					} else {
+																						$$ = MakeTwoBranchNode(NT_ADD, $1, MakeNodeFromNumber(NT_NUMBERLIT,$2,@2), @$);
+																					}
+																				}
 	;
 	
 expression_bitshift:
