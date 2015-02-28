@@ -141,8 +141,7 @@ from					count(); return FROM;
 
 true					count(); wakelval.number = 1; return BOOL;
 false					count(); wakelval.number = 0; return BOOL;
--?[0-9]+(\.[0-9]+)?		count(); wakelval.number = atof(waketext); return NUMBER;
-\.[0-9]+				count(); wakelval.number = atof(waketext); return NUMBER;
+-?(0[xX][0-9A-Fa-f]+(\.[0-9A-Fa-f]+)?([pP]-?[0-9A-Fa-f]+)?|(([0-9]*(\.[0-9]+)?)|[0-9]+)([eE]-?[0-9]+)?)		count(); wakelval.number = atof(waketext); return NUMBER;
 :[a-zA-Z0-9]+			count(); wakelval.string = strdup(waketext+1); return SPECIALTY;
 @[a-zA-Z0-9]+			count(); wakelval.string = strdup(waketext+1); return ANNOTATION;
 [a-z][a-zA-Z0-9]*		count(); wakelval.string = strdup(waketext); return LIDENTIFIER;

@@ -99,6 +99,29 @@ PTT_TEST_CASE(
 )
 
 PTT_TEST_CASE(
+	ValidArithmeticGivenWhiteSpace,
+	"every MyClass is:																\n\
+		validArithmetic() {															\n\
+			5/5/5;					// done thrice to ensure int returned		\n\
+			5*5*5;					// done thrice to ensure int returned		\n\
+			5+5+5;					// done thrice to ensure int returned		\n\
+			5-5-5;					// done thrice to ensure int returned		\n\
+			'test'+'test'+'test';	// done thrice to ensure string returned	\n\
+			'test'=='test'==true;	// test returns truth						\n\
+			'test'!='test'==true;	// test returns truth						\n\
+			5==5 ==true;				// test returns truth						\n\
+			5!=5==true;				// test returns truth						\n\
+			5<5==true;				// test returns truth						\n\
+			5>5==true;				// test returns truth						\n\
+			5<=5==true;				// test returns truth						\n\
+			5>=5==true;				// test returns truth						\n\
+			5- 4<<3==8==true;		// test 5- 4 isn't (5) (-4)					\n\
+		}																			\n\
+	",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
 	ArithmeticOperatorsNotValidOnStringPairs,
 	"every MyClass is:									\n\
 		subtractStrings() { 'test' - 'test'; }			\n\
