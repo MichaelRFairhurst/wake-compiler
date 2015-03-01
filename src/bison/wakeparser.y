@@ -47,7 +47,7 @@ int wakewrap()
 /* keywords */
 %token EVERY EXTERN CAPABLE KEYWORD_A AN IS RETURN WITH PUBLIC IF ELSE WHILE IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE EXISTS VAR FOREACH IN THROW TRY CATCH FROM
 /* symbols */
-%token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT SYM_PLUSEQ SYM_VALEQ SYM_MULTEQ SYM_SUBEQ SYM_DIVEQ SYM_PROVIDE_ARGS_OPEN SYM_EARLYBAILOUT_DOT SYM_TYPESAFE_INDEX SYM_LAMBDA SYM_BITSHIFTLEFT SYM_BITSHIFTRIGHT SYM_MODNATIVE SYM_MODALT;
+%token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT SYM_PLUSEQ SYM_VALEQ SYM_MULTEQ SYM_SUBEQ SYM_DIVEQ SYM_PROVIDE_ARGS_OPEN SYM_EARLYBAILOUT_DOT SYM_TYPESAFE_INDEX SYM_LAMBDA SYM_LAMBDA_AUTORETURN SYM_BITSHIFTLEFT SYM_BITSHIFTRIGHT SYM_MODNATIVE SYM_MODALT;
 /* this too */
 %token ERRORTOKEN
 
@@ -538,16 +538,16 @@ expression_add:
 	expression_multiply															{ $$ = $1; }
 	| expression_add '+' expression_multiply									{ $$ = MakeTwoBranchNode(NT_ADD, $1, $3, @$); }
 	| expression_add '-' expression_multiply									{ $$ = MakeTwoBranchNode(NT_SUBTRACT, $1, $3, @$); }
-	| expression_add NUMBER														{ 
-																					if ($2 > 0) { 
+	| expression_add NUMBER														{
+																					if ($2 > 0) {
 																						wakeerror("Number follows expression without an operator.");
-																						YYERROR; 
+																						YYERROR;
 																					} else {
 																						$$ = MakeTwoBranchNode(NT_ADD, $1, MakeNodeFromNumber(NT_NUMBERLIT,$2,@2), @$);
 																					}
 																				}
 	;
-	
+
 expression_bitshift:
 	expression_add																{ $$ = $1; }
 	| expression_bitshift SYM_BITSHIFTLEFT expression_add						{ $$ = MakeTwoBranchNode(NT_BITSHIFTLEFT, $1, $3, @$); }
@@ -567,22 +567,22 @@ expression_equality:
 	| expression_equality SYM_EQ expression_relational							{ $$ = MakeTwoBranchNode(NT_EQUALITY, $1, $3, @$); }
 	| expression_equality SYM_NE expression_relational							{ $$ = MakeTwoBranchNode(NT_INEQUALITY, $1, $3, @$); }
 	;
-	
+
 expression_bitand:
 	expression_equality															{ $$ = $1; }
 	| expression_bitand '&' expression_equality									{ $$ = MakeTwoBranchNode(NT_BITAND, $1, $3, @$); }
 	;
-	
+
 expression_bitxor:
 	expression_bitand															{ $$ = $1; }
 	| expression_bitxor '^' expression_bitand									{ $$ = MakeTwoBranchNode(NT_BITXOR, $1, $3, @$); }
 	;
-	
+
 expression_bitor:
 	expression_bitxor															{ $$ = $1; }
 	| expression_bitor '|' expression_bitxor										{ $$ = MakeTwoBranchNode(NT_BITOR, $1, $3, @$); }
 	;
-	
+
 
 expression_conditionaland:
 	expression_bitor															{ $$ = $1; }
@@ -623,6 +623,10 @@ lambda:
 	'{' SYM_LAMBDA declarationsandstatements '}'								{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, MakeEmptyNode(NT_INFERENCEABLE_TYPES, @2), $3, @$); }
 	| '{' inferenceabletypes SYM_LAMBDA declarationsandstatements '}'			{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, $2, $4, @$); }
 	| '{' inferenceabletypes SYM_LAMBDA '}'										{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, $2, MakeEmptyNode(NT_EMPTY, @3), @$); }
+	| '{' SYM_LAMBDA_AUTORETURN expression '}'									{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, MakeEmptyNode(NT_INFERENCEABLE_TYPES, @2), MakeOneBranchNode(NT_RETURN, $3, @3), @$); }
+	| '{' SYM_LAMBDA_AUTORETURN expression ';' '}'								{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, MakeEmptyNode(NT_INFERENCEABLE_TYPES, @2), MakeOneBranchNode(NT_RETURN, $3, @3), @$); }
+	| '{' inferenceabletypes SYM_LAMBDA_AUTORETURN expression '}'				{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, $2, MakeOneBranchNode(NT_RETURN, $4, @4), @$); }
+	| '{' inferenceabletypes SYM_LAMBDA_AUTORETURN expression ';' '}'			{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, $2, MakeOneBranchNode(NT_RETURN, $4, @4), @$); }
 	;
 
 expression_noretrieval:

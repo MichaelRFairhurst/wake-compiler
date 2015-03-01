@@ -460,3 +460,15 @@ PTT_TEST_CASE(
 		}",
 	PTT_VALID
 );
+
+PTT_TEST_CASE(
+	LambdasWithEqualsRocketReturnsWithOrWithoutSemicolon,
+	"every MyClass is:										\n\
+		method() {											\n\
+			var Bool -- fn() myfn1 = { => true };			\n\
+			var Bool -- fn() myfn2 = { => true; };			\n\
+			var Bool -- fn(Bool) myfn3 = { Bool => true };	\n\
+			var Bool -- fn(Bool) myfn4 = { Bool => true; };	\n\
+		}",
+	PTT_VALID
+);
