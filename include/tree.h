@@ -154,6 +154,10 @@
 #define NT_BITOR 115
 #define NT_BITNOT 116
 
+#define NT_MOD 117
+#define NT_MODNATIVE 118
+#define NT_MODALT 119
+
 void AddSubNode(Node* parent, Node* child);
 
 void PrependSubNode(Node* parent, Node* child);

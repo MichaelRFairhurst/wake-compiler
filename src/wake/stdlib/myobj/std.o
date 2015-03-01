@@ -9,6 +9,8 @@ function$ $$A(a, b) {
 	return$ c;
 }
 
+function$ $$B(a, b) { return a - b * Math.floor(a / b); }
+
 (function(require) {
 	var$ b='', fs = require('fs');
 	fs.existsSync = fs.existsSync || require("path").existsSync;

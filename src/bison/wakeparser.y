@@ -47,7 +47,7 @@ int wakewrap()
 /* keywords */
 %token EVERY EXTERN CAPABLE KEYWORD_A AN IS RETURN WITH PUBLIC IF ELSE WHILE IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE EXISTS VAR FOREACH IN THROW TRY CATCH FROM
 /* symbols */
-%token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT SYM_PLUSEQ SYM_VALEQ SYM_MULTEQ SYM_SUBEQ SYM_DIVEQ SYM_PROVIDE_ARGS_OPEN SYM_EARLYBAILOUT_DOT SYM_TYPESAFE_INDEX SYM_LAMBDA SYM_BITSHIFTLEFT SYM_BITSHIFTRIGHT;
+%token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT SYM_PLUSEQ SYM_VALEQ SYM_MULTEQ SYM_SUBEQ SYM_DIVEQ SYM_PROVIDE_ARGS_OPEN SYM_EARLYBAILOUT_DOT SYM_TYPESAFE_INDEX SYM_LAMBDA SYM_BITSHIFTLEFT SYM_BITSHIFTRIGHT SYM_MODNATIVE SYM_MODALT;
 /* this too */
 %token ERRORTOKEN
 
@@ -527,8 +527,11 @@ expression_logicalunary:
 
 expression_multiply:
 	expression_unary															{ $$ = $1; }
-	| expression_multiply '*' expression_unary								{ $$ = MakeTwoBranchNode(NT_MULTIPLY, $1, $3, @$); }
-	| expression_multiply '/' expression_unary								{ $$ = MakeTwoBranchNode(NT_DIVIDE, $1, $3, @$); }
+	| expression_multiply '*' expression_unary									{ $$ = MakeTwoBranchNode(NT_MULTIPLY, $1, $3, @$); }
+	| expression_multiply '/' expression_unary									{ $$ = MakeTwoBranchNode(NT_DIVIDE, $1, $3, @$); }
+	| expression_multiply '%' expression_unary									{ $$ = MakeTwoBranchNode(NT_MOD, $1, $3, @$); }
+	| expression_multiply SYM_MODNATIVE expression_unary						{ $$ = MakeTwoBranchNode(NT_MODNATIVE, $1, $3, @$); }
+	| expression_multiply SYM_MODALT expression_unary							{ $$ = MakeTwoBranchNode(NT_MODALT, $1, $3, @$); }
 	;
 
 expression_add:

@@ -756,6 +756,23 @@ void ObjectFileGenerator::generate(Node* tree) {
 			generate(tree->node_data.nodes[1]);
 			file << ")";
 			break;
+		
+		case NT_MOD:
+			file << "$B(";
+			generate(tree->node_data.nodes[0]);
+			file << ",";
+			generate(tree->node_data.nodes[1]);
+			file << ")";
+			break;
+		
+		case NT_MODNATIVE:
+		case NT_MODALT:
+			file << "(";
+			generate(tree->node_data.nodes[0]);
+			file << "%";
+			generate(tree->node_data.nodes[1]);
+			file << ")";
+			break;
 
 		case NT_ADD:
 			file << "(";
