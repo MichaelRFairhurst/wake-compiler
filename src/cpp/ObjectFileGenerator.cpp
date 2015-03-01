@@ -837,6 +837,12 @@ void ObjectFileGenerator::generate(Node* tree) {
 			file << ")";
 			break;
 		
+		case NT_BITNOT:
+			file << "(~";
+			generate(tree->node_data.nodes[0]);
+			file << ")";
+			break;
+		
 		case NT_BITAND:
 			file << "(";
 			generate(tree->node_data.nodes[0]);

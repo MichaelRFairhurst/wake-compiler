@@ -152,6 +152,7 @@
 #define NT_BITAND 113
 #define NT_BITXOR 114
 #define NT_BITOR 115
+#define NT_BITNOT 116
 
 void AddSubNode(Node* parent, Node* child);
 

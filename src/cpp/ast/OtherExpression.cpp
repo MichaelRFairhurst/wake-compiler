@@ -209,6 +209,24 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				}
 			}
 			break;
+		
+		case NT_BITNOT:
+			{
+				ret = children[0].typeCheck(false);
+				
+				if(!analyzer->isPrimitiveTypeNum(ret)) {
+					string erroneousstring = analyzer->getNameForType(ret);
+					delete ret;
+					ret = MakeType(TYPE_CLASS);
+					ret->typedata._class.classname = strdup("Num");
+				   
+					EXPECTED	"Num"
+					ERRONEOUS	erroneousstring
+					THROW		("Bitwise Not operation performed on non-numerals");
+				
+				}
+			}
+			break;
 
 		case NT_LESSTHAN:
 		case NT_LESSTHANEQUAL:

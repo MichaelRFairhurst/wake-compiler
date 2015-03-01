@@ -13,6 +13,18 @@
  **************************************************/
 
 PTT_TEST_CASE(
+ 	BitnotNumsAndAnythingElseIsTypeError,
+	"every MyClass is:															\n\
+		bitnotNumByString() { ~'test'; }									\n\
+		bitnotNumByObject(MyClass) { ~MyClass; }							\n\
+		bitnotLambdaByNum(MyClass --fn(MyClass) lambda) { ~lambda; }		\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+)
+
+PTT_TEST_CASE(
  	BitshiftleftNumsAndAnythingElseIsTypeError,
 	"every MyClass is:															\n\
 		bitshiftLeftNumByString() { 5 << 'test'; }									\n\
