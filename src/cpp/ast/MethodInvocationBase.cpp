@@ -68,6 +68,10 @@ Type* wake::ast::MethodInvocationBase::typeCheckMethodInvocation(Type& subject) 
 		lambdatype.reset(new Type((*lambdaprop)->type));
 		address = (*lambdaprop)->address;
 
+		if(!((*lambdaprop)->flags & PROPERTY_PUBLIC) && node->node_data.nodes[0]->node_type != NT_THIS) {
+			errors->addError(new SemanticError(PRIVATE_ACCESS, "Method " + address + " is private", node));
+		}
+
 		TypeParameterizer parameterizer;
 
 		for(boost::ptr_vector<MethodSegment>::iterator it = methodSegments.begin(); it != methodSegments.end(); ++it)
@@ -173,6 +177,10 @@ Type* wake::ast::MethodInvocationBase::typeCheckMethodInvocation(Type& subject) 
 		if(optlambdatype) {
 			lambdatype.reset(new Type(*optlambdatype));
 			address = methodtable->getAddress(name);
+			int flags = methodtable->getFlags(name);
+			if(!(flags & PROPERTY_PUBLIC) && node->node_data.nodes[0]->node_type != NT_THIS) {
+				errors->addError(new SemanticError(PRIVATE_ACCESS, "Method " + address + " is private", node));
+			}
 		}
 	}
 

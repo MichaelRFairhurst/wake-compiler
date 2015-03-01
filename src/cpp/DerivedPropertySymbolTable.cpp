@@ -49,6 +49,10 @@ string DerivedPropertySymbolTable::getAddress(string name) {
 	return properties->find(name)->second->address;
 }
 
+int DerivedPropertySymbolTable::getFlags(string name) {
+	return properties->find(name)->second->flags;
+}
+
 string DerivedPropertySymbolTable::getProvisionSymbol(Type* provided, vector<Type*> &arguments) {
 	return analyzer.getProvisionSymbol(provided, arguments);
 }

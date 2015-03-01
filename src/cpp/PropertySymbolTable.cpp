@@ -140,6 +140,10 @@ string PropertySymbolTable::getAddress(string name) {
 	return properties.find(name)->second->address;
 }
 
+int PropertySymbolTable::getFlags(string name) {
+	return properties.find(name)->second->flags;
+}
+
 string PropertySymbolTable::getProvisionSymbol(Type* provided, vector<Type*> &arguments) {
 	return analyzer->getProvisionSymbol(provided, arguments);
 }

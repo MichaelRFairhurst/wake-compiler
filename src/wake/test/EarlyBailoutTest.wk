@@ -137,7 +137,7 @@ every EarlyBailoutTest is:
 
 every Tree is:
 
-	needs Num;
+	needs public Num;
 	with public Tree? left = nothing;
 	with public Tree? right = nothing;
 

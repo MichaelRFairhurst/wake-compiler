@@ -277,3 +277,15 @@ PTT_TEST_CASE(
 	PTT_VALID
 );
 
+PTT_TEST_CASE(
+	TestAccessPrivateMemberIsInvalid,
+	"every MyClass is:		\n\
+		needs Num;			\n\
+		with $Num = 4;		\n\
+		myMethod(MyClass) {	\n\
+			MyClass.Num; 	\n\
+			MyClass.$Num; 	\n\
+		}",
+	PTT_EXPECT(PRIVATE_ACCESS)
+	PTT_EXPECT(PRIVATE_ACCESS)
+);

@@ -117,3 +117,22 @@ PTT_TEST_CASE(
 	PTT_EXPECT(TYPE_ERROR) // invalid return
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 );
+
+PTT_TEST_CASE(
+	CallPrivateMethodIsTypeError,
+	"every MyClass is:					\n\
+		private myMethod(MyClass) {		\n\
+			MyClass.myMethod(MyClass); 	\n\
+		}",
+	PTT_EXPECT(PRIVATE_ACCESS)
+);
+
+PTT_TEST_CASE(
+	CallPrivateOverloadedMethodIsTypeError,
+	"every MyClass is:					\n\
+		private myMethod(Num) {}		\n\
+		private myMethod(MyClass) {		\n\
+			MyClass.myMethod(MyClass); 	\n\
+		}",
+	PTT_EXPECT(PRIVATE_ACCESS)
+);

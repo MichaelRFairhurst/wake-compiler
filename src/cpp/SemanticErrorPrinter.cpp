@@ -121,6 +121,9 @@ void SemanticErrorPrinter::print(SemanticError* e) {
 		case EXTERN_METHOD_BODY:
 			cout << "Defining the behavior of a method or provision on an extern class. Extern classes should define the interface only.";
 			break;
+		case PRIVATE_ACCESS:
+			cout << "Access to method or property is private and can only be done within the class or its subtypes.";
+			break;
 		default:
 			cout << "bad error code provided";
 	}

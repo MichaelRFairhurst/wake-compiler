@@ -212,21 +212,21 @@ Type* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				}
 			}
 			break;
-		
+
 		case NT_BITNOT:
 			{
 				ret = children[0].typeCheck(false);
-				
+
 				if(!analyzer->isPrimitiveTypeNum(ret)) {
 					string erroneousstring = analyzer->getNameForType(ret);
 					delete ret;
 					ret = MakeType(TYPE_CLASS);
 					ret->typedata._class.classname = strdup("Num");
-				   
+
 					EXPECTED	"Num"
 					ERRONEOUS	erroneousstring
 					THROW		("Bitwise Not operation performed on non-numerals");
-				
+
 				}
 			}
 			break;
@@ -572,6 +572,13 @@ Type* wake::ast::OtherExpression::typeCheckMemberAccess(Node* tree, Type& subjec
 		Type* member = tree->node_data.nodes[1]->node_data.type;
 		if(!forceArrayIdentifier && tree->node_data.nodes[1]->node_type != NT_ALIAS && member->type == TYPE_LIST && analyzer->getArrayReferenceLevel(*member) != analyzer->getArrayReferenceLevel(**variable))
 			errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Accessed arrayed variable " + name + " with wrong number of [] brackets.", tree));
+
+		if(tree->node_data.nodes[0]->node_type != NT_THIS) {
+			int flags = proptable->getFlags(name);
+			if(!(flags & PROPERTY_PUBLIC)) {
+				errors->addError(new SemanticError(PRIVATE_ACCESS, "Accessing private member " + name, node));
+			}
+		}
 
 		ret = copyType(*variable);
 		AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(name.c_str()), tree->loc));

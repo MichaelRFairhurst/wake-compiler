@@ -30,6 +30,10 @@ string TempPropertySymbolTable::getAddress(string name) {
 	return table.getAddress(name);
 }
 
+int TempPropertySymbolTable::getFlags(string name) {
+	return table.getFlags(name);
+}
+
 string TempPropertySymbolTable::getProvisionSymbol(Type* provided, vector<Type*> &arguments) {
 	return table.getProvisionSymbol(provided, arguments);
 }

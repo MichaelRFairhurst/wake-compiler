@@ -43,6 +43,7 @@ class PropertySymbolTable : public ReadOnlyPropertySymbolTable {
 		boost::optional<ObjectProperty*> findByCasing(string casing);
 		bool isPublic(string name);
 		string getAddress(string name);
+		int getFlags(string name);
 		string getProvisionSymbol(Type* provided, vector<Type*> &arguments);
 		boost::optional<SemanticError*> addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, int flags, vector<Annotation*> annotations);
 		boost::optional<SemanticError*> addProperty(Type* property, int flags, vector<Annotation*> annotations);
