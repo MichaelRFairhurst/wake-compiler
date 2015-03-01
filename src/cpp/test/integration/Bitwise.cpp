@@ -15,9 +15,9 @@
 PTT_TEST_CASE(
  	BitnotNumsAndAnythingElseIsTypeError,
 	"every MyClass is:															\n\
-		bitshiftLeftNumByString() { ~'test'; }									\n\
-		bitshiftLeftNumByObject(MyClass) { ~MyClass; }							\n\
-		bitshiftLeftLambdaByNum(MyClass --fn(MyClass) lambda) { ~lambda; }		\n\
+		bitnotNumByString() { ~'test'; }									\n\
+		bitnotNumByObject(MyClass) { ~MyClass; }							\n\
+		bitnotLambdaByNum(MyClass --fn(MyClass) lambda) { ~lambda; }		\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
