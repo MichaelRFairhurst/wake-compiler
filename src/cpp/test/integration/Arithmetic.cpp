@@ -45,6 +45,54 @@ PTT_TEST_CASE(
 )
 
 PTT_TEST_CASE(
+	ModNumsAndAnythingElseIsTypeError,
+	"every MyClass is:											\n\
+		modNumByString() { 5 \% 'test'; }						\n\
+		modStringByNum() { 'test' % 5; }						\n\
+		modNumByObject(MyClass) { 5 % MyClass; }				\n\
+		modObjectByNum(MyClass) { MyClass % 5; }				\n\
+		modLambdaByNum(fn() lambda) { lambda % 5; }				\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+)
+	
+PTT_TEST_CASE(
+	ModNativeNumsAndAnythingElseIsTypeError,
+	"every MyClass is:											\n\
+		modNativeNumByString() { 5 %% 'test'; }						\n\
+		modNativeStringByNum() { 'test' %% 5; }						\n\
+		modNativeNumByObject(MyClass) { 5 %% MyClass; }				\n\
+		modNativeObjectByNum(MyClass) { MyClass %% 5; }				\n\
+		modNativeLambdaByNum(fn() lambda) { lambda %% 5; }				\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+)
+
+PTT_TEST_CASE(
+	ModAltNumsAndAnythingElseIsTypeError,
+	"every MyClass is:											\n\
+		modNativeNumByString() { 5 %%% 'test'; }						\n\
+		modNativeStringByNum() { 'test' %%% 5; }						\n\
+		modNativeNumByObject(MyClass) { 5 %%% MyClass; }				\n\
+		modNativeObjectByNum(MyClass) { MyClass %%% 5; }				\n\
+		modNativeLambdaByNum(fn() lambda) { lambda %%% 5; }				\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+)	
+	
+PTT_TEST_CASE(
 	AddNumsAndAnythingElseIsTypeError,
 	"every MyClass is:											\n\
 		addNumByString() { 5 + 'test'; }						\n\

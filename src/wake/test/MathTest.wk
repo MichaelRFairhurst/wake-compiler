@@ -46,6 +46,30 @@ every MathTest is:
 		Asserts.that(8 * 1)Equals(8);
 		Asserts.that(8 * 0.5)Equals(4);
 	}
+	
+	@Test
+	testMod(Asserts) {
+		Asserts.that(23 % 98)Equals(23);
+		Asserts.that(117 % -72)Equals(-27);
+		Asserts.that(-74 % 49)Equals(24);
+		Asserts.that(-20 % -6)Equals(-2);
+	}
+		
+	@Test
+	testModNative(Asserts) {
+		Asserts.that(23 %% 98)Equals(23);
+		Asserts.isTrue((117 %% -72 == -27) || (117 %% -72 == 45));
+		Asserts.isTrue((-74 %% 49 == -24) || (-74 %% 49 == -25));
+		Asserts.that(-20 %% -6)Equals(-2);
+	}
+	
+	@Test
+	testModAlt(Asserts) {
+		Asserts.that(23 %% 98)Equals(23);
+		Asserts.that(117 %% -72)Equals(45);
+		Asserts.that(-74 %% 49)Equals(-25);
+		Asserts.that(-20 %% -6)Equals(-2);
+	}
 
 	@Test
 	testOrderOfOperations(Asserts) {

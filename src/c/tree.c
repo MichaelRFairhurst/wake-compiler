@@ -105,6 +105,9 @@ void initTreeTypes() {
 	nodenames[NT_BITSHIFTLEFT] = "NT_BITSHIFTLEFT";
 	nodenames[NT_BITSHIFTRIGHT] = "NT_BITSHIFTRIGHT";
 	nodenames[NT_BITNOT] = "NT_BITNOT";
+	nodenames[NT_MOD] = "NT_MOD";
+	nodenames[NT_MODNATIVE] = "NT_MODNATIVE";
+	nodenames[NT_MODALT] = "NT_MODALT";
 	treeTypesInited = 1;
 }
 
