@@ -18,6 +18,16 @@ import Asserts;
 every BitwiseTest is:
 
 	@Test
+	testBitNot(Asserts) {
+		Asserts.that(~224)Equals(-225);
+		Asserts.that(~-85)Equals(84);
+		Asserts.that(~11.23432)Equals(-12);
+		Asserts.that(~11.53432)Equals(-12);
+		Asserts.that(~-191.532)Equals(190);
+		Asserts.that(~-191.332)Equals(190);
+	}
+
+	@Test
 	testBitShiftLeft(Asserts) {
 		Asserts.that(1 << 3)Equals(8);
 		Asserts.that(10 << 2)Equals(40);
@@ -47,6 +57,7 @@ every BitwiseTest is:
 		Asserts.that(221 ^ 29)Equals(192);
 	}
 	
+	@Test
 	testBitOr(Asserts) {
 		Asserts.that(64 | 148)Equals(212);
 		Asserts.that(96.341 | 88)Equals(120);
@@ -66,4 +77,12 @@ every BitwiseTest is:
 		Asserts.that(223 ^ 93 & 86)Equals(139);
 		Asserts.that(127 ^ 206 | 168)Equals(185);
 		Asserts.that(168 | 127 ^ 206)Equals(185);
+		var Num[] b = [0,1,2,3];
+		Asserts.that(~b[2])Equals(-3);
+		Asserts.that(~(1+2))Equals(-4);
+		Asserts.that(~-5.abs())Equals(-6);
+		var Num a = 5;
+		Asserts.that(~-a)Equals(4);
+		Asserts.that(-~a)Equals(6);
+		Asserts.that(~5 * 5)Equals(-30);
 	}

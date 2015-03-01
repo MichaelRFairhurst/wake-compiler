@@ -104,6 +104,7 @@ void initTreeTypes() {
 	nodenames[NT_COMPILER_HINT] = "NT_COMPILER_HINT";
 	nodenames[NT_BITSHIFTLEFT] = "NT_BITSHIFTLEFT";
 	nodenames[NT_BITSHIFTRIGHT] = "NT_BITSHIFTRIGHT";
+	nodenames[NT_BITNOT] = "NT_BITNOT";
 	treeTypesInited = 1;
 }
 
