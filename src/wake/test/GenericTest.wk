@@ -57,6 +57,19 @@ every GenericTest is:
 	}
 
 	@Test
+	~[ test set and then get in properties ]~ (Asserts) {
+		numText.setT1(4); numText.setT2("hi");
+		textNum.setT1("hey"); textNum.setT2(6);
+		nested.setT1(numText); nested.setT2(textNum);
+		Asserts.that(numText.Num == 4);
+		Asserts.that(numText.Text == "hi");
+		Asserts.that(textNum.Text == "hey");
+		Asserts.that(textNum.Num == 6);
+		//Asserts.that(nested.getT1Optional() == numText); -- these conflict...
+		//Asserts.that(nested.getT2Optional() == textNum);
+	}
+
+	@Test
 	~[ test unset and then all is nothing ]~ (Asserts) {
 		numText.unsetT1();
 		Asserts.that(numText.getT1Optional() == nothing);

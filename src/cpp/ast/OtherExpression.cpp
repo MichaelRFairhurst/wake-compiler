@@ -581,7 +581,7 @@ Type* wake::ast::OtherExpression::typeCheckMemberAccess(Node* tree, Type& subjec
 		}
 
 		ret = copyType(*variable);
-		AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(name.c_str()), tree->loc));
+		AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(proptable->getAddress(name).c_str()), tree->loc));
 	}
 
 	return ret;

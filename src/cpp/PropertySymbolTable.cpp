@@ -271,15 +271,19 @@ ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<Type*
 		newprop->flags = it->second->flags;
 		newprop->address = it->second->address;
 		parameterizer.applyParameterizations(&newprop->type, getParameters(), parameters);
-		int i = 0, c = 0;
-		while(c < oldcasing.length()) {
-			if(oldcasing.at(c) == '#') {
-				newname += analyzer->getNameForType(newprop->type->typedata.lambda.arguments->types[i]);
-				i++;
-			} else {
-				newname += oldcasing.at(c);
+		if(newprop->type->type == TYPE_LAMBDA) {
+			int i = 0, c = 0;
+			while(c < oldcasing.length()) {
+				if(oldcasing.at(c) == '#') {
+					newname += analyzer->getNameForType(newprop->type->typedata.lambda.arguments->types[i]);
+					i++;
+				} else {
+					newname += oldcasing.at(c);
+				}
+				c++;
 			}
-			c++;
+		} else {
+			newname = analyzer->getNameForTypeAsProperty(newprop->type);
 		}
 		newprop->casing = oldcasing;
 		(*newprops)[newname] = newprop;

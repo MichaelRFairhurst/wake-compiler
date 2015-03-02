@@ -337,3 +337,13 @@ PTT_TEST_CASE(
 	"every MyClass{T, T} is:",
 	PTT_EXPECT(GENERIC_TYPE_COLLISION)
 );
+
+PTT_TEST_CASE(
+	GetGenericPropertyOnOtherClass,
+	"every MyClass{T} is:				\n\
+		with public T? = nothing;		\n\
+		method(MyClass{Num}) {			\n\
+			var Num? = MyClass.Num; 	\n\
+		}",
+	PTT_VALID
+);
