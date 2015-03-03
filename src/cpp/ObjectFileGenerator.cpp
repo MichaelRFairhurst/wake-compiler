@@ -901,7 +901,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_NUMBERLIT:
-			file << std::setprecision (std::numeric_limits<double>::digits10 + 1) << tree->node_data.number;
+			file << std::setprecision (std::numeric_limits<double>::digits10 + 2) << tree->node_data.number;
 			break;
 
 		case NT_BOOLLIT: file << (tree->node_data.number ? "1" : "0"); break;
