@@ -34,7 +34,7 @@ boost::optional<SemanticError*> ClassSpaceSymbolTable::addClass(string name) {
 		return boost::optional<SemanticError*>(new SemanticError(MULTIPLE_CLASS_DEFINITION));
 	}
 
-	addingclass_symbol = new PropertySymbolTable(&analyzer);
+	addingclass_symbol = new PropertySymbolTable(&analyzer, module);
 	addingclass_symbol->classname = name;
 	addingclass_hassubclass = false;
 
@@ -53,7 +53,7 @@ boost::optional<SemanticError*> ClassSpaceSymbolTable::importClass(PropertySymbo
 }
 
 PropertySymbolTable* ClassSpaceSymbolTable::getEmptyPropertySymbolTable() {
-	return new PropertySymbolTable(&analyzer);
+	return new PropertySymbolTable(&analyzer, module);
 }
 
 vector<PropertySymbolTable*> ClassSpaceSymbolTable::getDefinedClasses() {
@@ -223,4 +223,12 @@ void ClassSpaceSymbolTable::assertNoNeedsAreCircular() {
 			analyzer.assertNeedIsNotCircular(it->first, *needit);
 		}
 	}
+}
+
+void ClassSpaceSymbolTable::setModule(string module) {
+	this->module = module;
+}
+
+string ClassSpaceSymbolTable::getModule() {
+	return module;
 }

@@ -17,12 +17,6 @@
 #include "DerivedPropertySymbolTable.h"
 #include "TypeParameterizer.h"
 
-PropertySymbolTable::PropertySymbolTable(TypeAnalyzer* analyzer) {
-	this->analyzer = analyzer;
-	abstract = false;
-	declaredtypeparameters = new vector<Type*>(); // @TODO this is a hack
-	needs = new vector<Type*>(); // @TODO so is this (kind of)
-}
 
 const map<string, bool>& PropertySymbolTable::getParentage() {
 	return parentage;

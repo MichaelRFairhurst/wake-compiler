@@ -29,6 +29,7 @@
 #define NT_IMPORTSET 3
 #define NT_IMPORTTARGET 4
 #define NT_IMPORTPATH 5
+#define NT_MODULE 120
 
 #define NT_CLASS 6
 #define NT_CLASS_EXTERN 108

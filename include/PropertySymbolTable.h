@@ -37,7 +37,7 @@ using namespace std;
 
 class PropertySymbolTable : public ReadOnlyPropertySymbolTable {
 	public:
-		PropertySymbolTable(TypeAnalyzer* tanalyzer);
+		PropertySymbolTable(TypeAnalyzer* tanalyzer, string module) : analyzer(tanalyzer), module(module), abstract(false), declaredtypeparameters(new vector<Type*>()), needs(new vector<Type*>()) {};
 		~PropertySymbolTable();
 		boost::optional<Type*> find(string name);
 		boost::optional<ObjectProperty*> findByCasing(string casing);
@@ -75,6 +75,7 @@ class PropertySymbolTable : public ReadOnlyPropertySymbolTable {
 		vector<Type*>* needs;
 		vector<Type*>* declaredtypeparameters;
 		boost::ptr_vector<Annotation> annotations;
+		string module;
 };
 
 #endif

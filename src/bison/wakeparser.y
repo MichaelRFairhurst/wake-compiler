@@ -45,7 +45,7 @@ int wakewrap()
 %}
 
 /* keywords */
-%token EVERY EXTERN CAPABLE KEYWORD_A AN IS RETURN WITH PUBLIC IF ELSE WHILE IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE EXISTS VAR FOREACH IN THROW TRY CATCH FROM
+%token EVERY EXTERN CAPABLE KEYWORD_A AN IS RETURN WITH PUBLIC IF ELSE WHILE IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST PRIVATE EXISTS VAR FOREACH IN THROW TRY CATCH FROM MODULE
 /* symbols */
 %token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT SYM_PLUSEQ SYM_VALEQ SYM_MULTEQ SYM_SUBEQ SYM_DIVEQ SYM_PROVIDE_ARGS_OPEN SYM_EARLYBAILOUT_DOT SYM_TYPESAFE_INDEX SYM_LAMBDA SYM_LAMBDA_AUTORETURN SYM_BITSHIFTLEFT SYM_BITSHIFTRIGHT SYM_MODNATIVE SYM_MODALT;
 /* this too */
@@ -65,6 +65,7 @@ int wakewrap()
 /* identifiers & values */
 %token <string> UIDENTIFIER
 %token <string> LIDENTIFIER
+%token <string> FQIDENTIFIER
 %token <string> SPECIALTY
 %token <string> ANNOTATION
 %token <string> STRING
@@ -73,10 +74,10 @@ int wakewrap()
 %token <number> BOOL
 %token <number> SYM_SHADOW
 %token <void> SYM_ARRAYED
-%type <node> imports import importtarget classes annotatedclass class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value value_invokable method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_bitshift expression_relational expression_bitand expression_bitxor expression_bitor expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args annotatedtype annotatedmethod annotation annotations annotationvals annotationval lambda statement_or_block expression_nolambda inferenceabletypes
+%type <node> imports import importtarget classes annotatedclass class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value value_invokable method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_bitshift expression_relational expression_bitand expression_bitxor expression_bitor expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args annotatedtype annotatedmethod annotation annotations annotationvals annotationval lambda statement_or_block expression_nolambda inferenceabletypes module
 %type <type> type specializabletype shadowabletype puretype classtype fntype parameterizedtype unboundtypespecification classdeclarationtype
 %type <type_array> puretypes types unboundtypespecifications
-%type <string> alias
+%type <string> alias modulename
 %start file
 
 /* 3 are from @annotations before class definitions, 1 from if/else, 1 from try/catch, 1 from exists/else */
@@ -86,9 +87,18 @@ int wakewrap()
 %%
 
 file:
-	imports classes																{ parsetree = MakeTwoBranchNode(NT_PROGRAM, $1, $2, @$); }
-	| classes																	{ parsetree = MakeOneBranchNode(NT_PROGRAM, $1, @$); }
-	| imports																	{ parsetree = MakeOneBranchNode(NT_PROGRAM, $1, @$); }
+	module imports classes														{ parsetree = MakeTwoBranchNode(NT_PROGRAM, $1, $2, @$); AddSubNode(parsetree, $3); }
+	| module classes															{ parsetree = MakeTwoBranchNode(NT_PROGRAM, $1, $2, @$); }
+	;
+
+module:
+	/* empty */																	{ YYLTYPE garbage; $$ = MakeNodeFromString(NT_MODULE, strdup(""), garbage); }
+	| MODULE modulename ';'													{ $$ = MakeNodeFromString(NT_MODULE, $2, @1); }
+	;
+
+modulename:
+	LIDENTIFIER																	{ $$ = $1; }
+	| modulename '.' LIDENTIFIER												{ $$ = strcat($1, "."); $$ = strcat($$, $3); }
 	;
 
 imports:
@@ -97,7 +107,8 @@ imports:
 	;
 
 import:
-	IMPORT importtarget identifier ';'											{ $$ = MakeTwoBranchNode(NT_IMPORT, $2, MakeNodeFromString(NT_IMPORTPATH, $3, @3), @$); }
+	IMPORT importtarget modulename '.' UIDENTIFIER ';'							{ $$ = MakeTwoBranchNode(NT_IMPORT, $2, MakeNodeFromString(NT_MODULE, $3, @3), @$); AddSubNode($$, MakeNodeFromString(NT_IMPORTPATH, $5, @5)); }
+	| IMPORT importtarget UIDENTIFIER ';'										{ $$ = MakeTwoBranchNode(NT_IMPORT, $2, MakeNodeFromString(NT_MODULE, strdup(""), @3), @$); AddSubNode($$, MakeNodeFromString(NT_IMPORTPATH, $3, @3)); }
 	;
 
 importtarget:

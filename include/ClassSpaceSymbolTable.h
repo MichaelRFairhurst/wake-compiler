@@ -52,10 +52,13 @@ class ClassSpaceSymbolTable {
 
 		PropertySymbolTable* findModifiable(string name);
 		PropertySymbolTable* findModifiable(Type* type);
+		void setModule(string module);
+		string getModule();
 
 	private:
 
 		// TRUE means defined, FALSE means imported
+		string module;
 		map<string, pair<PropertySymbolTable*, bool> > classes;
 		PropertySymbolTable* addingclass_symbol;
 		std::string addingclass_name;

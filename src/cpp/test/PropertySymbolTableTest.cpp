@@ -20,7 +20,7 @@ BOOST_AUTO_TEST_SUITE(PropertySymbolTableTestSuite);
 
 BOOST_AUTO_TEST_CASE(AddingNeedsAreGotten) {
 	TypeAnalyzer analyzer;
-	PropertySymbolTable table(&analyzer);
+	PropertySymbolTable table(&analyzer, "");
 	Type* thefirsttype = MakeType(TYPE_CLASS);
 	Type* thesecondtype = MakeType(TYPE_CLASS);
 	thefirsttype->typedata._class.classname = strdup("");
@@ -35,7 +35,7 @@ BOOST_AUTO_TEST_CASE(AddingNeedsAreGotten) {
 
 BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesReturnTypes) {
 	TypeAnalyzer analyzer;
-	PropertySymbolTable table(&analyzer);
+	PropertySymbolTable table(&analyzer, "");
 	ObjectProperty* property = new ObjectProperty();
 	vector<Type*>* parameters = new vector<Type*>();
 	vector<Type*> parameterizations;
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesReturnTypes) {
 
 BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesPropertyName) {
 	TypeAnalyzer analyzer;
-	PropertySymbolTable table(&analyzer);
+	PropertySymbolTable table(&analyzer, "");
 	ObjectProperty* property = new ObjectProperty();
 	vector<Type*>* parameters = new vector<Type*>();
 	vector<Type*> parameterizations;
@@ -103,7 +103,7 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesPropertyName) {
 
 BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesNeedName) {
 	TypeAnalyzer analyzer;
-	PropertySymbolTable table(&analyzer);
+	PropertySymbolTable table(&analyzer, "");
 	vector<Type*>* parameters = new vector<Type*>();
 	vector<Type*> parameterizations;
 	Type* parameter = MakeType(TYPE_PARAMETERIZED);

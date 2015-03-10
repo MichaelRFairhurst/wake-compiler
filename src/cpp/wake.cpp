@@ -44,12 +44,21 @@ extern "C" {
 #include "SimpleAddressTable.h"
 #include "ImportParseTreeTraverser.h"
 #include "ErrorTracker.h"
+#include <boost/filesystem.hpp>
 
 void writeTableFiles(std::string dirname, ClassSpaceSymbolTable& table) {
 	vector<PropertySymbolTable*> tables = table.getDefinedClasses();
 	for(vector<PropertySymbolTable*>::iterator it = tables.begin(); it != tables.end(); ++it) {
 		fstream file;
-		file.open((dirname + "/" + (*it)->classname + ".table").c_str(), ios::out | ios::binary);
+
+		string filename = dirname;
+		if(table.getModule().size()) {
+			filename += "/" + table.getModule();
+			boost::filesystem::create_directory(filename);
+		}
+		filename += "/" + (*it)->classname + ".table";
+
+		file.open((filename).c_str(), ios::out | ios::binary);
 		TableFileWriter writer;
 		writer.write(file, *it);
 		file.close();
@@ -85,6 +94,9 @@ void compileFile(Options* options) {
 	importer.traverse(parser.getParseTree(), table, loader, errors, options->tabledir);
 	errors.popContext();
 
+	if(parser.getParseTree()->node_data.nodes[0]->node_type == NT_MODULE) {
+		table.setModule(parser.getParseTree()->node_data.nodes[0]->node_data.string);
+	}
 	// Now do all the semantic analysis
 	ParseTreeTraverser traverser(&table, errors);
 	traverser.traverse(parser.getParseTree());

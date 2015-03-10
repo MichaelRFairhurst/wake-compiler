@@ -23,10 +23,12 @@ void ParseTreeTraverser::traverse(Node* tree) {
 		case NT_PROGRAM:
 			traverse(tree->node_data.nodes[0]);
 			if(tree->subnodes > 1) traverse(tree->node_data.nodes[1]);
+			if(tree->subnodes > 2) traverse(tree->node_data.nodes[2]);
 
 			if(!passesForCompilation()) return;
 			secondPass(tree->node_data.nodes[0]);
 			if(tree->subnodes > 1) secondPass(tree->node_data.nodes[1]);
+			if(tree->subnodes > 2) secondPass(tree->node_data.nodes[2]);
 
 			if(!passesForCompilation()) return;
 			try {
@@ -39,6 +41,7 @@ void ParseTreeTraverser::traverse(Node* tree) {
 
 			thirdPass(tree->node_data.nodes[0]);
 			if(tree->subnodes > 1) thirdPass(tree->node_data.nodes[1]);
+			if(tree->subnodes > 2) thirdPass(tree->node_data.nodes[2]);
 			break;
 
 		case NT_INHERITANCESET:

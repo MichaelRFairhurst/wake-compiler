@@ -31,7 +31,7 @@ BOOST_AUTO_TEST_CASE(TestWritesSimple)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer);
+	PropertySymbolTable table(&tanalyzer, "");
 	table.classname = "classname";
 	writer.write(out, &table);
 	ASSERTLENGTH(16);
@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer);
+	PropertySymbolTable table(&tanalyzer, "");
 
 	vector<pair<string, TypeArray*> > segments_arguments;
 	TypeArray* arguments = MakeTypeArray();
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer);
+	PropertySymbolTable table(&tanalyzer, "");
 
 	Type* text = MakeType(TYPE_CLASS);text->typedata._class.classname = strdup("Text");
 	table.addNeed(text, 0, vector<Annotation*>());
@@ -134,7 +134,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer);
+	PropertySymbolTable table(&tanalyzer, "");
 
 	Type* text = MakeType(TYPE_CLASS);text->typedata._class.classname = strdup("Text");
 	Type* printer = MakeType(TYPE_CLASS);printer->typedata._class.classname = strdup("Printer");
@@ -186,7 +186,7 @@ BOOST_AUTO_TEST_CASE(TestWritesInheritance)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer);
+	PropertySymbolTable table(&tanalyzer, "");
 	table.classname = "classname";
 	table.parentage["myparent"] = true;
 	table.parentage["myinterface"] = false;
@@ -214,7 +214,7 @@ BOOST_AUTO_TEST_CASE(TestWritesParameters)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer);
+	PropertySymbolTable table(&tanalyzer, "");
 	table.classname = "classname";
 	vector<Type*>* parameters = new vector<Type*>();
 	Type* t = MakeType(TYPE_PARAMETERIZED); t->typedata.parameterized.label = strdup("T");
@@ -271,7 +271,7 @@ BOOST_AUTO_TEST_CASE(TestWritesList)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer);
+	PropertySymbolTable table(&tanalyzer, "");
 	table.classname = "classname";
 	vector<Type*> parameters;
 	Type* list = MakeType(TYPE_LIST);
@@ -314,7 +314,7 @@ BOOST_AUTO_TEST_CASE(TestWritesOptional)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer);
+	PropertySymbolTable table(&tanalyzer, "");
 	table.classname = "classname";
 	vector<Type*> parameters;
 	Type* optional = MakeType(TYPE_OPTIONAL);
@@ -356,7 +356,7 @@ BOOST_AUTO_TEST_CASE(TestWritesClassAnnotations)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer);
+	PropertySymbolTable table(&tanalyzer, "");
 	table.classname = "classname";
 	vector<Type*> parameters;
 	vector<Annotation*> annotations;
@@ -417,7 +417,7 @@ BOOST_AUTO_TEST_CASE(TestWritesMethodAnnotations)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer);
+	PropertySymbolTable table(&tanalyzer, "");
 	table.classname = "classname";
 	vector<Type*> parameters;
 	Type* text = MakeType(TYPE_CLASS);

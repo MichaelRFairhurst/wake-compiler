@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(TestReadsSimple)
 	TableFileReader reader;
 
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer);
+	PropertySymbolTable table(&tanalyzer, "");
 	reader.read(&table, in);
 
 	BOOST_CHECK(table.classname == string("classname"));
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 	TableFileReader reader;
 
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer);
+	PropertySymbolTable table(&tanalyzer, "");
 	reader.read(&table, in);
 
 	BOOST_CHECK(table.classname == string("classname"));
@@ -132,7 +132,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 	TableFileReader reader;
 
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer);
+	PropertySymbolTable table(&tanalyzer, "");
 	reader.read(&table, in);
 
 	BOOST_CHECK(table.classname == string("classname"));
@@ -193,7 +193,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	TableFileReader reader;
 
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer);
+	PropertySymbolTable table(&tanalyzer, "");
 	reader.read(&table, in);
 
 	BOOST_CHECK(table.classname == string("classname"));
@@ -240,7 +240,7 @@ BOOST_AUTO_TEST_CASE(TestReadsInheritance)
 	TableFileReader reader;
 
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer);
+	PropertySymbolTable table(&tanalyzer, "");
 	reader.read(&table, in);
 
 	BOOST_CHECK(table.classname == string("classname"));
@@ -294,7 +294,7 @@ BOOST_AUTO_TEST_CASE(TestReadsParameters)
 	TableFileReader reader;
 
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer);
+	PropertySymbolTable table(&tanalyzer, "");
 	reader.read(&table, in);
 
 	BOOST_CHECK(table.classname == string("classname"));
@@ -365,7 +365,7 @@ BOOST_AUTO_TEST_CASE(TestReadsClassAnnotations)
 	TableFileReader reader;
 
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer);
+	PropertySymbolTable table(&tanalyzer, "");
 	reader.read(&table, in);
 
 	BOOST_CHECK(table.classname == string("classname"));
@@ -439,7 +439,7 @@ BOOST_AUTO_TEST_CASE(TestReadsPropertyAnnotations)
 	TableFileReader reader;
 
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer);
+	PropertySymbolTable table(&tanalyzer, "");
 	reader.read(&table, in);
 
 	BOOST_CHECK(table.classname == string("classname"));
