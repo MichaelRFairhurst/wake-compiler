@@ -51,6 +51,16 @@ void Linker::loadTables(string dirname, ClassSpaceSymbolTable& table) {
 		table.importClass(ptable);
 		file.close();
 	}
+	else
+	for(directory_iterator moduleitr(itr); moduleitr != end_itr; ++moduleitr) {
+		string fname = moduleitr->path().string();
+		if(fname.substr(fname.size() - 6) != ".table") continue;
+		file.open(fname.c_str(), fstream::in | fstream::binary);
+		PropertySymbolTable* ptable = table.getEmptyPropertySymbolTable();
+		reader.read(ptable, file);
+		table.importClass(ptable);
+		file.close();
+	}
 }
 
 void Linker::loadObject(string filename) {
