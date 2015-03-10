@@ -74,7 +74,7 @@ int wakewrap()
 %token <number> BOOL
 %token <number> SYM_SHADOW
 %token <void> SYM_ARRAYED
-%type <node> imports import importtarget classes annotatedclass class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value value_invokable method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_bitshift expression_relational expression_bitand expression_bitxor expression_bitor expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args annotatedtype annotatedmethod annotation annotations annotationvals annotationval lambda statement_or_block expression_nolambda inferenceabletypes module
+%type <node> imports import classes annotatedclass class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value value_invokable method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_bitshift expression_relational expression_bitand expression_bitxor expression_bitor expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args annotatedtype annotatedmethod annotation annotations annotationvals annotationval lambda statement_or_block expression_nolambda inferenceabletypes module
 %type <type> type specializabletype shadowabletype puretype classtype fntype parameterizedtype unboundtypespecification classdeclarationtype
 %type <type_array> puretypes types unboundtypespecifications
 %type <string> alias modulename
@@ -93,7 +93,7 @@ file:
 
 module:
 	/* empty */																	{ YYLTYPE garbage; $$ = MakeNodeFromString(NT_MODULE, strdup(""), garbage); }
-	| MODULE modulename ';'													{ $$ = MakeNodeFromString(NT_MODULE, $2, @1); }
+	| MODULE modulename ';'														{ $$ = MakeNodeFromString(NT_MODULE, $2, @1); }
 	;
 
 modulename:
@@ -107,13 +107,8 @@ imports:
 	;
 
 import:
-	IMPORT importtarget modulename '.' UIDENTIFIER ';'							{ $$ = MakeTwoBranchNode(NT_IMPORT, $2, MakeNodeFromString(NT_MODULE, $3, @3), @$); AddSubNode($$, MakeNodeFromString(NT_IMPORTPATH, $5, @5)); }
-	| IMPORT importtarget UIDENTIFIER ';'										{ $$ = MakeTwoBranchNode(NT_IMPORT, $2, MakeNodeFromString(NT_MODULE, strdup(""), @3), @$); AddSubNode($$, MakeNodeFromString(NT_IMPORTPATH, $3, @3)); }
-	;
-
-importtarget:
-	/* empty */																	{ $$ = MakeEmptyNode(NT_EMPTY, @$); }
-	| '(' identifier ')'														{ $$ = MakeNodeFromString(NT_IMPORTTARGET, $2, @2); }
+	IMPORT modulename '.' UIDENTIFIER ';'										{ $$ = MakeTwoBranchNode(NT_IMPORT, MakeNodeFromString(NT_MODULE, $2, @3), MakeNodeFromString(NT_IMPORTPATH, $4, @4), @$); }
+	| IMPORT UIDENTIFIER ';'													{ $$ = MakeTwoBranchNode(NT_IMPORT, MakeNodeFromString(NT_MODULE, strdup(""), @2), MakeNodeFromString(NT_IMPORTPATH, $2, @2), @$); }
 	;
 
 classes:
