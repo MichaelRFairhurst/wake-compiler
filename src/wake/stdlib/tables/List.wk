@@ -1,3 +1,5 @@
+module lang;
+
 #>
 # Source Code for the Original Compiler for the
 # Programming Language Wake
@@ -24,6 +26,7 @@ extern List{T} is:
 	Bool -- any(Bool -- fn(T) checker);
 	sort(Num -- fn(T,T) sorter);
 	push(T);
+	pop(T);
 	{R} R[] -- map(R -- fn(T) mapper);
 	{R} R -- foldl(R -- fn(T, R) mapper, R acc);
 	{R} R -- foldr(R -- fn(T, R) mapper, R acc);
