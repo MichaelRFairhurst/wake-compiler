@@ -14,9 +14,9 @@ module io;
 #
 ##
 
-import Text;
-import Num;
-import FilePath;
+import lang.Text;
+import lang.Num;
+import io.FilePath;
 
 extern FileSystem is:
 

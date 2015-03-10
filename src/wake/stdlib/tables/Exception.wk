@@ -14,8 +14,8 @@ module lang;
 #
 ##
 
-import Bool;
-import Text;
+import lang.Bool;
+import lang.Text;
 
 extern Exception is:
 

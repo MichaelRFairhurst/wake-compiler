@@ -14,8 +14,8 @@ module lang;
 #
 ##
 
-import Num;
-import Bool;
+import lang.Num;
+import lang.Bool;
 
 extern List{T} is:
 

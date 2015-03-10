@@ -14,7 +14,7 @@ module std;
 #
 ##
 
-import Text;
+import lang.Text;
 
 extern Argv is:
 

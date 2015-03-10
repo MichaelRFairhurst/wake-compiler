@@ -14,9 +14,9 @@ module io;
 #
 ##
 
-import Text;
-import Num;
-import Bool;
+import lang.Text;
+import lang.Num;
+import lang.Bool;
 
 extern FilePath is:
 

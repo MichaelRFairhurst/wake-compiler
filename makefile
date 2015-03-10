@@ -81,7 +81,8 @@ CPPNAMES= \
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
 
 WAKETABLENAMES=Printer.wk List.wk Text.wk Num.wk Bool.wk File.wk FilePath.wk FileSystem.wk Argv.wk Exception.wk System.wk
-WAKETABLEOBJS=$(addprefix bin/waketable/, $(WAKETABLENAMES:.wk=.table))
+WAKETABLENAMES=List.wk Text.wk Num.wk Bool.wk Exception.wk
+WAKETABLEOBJS=$(addprefix bin/waketable/lang/, $(WAKETABLENAMES:.wk=.table))
 WAKETABLEINCLUDES=$(addprefix gen/, $(WAKETABLENAMES:.wk=.table.h))
 
 CNAMES=tree.c type.c parseUtil.c error.c
@@ -157,27 +158,27 @@ bin/wakeobj/std.o: src/wake/stdlib/myobj/std.o js_to_wakeobj.sh
 $(OBJECTFILES) : bin/wake
 $(TABLEFILES) : bin/wake
 
-bin/waketable/UndefinedIndexException.table: src/wake/stdlib/external/UndefinedIndexException.table
+bin/waketable/std/UndefinedIndexException.table: src/wake/stdlib/external/UndefinedIndexException.table
 	cp $< $@
 
-bin/wakeobj/UndefinedIndexException.o: src/wake/stdlib/external/UndefinedIndexException.o
+bin/wakeobj/std/UndefinedIndexException.o: src/wake/stdlib/external/UndefinedIndexException.o
 	cp $< $@
 
-bin/waketable/FilePath.table: bin/waketable/File.table bin/waketable/Text.table bin/waketable/Num.table bin/waketable/Bool.table
+bin/waketable/io/FilePath.table: bin/waketable/File.table bin/waketable/lang/Text.table bin/waketable/lang/Num.table bin/waketable/lang/Bool.table
 	echo this overrides the wildcard that doesnt work
 
-bin/waketable/FileSystem.table: bin/waketable/File.table bin/waketable/Text.table bin/waketable/Num.table
+bin/waketable/io/FileSystem.table: bin/waketable/File.table bin/waketable/lang/Text.table bin/waketable/lang/Num.table
 
 bin/waketable/%.table: src/wake/stdlib/tables/%.wk bin/wake-nolib
 	./bin/wake-nolib -d bin/waketable -t $< -d bin/waketable
 
-bin/waketable/Printer.table: bin/waketable/Num.table bin/waketable/Text.table bin/wake-nolib src/wake/stdlib/tables/Printer.wk
-bin/waketable/File.table: src/wake/stdlib/tables/File.wk bin/waketable/Text.table bin/waketable/Num.table bin/waketable/Bool.table
-bin/waketable/List.table: src/wake/stdlib/tables/List.wk bin/waketable/Num.table bin/waketable/Bool.table
-bin/waketable/Argv.table: bin/waketable/Text.table
-bin/waketable/Exception.table: bin/waketable/Text.table src/wake/stdlib/tables/Exception.wk
+bin/waketable/io/Printer.table: bin/waketable/lang/Num.table bin/waketable/lang/Text.table bin/wake-nolib src/wake/stdlib/tables/Printer.wk
+bin/waketable/io/File.table: src/wake/stdlib/tables/File.wk bin/waketable/lang/Text.table bin/waketable/lang/Num.table bin/waketable/lang/Bool.table
+bin/waketable/lang/List.table: src/wake/stdlib/tables/List.wk bin/waketable/lang/Num.table bin/waketable/lang/Bool.table
+bin/waketable/std/Argv.table: bin/waketable/lang/Text.table
+bin/waketable/lang/Exception.table: bin/waketable/lang/Text.table src/wake/stdlib/tables/Exception.wk
 
-bin/waketable/Text.table bin/waketable/Num.table bin/waketable/Bool.table: src/wake/stdlib/tables/Primitives.wk bin/wake-nolib
+bin/waketable/lang/Text.table bin/waketable/lang/Num.table bin/waketable/lang/Bool.table: src/wake/stdlib/tables/Primitives.wk bin/wake-nolib
 	./bin/wake-nolib -d bin/waketable -t $< -d bin/waketable
 
 bin/gen/%.o: gen/%.c gen/wake.tab.c
@@ -201,7 +202,7 @@ bin/c/%.o: src/c/%.c gen/wake.tab.c gen/objectfile.tab.c
 gen/%.tab.c: src/bison/%parser.y
 	bison --report=states --locations -p $* -dg -o $@ $<
 
-gen/%.table.h: bin/waketable/%.table bin/wake-nolib
+gen/%.table.h: bin/waketable/lang/%.table bin/wake-nolib
 	xxd -i $< $@
 
 gen/lex.%.c: src/flex/%lexer.l gen/wake.tab.c gen/objectfile.tab.c

@@ -14,7 +14,7 @@ module std;
 #
 ##
 
-import Num;
+import lang.Num;
 
 #>
 # This only defines the signatures, and will be used to
