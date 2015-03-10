@@ -318,3 +318,11 @@ void PropertySymbolTable::setAnnotations(vector<Annotation*> annotations) {
 const boost::ptr_vector<Annotation>& PropertySymbolTable::getAnnotations() {
 	return annotations;
 }
+
+void PropertySymbolTable::setModule(string module) {
+	this->module = module;
+}
+
+string PropertySymbolTable::getModule() {
+	return module;
+}

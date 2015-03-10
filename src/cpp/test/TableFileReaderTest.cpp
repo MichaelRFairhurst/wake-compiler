@@ -18,17 +18,17 @@
 #include <string>
 #include "type.h"
 
-#define TABLE_FILE_VERSION "\003"
+#define TABLE_FILE_VERSION "\005"
 
 BOOST_AUTO_TEST_SUITE(TableFileReaderTest)
 
 BOOST_AUTO_TEST_CASE(TestReadsSimple)
 {
-										// classname length 9  classname   not abstract begin inheritance	begin parameters	end parameters	begin annotations;
-	char* dataptr = TABLE_FILE_VERSION	"\011"                 "classname" "\000"       "\000"				"\000"				"\000"			"\000";
+										// module  classname length 9     classname   not abstract begin inheritance	begin parameters	end parameters	begin annotations;
+	char* dataptr = TABLE_FILE_VERSION	"\004test" "\011"                 "classname" "\000"       "\000"				"\000"				"\000"			"\000";
 
 	std::stringstream in;
-	in.write(dataptr, 16);
+	in.write(dataptr, 21);
 
 	TableFileReader reader;
 
@@ -36,6 +36,30 @@ BOOST_AUTO_TEST_CASE(TestReadsSimple)
 	PropertySymbolTable table(&tanalyzer, "");
 	reader.read(&table, in);
 
+	BOOST_CHECK(table.getModule() == string("test"));
+	BOOST_CHECK(table.classname == string("classname"));
+	BOOST_CHECK(table.isAbstract() == false);
+	BOOST_CHECK(table.getNeeds()->size() == 0);
+	BOOST_CHECK(table.properties.size() == 0);
+	BOOST_CHECK(table.parentage.size() == 0);
+	BOOST_CHECK(table.getParameters().size() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(TestReadsNoModuleName)
+{
+										// module   classname length 9     classname   not abstract begin inheritance	begin parameters	end parameters	begin annotations;
+	char* dataptr = TABLE_FILE_VERSION	"\000" 		"\011"                 "classname" "\000"       "\000"				"\000"				"\000"			"\000";
+
+	std::stringstream in;
+	in.write(dataptr, 21);
+
+	TableFileReader reader;
+
+	TypeAnalyzer tanalyzer;
+	PropertySymbolTable table(&tanalyzer, "");
+	reader.read(&table, in);
+
+	BOOST_CHECK(table.getModule() == string(""));
 	BOOST_CHECK(table.classname == string("classname"));
 	BOOST_CHECK(table.isAbstract() == false);
 	BOOST_CHECK(table.getNeeds()->size() == 0);
@@ -47,6 +71,8 @@ BOOST_AUTO_TEST_CASE(TestReadsSimple)
 BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 {
 	char* dataptr = TABLE_FILE_VERSION
+					"\004" // module len
+					"test" // module
 					"\011" // classname length of 9
 					"classname"
 					"\000" // not abstract
@@ -74,7 +100,7 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 					"\000"; // begin annotations
 
 	std::stringstream in;
-	in.write(dataptr, 54);
+	in.write(dataptr, 59);
 
 	TableFileReader reader;
 
@@ -105,6 +131,8 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 BOOST_AUTO_TEST_CASE(TestWritesNeed)
 {
 	char* dataptr = TABLE_FILE_VERSION
+					"\004" // module len
+					"test" // module
 					"\011" // classname length of 9
 					"classname"
 					"\000" // not abstract
@@ -127,7 +155,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 					"\000"; // begin annotations
 
 	std::stringstream in;
-	in.write(dataptr, 38);
+	in.write(dataptr, 43);
 
 	TableFileReader reader;
 
@@ -153,6 +181,8 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 {
 	char* dataptr = TABLE_FILE_VERSION
+					"\004" // module len
+					"test" // module
 					"\011" // classname length of 9
 					"classname"
 					"\000" // not abstract
@@ -188,7 +218,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 					"\000"; // begin annotations
 
 	std::stringstream in;
-	in.write(dataptr, 69);
+	in.write(dataptr, 74);
 
 	TableFileReader reader;
 
@@ -220,6 +250,8 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 BOOST_AUTO_TEST_CASE(TestReadsInheritance)
 {
 	char* dataptr = TABLE_FILE_VERSION
+					"\004" // module len
+					"test" // module
 					"\011" // classname len
 					"classname"
 					"\000" // not abstract
@@ -235,7 +267,7 @@ BOOST_AUTO_TEST_CASE(TestReadsInheritance)
 					"\000"; // begin annotations
 
 	std::stringstream in;
-	in.write(dataptr, 39);
+	in.write(dataptr, 44);
 
 	TableFileReader reader;
 
@@ -256,6 +288,8 @@ BOOST_AUTO_TEST_CASE(TestReadsInheritance)
 BOOST_AUTO_TEST_CASE(TestReadsParameters)
 {
 	char* dataptr = TABLE_FILE_VERSION
+					"\004" // module len
+					"test" // module
 					"\011" // classname len
 					"classname"
 					"\000" // not abstract
@@ -289,7 +323,7 @@ BOOST_AUTO_TEST_CASE(TestReadsParameters)
 					"\000";// end annotations
 
 	std::stringstream in;
-	in.write(dataptr, 50);
+	in.write(dataptr, 55);
 
 	TableFileReader reader;
 
@@ -333,6 +367,8 @@ BOOST_AUTO_TEST_CASE(TestReadsParameters)
 BOOST_AUTO_TEST_CASE(TestReadsClassAnnotations)
 {
 	char* dataptr = TABLE_FILE_VERSION
+					"\004" // module len
+					"test" // module
 					"\011" // classname len
 					"classname"
 					"\000" // not abstract
@@ -360,7 +396,7 @@ BOOST_AUTO_TEST_CASE(TestReadsClassAnnotations)
 					"\000";// end annotations
 
 	std::stringstream in;
-	in.write(dataptr, 58);
+	in.write(dataptr, 63);
 
 	TableFileReader reader;
 
@@ -395,6 +431,8 @@ BOOST_AUTO_TEST_CASE(TestReadsClassAnnotations)
 BOOST_AUTO_TEST_CASE(TestReadsPropertyAnnotations)
 {
 	char* dataptr = TABLE_FILE_VERSION
+					"\004" // module len
+					"test" // module
 					"\011" // classname len
 					"classname"
 					"\000" // not abstract
@@ -434,7 +472,7 @@ BOOST_AUTO_TEST_CASE(TestReadsPropertyAnnotations)
 					"\000";// end annotations
 
 	std::stringstream in;
-	in.write(dataptr, 79);
+	in.write(dataptr, 84);
 
 	TableFileReader reader;
 

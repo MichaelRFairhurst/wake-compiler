@@ -15,10 +15,14 @@
 #include "TableFileWriter.h"
 
 void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
-	char* dataptr = (char*) malloc(1);
+	char dataptr[1] = {0};
 
-	dataptr[0] = (char) 4; //version
+	dataptr[0] = (char) 5; //version
 	out.write(dataptr, 1);
+
+	dataptr[0] = (char) table->getModule().size();
+	out.write(dataptr, 1);
+	out.write(table->getModule().c_str(), table->getModule().size());
 
 	dataptr[0] = (char) table->classname.size();
 	out.write(dataptr, 1);
@@ -70,13 +74,11 @@ void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 	dataptr[0] = 0x00; // End Parameters
 	out.write(dataptr, 1);
 
-	free(dataptr);
-
 	writeAnnotations(out, table->getAnnotations());
 }
 
 void TableFileWriter::writeType(ostream& out, Type* type) {
-	char * dataptr = (char*) malloc(1);
+	char dataptr[1] = {0};
 	if(type->type == TYPE_CLASS) {
 		dataptr[0] = TYPE_CLASS;
 		out.write(dataptr, 1);
@@ -174,12 +176,10 @@ void TableFileWriter::writeType(ostream& out, Type* type) {
 		dataptr[0] = 0;
 		out.write(dataptr, 1);
 	}
-
-	free(dataptr);
 }
 
 void TableFileWriter::writeProperty(ostream& out, ObjectProperty* property) {
-	char * dataptr = (char*) malloc(1);
+	char dataptr[1] = {0};
 
 	dataptr[0] = (char) property->casing.size();
 	out.write(dataptr, 1);
@@ -191,12 +191,11 @@ void TableFileWriter::writeProperty(ostream& out, ObjectProperty* property) {
 	writeType(out, property->type);
 
 	// annotations... hard coded to none
-	free(dataptr);
 	writeAnnotations(out, property->annotations);
 }
 
 void TableFileWriter::writeAnnotations(ostream& out, const boost::ptr_vector<Annotation>& annotations) {
-	char dataptr[4];
+	char dataptr[1];
 	for(boost::ptr_vector<Annotation>::const_iterator ann = annotations.begin(); ann != annotations.end(); ++ann) {
 		dataptr[0] = (char) strlen(ann->name);
 		out.write(dataptr, 1);

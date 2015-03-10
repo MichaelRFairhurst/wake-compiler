@@ -232,3 +232,12 @@ void ClassSpaceSymbolTable::setModule(string module) {
 string ClassSpaceSymbolTable::getModule() {
 	return module;
 }
+
+string ClassSpaceSymbolTable::getFullyQualifiedClassname(string classname) {
+	PropertySymbolTable* table = findModifiable(classname);
+	if(table->getModule().size()) {
+		return table->getModule() + "." + classname;
+	}
+
+	return classname;
+}

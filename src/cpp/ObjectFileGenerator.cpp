@@ -89,7 +89,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 		case NT_AUTOBOX:
 			file << "new ";
-			header->addClassUsage(file.tellp(), tree->node_data.nodes[1]->node_data.string);
+			header->addClassUsage(file.tellp(), classes->getFullyQualifiedClassname(tree->node_data.nodes[1]->node_data.string));
 			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << ")";
@@ -104,7 +104,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 				file << "function ";
 				table.pushScope();
 				classname = tree->node_data.nodes[0]->node_data.type->typedata._class.classname;
-				header->addClassUsage(file.tellp(), classname);
+				header->addClassUsage(file.tellp(), classes->getFullyQualifiedClassname(classname));
 				file << "(";
 
 				vector<Type*>* needs = classes->find(classname)->getNeeds();
@@ -136,11 +136,11 @@ void ObjectFileGenerator::generate(Node* tree) {
 				// @Todo only print exception classes
 				for(map<string, bool>::const_iterator it = parentage.begin(); it != parentage.end(); ++it) {
 					file << "'";
-					header->addClassUsage(file.tellp(), it->first);
+					header->addClassUsage(file.tellp(), classes->getFullyQualifiedClassname(it->first));
 					file << "',";
 				}
 				file << "'";
-				header->addClassUsage(file.tellp(), classname);
+				header->addClassUsage(file.tellp(), classes->getFullyQualifiedClassname(classname));
 				file << "'].indexOf(a)!==-1;};";
 
 				// End exception class type checking
@@ -165,14 +165,14 @@ void ObjectFileGenerator::generate(Node* tree) {
 			file << "if(!" << table.getAddress(tree->node_data.nodes[0]->node_data.type) << ".";
 			header->addPropertyUsage(file.tellp(), "isExceptionType(Text)");
 			file << ")" << table.getAddress(tree->node_data.nodes[0]->node_data.type) << "=new ";
-			header->addClassUsage(file.tellp(), "Exception");
+			header->addClassUsage(file.tellp(), "std.Exception");
 			file << "(" << table.getAddress(tree->node_data.nodes[0]->node_data.type) << ");";
 
 			// check its type
 			file << "if(" << table.getAddress(tree->node_data.nodes[0]->node_data.type) << ".";
 			header->addPropertyUsage(file.tellp(), "isExceptionType(Text)");
 			file << "('";
-			header->addClassUsage(file.tellp(), tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
+			header->addClassUsage(file.tellp(), classes->getFullyQualifiedClassname(tree->node_data.nodes[0]->node_data.type->typedata._class.classname));
 			file << "')){";
 
 			// run catch statement
@@ -207,7 +207,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 			if(tree->subnodes == 2) { // one for type, on for hint
 				string provisionname = tree->node_data.nodes[0]->node_data.type->typedata._class.classname;
 				file << "function(){return new ";
-				header->addClassUsage(file.tellp(), provisionname);
+				header->addClassUsage(file.tellp(), classes->getFullyQualifiedClassname(provisionname));
 				file << "(";
 				vector<Type*>* needs = classes->find(provisionname)->getNeeds();
 				for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
@@ -243,7 +243,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 					file << "){return new ";
 					string provisionname = tree->node_data.nodes[0]->node_data.type->typedata._class.classname;
-					header->addClassUsage(file.tellp(), provisionname);
+					header->addClassUsage(file.tellp(), classes->getFullyQualifiedClassname(provisionname));
 					file << "(";
 						for(int i = 0; i < inj->subnodes; i++) {
 							if(i != 0) {
@@ -598,7 +598,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 		case NT_SUBCLASS:
 			{
-			header->addClassUsage(file.tellp(), tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
+			header->addClassUsage(file.tellp(), classes->getFullyQualifiedClassname(tree->node_data.nodes[0]->node_data.type->typedata._class.classname));
 			file << ".call(this";
 			PropertySymbolTable* proptable = classes->findModifiable(tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
 			for(vector<Type*>::iterator it = proptable->getNeeds()->begin(); it != proptable->getNeeds()->end(); ++it) {
@@ -756,7 +756,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 			generate(tree->node_data.nodes[1]);
 			file << ")";
 			break;
-		
+
 		case NT_MOD:
 			file << "$B(";
 			generate(tree->node_data.nodes[0]);
@@ -764,7 +764,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 			generate(tree->node_data.nodes[1]);
 			file << ")";
 			break;
-		
+
 		case NT_MODNATIVE:
 		case NT_MODALT:
 			file << "(";
@@ -789,7 +789,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 			generate(tree->node_data.nodes[1]);
 			file << ")";
 			break;
-		
+
 		case NT_BITSHIFTLEFT:
 			file << "(";
 			generate(tree->node_data.nodes[0]);
@@ -797,7 +797,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 			generate(tree->node_data.nodes[1]);
 			file << ")";
 			break;
-		
+
 		case NT_BITSHIFTRIGHT:
 			file << "(";
 			generate(tree->node_data.nodes[0]);
@@ -853,13 +853,13 @@ void ObjectFileGenerator::generate(Node* tree) {
 			generate(tree->node_data.nodes[1]);
 			file << ")";
 			break;
-		
+
 		case NT_BITNOT:
 			file << "(~";
 			generate(tree->node_data.nodes[0]);
 			file << ")";
 			break;
-		
+
 		case NT_BITAND:
 			file << "(";
 			generate(tree->node_data.nodes[0]);
@@ -867,7 +867,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 			generate(tree->node_data.nodes[1]);
 			file << ")";
 			break;
-		
+
 		case NT_BITXOR:
 			file << "(";
 			generate(tree->node_data.nodes[0]);
@@ -875,7 +875,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 			generate(tree->node_data.nodes[1]);
 			file << ")";
 			break;
-		
+
 		case NT_BITOR:
 			file << "(";
 			generate(tree->node_data.nodes[0]);

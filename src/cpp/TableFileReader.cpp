@@ -19,7 +19,8 @@
 void TableFileReader::read(PropertySymbolTable* table, istream& s) {
 	//@TODO work rom tablefile
 	int version = readUInt8(s);
-	if(version < 3 || version > 4) throw string("Can not read table file, it has an unsupported version");
+	if(version != 5) throw string("Can not read table file, it has an unsupported version");
+	table->setModule(readString(s));
 	table->classname = readString(s);
 	table->abstract = readUInt8(s);
 	unsigned char tag;
@@ -53,7 +54,7 @@ void TableFileReader::read(PropertySymbolTable* table, istream& s) {
 
 std::string TableFileReader::readString(istream& s) {
 	char* strb = readCString(s);
-	if(strb == NULL) return NULL;
+	if(strb == NULL) return string("");
 	std::string str(strb);
 	free(strb);
 	return str;

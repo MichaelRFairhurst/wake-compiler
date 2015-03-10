@@ -54,6 +54,7 @@ class ClassSpaceSymbolTable {
 		PropertySymbolTable* findModifiable(Type* type);
 		void setModule(string module);
 		string getModule();
+		string getFullyQualifiedClassname(string classname);
 
 	private:
 

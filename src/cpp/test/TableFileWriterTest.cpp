@@ -22,7 +22,7 @@
 #define ASSERTCHAR(v) BOOST_CHECK_MESSAGE(dataptr[i++] == v, "Expected " #v " in stream at pos " + boost::lexical_cast<string>(i) + " got " + string(1, (unsigned char) dataptr[i]));
 #define ASSERTLENGTH(l) char* dataptr = (char*) malloc(l); out.read(dataptr, l); BOOST_CHECK_MESSAGE(!out.eof(), "too short"); out.peek(); BOOST_CHECK_MESSAGE(out.eof(), "too long"); int i = 0;
 
-#define TABLE_FILE_VERSION 4
+#define TABLE_FILE_VERSION 5
 
 BOOST_AUTO_TEST_SUITE(TableFileWriterTest)
 
@@ -31,12 +31,35 @@ BOOST_AUTO_TEST_CASE(TestWritesSimple)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
+	PropertySymbolTable table(&tanalyzer, "test");
+	table.classname = "classname";
+	writer.write(out, &table);
+	ASSERTLENGTH(21);
+
+	ASSERTCHAR(TABLE_FILE_VERSION);
+	ASSERTCHAR(4); // module len
+	ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('s'); ASSERTCHAR('t');
+	ASSERTCHAR(9);
+	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
+	ASSERTCHAR(0); // not abstract
+	ASSERTCHAR(0); // inheritances
+	ASSERTCHAR(0); // begin parameters
+	ASSERTCHAR(0); // end parameters
+	ASSERTCHAR(0); // annotations
+}
+
+BOOST_AUTO_TEST_CASE(TestWritesNoModuleName)
+{
+	std::stringstream out;
+	TableFileWriter writer;
+	TypeAnalyzer tanalyzer;
 	PropertySymbolTable table(&tanalyzer, "");
 	table.classname = "classname";
 	writer.write(out, &table);
-	ASSERTLENGTH(16);
+	ASSERTLENGTH(17);
 
 	ASSERTCHAR(TABLE_FILE_VERSION);
+	ASSERTCHAR(0); // module len
 	ASSERTCHAR(9);
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
@@ -51,7 +74,7 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer, "");
+	PropertySymbolTable table(&tanalyzer, "test");
 
 	vector<pair<string, TypeArray*> > segments_arguments;
 	TypeArray* arguments = MakeTypeArray();
@@ -64,8 +87,10 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 
 	writer.write(out, &table);
 
-	ASSERTLENGTH(54);
+	ASSERTLENGTH(59);
 	ASSERTCHAR(TABLE_FILE_VERSION);
+	ASSERTCHAR(4); // module len
+	ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('s'); ASSERTCHAR('t');
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
@@ -98,15 +123,17 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer, "");
+	PropertySymbolTable table(&tanalyzer, "test");
 
 	Type* text = MakeType(TYPE_CLASS);text->typedata._class.classname = strdup("Text");
 	table.addNeed(text, 0, vector<Annotation*>());
 	table.classname = "classname";
 
 	writer.write(out, &table);
-	ASSERTLENGTH(38);
+	ASSERTLENGTH(43);
 	ASSERTCHAR(TABLE_FILE_VERSION);
+	ASSERTCHAR(4); // module len
+	ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('s'); ASSERTCHAR('t');
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
@@ -134,7 +161,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer, "");
+	PropertySymbolTable table(&tanalyzer, "test");
 
 	Type* text = MakeType(TYPE_CLASS);text->typedata._class.classname = strdup("Text");
 	Type* printer = MakeType(TYPE_CLASS);printer->typedata._class.classname = strdup("Printer");
@@ -144,8 +171,10 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 
 	writer.write(out, &table);
 
-	ASSERTLENGTH(69);
+	ASSERTLENGTH(74);
 	ASSERTCHAR(TABLE_FILE_VERSION);
+	ASSERTCHAR(4); // module len
+	ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('s'); ASSERTCHAR('t');
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
@@ -186,14 +215,16 @@ BOOST_AUTO_TEST_CASE(TestWritesInheritance)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer, "");
+	PropertySymbolTable table(&tanalyzer, "test");
 	table.classname = "classname";
 	table.parentage["myparent"] = true;
 	table.parentage["myinterface"] = false;
 	writer.write(out, &table);
-	ASSERTLENGTH(39);
+	ASSERTLENGTH(44);
 
 	ASSERTCHAR(TABLE_FILE_VERSION);
+	ASSERTCHAR(4); // module len
+	ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('s'); ASSERTCHAR('t');
 	ASSERTCHAR(9);
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
@@ -214,7 +245,7 @@ BOOST_AUTO_TEST_CASE(TestWritesParameters)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer, "");
+	PropertySymbolTable table(&tanalyzer, "test");
 	table.classname = "classname";
 	vector<Type*>* parameters = new vector<Type*>();
 	Type* t = MakeType(TYPE_PARAMETERIZED); t->typedata.parameterized.label = strdup("T");
@@ -228,9 +259,11 @@ BOOST_AUTO_TEST_CASE(TestWritesParameters)
 	parameters->push_back(t); parameters->push_back(b);
 	table.setParameters(parameters);
 	writer.write(out, &table);
-	ASSERTLENGTH(50);
+	ASSERTLENGTH(55);
 
 	ASSERTCHAR(TABLE_FILE_VERSION);
+	ASSERTCHAR(4); // module len
+	ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('s'); ASSERTCHAR('t');
 	ASSERTCHAR(9);
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
@@ -271,7 +304,7 @@ BOOST_AUTO_TEST_CASE(TestWritesList)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer, "");
+	PropertySymbolTable table(&tanalyzer, "test");
 	table.classname = "classname";
 	vector<Type*> parameters;
 	Type* list = MakeType(TYPE_LIST);
@@ -281,8 +314,10 @@ BOOST_AUTO_TEST_CASE(TestWritesList)
 	table.addProperty(list, 1, vector<Annotation*>());
 	writer.write(out, &table);
 
-	ASSERTLENGTH(46);
+	ASSERTLENGTH(51);
 	ASSERTCHAR(TABLE_FILE_VERSION);
+	ASSERTCHAR(4); // module len
+	ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('s'); ASSERTCHAR('t');
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
@@ -314,7 +349,7 @@ BOOST_AUTO_TEST_CASE(TestWritesOptional)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer, "");
+	PropertySymbolTable table(&tanalyzer, "test");
 	table.classname = "classname";
 	vector<Type*> parameters;
 	Type* optional = MakeType(TYPE_OPTIONAL);
@@ -324,8 +359,10 @@ BOOST_AUTO_TEST_CASE(TestWritesOptional)
 	table.addProperty(optional, 1, vector<Annotation*>());
 	writer.write(out, &table);
 
-	ASSERTLENGTH(42);
+	ASSERTLENGTH(47);
 	ASSERTCHAR(TABLE_FILE_VERSION);
+	ASSERTCHAR(4); // module len
+	ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('s'); ASSERTCHAR('t');
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
@@ -356,7 +393,7 @@ BOOST_AUTO_TEST_CASE(TestWritesClassAnnotations)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer, "");
+	PropertySymbolTable table(&tanalyzer, "test");
 	table.classname = "classname";
 	vector<Type*> parameters;
 	vector<Annotation*> annotations;
@@ -383,8 +420,10 @@ BOOST_AUTO_TEST_CASE(TestWritesClassAnnotations)
 	table.setAnnotations(annotations);
 	writer.write(out, &table);
 
-	ASSERTLENGTH(60);
+	ASSERTLENGTH(65);
 	ASSERTCHAR(TABLE_FILE_VERSION);
+	ASSERTCHAR(4); // module len
+	ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('s'); ASSERTCHAR('t');
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
@@ -417,7 +456,7 @@ BOOST_AUTO_TEST_CASE(TestWritesMethodAnnotations)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer, "");
+	PropertySymbolTable table(&tanalyzer, "test");
 	table.classname = "classname";
 	vector<Type*> parameters;
 	Type* text = MakeType(TYPE_CLASS);
@@ -446,8 +485,10 @@ BOOST_AUTO_TEST_CASE(TestWritesMethodAnnotations)
 	table.addProperty(text, 1, annotations);
 	writer.write(out, &table);
 
-	ASSERTLENGTH(82);
+	ASSERTLENGTH(87);
 	ASSERTCHAR(TABLE_FILE_VERSION);
+	ASSERTCHAR(4); // module len
+	ASSERTCHAR('t'); ASSERTCHAR('e'); ASSERTCHAR('s'); ASSERTCHAR('t');
 	ASSERTCHAR(9); // classname length
 	ASSERTCHAR('c'); ASSERTCHAR('l'); ASSERTCHAR('a'); ASSERTCHAR('s'); ASSERTCHAR('s'); ASSERTCHAR('n'); ASSERTCHAR('a'); ASSERTCHAR('m'); ASSERTCHAR('e');
 	ASSERTCHAR(0); // not abstract
