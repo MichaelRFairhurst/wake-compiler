@@ -52,7 +52,7 @@ void Linker::loadTables(string dirname, ClassSpaceSymbolTable& table) {
 		file.close();
 	}
 	else
-	for(directory_iterator moduleitr(itr); moduleitr != end_itr; ++moduleitr) {
+	for(directory_iterator moduleitr(*itr); moduleitr != end_itr; ++moduleitr) {
 		string fname = moduleitr->path().string();
 		if(fname.substr(fname.size() - 6) != ".table") continue;
 		file.open(fname.c_str(), fstream::in | fstream::binary);

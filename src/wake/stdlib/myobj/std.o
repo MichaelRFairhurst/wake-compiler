@@ -402,4 +402,13 @@ function$ $$B(a, b) { return$ a - b * Math.floor(a / b); }
 		};
 	};
 
+	~std.Argv~ = function$ ~std.Argv~() {
+
+		this.`getArgv()` = function() {
+				return$ process.argv;
+		};
+
+	};
+
+
 })(typeof$ require === 'undefined' ? function() {return {};} : require);
