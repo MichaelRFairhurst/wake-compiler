@@ -163,7 +163,7 @@ void Linker::setMain(ostream& file, string classname, string methodname, ClassSp
 
 void Linker::generateRecursiveConstructors(ostream& file, string ctedclass, ClassSpaceSymbolTable& table) {
 	file << "new ";
-	file << "_" << classTable.getAddress(ctedclass);
+	file << "_" << classTable.getAddress(table.getFullyQualifiedClassname(ctedclass));
 	file << "(";
 
 	vector<Type*>* needs = table.find(ctedclass)->getNeeds();
