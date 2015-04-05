@@ -720,13 +720,13 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_THIS: file << "this"; break;
 
 		case NT_IF_THEN_ELSE:
-			file << "(";
+			file << "((";
 			generate(tree->node_data.nodes[1]);
 			file << ")?(";
 			generate(tree->node_data.nodes[0]);
 			file << "):(";
 			generate(tree->node_data.nodes[2]);
-			file << ")";
+			file << "))";
 			break;
 
 		case NT_RETURN:
