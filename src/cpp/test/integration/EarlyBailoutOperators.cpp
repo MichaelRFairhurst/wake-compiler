@@ -76,10 +76,10 @@ PTT_TEST_CASE(
 			var Text? = MyClass.?Text; 							\n\
 			var Num[]? = MyClass.?Num[]; 						\n\
 			var Text[]? = MyClass.?Text[]; 						\n\
-			Num?? = $MyClass.?Num; 								\n\
-			Text?? = $MyClass.?Text; 							\n\
-			Num[]?? = $MyClass.?Num[]; 							\n\
-			Text[]?? = $MyClass.?Text[]; 						\n\
+			Num = $MyClass.?Num; 								\n\
+			Text = $MyClass.?Text; 							\n\
+			Num[] = $MyClass.?Num[]; 							\n\
+			Text[] = $MyClass.?Text[]; 						\n\
 		}",
 	PTT_VALID
 );
@@ -96,10 +96,10 @@ PTT_TEST_CASE(
 			var Text? = MyClass.?getText(); 					\n\
 			var Num[]? = MyClass.?getNumList(); 				\n\
 			var Text[]? = MyClass.?getTextList(); 				\n\
-			Num? = $MyClass.?getNum();							\n\
-			Text? = $MyClass.?getText();						\n\
-			Num[]? = $MyClass.?getNumList();					\n\
-			Text[]? = $MyClass.?getTextList();					\n\
+			Num = $MyClass.?getNum();							\n\
+			Text = $MyClass.?getText();						\n\
+			Num[] = $MyClass.?getNumList();					\n\
+			Text[] = $MyClass.?getTextList();					\n\
 		}",
 	PTT_VALID
 );
