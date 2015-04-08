@@ -280,8 +280,7 @@ function$ $$B(a, b) { return$ a - b * Math.floor(a / b); }
 		};
 
 		this.`getParent()` = function() {
-			var$ b = new$ ~io.FilePath~(this.`getDirname`);
-			return$ b.`fileExists()`() ? b : null;
+			return$ new$ ~io.FilePath~(this.`getDirname()`());
 		};
 
 		this.`delete()` = function() {
