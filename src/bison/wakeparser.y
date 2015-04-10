@@ -18,7 +18,13 @@
 #include "type.h"
 #include "node.h"
 #include "tree.h"
-#include "type.h"
+#include "VarRef.h"
+#include "ClassVarRef.h"
+#include "VarDecl.h"
+#include "SpecializableVarDecl.h"
+#include "SpecializablePureType.h"
+#include "PureType.h"
+#include "PureTypeArray.h"
 #include "wakelltype.h"
 #include "error.h"
 
@@ -32,14 +38,14 @@ Node* parsetree;
 
 void wakeerror(const char *str)
 {
-		//error_open_file(YYFILE);
-		error_print_error_token(&yylloc);
-        puts(str);
+	//error_open_file(YYFILE);
+	error_print_error_token(&yylloc);
+	puts(str);
 }
 
 int wakewrap()
 {
-        return 1;
+	return 1;
 }
 
 %}
@@ -55,11 +61,16 @@ int wakewrap()
 
 %union
 {
-        double number;
-        char *string;
-        Node *node;
-        Type *type;
-        TypeArray *type_array;
+	double number;
+	char *string;
+	Node *node;
+	PureType *pure_type;
+	VarRef *var_ref;
+	PureTypeArray *pure_type_array;
+	ClassVarRef *class_var_ref;
+	VarDecl *var_decl;
+	SpecializableVarDecl *specializable_var_decl;
+	SpecializablePureType *specializable_pure_type;
 }
 
 /* identifiers & values */
@@ -74,9 +85,14 @@ int wakewrap()
 %token <number> BOOL
 %token <number> SYM_SHADOW
 %token <void> SYM_ARRAYED
-%type <node> imports import classes annotatedclass class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value value_invokable method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments methodcallsegments curryableexpressions expression expressions declarationsandstatements declarationorstatement declaration statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_bitshift expression_relational expression_bitand expression_bitxor expression_bitor expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args annotatedmethod annotation annotations annotationvals annotationval lambda statement_or_block expression_nolambda /* inferenceabletypes annotatedtype */ module inferenceable_declaration_types annotated_specializable_declaration_type
-%type <type> /* type specializabletype shadowabletype classtype */ pure_type function_type classdeclarationtype unboundtypespecification parameterized_inheritance_type usable_as_variable_type declaration_type specializable_declaration_type base_class_type specializable_pure_type pure_class_type pure_optional_type pure_optional_parameterized_type
-%type <type_array> /* pure_types types */ pure_types unboundtypespecifications declaration_types
+%type <node> imports import classes annotatedclass class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value value_invokable method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments methodcallsegments curryableexpressions expression expressions decls_and_stmts decl_or_stmt decl statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_bitshift expression_relational expression_bitand expression_bitxor expression_bitor expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args annotatedmethod annotation annotations annotationvals annotationval lambda statement_or_block expression_nolambda module inferenceable_decl_types annotated_specializable_decl_type
+%type <pure_type> pure_type function_type class_decl_type unboundtypespecification parameterized_inheritance_type pure_class_type pure_optional_type pure_optional_parameterized_type
+%type <class_var_ref> usable_as_variable_type base_class_type
+%type <pure_type_array> pure_types unboundtypespecifications decl_types
+/*%type <var_ref> */
+%type <var_decl> decl_type
+%type <specializable_var_decl> specializable_decl_type
+%type <specializable_pure_type> specializable_pure_type
 %type <string> alias modulename
 %start file
 
@@ -144,10 +160,10 @@ annotatedclass:
 	;
 
 class:
-	EVERY classdeclarationtype parentage IS ':'									{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromType($2, @$), $3, @$); }
-	| EVERY classdeclarationtype parentage IS ':' classbody						{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromType($2, @$), $3, @$); AddSubNode($$, $6); }
-	| EXTERN classdeclarationtype parentage IS ':'								{ $$ = MakeTwoBranchNode(NT_CLASS_EXTERN, MakeNodeFromType($2, @$), $3, @$); }
-	| EXTERN classdeclarationtype parentage IS ':' classbody					{ $$ = MakeTwoBranchNode(NT_CLASS_EXTERN, MakeNodeFromType($2, @$), $3, @$); AddSubNode($$, $6); }
+	EVERY class_decl_type parentage IS ':'									{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromType($2, @$), $3, @$); }
+	| EVERY class_decl_type parentage IS ':' classbody						{ $$ = MakeTwoBranchNode(NT_CLASS, MakeNodeFromType($2, @$), $3, @$); AddSubNode($$, $6); }
+	| EXTERN class_decl_type parentage IS ':'								{ $$ = MakeTwoBranchNode(NT_CLASS_EXTERN, MakeNodeFromType($2, @$), $3, @$); }
+	| EXTERN class_decl_type parentage IS ':' classbody					{ $$ = MakeTwoBranchNode(NT_CLASS_EXTERN, MakeNodeFromType($2, @$), $3, @$); AddSubNode($$, $6); }
 	;
 
 parentage:
@@ -186,8 +202,8 @@ property:
 	;
 
 property_value:
-	declaration_type '=' expression															{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1, @$), $3, @$); }
-	| declaration_type retrievalargs expression												{	Node* retrieval = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1, @$), $2, @$);
+	decl_type '=' expression															{ $$ = MakeTwoBranchNode(NT_ASSIGNMENT, MakeNodeFromType($1, @$), $3, @$); }
+	| decl_type retrievalargs expression												{	Node* retrieval = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($1, @$), $2, @$);
 																					AddSubNode(retrieval, $3);
 																					$$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType(copyType($1), @$), retrieval, @$);		}
 	;
@@ -215,7 +231,7 @@ providable:
 
 provision_args:
 	/* empty */																	{ $$ = MakeOneBranchNode(NT_PROVISION_BEHAVIOR, MakeNodeFromTypeArray(MakeTypeArray(), @$), @$); }
-	| '(' declaration_types ')'																{ $$ = MakeOneBranchNode(NT_PROVISION_BEHAVIOR, MakeNodeFromTypeArray($2, @$), @$); }
+	| '(' decl_types ')'																{ $$ = MakeOneBranchNode(NT_PROVISION_BEHAVIOR, MakeNodeFromTypeArray($2, @$), @$); }
 	;
 
 injection:
@@ -247,8 +263,8 @@ ctorargs:
 	;
 
 ctorarg:
-	annotated_specializable_declaration_type																{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, $1, MakeEmptyNode(NT_PRIVATE, @$), @$); }
-	| PUBLIC annotated_specializable_declaration_type														{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, $2, MakeEmptyNode(NT_PUBLIC, @$), @$); }
+	annotated_specializable_decl_type																{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, $1, MakeEmptyNode(NT_PRIVATE, @$), @$); }
+	| PUBLIC annotated_specializable_decl_type														{ $$ = MakeTwoBranchNode(NT_CTOR_ARG, $2, MakeEmptyNode(NT_PUBLIC, @$), @$); }
 	;
 
 annotatedmethod:
@@ -282,14 +298,14 @@ methodbody:
 
 lmethodnamesegments:
 	alias '(' ')'																{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$), @$); }
-	| alias '(' declaration_types ')'														{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$), MakeNodeFromTypeArray($3, @$), @$); }
-	| alias '(' declaration_types ')' lumethodnamesegments									{ $$ = $5; PrependSubNode($5, MakeNodeFromTypeArray($3, @$)); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$)); }
+	| alias '(' decl_types ')'														{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$), MakeNodeFromTypeArray($3, @$), @$); }
+	| alias '(' decl_types ')' lumethodnamesegments									{ $$ = $5; PrependSubNode($5, MakeNodeFromTypeArray($3, @$)); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$)); }
 	;
 
 lumethodnamesegments:
 	identifier '(' ')'															{ $$ = MakeOneBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$), @$); }
-	| identifier '(' declaration_types ')'													{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$), MakeNodeFromTypeArray($3, @$), @$); }
-	| identifier '(' declaration_types ')' lumethodnamesegments								{ $$ = $5; PrependSubNode($5, MakeNodeFromTypeArray($3, @$)); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$)); }
+	| identifier '(' decl_types ')'													{ $$ = MakeTwoBranchNode(NT_METHOD_NAME, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$), MakeNodeFromTypeArray($3, @$), @$); }
+	| identifier '(' decl_types ')' lumethodnamesegments								{ $$ = $5; PrependSubNode($5, MakeNodeFromTypeArray($3, @$)); PrependSubNode($5, MakeNodeFromString(NT_METHOD_NAME_SEGMENT, $1, @$)); }
 	;
 
 methodcallsegments:
@@ -312,7 +328,7 @@ curryableexpressions:
 	;
 
 value:
-	usable_as_variable_type																{ $$ = MakeNodeFromType($1, @$); }
+	usable_as_variable_type														{ $$ = MakeNodeFromType($1, @$); }
 	| value_invokable															{ $$ = $1; }
 	| THIS																		{ $$ = MakeEmptyNode(NT_THIS, @$); }
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1, @$); }
@@ -321,8 +337,8 @@ value:
 	| '[' expressions ']'														{ $$ = $2; $$->loc = @$; $$->node_type = NT_ARRAY_DECLARATION; }
 	| SYM_ARRAYED																{ $$ = MakeEmptyNode(NT_ARRAY_DECLARATION, @$); }
 	| NOTHING																	{ $$ = MakeEmptyNode(NT_NOTHING, @$); }
-	| objectable '.' usable_as_variable_type												{ $$ = MakeTwoBranchNode(NT_MEMBER_ACCESS, $1, MakeNodeFromType($3, @3), @$); }
-	| objectable SYM_EARLYBAILOUT_DOT usable_as_variable_type							{ $$ = MakeTwoBranchNode(NT_EARLYBAILOUT_MEMBER_ACCESS, $1, MakeNodeFromType($3, @3), @$); }
+	| objectable '.' usable_as_variable_type									{ $$ = MakeTwoBranchNode(NT_MEMBER_ACCESS, $1, MakeNodeFromType($3, @3), @$); }
+	| objectable SYM_EARLYBAILOUT_DOT usable_as_variable_type					{ $$ = MakeTwoBranchNode(NT_EARLYBAILOUT_MEMBER_ACCESS, $1, MakeNodeFromType($3, @3), @$); }
 	;
 
 value_invokable:
@@ -390,23 +406,23 @@ objectable:
 	;
 
 block:
-	'{' declarationsandstatements '}'											{ $$ = MakeOneBranchNode(NT_BLOCK, $2, @$); }
+	'{' decls_and_stmts '}'											{ $$ = MakeOneBranchNode(NT_BLOCK, $2, @$); }
 	| '{' '}'																	{ $$ = MakeEmptyNode(NT_EMPTY, @$); }
 	;
 
-declarationsandstatements:
-	declarationorstatement														{ $$ = MakeOneBranchNode(NT_RETRIEVALS_STATEMENTS, $1, @$); }
-	| declarationsandstatements declarationorstatement							{ $$ = $1; AddSubNode($$, $2); }
+decls_and_stmts:
+	decl_or_stmt														{ $$ = MakeOneBranchNode(NT_RETRIEVALS_STATEMENTS, $1, @$); }
+	| decls_and_stmts decl_or_stmt							{ $$ = $1; AddSubNode($$, $2); }
 	;
 
-declarationorstatement:
-	declaration																	{ $$ = $1; }
+decl_or_stmt:
+	decl																	{ $$ = $1; }
 	| statement																	{ $$ = $1; }
 	;
 
-declaration:
-	VAR declaration_type '=' expression ';'													{ $$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType($2, @2), $4, @$); }
-	| VAR specializable_declaration_type retrievalargs expression ';'										{	Node* retrieval = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($2, @2), $3, @$);
+decl:
+	VAR decl_type '=' expression ';'													{ $$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType($2, @2), $4, @$); }
+	| VAR specializable_decl_type retrievalargs expression ';'										{	Node* retrieval = MakeTwoBranchNode(NT_RETRIEVAL, MakeNodeFromType($2, @2), $3, @$);
 																					AddSubNode(retrieval, $4);
 																					$$ = MakeTwoBranchNode(NT_DECLARATION, MakeNodeFromType(copyType($2), @2), retrieval, @$);		}
 	;
@@ -476,7 +492,7 @@ member:
 	;
 
 forinit:
-	declaration																	{ $$ = $1; }
+	decl																	{ $$ = $1; }
 	| expression ';'															{ $$ = $1; }
 	;
 
@@ -510,7 +526,7 @@ trystatement:
 	;
 
 catchstatement:
-	CATCH '(' declaration_type ')' block													{ $$ = MakeTwoBranchNode(NT_CATCH, MakeNodeFromType($3, @$), $5, @$); }
+	CATCH '(' decl_type ')' block													{ $$ = MakeTwoBranchNode(NT_CATCH, MakeNodeFromType($3, @$), $5, @$); }
 	;
 
 expression_unary:
@@ -626,13 +642,13 @@ expression:
 	;
 
 lambda:
-	'{' SYM_LAMBDA declarationsandstatements '}'								{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, MakeEmptyNode(NT_INFERENCEABLE_TYPES, @2), $3, @$); }
-	| '{' inferenceable_declaration_types SYM_LAMBDA declarationsandstatements '}'			{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, $2, $4, @$); }
-	| '{' inferenceable_declaration_types SYM_LAMBDA '}'										{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, $2, MakeEmptyNode(NT_EMPTY, @3), @$); }
+	'{' SYM_LAMBDA decls_and_stmts '}'								{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, MakeEmptyNode(NT_INFERENCEABLE_TYPES, @2), $3, @$); }
+	| '{' inferenceable_decl_types SYM_LAMBDA decls_and_stmts '}'			{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, $2, $4, @$); }
+	| '{' inferenceable_decl_types SYM_LAMBDA '}'										{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, $2, MakeEmptyNode(NT_EMPTY, @3), @$); }
 	| '{' SYM_LAMBDA_AUTORETURN expression '}'									{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, MakeEmptyNode(NT_INFERENCEABLE_TYPES, @2), MakeOneBranchNode(NT_RETURN, $3, @3), @$); }
 	| '{' SYM_LAMBDA_AUTORETURN expression ';' '}'								{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, MakeEmptyNode(NT_INFERENCEABLE_TYPES, @2), MakeOneBranchNode(NT_RETURN, $3, @3), @$); }
-	| '{' inferenceable_declaration_types SYM_LAMBDA_AUTORETURN expression '}'				{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, $2, MakeOneBranchNode(NT_RETURN, $4, @4), @$); }
-	| '{' inferenceable_declaration_types SYM_LAMBDA_AUTORETURN expression ';' '}'			{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, $2, MakeOneBranchNode(NT_RETURN, $4, @4), @$); }
+	| '{' inferenceable_decl_types SYM_LAMBDA_AUTORETURN expression '}'				{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, $2, MakeOneBranchNode(NT_RETURN, $4, @4), @$); }
+	| '{' inferenceable_decl_types SYM_LAMBDA_AUTORETURN expression ';' '}'			{ $$ = MakeTwoBranchNode(NT_LAMBDA_DECLARATION, $2, MakeOneBranchNode(NT_RETURN, $4, @4), @$); }
 	;
 
 expression_noretrieval:
@@ -668,14 +684,10 @@ alias:
 
 usable_as_variable_type:
 	base_class_type																{ $$ = $1; }
-	| SYM_SHADOW base_class_type												{ $$ = $2;
-																					Type* classtype = $$;
-																					while(classtype->type != TYPE_CLASS)
-																						classtype = classtype->type == TYPE_OPTIONAL ? classtype->typedata.optional.contained : classtype->typedata.list.contained;
-																					classtype->typedata._class.shadow = $1; }
+	| SYM_SHADOW base_class_type												{ $$ = $2; $$->shadow = $1; }
 	;
 
-declaration_type:
+decl_type:
 	alias pure_type																{ $$ = $2; $$->alias = strdup($1); }
 	| pure_type alias															{ $$ = $1; $$->alias = strdup($2); }
 	| pure_type																	{ $$ = $1; }
@@ -686,11 +698,11 @@ declaration_type:
 																					classtype->typedata._class.shadow = $1; }
 	;
 
-inferenceable_declaration_types:
-	declaration_type																		{ $$ = MakeOneBranchNode(NT_INFERENCEABLE_TYPES, MakeNodeFromType($1, @1), @$); }
+inferenceable_decl_types:
+	decl_type																		{ $$ = MakeOneBranchNode(NT_INFERENCEABLE_TYPES, MakeNodeFromType($1, @1), @$); }
 	| alias																		{ $$ = MakeOneBranchNode(NT_INFERENCEABLE_TYPES, MakeNodeFromString(NT_ALIAS, $1, @1), @$); }
-	| inferenceable_declaration_types ',' declaration_type												{ $$ = $1; AddSubNode($$, MakeNodeFromType($3, @3)); $$->loc = @$; }
-	| inferenceable_declaration_types ',' alias												{ $$ = $1; AddSubNode($$, MakeNodeFromString(NT_ALIAS, $3, @3)); $$->loc = @$; }
+	| inferenceable_decl_types ',' decl_type												{ $$ = $1; AddSubNode($$, MakeNodeFromType($3, @3)); $$->loc = @$; }
+	| inferenceable_decl_types ',' alias												{ $$ = $1; AddSubNode($$, MakeNodeFromString(NT_ALIAS, $3, @3)); $$->loc = @$; }
 	;
 
 pure_type:
@@ -703,7 +715,7 @@ specializable_pure_type:
 	| pure_type SPECIALTY														{ $$ = $1; $$->specialty = strdup($2); }
 	;
 
-specializable_declaration_type:
+specializable_decl_type:
 	alias pure_type																{ $$ = $2; $$->alias = strdup($1); }
 	| alias pure_type SPECIALTY													{ $$ = $2; $$->alias = strdup($1); $$->specialty = strdup($3); }
 	| pure_type alias															{ $$ = $1; $$->alias = strdup($2); }
@@ -724,8 +736,8 @@ specializable_declaration_type:
 	;
 
 base_class_type:
-	UIDENTIFIER																	{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = strdup($1); }
-	| base_class_type SYM_ARRAYED												{ $$ = MakeType(TYPE_LIST); $$->typedata.list.contained = $1; }
+	UIDENTIFIER																	{ $$ = makeVariableClassReference($1, 0, 0); }
+	| base_class_type SYM_ARRAYED												{ $$->arrayed++; }
 	;
 
 pure_class_type:
@@ -760,7 +772,7 @@ function_type:
 	| function_type SYM_ARRAYED														{ $$ = MakeType(TYPE_LIST); $$->typedata.list.contained = $1; }
 	;
 
-classdeclarationtype:
+class_decl_type:
 	UIDENTIFIER																	{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; }
 	| UIDENTIFIER '{' unboundtypespecifications '}'								{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; $$->typedata._class.parameters = $3; }
 	;
@@ -782,64 +794,14 @@ parameterized_inheritance_type:
 	| UIDENTIFIER '{' pure_types '}'												{ $$ = MakeType(TYPE_CLASS); $$->typedata._class.classname = $1; $$->typedata._class.parameters = $3; }
 	;
 
-declaration_types:
-	declaration_type																		{ $$ = MakeTypeArray(); AddTypeToTypeArray($1, $$); }
-	| declaration_types ',' declaration_type															{ $$ = $1; AddTypeToTypeArray($3, $$); }
+decl_types:
+	decl_type																		{ $$ = MakeTypeArray(); AddTypeToTypeArray($1, $$); }
+	| decl_types ',' decl_type															{ $$ = $1; AddTypeToTypeArray($3, $$); }
 	;
 
-annotated_specializable_declaration_type:
-	annotations specializable_declaration_type														{ $$ = MakeTwoBranchNode(NT_ANNOTATED_TYPE, MakeNodeFromType($2, @2), $1, @$); }
-	| specializable_declaration_type																		{ $$ = MakeNodeFromType($1, @$); }
+annotated_specializable_decl_type:
+	annotations specializable_decl_type														{ $$ = MakeTwoBranchNode(NT_ANNOTATED_TYPE, MakeNodeFromType($2, @2), $1, @$); }
+	| specializable_decl_type																		{ $$ = MakeNodeFromType($1, @$); }
 	;
 
 %%
-/*
-annotatedtype:
-	annotations type															{ $$ = MakeTwoBranchNode(NT_ANNOTATED_TYPE, MakeNodeFromType($2, @2), $1, @$); }
-	| type																		{ $$ = MakeNodeFromType($1, @$); }
-	;
-
-type:
-	alias specializabletype														{ $$ = $2; $$->alias = $1; }
-	| specializabletype alias													{ $$ = $1; $$->alias = $2; }
-	| specializabletype															{ $$ = $1; }
-	;
-
-specializabletype:
-	shadowabletype																{ $$ = $1; }
-	| shadowabletype SPECIALTY													{ $$ = $1; $$->specialty = $2; }
-	;
-
-shadowabletype:
-	pure_type																	{ $$ = $1; }
-	| SYM_SHADOW classtype														{ $$ = $2;
-																					Type* classtype = $$;
-																					while(classtype->type != TYPE_CLASS)
-																						classtype = classtype->type == TYPE_OPTIONAL ? classtype->typedata.optional.contained : classtype->typedata.list.contained;
-																					classtype->typedata._class.shadow = $1; }
-	;
-
-pure_type:
-	classtype																	{ $$ = $1; }
-	| function_type																	{ $$ = $1; }
-	;
-
-types:
-	type																		{ $$ = MakeTypeArray(); AddTypeToTypeArray($1, $$); }
-	| types ',' type															{ $$ = $1; AddTypeToTypeArray($3, $$); }
-	;
-
-inferenceabletypes:
-	type																		{ $$ = MakeOneBranchNode(NT_INFERENCEABLE_TYPES, MakeNodeFromType($1, @1), @$); }
-	| alias																		{ $$ = MakeOneBranchNode(NT_INFERENCEABLE_TYPES, MakeNodeFromString(NT_ALIAS, $1, @1), @$); }
-	| inferenceabletypes ',' type												{ $$ = $1; AddSubNode($$, MakeNodeFromType($3, @3)); $$->loc = @$; }
-	| inferenceabletypes ',' alias												{ $$ = $1; AddSubNode($$, MakeNodeFromString(NT_ALIAS, $3, @3)); $$->loc = @$; }
-	;
-
-classtype:
-	parameterized_inheritance_type															{ $$ = $1; }
-	| classtype '?'																{ $$ = MakeType(TYPE_OPTIONAL); $$->typedata.optional.contained = $1; }
-	| classtype SYM_ARRAYED														{ $$ = MakeType(TYPE_LIST); $$->typedata.list.contained = $1; }
-	;
-
-	*/

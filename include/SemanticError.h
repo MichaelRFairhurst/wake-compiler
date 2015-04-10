@@ -19,7 +19,6 @@
 using namespace std;
 
 extern "C" {
-	#include "type.h"
 	#include "node.h"
 }
 

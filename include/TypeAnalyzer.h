@@ -15,10 +15,10 @@
 #ifndef HEADER_TYPE_ANALYZER
 #define HEADER_TYPE_ANALYZER
 
-extern "C" {
-	#include "type.h"
-}
-
+#include "PureType.h"
+#include "SpecializablePureType.h"
+#include "SpecializableVarDecl.h"
+#include "VarRef.h"
 #include <string>
 #include <vector>
 #include <boost/optional/optional.hpp>
@@ -32,33 +32,29 @@ class TypeAnalyzer {
 	public:
 		ClassSpaceSymbolTable* reference;
 		bool isASubtypeOfB(string a, string b);
-		bool isASubtypeOfB(Type* a, Type* b);
-		bool isAExactlyB(Type* a, Type* b);
-		void assertClassCanProvide(Type* provider, Type* binding);
-		void assertClassCanProvide(string provider, Type* binding);
-		void assertClassCanBeBound(Type* binding);
-		void assertNeedIsNotCircular(string classname, Type* need);
-		boost::optional<Type*> getCommonSubtypeOf(Type* a, Type* b);
-		bool isPrimitiveTypeNum(Type* theint);
-		bool isPrimitiveTypeText(Type* theint);
-		bool isPrimitiveTypeBool(Type* theint);
-		bool isAutoboxedType(Type* type, Type** boxedtype);
-		bool isException(Type* type);
-		bool hasArgParameterization(Type* type);
-		bool hasArgParameterization(TypeArray* typearray);
+		bool isASubtypeOfB(PureType* a, PureType* b);
+		bool isAExactlyB(PureType* a, PureType* b);
+		void assertFQClassCanProvide(string provider, SpecializablePureType* binding);
+		void assertFQClassCanBeProvided(string fullyqualifiedclassname);
+		void assertFQNeedIsNotCircular(string classname, string otherclassname);
+		boost::optional<PureType*> getCommonSubtypeOf(PureType* a, PureType* b);
+		bool isPrimitiveTypeNum(PureType* theint);
+		bool isPrimitiveTypeText(PureType* theint);
+		bool isPrimitiveTypeBool(PureType* theint);
+		bool isAutoboxedType(PureType* type, PureType** boxedtype);
+		bool isException(PureType* type);
+		bool hasArgParameterization(PureType* type);
+		bool hasArgParameterization(PureTypeArray* typearray);
 
 		/**
 		 * Text[][] -- 2
 		 * Text[]?[] -- 2
 		 * Text?[] -- 1
 		 */
-		int getArrayReferenceLevel(Type& type);
-		string getNameForType(Type* type);
-		string getNameForTypeAsProperty(Type* type);
-		string getProvisionSymbol(Type* provided, vector<Type*> &arguments);
+		int getArrayReferenceLevel(PureType& type);
 
 	private:
-		boost::optional<pair<int, Type*> > getCommonClassnamesWithDepth(Type& a, Type& b, int depth);
+		boost::optional<pair<int, string> > getCommonFQClassnamesWithDepth(string a, string b, int depth);
 
 };
 

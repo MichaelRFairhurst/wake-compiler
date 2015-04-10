@@ -24,7 +24,6 @@
 #include "TypeChecker.h"
 
 extern "C" {
-	#include "type.h"
 	#include "node.h"
 	#include "tree.h"
 }

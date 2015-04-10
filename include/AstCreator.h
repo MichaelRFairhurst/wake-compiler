@@ -22,7 +22,7 @@
 #include "ClassSpaceSymbolTable.h"
 #include "ScopeSymbolTable.h"
 #include "MethodSignatureParseTreeTraverser.h"
-#include "type.h"
+#include "PureType.h"
 #include "node.h"
 #include "UnifyingType.h"
 
@@ -31,7 +31,7 @@ namespace wake {
 	class AstCreator {
 
 		public:
-			AstCreator(ErrorTracker* errors, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, MethodSignatureParseTreeTraverser* methodanalyzer, Type* returntype, Type* thiscontext, vector<Type*>& parameterizedtypes)
+			AstCreator(ErrorTracker* errors, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, MethodSignatureParseTreeTraverser* methodanalyzer, PureType* returntype, PureType* thiscontext, vector<PureType*>& parameterizedtypes)
 				: errors(errors), classestable(classestable), scopesymtable(scopesymtable), methodanalyzer(methodanalyzer), returntype(returntype), thiscontext(thiscontext), parameterizedtypes(parameterizedtypes), lambdaReturnType(NULL) {};
 
 			ast::StatementNode* generateStatementAst(Node* node);
@@ -44,9 +44,9 @@ namespace wake {
 			ErrorTracker* errors;
 			ClassSpaceSymbolTable* classestable;
 			ScopeSymbolTable* scopesymtable;
-			Type* returntype;
-			Type* thiscontext;
-			vector<Type*>& parameterizedtypes;
+			PureType* returntype;
+			PureType* thiscontext;
+			vector<PureType*>& parameterizedtypes;
 			UnifyingType* lambdaReturnType;
 
 	};

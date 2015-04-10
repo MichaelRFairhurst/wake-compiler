@@ -18,9 +18,7 @@
 #include <string>
 #include "Annotation.h"
 
-extern "C" {
-	#include "type.h"
-}
+#include "VarDecl.h"
 
 using namespace std;
 
@@ -28,12 +26,8 @@ struct ObjectProperty {
 	string address;
 	string casing;
 	int flags;
-	Type* type;
+	VarDecl decl;
 	boost::ptr_vector<Annotation> annotations;
-
-	~ObjectProperty() {
-		delete type;
-	}
 };
 
 #endif

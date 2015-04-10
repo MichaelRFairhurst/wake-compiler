@@ -21,7 +21,6 @@
 #include <boost/optional/optional.hpp>
 
 extern "C" {
-	#include "type.h"
 	#include "tree.h"
 }
 
@@ -37,45 +36,44 @@ using namespace std;
 
 class PropertySymbolTable : public ReadOnlyPropertySymbolTable {
 	public:
-		PropertySymbolTable(TypeAnalyzer* tanalyzer, string module) : analyzer(tanalyzer), module(module), abstract(false), declaredtypeparameters(new vector<Type*>()), needs(new vector<Type*>()) {};
+		PropertySymbolTable(TypeAnalyzer* tanalyzer, string module) : analyzer(tanalyzer), module(module), abstract(false), declaredtypeparameters(new vector<PureType*>()), needs(new vector<SpecializableVarDecl*>()) {};
 		~PropertySymbolTable();
-		boost::optional<Type*> find(string name);
+		boost::optional<PureType*> find(string name);
 		boost::optional<ObjectProperty*> findByCasing(string casing);
 		bool isPublic(string name);
 		string getAddress(string name);
 		int getFlags(string name);
-		string getProvisionSymbol(Type* provided, vector<Type*> &arguments);
-		boost::optional<SemanticError*> addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, int flags, vector<Annotation*> annotations);
-		boost::optional<SemanticError*> addProperty(Type* property, int flags, vector<Annotation*> annotations);
-		boost::optional<SemanticError*> addProvision(Type* provision, vector<Type*> &arguments, int flags, vector<Annotation*> annotations);
+		boost::optional<SemanticError*> addMethod(PureType* returntype, vector<pair<string, PureTypeArray*> >* segments_arguments, int flags, vector<Annotation*> annotations);
+		boost::optional<SemanticError*> addProperty(VarDecl* property, int flags, vector<Annotation*> annotations);
+		boost::optional<SemanticError*> addProvision(SpecializablePureType* provision, vector<PureType*> &arguments, int flags, vector<Annotation*> annotations);
 		bool isBehavioralProvision(string name);
-		void addNeed(Type* returntype, int flags, vector<Annotation*> annotations);
+		void addNeed(SpecializableVarDecl* need, int flags, vector<Annotation*> annotations);
 		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);
-		vector<Type*>* getNeeds();
-		string getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments);
-		string getCasingNameOf(vector<pair<string, TypeArray*> >* segments_arguments);
+		vector<SpecializableVarDecl*>* getNeeds();
+		string getSymbolNameOf(vector<pair<string, PureTypeArray*> >* segments_arguments);
+		string getCasingNameOf(vector<pair<string, PureTypeArray*> >* segments_arguments);
 		bool isAbstract();
 		string classname;
 		bool abstract;
 		map<string, ObjectProperty*> properties;
 		const map<string, bool>& getParentage();
 		map<string, bool> parentage;
-		void setParameters(vector<Type*>* parameters);
-		const vector<Type*>& getParameters();
-		Type* getAsType();
+		void setParameters(vector<PureType*>* parameters);
+		const vector<PureType*>& getParameters();
+		PureType* getAsPureType();
 		void setAnnotations(vector<Annotation*> annotations);
 		const boost::ptr_vector<Annotation>& getAnnotations();
 		void setModule(string newmodule);
 		string getModule();
 
-		ReadOnlyPropertySymbolTable* resolveParameters(vector<Type*>& parameters);
+		ReadOnlyPropertySymbolTable* resolveParameters(vector<PureType*>& parameters);
 
 		friend void propagateInheritanceTables(PropertySymbolTable* parent, PropertySymbolTable* child, bool extend, ErrorTracker& errors);
 
 	private:
 		TypeAnalyzer* analyzer;
-		vector<Type*>* needs;
-		vector<Type*>* declaredtypeparameters;
+		vector<SpecializableVarDecl*>* needs;
+		vector<PureType*>* declaredtypeparameters;
 		boost::ptr_vector<Annotation> annotations;
 		string module;
 };

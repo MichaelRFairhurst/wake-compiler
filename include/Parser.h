@@ -18,7 +18,6 @@
 #include <stdio.h>
 
 extern "C" {
-	#include "type.h"
 	#include "node.h"
 	#include "tree.h"
 	#include "wake.tab.h"

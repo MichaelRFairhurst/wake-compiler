@@ -19,22 +19,20 @@
 #include <map>
 #include <string>
 #include "TypeAnalyzer.h"
-
-extern "C" {
-	#include "type.h"
-}
+#include "PureType.h"
+#include "PureTypeArray.h"
 
 class TypeParameterizer {
 
 	public:
-		void rewriteClasstypesToParameterizedtypeByLabel(Type** typeaddr, const std::vector<Type*>& parameters);
-		void rewriteClasstypesToParameterizedtypeByLabel(TypeArray* types, const std::vector<Type*>& parameters);
+		void rewriteClasstypesToParameterizedtypeByLabel(PureType** typeaddr, const std::vector<PureType*>& parameters);
+		void rewriteClasstypesToParameterizedtypeByLabel(PureTypeArray* types, const std::vector<PureType*>& parameters);
 
-		void applyParameterizations(Type** typeaddr, const std::vector<Type*>& parameters, const std::vector<Type*>& parameterizations);
-		void applyParameterizations(TypeArray* types, const std::vector<Type*>& parameters, const std::vector<Type*>& parameterizations);
+		void applyParameterizations(PureType** typeaddr, const std::vector<PureType*>& parameters, const std::vector<PureType*>& parameterizations);
+		void applyParameterizations(PureTypeArray* types, const std::vector<PureType*>& parameters, const std::vector<PureType*>& parameterizations);
 
-		bool captureArgumentParameterizations(Type* actual, Type* argument, std::map<std::string, Type*>& parameters, TypeAnalyzer* analyzer);
-		bool captureArgumentParameterizations(TypeArray* actual, TypeArray* argument, std::map<std::string, Type*>& parameters, TypeAnalyzer* analyzer);
+		bool captureArgumentParameterizations(PureType* actual, PureType* argument, std::map<std::string, PureType*>& parameters, TypeAnalyzer* analyzer);
+		bool captureArgumentParameterizations(PureTypeArray* actual, PureTypeArray* argument, std::map<std::string, PureType*>& parameters, TypeAnalyzer* analyzer);
 
 };
 

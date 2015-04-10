@@ -27,8 +27,14 @@ typedef struct Node {
 		char* string;
 		double number;
 		struct Node** nodes;
-		struct Type* type;
-		struct TypeArray* typearray;
+		struct PureType* type;
+		struct PureType* pure_type;
+		struct PureTypeArray* pure_type_array;
+		struct ClassVarRef* class_var_ref;
+		struct VarRef* var_ref;
+		struct VarDecl* var_decl;
+		struct SpecializableVarDecl* specializable_var_decl;
+		struct SpecializablePureType* specializable_pure_type;
 	} node_data;
 } Node;
 

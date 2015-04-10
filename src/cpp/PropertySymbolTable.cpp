@@ -16,13 +16,16 @@
 #include "SemanticError.h"
 #include "DerivedPropertySymbolTable.h"
 #include "TypeParameterizer.h"
-
+#include "VarRef.h"
+#include "VarDecl.h"
+#include "SpecializableVarDecl.h"
+#include "SpecializablePureType.h"
 
 const map<string, bool>& PropertySymbolTable::getParentage() {
 	return parentage;
 }
 
-boost::optional<SemanticError*> PropertySymbolTable::addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, int flags, vector<Annotation*> annotations) {
+boost::optional<SemanticError*> PropertySymbolTable::addMethod(PureType* returntype, vector<pair<string, PureTypeArray*> >* segments_arguments, int flags, vector<Annotation*> annotations) {
 	string name = getSymbolNameOf(segments_arguments);
 
 	if(properties.count(name)) {
@@ -34,21 +37,21 @@ boost::optional<SemanticError*> PropertySymbolTable::addMethod(Type* returntype,
 		abstract = true;
 	}
 
-	Type* method = MakeType(TYPE_LAMBDA);
-	method->typedata.lambda.returntype = returntype == NULL ? NULL : new Type(*returntype);
+	PureType* method = new PureType(TYPE_LAMBDA);
+	method->typedata.lambda.returntype = returntype == NULL ? NULL : new PureType(*returntype);
 
-	TypeArray* conglomerate = MakeTypeArray();
-	for(vector<pair<string, TypeArray*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
+	PureTypeArray* conglomerate = new PureTypeArray();
+	for(vector<pair<string, PureTypeArray*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
 		int i;
 		for(i = 0; i < it->second->typecount; i++)
-			AddTypeToTypeArray(copyType(it->second->types[i]), conglomerate);
+			addPureTypeToPureTypeArray(new PureType(*it->second->types[i]), conglomerate);
 	}
 
 	method->typedata.lambda.arguments = conglomerate;
 
 	ObjectProperty* prop = new ObjectProperty;
 	prop->flags = flags;
-	prop->type = method;
+	prop->decl.typedata = *method;
 	prop->casing = getCasingNameOf(segments_arguments);
 	prop->address = name;
 	for(vector<Annotation*>::iterator annit = annotations.begin(); annit != annotations.end(); ++annit)
@@ -59,8 +62,9 @@ boost::optional<SemanticError*> PropertySymbolTable::addMethod(Type* returntype,
 	return boost::optional<SemanticError*>();
 }
 
-boost::optional<SemanticError*> PropertySymbolTable::addProperty(Type* property, int flags, vector<Annotation*> annotations) {
-	string name = analyzer->getNameForTypeAsProperty(property);
+boost::optional<SemanticError*> PropertySymbolTable::addProperty(VarDecl* property, int flags, vector<Annotation*> annotations) {
+	VarRef refOfDecl = property->createVarRef();
+	string name = refOfDecl.toString();
 
 	if(properties.count(name)) {
 		string temp = "duplicate property name is " + name;
@@ -70,7 +74,7 @@ boost::optional<SemanticError*> PropertySymbolTable::addProperty(Type* property,
 	ObjectProperty* prop = new ObjectProperty;
 	prop->casing = name;
 	prop->flags = flags;
-	prop->type = property;
+	prop->decl = *property;
 	prop->address = name;
 	for(vector<Annotation*>::iterator annit = annotations.begin(); annit != annotations.end(); ++annit)
 		prop->annotations.push_back(*annit);
@@ -79,21 +83,21 @@ boost::optional<SemanticError*> PropertySymbolTable::addProperty(Type* property,
 	return boost::optional<SemanticError*>();
 }
 
-boost::optional<SemanticError*> PropertySymbolTable::addProvision(Type* provided, vector<Type*> &arguments, int flags, vector<Annotation*> annotations) {
-	string name = getProvisionSymbol(provided, arguments);
+boost::optional<SemanticError*> PropertySymbolTable::addProvision(SpecializablePureType* provided, vector<PureType*> &arguments, int flags, vector<Annotation*> annotations) {
+	string name = provided->toProvisionSymbol(arguments);
 
 	if(properties.count(name)) {
 		string temp = "duplicate provision is " + name;
 		return boost::optional<SemanticError*>(new SemanticError(DUPLICATE_PROPERTY_DEFINITION, temp));
 	}
 
-	Type* method = MakeType(TYPE_LAMBDA);
-	method->typedata.lambda.returntype = copyType(provided);
+	PureType* method = new PureType(TYPE_LAMBDA);
+	method->typedata.lambda.returntype = new PureType(provided->typedata);
 
-	method->typedata.lambda.arguments = MakeTypeArray(); //TODO injections with curried ctors or arguments!
+	method->typedata.lambda.arguments = new PureTypeArray(); //TODO injections with curried ctors or arguments!
 
 	ObjectProperty* prop = new ObjectProperty;
-	prop->type = method;
+	prop->decl.typedata = *method;
 	prop->casing = name;
 	prop->address = name;
 	prop->flags = flags;
@@ -104,12 +108,12 @@ boost::optional<SemanticError*> PropertySymbolTable::addProvision(Type* provided
 	return boost::optional<SemanticError*>();
 }
 
-boost::optional<Type*> PropertySymbolTable::find(string name) {
+boost::optional<PureType*> PropertySymbolTable::find(string name) {
 	if(!properties.count(name))
 		//throw new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Cannot find method with signature " + name);
-		return boost::optional<Type*>();
+		return boost::optional<PureType*>();
 
-	return boost::optional<Type*>(properties.find(name)->second->type);
+	return boost::optional<PureType*>(&properties.find(name)->second->decl.typedata);
 }
 
 boost::optional<ObjectProperty*> PropertySymbolTable::findByCasing(string casing) {
@@ -138,13 +142,9 @@ int PropertySymbolTable::getFlags(string name) {
 	return properties.find(name)->second->flags;
 }
 
-string PropertySymbolTable::getProvisionSymbol(Type* provided, vector<Type*> &arguments) {
-	return analyzer->getProvisionSymbol(provided, arguments);
-}
-
-string PropertySymbolTable::getCasingNameOf(vector<pair<string, TypeArray*> >* segments_arguments) {
+string PropertySymbolTable::getCasingNameOf(vector<pair<string, PureTypeArray*> >* segments_arguments) {
 	string name;
-	for(vector<pair<string, TypeArray*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
+	for(vector<pair<string, PureTypeArray*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
 		name += it->first;
 		name += "(";
 		int i;
@@ -158,15 +158,15 @@ string PropertySymbolTable::getCasingNameOf(vector<pair<string, TypeArray*> >* s
 	return name;
 }
 
-string PropertySymbolTable::getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments) {
+string PropertySymbolTable::getSymbolNameOf(vector<pair<string, PureTypeArray*> >* segments_arguments) {
 	string name;
-	for(vector<pair<string, TypeArray*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
+	for(vector<pair<string, PureTypeArray*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
 		name += it->first;
 		name += "(";
 		int i;
 		for(i = 0; i < it->second->typecount; i++) {
 			if(i) name += ",";
-			name += analyzer->getNameForType(it->second->types[i]);
+			name += it->second->types[i]->toString();
 		}
 		name += ")";
 	}
@@ -176,17 +176,17 @@ string PropertySymbolTable::getSymbolNameOf(vector<pair<string, TypeArray*> >* s
 
 void PropertySymbolTable::printEntryPoints(EntryPointAnalyzer* entryanalyzer) {
 	for(map<string, ObjectProperty*>::iterator it = properties.begin(); it != properties.end(); ++it) {
-		if(entryanalyzer->checkMethodCanBeMain(it->first, it->second->type))
+		if(entryanalyzer->checkMethodCanBeMain(it->first, &it->second->decl.typedata))
 			entryanalyzer->printMethod(it->first);
 	}
 }
 
-void PropertySymbolTable::addNeed(Type* needed, int flags, vector<Annotation*> annotations) {
+void PropertySymbolTable::addNeed(SpecializableVarDecl* needed, int flags, vector<Annotation*> annotations) {
 	needs->push_back(needed);
-	addProperty(needed, flags | PROPERTY_NEED, annotations);
+	addProperty(&needed->decl, flags | PROPERTY_NEED, annotations);
 }
 
-vector<Type*>* PropertySymbolTable::getNeeds() {
+vector<SpecializableVarDecl*>* PropertySymbolTable::getNeeds() {
 	return needs;
 }
 
@@ -209,7 +209,7 @@ void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable*
 		map<string, ObjectProperty*>::iterator searcher = child->properties.find(it->first);
 		if(searcher == child->properties.end()) {
 			ObjectProperty* propagate = new ObjectProperty;
-			propagate->type = copyType(it->second->type);
+			propagate->decl = it->second->decl;
 			propagate->flags = it->second->flags;
 			propagate->casing = it->second->casing;
 			propagate->address = it->second->address;
@@ -222,18 +222,24 @@ void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable*
 			child->properties[it->first] = propagate;
 
 			if(extend && propagate->flags & PROPERTY_NEED) {
-				child->analyzer->assertNeedIsNotCircular(child->classname, propagate->type);
-				child->getNeeds()->push_back(propagate->type);
+				if(propagate->decl.typedata.type == TYPE_CLASS) {
+					string fqname = (child->getModule().size() ? child->getModule() + "." : "") + child->classname;
+					child->analyzer->assertFQNeedIsNotCircular(fqname, propagate->decl.typedata.getFQClassname());
+				}
+
+				SpecializableVarDecl* spdecl = new SpecializableVarDecl();
+				spdecl->decl = propagate->decl;
+				child->getNeeds()->push_back(spdecl);
 			}
 
 		} else {
 			searcher->second->address = it->second->address;
-			if(searcher->second->type->type == TYPE_LAMBDA)
-			if(it->second->type->typedata.lambda.returntype != NULL)
-			if(searcher->second->type->typedata.lambda.returntype == NULL
+			if(searcher->second->decl.typedata.type == TYPE_LAMBDA)
+			if(it->second->decl.typedata.typedata.lambda.returntype != NULL)
+			if(searcher->second->decl.typedata.typedata.lambda.returntype == NULL
 				|| !child->analyzer->isASubtypeOfB(
-					searcher->second->type->typedata.lambda.returntype,	// this is contravariance
-					it->second->type->typedata.lambda.returntype 		// Check parent return is a subtype of child return
+					searcher->second->decl.typedata.typedata.lambda.returntype,	// this is contravariance
+					it->second->decl.typedata.typedata.lambda.returntype 		// Check parent return is a subtype of child return
 				)
 			) {
 				errors.addError(new SemanticError(INVALID_CHILD_RETURN_TYPE, "method " + searcher->second->address + " on class " + child->classname, NULL, ""));
@@ -246,30 +252,30 @@ bool PropertySymbolTable::isPublic(string name) {
 	return properties.find(name)->second->flags & PROPERTY_PUBLIC;
 }
 
-void PropertySymbolTable::setParameters(vector<Type*>* parameters) {
+void PropertySymbolTable::setParameters(vector<PureType*>* parameters) {
 	delete declaredtypeparameters;
 	declaredtypeparameters = parameters;
 }
 
-const vector<Type*>& PropertySymbolTable::getParameters() {
+const vector<PureType*>& PropertySymbolTable::getParameters() {
 	return *declaredtypeparameters;
 }
 
-ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<Type*>& parameters) {
+ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<PureType*>& parameters) {
 	TypeParameterizer parameterizer;
 	map<string, ObjectProperty*>* newprops = new map<string, ObjectProperty*>();
 	for(map<string, ObjectProperty*>::iterator it = properties.begin(); it != properties.end(); ++it) {
 		string newname, oldcasing = it->second->casing;
 		ObjectProperty* newprop = new ObjectProperty();
-		newprop->type = copyType(it->second->type);
+		newprop->decl = it->second->decl;
 		newprop->flags = it->second->flags;
 		newprop->address = it->second->address;
-		parameterizer.applyParameterizations(&newprop->type, getParameters(), parameters);
-		if(newprop->type->type == TYPE_LAMBDA) {
+		//parameterizer.applyParameterizations(&newprop->type, getParameters(), parameters);
+		if(newprop->decl.typedata.type == TYPE_LAMBDA) {
 			int i = 0, c = 0;
 			while(c < oldcasing.length()) {
 				if(oldcasing.at(c) == '#') {
-					newname += analyzer->getNameForType(newprop->type->typedata.lambda.arguments->types[i]);
+					newname += newprop->decl.typedata.typedata.lambda.arguments->types[i]->toString();
 					i++;
 				} else {
 					newname += oldcasing.at(c);
@@ -277,29 +283,30 @@ ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<Type*
 				c++;
 			}
 		} else {
-			newname = analyzer->getNameForTypeAsProperty(newprop->type);
+			VarRef ref(newprop->decl.createVarRef());
+			newname = ref.toString();
 		}
 		newprop->casing = oldcasing;
 		(*newprops)[newname] = newprop;
 	}
 
-	vector<Type*>* newneeds = new vector<Type*>();
-	for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
-		Type* newneed = copyType(*it);
-		parameterizer.applyParameterizations(&newneed, getParameters(), parameters);
+	vector<SpecializableVarDecl*>* newneeds = new vector<SpecializableVarDecl*>();
+	for(vector<SpecializableVarDecl*>::iterator it = needs->begin(); it != needs->end(); ++it) {
+		SpecializableVarDecl* newneed = new SpecializableVarDecl(**it);
+		//parameterizer.applyParameterizations(&newneed->decl.typedata, getParameters(), parameters);
 		newneeds->push_back(newneed);
 	}
 
 	return new DerivedPropertySymbolTable(*analyzer, newneeds, newprops, parentage);
 }
 
-Type* PropertySymbolTable::getAsType() {
-	Type* ret = MakeType(TYPE_CLASS);
+PureType* PropertySymbolTable::getAsPureType() {
+	PureType* ret = new PureType(TYPE_CLASS);
 	ret->typedata._class.classname = strdup(classname.c_str());
 	if(getParameters().size()) {
-		ret->typedata._class.parameters = MakeTypeArray();
-		for(vector<Type*>::const_iterator it = getParameters().begin(); it != getParameters().end(); ++it) {
-			AddTypeToTypeArray(*it, ret->typedata._class.parameters);
+		ret->typedata._class.parameters = new PureTypeArray();
+		for(vector<PureType*>::const_iterator it = getParameters().begin(); it != getParameters().end(); ++it) {
+			addPureTypeToPureTypeArray(*it, ret->typedata._class.parameters);
 		}
 	}
 

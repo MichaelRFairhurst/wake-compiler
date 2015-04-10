@@ -25,7 +25,6 @@
 #include "TypeChecker.h"
 #include "MethodSignatureParseTreeTraverser.h"
 
-	#include "type.h"
 extern "C" {
 	#include "node.h"
 	#include "tree.h"
@@ -44,8 +43,8 @@ class ClassParseTreeTraverser {
 		void typeCheckProperties(Node* tree);
 		void typeCheckMethods(Node* tree);
 		Node* getMethodBody(Node* methoddef);
-		Type* getMethodReturn(Node* methoddef);
-		vector<pair<string, TypeArray*> >* getMethodName(Node* methoddef);
+		PureType* getMethodReturn(Node* methoddef);
+		vector<pair<string, PureTypeArray*> >* getMethodName(Node* methoddef);
 
 		string classname;
 

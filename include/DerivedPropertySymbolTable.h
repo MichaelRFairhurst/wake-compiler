@@ -21,7 +21,6 @@
 #include <boost/optional/optional.hpp>
 
 extern "C" {
-	#include "type.h"
 	#include "tree.h"
 }
 
@@ -33,25 +32,25 @@ using namespace std;
 
 class DerivedPropertySymbolTable : public ReadOnlyPropertySymbolTable {
 	public:
-		DerivedPropertySymbolTable(TypeAnalyzer& analyzer, vector<Type*>* needs, map<string, ObjectProperty*>* properties, const map<string, bool>& parentage) : analyzer(analyzer), parentage(parentage) {
+		DerivedPropertySymbolTable(TypeAnalyzer& analyzer, vector<SpecializableVarDecl*>* needs, map<string, ObjectProperty*>* properties, const map<string, bool>& parentage) : analyzer(analyzer), parentage(parentage) {
 			this->needs = needs;
 			this->properties = properties;
 		};
-		boost::optional<Type*> find(string name);
+		boost::optional<PureType*> find(string name);
 		boost::optional<ObjectProperty*> findByCasing(string casing);
 		bool isPublic(string name);
 		string getAddress(string name);
 		int getFlags(string name);
-		string getProvisionSymbol(Type* provided, vector<Type*> &arguments);
-		vector<Type*>* getNeeds();
-		string getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments);
+		string getProvisionSymbol(SpecializablePureType* provided, vector<PureType*> &arguments);
+		vector<SpecializableVarDecl*>* getNeeds();
+		string getSymbolNameOf(vector<pair<string, PureTypeArray*> >* segments_arguments);
 		bool isAbstract();
 		const map<string, bool>& getParentage();
 		~DerivedPropertySymbolTable();
 
 	private:
 		TypeAnalyzer& analyzer;
-		vector<Type*>* needs;
+		vector<SpecializableVarDecl*>* needs;
 		map<string, ObjectProperty*>* properties;
 		const map<string, bool>& parentage;
 

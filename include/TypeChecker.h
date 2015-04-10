@@ -19,7 +19,6 @@
 #include <vector>
 
 extern "C" {
-	#include "type.h"
 	#include "tree.h"
 }
 
@@ -34,10 +33,10 @@ class TypeChecker {
 
 	public:
 		TypeChecker(ErrorTracker* errors, ClassSpaceSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, MethodSignatureParseTreeTraverser* methodanalyzer);
-		void setReturnType(Type* returntype);
-		void setThisContext(Type* thiscontext);
+		void setReturnType(PureType* returntype);
+		void setThisContext(PureType* thiscontext);
 		void check(Node* n);
-		void setParameterizedTypes(const vector<Type*>& types);
+		void setParameterizedTypes(const vector<PureType*>& types);
 
 	private:
 		void flowAnalysis(Node* n, bool breakable, bool caseable, bool continuable);
@@ -46,9 +45,9 @@ class TypeChecker {
 		ErrorTracker* errors;
 		ClassSpaceSymbolTable* classestable;
 		ScopeSymbolTable* scopesymtable;
-		Type* returntype;
-		Type* thiscontext;
-		vector<Type*> parameterizedtypes;
+		PureType* returntype;
+		PureType* thiscontext;
+		vector<PureType*> parameterizedtypes;
 
 };
 

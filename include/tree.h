@@ -18,7 +18,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include "node.h"
-#include "type.h"
 #include "wake.tab.h"
 
 #define NT_PROGRAM 0
@@ -159,25 +158,25 @@
 #define NT_MODNATIVE 118
 #define NT_MODALT 119
 
-void AddSubNode(Node* parent, Node* child);
+void addSubNode(Node* parent, Node* child);
 
-void PrependSubNode(Node* parent, Node* child);
+void prependSubNode(Node* parent, Node* child);
 
-Node* MakeEmptyNode(int nodetype, YYLTYPE loc);
+Node* makeEmptyNode(int nodetype, YYLTYPE loc);
 
-Node* MakeNodeFromType(Type* thetype, YYLTYPE loc);
+Node* makeNodeFromPureType(PureType* thetype, YYLTYPE loc);
 
-Node* MakeNodeFromTypeArray(TypeArray* thearray, YYLTYPE loc);
+Node* makeNodeFromPureTypeArray(PureTypeArray* thearray, YYLTYPE loc);
 
-Node* MakeNodeFromString(int nodetype, char* mystring, YYLTYPE loc);
+Node* makeNodeFromString(int nodetype, char* mystring, YYLTYPE loc);
 
-Node* MakeNodeFromNumber(int nodetype, double number, YYLTYPE loc);
+Node* makeNodeFromNumber(int nodetype, double number, YYLTYPE loc);
 
-Node* MakeTwoBranchNode(int nodetype, Node* a, Node* b, YYLTYPE loc);
+Node* makeTwoBranchNode(int nodetype, Node* a, Node* b, YYLTYPE loc);
 
-Node* MakeOneBranchNode(int nodetype, Node* a, YYLTYPE loc);
+Node* makeOneBranchNode(int nodetype, Node* a, YYLTYPE loc);
 
-char* getTypeLabel(Type* thetype);
+//char* getTypeLabel(Type* thetype);
 
 void printtree (Node *n, int level);
 

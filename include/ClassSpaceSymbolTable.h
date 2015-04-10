@@ -26,6 +26,7 @@
 #include "EntryPointAnalyzer.h"
 #include "AddressAllocator.h"
 #include "ErrorTracker.h"
+#include "PureTypeArray.h"
 
 using namespace std;
 
@@ -43,15 +44,19 @@ class ClassSpaceSymbolTable {
 
 		void propagateInheritance(ErrorTracker& errors);
 		void propagateInheritanceToParent(string childname, ErrorTracker& errors);
-		ReadOnlyPropertySymbolTable* find(Type* type);
-		ReadOnlyPropertySymbolTable* find(string name);
-		void assertTypeIsValid(Type* type);
+		//ReadOnlyPropertySymbolTable* find(Type* type);
+		PropertySymbolTable* findFullyQualifiedModifiable(string fqclassname);
+		ReadOnlyPropertySymbolTable* findFullyQualified(string fqclassname);
+		ReadOnlyPropertySymbolTable* findFullyQualified(string fqclassname, vector<PureType*> args);
+		PropertySymbolTable* findByImportedNameModifiable(string fqclassname);
+		ReadOnlyPropertySymbolTable* findByImportedName(string fqclassname);
+		ReadOnlyPropertySymbolTable* findByImportedName(string fqclassname, vector<PureType*> args);
+		void assertTypeIsValid(PureType* type);
 		void assertNoNeedsAreCircular();
 		TypeAnalyzer* getAnalyzer();
 		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);
 
-		PropertySymbolTable* findModifiable(string name);
-		PropertySymbolTable* findModifiable(Type* type);
+		//PropertySymbolTable* findModifiable(Type* type);
 		void setModule(string module);
 		string getModule();
 		string getFullyQualifiedClassname(string classname);
@@ -61,6 +66,7 @@ class ClassSpaceSymbolTable {
 		// TRUE means defined, FALSE means imported
 		string module;
 		map<string, pair<PropertySymbolTable*, bool> > classes;
+		map<string, string> fullQualifications;
 		PropertySymbolTable* addingclass_symbol;
 		std::string addingclass_name;
 		bool addingclass_hassubclass;

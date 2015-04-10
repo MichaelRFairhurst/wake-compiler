@@ -20,11 +20,9 @@
 #include <map>
 #include <boost/optional/optional.hpp>
 
-extern "C" {
-	#include "type.h"
-}
-
 #include "AddressAllocator.h"
+#include "PureType.h"
+#include "VarDecl.h"
 
 using namespace std;
 
@@ -35,21 +33,20 @@ class ScopeSymbolTable {
 			scopes.push_back(vector<string>());
 		}
 
-		void add(string name, Type* type);
-		void add(Type* type);
-		void addOverwriting(string name, Type* type);
-		void addOverwriting(Type* type);
-		string getNameForType(Type* type);
-		boost::optional<Type*> find(string name);
-		boost::optional<Type*> find(Type* type);
-		string getAddress(Type* type);
+		void add(string name, PureType* type);
+		void add(VarDecl* type);
+		void addOverwriting(string name, PureType* type);
+		void addOverwriting(VarDecl* type);
+		boost::optional<PureType*> find(string name);
+		boost::optional<PureType*> find(VarRef* type);
+		string getAddress(VarRef* type);
 		string getAddress(string name);
 		void pushScope();
 		void popScope();
 
 	private:
 		AddressAllocator allocator;
-		map<string, pair<Type*, string> > table;
+		map<string, pair<PureType*, string> > table;
 		vector<vector<string> > scopes;
 };
 

@@ -70,10 +70,10 @@ void ParseTreeTraverser::traverse(Node* tree) {
 					errors.addError(*error);
 				}
 
-				PropertySymbolTable* proptable = objectsymtable->findModifiable(tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
+				PropertySymbolTable* proptable = objectsymtable->findByImportedNameModifiable(tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
 
-				Type* classtype = tree->node_data.nodes[0]->node_data.type;
-				vector<Type*>* parameters = new vector<Type*>();
+				PureType* classtype = tree->node_data.nodes[0]->node_data.type;
+				vector<PureType*>* parameters = new vector<PureType*>();
 
 				vector<string> usedGenericNames;
 				if(classtype->typedata._class.parameters != NULL)
@@ -127,11 +127,11 @@ void ParseTreeTraverser::secondPass(Node* tree) {
 					tree = tree->node_data.nodes[0];
 				}
 
-				Type* classtype = tree->node_data.nodes[0]->node_data.type;
+				PureType* classtype = tree->node_data.nodes[0]->node_data.type;
 				string classname = classtype->typedata._class.classname;
 				errors.pushContext("In declaration of '" + string(tree->node_type == NT_CLASS ? "every" : "extern") + " " + classname + "'");
 
-				PropertySymbolTable* proptable = objectsymtable->findModifiable(classname);
+				PropertySymbolTable* proptable = objectsymtable->findByImportedNameModifiable(classname);
 				proptable->setAnnotations(annotations);
 
 				ClassParseTreeTraverser classtraverser(&errors, objectsymtable, &scopesymtable, classname, &typechecker, &methodanalyzer, proptable, tree->node_type == NT_CLASS_EXTERN);
@@ -146,7 +146,7 @@ void ParseTreeTraverser::secondPass(Node* tree) {
 		case NT_INTERFACE:
 		case NT_SUBCLASS:
 			try {
-				objectsymtable->find(tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
+				objectsymtable->findByImportedName(tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
 			} catch(SymbolNotFoundException* e) {
 				errors.addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
 				delete e;
@@ -175,11 +175,11 @@ void ParseTreeTraverser::thirdPass(Node* tree) {
 		case NT_CLASS:
 		case NT_CLASS_EXTERN:
 			{
-				Type* classtype = tree->node_data.nodes[0]->node_data.type;
+				PureType* classtype = tree->node_data.nodes[0]->node_data.type;
 				string classname = classtype->typedata._class.classname;
 				errors.pushContext("In declaration of '" + string(tree->node_type == NT_CLASS ? "every" : "extern") + " " + classname + "'");
 
-				ClassParseTreeTraverser classtraverser(&errors, objectsymtable, &scopesymtable, classname, &typechecker, &methodanalyzer, objectsymtable->findModifiable(classname), tree->node_type == NT_CLASS_EXTERN);
+				ClassParseTreeTraverser classtraverser(&errors, objectsymtable, &scopesymtable, classname, &typechecker, &methodanalyzer, objectsymtable->findByImportedNameModifiable(classname), tree->node_type == NT_CLASS_EXTERN);
 
 				thirdPass(tree->node_data.nodes[1]);
 				if(tree->subnodes > 2) classtraverser.secondPass(tree->node_data.nodes[2]);

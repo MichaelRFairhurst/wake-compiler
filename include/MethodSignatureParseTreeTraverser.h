@@ -20,7 +20,6 @@
 #include <vector>
 
 extern "C" {
-	#include "type.h"
 	#include "tree.h"
 }
 
@@ -34,15 +33,15 @@ class MethodSignatureParseTreeTraverser {
 		MethodSignatureParseTreeTraverser(ClassSpaceSymbolTable* objectsymtable);
 		~MethodSignatureParseTreeTraverser();
 
-		vector<pair<string, TypeArray*> >* getName(Node* methoddef);
+		vector<pair<string, PureTypeArray*> >* getName(Node* methoddef);
 		Node* getBody(Node* methoddef);
-		Type* getReturn(Node* methoddef);
-		void convertParameterizedTypes(Node* methoddef, const vector<Type*>& parameterizedtypes);
+		PureType* getReturn(Node* methoddef);
+		void convertParameterizedTypes(Node* methoddef, const vector<PureType*>& parameterizedtypes);
 		int getFlags(Node* methoddef);
 
 	private:
 		ClassSpaceSymbolTable* classestable;
-		TypeArray* emptytypearray;
+		PureTypeArray* emptytypearray;
 
 };
 

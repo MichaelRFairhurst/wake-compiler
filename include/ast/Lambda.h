@@ -29,16 +29,16 @@ namespace wake {
 
 		class Lambda : public ExpectedTypeExpression {
 			public:
-				Lambda(std::vector<std::pair<boost::optional<std::string>, boost::optional<Type> > > arguments, StatementNode* body, UnifyingType* returntype, ScopeSymbolTable* scopesymtable, ErrorTracker* errors, Node* node, TypeAnalyzer* analyzer)
+				Lambda(std::vector<std::pair<boost::optional<std::string>, boost::optional<PureType> > > arguments, StatementNode* body, UnifyingType* returntype, ScopeSymbolTable* scopesymtable, ErrorTracker* errors, Node* node, TypeAnalyzer* analyzer)
 				: analyzer(analyzer), arguments(arguments), body(body), scopesymtable(scopesymtable), errors(errors), returntype(returntype), node(node) {};
 
-				Type* typeCheck(bool forceArrayIdentifier);
-				Type* typeCheckExpecting(Type* hint);
-				Type* typeCheckCommon(Type* hint);
+				PureType* typeCheck(bool forceArrayIdentifier);
+				PureType* typeCheckExpecting(PureType* hint);
+				PureType* typeCheckCommon(PureType* hint);
 
 			private:
 				std::auto_ptr<UnifyingType> returntype;
-				std::vector<std::pair<boost::optional<std::string>, boost::optional<Type> > > arguments;
+				std::vector<std::pair<boost::optional<std::string>, boost::optional<PureType> > > arguments;
 				std::auto_ptr<StatementNode> body;
 				ScopeSymbolTable* scopesymtable;
 				ErrorTracker* errors;

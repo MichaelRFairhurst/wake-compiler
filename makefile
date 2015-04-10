@@ -22,6 +22,13 @@ CPP=g++ $(FLAGS)
 TEST=false
 
 CPPNAMES= \
+	VarRef.cpp \
+	ClassVarRef.cpp \
+	VarDecl.cpp \
+	SpecializableVarDecl.cpp \
+	SpecializablePureType.cpp \
+	PureType.cpp \
+	PureTypeArray.cpp \
 	ClassSpaceSymbolTable.cpp \
 	ParseTreeTraverser.cpp \
 	SemanticError.cpp \
@@ -49,7 +56,6 @@ CPPNAMES= \
 	TypeParameterizer.cpp \
 	DerivedPropertySymbolTable.cpp \
 	TempPropertySymbolTable.cpp \
-	type.cpp \
 	AnnotationTreeTraverser.cpp \
 	UnifyingType.cpp \
 	AstCreator.cpp \
@@ -91,6 +97,9 @@ COBJS=$(addprefix bin/c/, $(CNAMES:.c=.o))
 GENNAMES=lex.wake.c wake.tab.c objectfile.tab.c lex.objectfile.c
 GENOBJS=$(addprefix bin/gen/, $(GENNAMES:.c=.o))
 
+ifeq ( false , $(TEST) )
+TESTNAMES=
+else
 TESTNAMES=CompilerTests.cpp \
 	ClassSpaceSymbolTableTest.cpp \
 	Integration.cpp \
@@ -103,6 +112,7 @@ TESTNAMES=CompilerTests.cpp \
 	TableFileWriterTest.cpp \
 	TableFileReaderTest.cpp \
 	DerivedPropertySymbolTableTest.cpp
+endif
 
 TESTOBJS=$(addprefix bin/tests/, $(TESTNAMES:.cpp=.o))
 
@@ -185,7 +195,7 @@ bin/gen/%.o: gen/%.c gen/wake.tab.c
 	$(CC) $(OPT) -c $< -o $@
 
 bin/tests/%.o: src/cpp/test/%.cpp
-	$(CPP) -g -c $< -o $@
+	#$(CPP) -g -c $< -o $@
 
 bin/cpp/%.o: src/cpp/%.cpp gen/wake.tab.c gen/objectfile.tab.c
 	$(CPP) $(OPT) -c $< -o $@

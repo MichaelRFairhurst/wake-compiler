@@ -76,14 +76,14 @@ void TypeChecker::flowAnalysis(Node* tree, bool breakable, bool caseable, bool c
 	}
 }
 
-void TypeChecker::setReturnType(Type* returntype) {
+void TypeChecker::setReturnType(PureType* returntype) {
 	this->returntype = returntype;
 }
 
-void TypeChecker::setThisContext(Type* context) {
+void TypeChecker::setThisContext(PureType* context) {
 	thiscontext = context;
 }
 
-void TypeChecker::setParameterizedTypes(const vector<Type*>& types) {
+void TypeChecker::setParameterizedTypes(const vector<PureType*>& types) {
 	parameterizedtypes = types;
 }
