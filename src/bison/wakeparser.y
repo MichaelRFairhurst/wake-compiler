@@ -244,11 +244,11 @@ injection_subinjections:
 	;
 
 injection_subinjection:
-	specializable_pure_type																		{ $$ = MakeNodeFromType($1, @$); }
+	specializable_pure_type														{ $$ = MakeNodeFromSpecalizablePureType($1, @$); }
 	| STRING																	{ $$ = MakeNodeFromString(NT_STRINGLIT, $1, @$); }
 	| NUMBER																	{ $$ = MakeNodeFromNumber(NT_NUMBERLIT, $1, @$); }
 	| BOOL																		{ $$ = MakeNodeFromNumber(NT_BOOLLIT, $1, @$); }
-	| '?' pure_type																	{ $$ = MakeOneBranchNode(NT_INJECTION_ARG, MakeNodeFromType($2, @$), @$); }
+	| '?' pure_type																{ $$ = MakeOneBranchNode(NT_INJECTION_ARG, MakeNodeFromType($2, @$), @$); }
 	;
 
 ctor:

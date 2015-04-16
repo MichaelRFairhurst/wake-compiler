@@ -231,10 +231,34 @@ string ClassSpaceSymbolTable::getModule() {
 }
 
 string ClassSpaceSymbolTable::getFullyQualifiedClassname(string classname) {
-	PropertySymbolTable* table = findFullyQualifiedModifiable(classname);
-	if(table->getModule().size()) {
-		return table->getModule() + "." + classname;
-	}
+	return fullQualifications[classname];
+}
 
-	return classname;
+void ClassSpaceSymbolTable::setModulesOnType(PureType* type) {
+	if(type->type == TYPE_CLASS) {
+		if(type->typedata._class.modulename != NULL) {
+			type->typedata._class.modulename = strdup(getFullyQualifiedClassname(type->typedata._class.classname).c_str());
+		}
+
+		if(type->typedata._class.parameters != NULL) {
+			for (int i = 0; i < type->typedata._class.parameters->typecount; i++) {
+				setModulesOnType(type->typedata._class.parameters->types[i]);
+			}
+		}
+	} else if(type->type == TYPE_OPTIONAL) {
+		setModulesOnType(type->typedata.optional.contained);
+	} else if(type->type == TYPE_LIST) {
+		setModulesOnType(type->typedata.list.contained);
+	} else if(type->type == TYPE_PARAMETERIZED || type->type == TYPE_PARAMETERIZED_ARG) {
+		setModulesOnType(type->typedata.parameterized.upperbound);
+		setModulesOnType(type->typedata.parameterized.lowerbound);
+	} else if(type->type == TYPE_LAMBDA) {
+		setModulesOnType(type->typedata.lambda.returntype);
+
+		if(type->typedata.lambda.arguments != NULL) {
+			for (int i = 0; i < type->typedata.lambda.arguments->typecount; i++) {
+				setModulesOnType(type->typedata.lambda.arguments->types[i]);
+			}
+		}
+	}
 }

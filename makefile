@@ -195,7 +195,7 @@ bin/gen/%.o: gen/%.c gen/wake.tab.c
 	$(CC) $(OPT) -c $< -o $@
 
 bin/tests/%.o: src/cpp/test/%.cpp
-	#$(CPP) -g -c $< -o $@
+	$(CPP) -g -c $< -o $@
 
 bin/cpp/%.o: src/cpp/%.cpp gen/wake.tab.c gen/objectfile.tab.c
 	$(CPP) $(OPT) -c $< -o $@

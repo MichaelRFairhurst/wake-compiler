@@ -27,7 +27,8 @@ typedef struct Node {
 		char* string;
 		double number;
 		struct Node** nodes;
-		struct PureType* type;
+		struct PureType* type; // will fix these later
+		struct PureTypeArray* typearray; // will fix these later
 		struct PureType* pure_type;
 		struct PureTypeArray* pure_type_array;
 		struct ClassVarRef* class_var_ref;

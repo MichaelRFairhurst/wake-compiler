@@ -73,7 +73,7 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 					tree = tree->node_data.nodes[0];
 				}
 				int flags = 0;
-				std::vector<Type*> arguments;
+				std::vector<PureType*> arguments;
 				if(tree->subnodes > 1) {
 					if(tree->node_data.nodes[1]->node_type == NT_PROVISION_BEHAVIOR) {
 						flags |= PROPERTY_BLOCKPROVISION;
@@ -85,7 +85,7 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 						Node* subinjections = tree->node_data.nodes[1]->node_data.nodes[1];
 						for(int i = 0; i < subinjections->subnodes; i++) {
 							if(subinjections->node_data.nodes[i]->node_type == NT_INJECTION_ARG) {
-								arguments.push_back(subinjections->node_data.nodes[i]->node_data.nodes[0]->node_data.type);
+								arguments.push_back(subinjections->node_data.nodes[i]->node_data.nodes[0]->node_data.pure_type);
 							}
 						}
 					}
@@ -95,13 +95,13 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 					flags |= PROPERTY_BLOCKPROVISION;
 				}
 
-				boost::optional<SemanticError*> error = propertysymtable->addProvision(tree->node_data.nodes[0]->node_data.type, arguments, flags, annotations);
-				AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(classestable->getAnalyzer()->getProvisionSymbol(tree->node_data.nodes[0]->node_data.type, arguments).c_str()), tree->loc));
+				boost::optional<SemanticError*> error = propertysymtable->addProvision(tree->node_data.nodes[0]->node_data.specializable_pure_type, arguments, flags, annotations);
+				addSubNode(tree, makeNodeFromString(NT_COMPILER_HINT, strdup(tree->node_data.nodes[0]->node_data.specializable_pure_type->toProvisionSymbol(arguments).c_str()), tree->loc));
 				if(error) {
 					(*error)->token = tree;
 					errors->addError(*error);
 				}
-				classestable->assertTypeIsValid(tree->node_data.nodes[0]->node_data.type);
+				classestable->assertTypeIsValid(&tree->node_data.nodes[0]->node_data.specializable_pure_type->typedata);
 			} catch(SemanticError* e) {
 				e->token = tree;
 				errors->addError(e);
@@ -117,18 +117,18 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 					annotations = traverser.getAnnotations(tree->node_data.nodes[1]);
 					tree = tree->node_data.nodes[0];
 				}
-				vector<Type*> parameterizedtypes = propertysymtable->getParameters();
+				vector<PureType*> parameterizedtypes = propertysymtable->getParameters();
 
 				Node* lastnode = tree->node_data.nodes[tree->subnodes - 1];
 				vector<string> usedGenericNames;
-				for(std::vector<Type*>::iterator it = parameterizedtypes.begin(); it != parameterizedtypes.end(); ++it) {
+				for(std::vector<PureType*>::iterator it = parameterizedtypes.begin(); it != parameterizedtypes.end(); ++it) {
 					usedGenericNames.push_back((*it)->typedata.parameterized.label);
 				}
 
 				if(lastnode->node_type == NT_TYPE_ARRAY)
 				for(int i = 0; i < lastnode->node_data.typearray->typecount; i++)
 				if(std::find(usedGenericNames.begin(), usedGenericNames.end(), lastnode->node_data.typearray->types[i]->typedata.parameterized.label) == usedGenericNames.end()) {
-					lastnode->node_data.typearray->types[i]->type = TYPE_PARAMETERIZED_ARG;
+					lastnode->node_data.pure_type_array->types[i]->type = TYPE_PARAMETERIZED_ARG;
 					parameterizedtypes.push_back(lastnode->node_data.typearray->types[i]);
 					usedGenericNames.push_back(lastnode->node_data.typearray->types[i]->typedata.parameterized.label);
 				} else {
@@ -136,7 +136,7 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 				}
 
 				methodanalyzer->convertParameterizedTypes(tree, parameterizedtypes);
-				vector<pair<string, TypeArray*> >* methodname = methodanalyzer->getName(tree);
+				vector<pair<string, PureTypeArray*> >* methodname = methodanalyzer->getName(tree);
 
 				int methodFlags = methodanalyzer->getFlags(tree);
 				if(is_extern) {
@@ -165,10 +165,13 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 					tree = tree->node_data.nodes[0];
 				}
 				TypeParameterizer parameterizer;
-				parameterizer.rewriteClasstypesToParameterizedtypeByLabel(&tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type, propertysymtable->getParameters());
-				Type prop = *tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type;
-				classestable->assertTypeIsValid(&prop);
-				boost::optional<SemanticError*> error = propertysymtable->addProperty(new Type(prop), tree->subnodes == 2 ? PROPERTY_PUBLIC : 0, annotations);
+				throw "fixme";
+				//parameterizer.rewriteClasstypesToParameterizedtypeByLabel(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.var_decl->typedata, propertysymtable->getParameters());
+				VarDecl decl;
+				throw "fixme";
+				//Type prop = *tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type;
+				classestable->assertTypeIsValid(&decl.typedata);
+				boost::optional<SemanticError*> error = propertysymtable->addProperty(&decl, tree->subnodes == 2 ? PROPERTY_PUBLIC : 0, annotations);
 				if(error) {
 					(*error)->token = tree;
 					errors->addError(*error);
@@ -187,9 +190,9 @@ void ClassParseTreeTraverser::secondPass(Node* tree) {
 		case NT_CLASSBODY:
 			{
 				scopesymtable->pushScope();
-				for(vector<Type*>::iterator it = propertysymtable->getNeeds()->begin(); it != propertysymtable->getNeeds()->end(); ++it) {
+				for(vector<SpecializableVarDecl*>::iterator it = propertysymtable->getNeeds()->begin(); it != propertysymtable->getNeeds()->end(); ++it) {
 					try {
-						scopesymtable->add(*it);
+						scopesymtable->add(&(*it)->decl);
 					} catch(SemanticError* e) {
 						errors->addError(e);
 					}
@@ -199,7 +202,7 @@ void ClassParseTreeTraverser::secondPass(Node* tree) {
 				scopesymtable->popScope();
 				scopesymtable->pushScope();
 				//auto_ptr<Type> thiscontext(propertysymtable->getAsType());
-				typechecker->setThisContext(propertysymtable->getAsType());
+				typechecker->setThisContext(propertysymtable->getAsPureType());
 				typeCheckMethods(tree);
 				//typechecker->setThisContext(NULL);
 
@@ -241,11 +244,13 @@ void ClassParseTreeTraverser::checkCtorArgs(Node* tree) {
 							typeNode = needNode->node_data.nodes[0];
 						}
 
-						parameterizer.rewriteClasstypesToParameterizedtypeByLabel(&typeNode->node_data.type, propertysymtable->getParameters());
-						Type* needtype = typeNode->node_data.type;
+						SpecializableVarDecl needDecl = *typeNode->node_data.specializable_var_decl;
+						throw "fixme";
+						//parameterizer.rewriteClasstypesToParameterizedtypeByLabel(&needDecl.decl.typedata, propertysymtable->getParameters());
+						PureType* needtype = &needDecl.decl.typedata;
 						classestable->assertTypeIsValid(needtype);
 						//classestable->getAnalyzer()->assertNeedIsNotCircular(classname, needtype); DISABLED because we can't tell without importing everything
-						propertysymtable->addNeed(copyType(needtype), needNode->node_data.nodes[1]->node_type == NT_PUBLIC ? PROPERTY_PUBLIC : 0, annotations);
+						propertysymtable->addNeed(&needDecl, needNode->node_data.nodes[1]->node_type == NT_PUBLIC ? PROPERTY_PUBLIC : 0, annotations);
 					} catch(SymbolNotFoundException* e) {
 						errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
 						delete e;
@@ -278,12 +283,12 @@ void ClassParseTreeTraverser::typeCheckProperties(Node* tree) {
 			scopesymtable->pushScope();
 			try {
 				if(tree->node_data.nodes[0]->node_type == NT_ASSIGNMENT) {
-					scopesymtable->add(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type);
+					scopesymtable->add(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.var_decl);
 					typechecker->setReturnType(NULL);
 					typechecker->check(tree->node_data.nodes[0]);
 				} else {
-					classestable->assertTypeIsValid(tree->node_data.nodes[0]->node_data.type);
-					scopesymtable->add(tree->node_data.nodes[0]->node_data.type);
+					classestable->assertTypeIsValid(&tree->node_data.nodes[0]->node_data.var_decl->typedata);
+					scopesymtable->add(tree->node_data.nodes[0]->node_data.var_decl);
 				}
 			} catch(SymbolNotFoundException* e) {
 				errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
@@ -320,25 +325,27 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 					errors->addError(new SemanticError(EXTERN_METHOD_BODY, "Provisions cannot be defined in extern classes, since the implementation is not generated by the wake compiler.", tree));
 					break;
 				}
-				Type* provision = tree->node_data.nodes[0]->node_data.type;
+				SpecializablePureType* provision = tree->node_data.nodes[0]->node_data.specializable_pure_type;
 				Node* served = tree->node_data.nodes[1];
 				switch(served->node_type) {
 					case NT_PROVISION_BEHAVIOR:
 						{
 							// @TODO get arguments for symbol name
-							vector<Type*> arguments;
+							vector<VarDecl*> arguments;
+							vector<PureType*> argumentsPure;
 
 							Node* argnodes = served->node_data.nodes[0];
-							for(int i = 0; i < argnodes->node_data.typearray->typecount; i++) {
-								arguments.push_back(argnodes->node_data.typearray->types[i]);
+							for(int i = 0; i < argnodes->subnodes; i++) {
+								arguments.push_back(argnodes->node_data.nodes[i]->node_data.var_decl);
+								argumentsPure.push_back(&argnodes->node_data.nodes[i]->node_data.var_decl->typedata);
 							}
 
-							errors->pushContext("In declaration of 'every " + classname + "' provision " + propertysymtable->getProvisionSymbol(provision, arguments));
+							errors->pushContext("In declaration of 'every " + classname + "' provision " + provision->toProvisionSymbol(argumentsPure));
 
 							// Begin Method Scope For Type Analysis
 							scopesymtable->pushScope();
 
-							for(vector<Type*>::iterator it = arguments.begin(); it != arguments.end(); ++it) {
+							for(vector<VarDecl*>::iterator it = arguments.begin(); it != arguments.end(); ++it) {
 								scopesymtable->add(*it);
 							}
 
@@ -346,7 +353,7 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 
 							try {
 								// Run Type Analysis
-								typechecker->setReturnType(provision);
+								typechecker->setReturnType(&provision->typedata);
 								typechecker->check(block);
 							} catch(SemanticError* e) {
 								e->token = tree;
@@ -360,23 +367,26 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 						break;
 
 					case NT_STRINGLIT:
-						if(!classestable->getAnalyzer()->isPrimitiveTypeText(provision))
+						if(!classestable->getAnalyzer()->isPrimitiveTypeText(&provision->typedata))
 							errors->addError(new SemanticError(TYPE_ERROR, "Bound a Text value to something that is not a Text", tree));
 						break;
 					case NT_NUMBERLIT:
-						if(!classestable->getAnalyzer()->isPrimitiveTypeNum(provision))
+						if(!classestable->getAnalyzer()->isPrimitiveTypeNum(&provision->typedata))
 							errors->addError(new SemanticError(TYPE_ERROR, "Bound an Num value to something that is not an Num", tree));
 						break;
 					case NT_TYPEDATA:
 						try {
-							classestable->assertTypeIsValid(served->node_data.type);
+							PureType* servedType = served->node_data.pure_type;
+							classestable->assertTypeIsValid(servedType);
 
-							if(!classestable->getAnalyzer()->isASubtypeOfB(served->node_data.type, provision))
+							if(!classestable->getAnalyzer()->isASubtypeOfB(servedType, &provision->typedata)) {
 								errors->addError(new SemanticError(TYPE_ERROR, "Bound class is not a subtype of provided class", tree));
-
-							else {
-								classestable->getAnalyzer()->assertClassCanBeBound(served->node_data.type); // Test that this class isn't abstract
-								classestable->getAnalyzer()->assertClassCanProvide(classname, served->node_data.type); // Test that this class Ctor is recursively provided
+							} else if(servedType->type == TYPE_CLASS) {
+								classestable->setModulesOnType(servedType);
+								classestable->getAnalyzer()->assertFQClassCanBeProvided(served->node_data.pure_type->getFQClassname()); // Test that this class isn't abstract
+								SpecializablePureType servedTypeSp;
+								servedTypeSp.typedata = *servedType;
+								classestable->getAnalyzer()->assertFQClassCanProvide(classname, &servedTypeSp); // Test that this class Ctor is recursively provided
 							}
 						} catch(SemanticError* e) {
 							e->token = tree;
@@ -388,32 +398,32 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 						try {
 							int i;
 							string otherclassname = served->node_data.nodes[0]->node_data.string;
-							vector<Type*>* needs = classestable->find(otherclassname)->getNeeds();
+							vector<SpecializableVarDecl*>* needs = classestable->findByImportedName(otherclassname)->getNeeds();
 							Node* injections = served->node_data.nodes[1];
 							if(needs->size() == injections->subnodes)
 							for(i = 0; i < injections->subnodes; i++) {
-								Type* required = needs->at(i);
-								Type actual(TYPE_UNUSABLE);
+								SpecializableVarDecl* required = needs->at(i);
+								SpecializablePureType actual;
 								switch(injections->node_data.nodes[i]->node_type) {
-									case NT_TYPEDATA:
+									case NT_SPECIALIZABLE_TYPEDATA:
 										{
-											actual = *injections->node_data.nodes[i]->node_data.type;
-											classestable->assertTypeIsValid(&actual);
+											actual = *injections->node_data.nodes[i]->node_data.specializable_pure_type;
+											classestable->assertTypeIsValid(&actual.typedata);
 										}
 										break;
 									case NT_STRINGLIT:
-										actual = Type(TYPE_CLASS);
-										actual.typedata._class.classname = strdup("Text");
+										actual.typedata = PureType(TYPE_CLASS);
+										actual.typedata.typedata._class.classname = strdup("Text");
 										break;
 									case NT_NUMBERLIT:
-										actual = Type(TYPE_CLASS);
-										actual.typedata._class.classname = strdup("Num");
+										actual.typedata = PureType(TYPE_CLASS);
+										actual.typedata.typedata._class.classname = strdup("Num");
 										break;
 
 									case NT_INJECTION_ARG:
 										{
-											actual = *injections->node_data.nodes[i]->node_data.nodes[0]->node_data.type;
-											classestable->assertTypeIsValid(&actual);
+											actual = *injections->node_data.nodes[i]->node_data.nodes[0]->node_data.specializable_pure_type;
+											classestable->assertTypeIsValid(&actual.typedata);
 										}
 										break;
 								}
@@ -421,10 +431,10 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 								if(required->specialty != NULL && (actual.specialty == NULL || string(required->specialty) != actual.specialty))
 									errors->addError(new SemanticError(WARNING, "Injected a class with specialized dependencies...it may not be looking for what you're giving it!", tree));
 
-								if(!classestable->getAnalyzer()->isASubtypeOfB(&actual, required)) {
+								if(!classestable->getAnalyzer()->isASubtypeOfB(&actual.typedata, &required->decl.typedata)) {
 									errors->addError(new SemanticError(TYPE_ERROR, "Injection is not a proper subtype for class dependencies", tree));
 								} else if(injections->node_data.nodes[i]->node_type == NT_TYPEDATA) {
-									classestable->getAnalyzer()->assertClassCanProvide(classname, &actual);
+									classestable->getAnalyzer()->assertFQClassCanProvide(classname, &actual);
 								}
 							} else {
 								errors->addError(new SemanticError(MISMATCHED_INJECTION, "Too many or too few injected dependencies", tree));
@@ -441,8 +451,11 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 			} else {
 				try {
 					// if we merely 'provide SomeClass' we must check we provide all its dependencies
-					classestable->getAnalyzer()->assertClassCanBeBound(tree->node_data.nodes[0]->node_data.type); // Test that this class isn't abstract
-					classestable->getAnalyzer()->assertClassCanProvide(classname, tree->node_data.nodes[0]->node_data.type);
+					SpecializablePureType* provided = tree->node_data.nodes[0]->node_data.specializable_pure_type;
+					if(provided->typedata.type == TYPE_CLASS) {
+						classestable->getAnalyzer()->assertFQClassCanBeProvided(provided->typedata.getFQClassname()); // Test that this class isn't abstract
+					}
+					classestable->getAnalyzer()->assertFQClassCanProvide(classname, tree->node_data.nodes[0]->node_data.specializable_pure_type);
 				} catch(SemanticError *e) {
 					e->token = tree;
 					errors->addError(e);
@@ -462,8 +475,8 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 			try {
 				Node* methodbody = methodanalyzer->getBody(tree);
 
-				vector<pair<string, TypeArray*> >* methodname;
-				Type* methodreturn;
+				vector<pair<string, PureTypeArray*> >* methodname;
+				PureType* methodreturn;
 				string name;
 
 				try { // If this throws we can't type check
@@ -476,14 +489,14 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 					return;
 				}
 
-				boost::optional<Type*> optmethod = propertysymtable->find(name);
+				boost::optional<PureType*> optmethod = propertysymtable->find(name);
 				if(!optmethod) return;
-				Type* method = *optmethod;
+				PureType* method = *optmethod;
 
 				errors->pushContext("In declaration of 'every " + classname + "' method " + name);
-				AddSubNode(tree, MakeNodeFromString(NT_COMPILER_HINT, strdup(name.c_str()), tree->loc));
+				addSubNode(tree, makeNodeFromString(NT_COMPILER_HINT, strdup(name.c_str()), tree->loc));
 
-				vector<Type*> parameterizedtypes = propertysymtable->getParameters();
+				vector<PureType*> parameterizedtypes = propertysymtable->getParameters();
 
 				Node* lastnode = tree->node_data.nodes[tree->subnodes - 1];
 				if(lastnode->node_type == NT_TYPE_ARRAY)
@@ -495,12 +508,9 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 
 				// Begin Method Scope For Type Analysis
 				scopesymtable->pushScope();
-				int i;
-				for(i = 0; i < method->typedata.lambda.arguments->typecount; i++)
-				if(method->typedata.lambda.arguments->types[i]->type == TYPE_LAMBDA && method->typedata.lambda.arguments->types[i]->alias == NULL) {
-					errors->addError(new SemanticError(ALIAS_REQUIRED, "Argument number " + boost::lexical_cast<string>(i + 1) + " must be aliased"));
-				} else {
-					scopesymtable->add(method->typedata.lambda.arguments->types[i]);
+				vector<VarDecl*> argDecls = methodanalyzer->getArgDecls(tree);
+				for(std::vector<VarDecl*>::iterator it = argDecls.begin(); it != argDecls.end(); ++it) {
+					scopesymtable->add(*it);
 				}
 
 				if(is_extern && methodbody->node_type != NT_ABSTRACT_METHOD) {

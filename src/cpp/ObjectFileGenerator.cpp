@@ -107,19 +107,21 @@ void ObjectFileGenerator::generate(Node* tree) {
 				header->addClassUsage(file.tellp(), classes->getFullyQualifiedClassname(classname));
 				file << "(";
 
-				vector<Type*>* needs = classes->find(classname)->getNeeds();
-				for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
-					table.add(*it);
+				vector<SpecializableVarDecl*>* needs = classes->findByImportedName(classname)->getNeeds();
+				for(vector<SpecializableVarDecl*>::iterator it = needs->begin(); it != needs->end(); ++it) {
+					table.add(&(*it)->decl);
 					if(it != needs->begin()) file << ",";
-					file << table.getAddress(*it);
+					VarRef ref = (*it)->decl.createVarRef();
+					file << table.getAddress(&ref);
 				}
 
 				file << "){";
 
-				for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
+				for(vector<SpecializableVarDecl*>::iterator it = needs->begin(); it != needs->end(); ++it) {
 					file << "this.";
-					header->addPropertyUsage(file.tellp(), table.getNameForType(*it));
-					file << "=" << table.getAddress(*it) << ";";
+					VarRef ref = (*it)->decl.createVarRef();
+					header->addPropertyUsage(file.tellp(), ref.toString());
+					file << "=" << table.getAddress(&ref) << ";";
 				}
 
 				generate(tree->node_data.nodes[1]);
@@ -132,7 +134,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 				file << "this.";
 				header->addPropertyUsage(file.tellp(), "isExceptionType(Text)");
 				file << "=function(a){return [";
-				const map<string, bool> parentage = classes->find(classname)->getParentage();
+				const map<string, bool> parentage = classes->findByImportedName(classname)->getParentage();
 				// @Todo only print exception classes
 				for(map<string, bool>::const_iterator it = parentage.begin(); it != parentage.end(); ++it) {
 					file << "'";
@@ -158,35 +160,39 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 		case NT_CATCH:
 			table.pushScope();
-			table.add(tree->node_data.nodes[0]->node_data.type);
-			file << "catch(" << table.getAddress(tree->node_data.nodes[0]->node_data.type) << "){";
+			{
+				VarDecl* decl = tree->node_data.nodes[0]->node_data.var_decl;
+				VarRef ref = decl->createVarRef();
+				table.add(decl);
+				file << "catch(" << table.getAddress(&ref) << "){";
 
-			// wrap in a wake exception if its not one
-			file << "if(!" << table.getAddress(tree->node_data.nodes[0]->node_data.type) << ".";
-			header->addPropertyUsage(file.tellp(), "isExceptionType(Text)");
-			file << ")" << table.getAddress(tree->node_data.nodes[0]->node_data.type) << "=new ";
-			header->addClassUsage(file.tellp(), "std.Exception");
-			file << "(" << table.getAddress(tree->node_data.nodes[0]->node_data.type) << ");";
+				// wrap in a wake exception if its not one
+				file << "if(!" << table.getAddress(&ref) << ".";
+				header->addPropertyUsage(file.tellp(), "isExceptionType(Text)");
+				file << ")" << table.getAddress(&ref) << "=new ";
+				header->addClassUsage(file.tellp(), "std.Exception");
+				file << "(" << table.getAddress(&ref) << ");";
 
-			// check its type
-			file << "if(" << table.getAddress(tree->node_data.nodes[0]->node_data.type) << ".";
-			header->addPropertyUsage(file.tellp(), "isExceptionType(Text)");
-			file << "('";
-			header->addClassUsage(file.tellp(), classes->getFullyQualifiedClassname(tree->node_data.nodes[0]->node_data.type->typedata._class.classname));
-			file << "')){";
+				// check its type
+				file << "if(" << table.getAddress(&ref) << ".";
+				header->addPropertyUsage(file.tellp(), "isExceptionType(Text)");
+				file << "('";
+				header->addClassUsage(file.tellp(), classes->getFullyQualifiedClassname(tree->node_data.nodes[0]->node_data.type->typedata._class.classname));
+				file << "')){";
 
-			// run catch statement
-			generate(tree->node_data.nodes[1]);
+				// run catch statement
+				generate(tree->node_data.nodes[1]);
 
-			// or rethrow it
-			file << "}else{throw " << table.getAddress(tree->node_data.nodes[0]->node_data.type) << ";}}";
-			table.popScope();
+				// or rethrow it
+				file << "}else{throw " << table.getAddress(&ref) << ";}}";
+				table.popScope();
+			}
 			break;
 
 		case NT_THROW:
 			{
 				table.pushScope();
-				Type* exception = MakeType(TYPE_MATCHALL);
+				PureType* exception = new PureType(TYPE_MATCHALL);
 				std::stringstream exceptionname;
 				exceptionname << exception;
 				table.add(exceptionname.str(), exception);
@@ -209,24 +215,24 @@ void ObjectFileGenerator::generate(Node* tree) {
 				file << "function(){return new ";
 				header->addClassUsage(file.tellp(), classes->getFullyQualifiedClassname(provisionname));
 				file << "(";
-				vector<Type*>* needs = classes->find(provisionname)->getNeeds();
-				for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
-					vector<Type*> no_args;
+				vector<SpecializableVarDecl*>* needs = classes->find(provisionname)->getNeeds();
+				for(vector<SpecializableVarDecl*>::iterator it = needs->begin(); it != needs->end(); ++it) {
+					vector<VarDecl*> no_args;
 					if(it != needs->begin()) file << ",";
 					file << "this.";
-					header->addPropertyUsage(file.tellp(), classes->find(classname)->getProvisionSymbol(*it, no_args));
+					header->addPropertyUsage(file.tellp(), (*it)->toProvisionSymbol(no_args));
 					file << "()";
 				}
 				file << ");";
 			} else {
 				if(tree->node_data.nodes[1]->node_type == NT_TYPEDATA) {
 					file << "function(){return this.";
-					vector<Type*> no_args;
+					vector<VarDecl*> no_args;
 					header->addPropertyUsage(file.tellp(), classes->find(classname)->getProvisionSymbol(tree->node_data.nodes[1]->node_data.type, no_args));
 					file << "();";
 				} else if(tree->node_data.nodes[1]->node_type == NT_INJECTION) {
 					file << "function(";
-					vector<Type*> no_args;
+					vector<VarDecl*> no_args;
 					Node* inj = tree->node_data.nodes[1]->node_data.nodes[1];
 					table.pushScope();
 

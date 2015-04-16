@@ -60,6 +60,7 @@ class ClassSpaceSymbolTable {
 		void setModule(string module);
 		string getModule();
 		string getFullyQualifiedClassname(string classname);
+		void setModulesOnType(PureType* type);
 
 	private:
 

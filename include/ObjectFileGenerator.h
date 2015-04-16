@@ -19,7 +19,6 @@
 
 extern "C" {
 	#include "tree.h"
-	#include "type.h"
 }
 
 #include "ScopeSymbolTable.h"

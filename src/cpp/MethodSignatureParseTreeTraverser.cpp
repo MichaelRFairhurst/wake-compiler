@@ -16,7 +16,7 @@
 #include "SemanticError.h"
 #include "TypeParameterizer.h"
 
-void MethodSignatureParseTreeTraverser::convertParameterizedTypes(Node* methoddef, const vector<Type*>& parameterizedtypes) {
+void MethodSignatureParseTreeTraverser::convertParameterizedTypes(Node* methoddef, const vector<PureType*>& parameterizedtypes) {
 	int i;
 	Node* methodname;
 	TypeParameterizer parameterizer;
@@ -29,7 +29,7 @@ void MethodSignatureParseTreeTraverser::convertParameterizedTypes(Node* methodde
 	}
 
 	for(i = 0; i < methodname->subnodes; i++) {
-		TypeArray* args;
+		PureTypeArray* args;
 		i++;
 
 		if(i < methodname->subnodes) {
@@ -42,8 +42,8 @@ void MethodSignatureParseTreeTraverser::convertParameterizedTypes(Node* methodde
 	}
 }
 
-vector<pair<string, TypeArray*> >* MethodSignatureParseTreeTraverser::getName(Node* methoddef) {
-	vector<pair<string, TypeArray*> >* arguments_segments = new vector<pair<string, TypeArray*> >();
+vector<pair<string, PureTypeArray*> >* MethodSignatureParseTreeTraverser::getName(Node* methoddef) {
+	vector<pair<string, PureTypeArray*> >* arguments_segments = new vector<pair<string, PureTypeArray*> >();
 	int i;
 
 	try {
@@ -52,7 +52,7 @@ vector<pair<string, TypeArray*> >* MethodSignatureParseTreeTraverser::getName(No
 		];
 
 		for(i = 0; i < methodname->subnodes; i++) {
-			TypeArray* argshere;
+			PureTypeArray* argshere;
 			string namesegment = methodname->node_data.nodes[i]->node_data.string;
 			i++;
 
@@ -65,7 +65,7 @@ vector<pair<string, TypeArray*> >* MethodSignatureParseTreeTraverser::getName(No
 				argshere = emptytypearray;
 			}
 
-			arguments_segments->push_back(pair<string, TypeArray*>(namesegment, argshere));
+			arguments_segments->push_back(pair<string, PureTypeArray*>(namesegment, argshere));
 		}
 
 		return arguments_segments;
@@ -83,8 +83,11 @@ Node* MethodSignatureParseTreeTraverser::getBody(Node* methoddef) {
 	}
 }
 
-Type* MethodSignatureParseTreeTraverser::getReturn(Node* methoddef) {
-	Type* returntype;
+vector<VarDecl*> MethodSignatureParseTreeTraverser::getArgDecls(Node* methoddef) {
+}
+
+PureType* MethodSignatureParseTreeTraverser::getReturn(Node* methoddef) {
+	PureType* returntype;
 
 	if(methoddef->node_data.nodes[1]->node_type == NT_METHOD_RETURN_TYPE) {
 		returntype = methoddef->node_data.nodes[1]->node_data.nodes[0]->node_data.type;
@@ -110,9 +113,9 @@ int MethodSignatureParseTreeTraverser::getFlags(Node* methoddef) {
 
 MethodSignatureParseTreeTraverser::MethodSignatureParseTreeTraverser(ClassSpaceSymbolTable* classestable) {
 	this->classestable = classestable;
-	emptytypearray = MakeTypeArray();
+	emptytypearray = new PureTypeArray();
 }
 
 MethodSignatureParseTreeTraverser::~MethodSignatureParseTreeTraverser() {
-	freeTypeArray(emptytypearray);
+	delete emptytypearray;
 }
