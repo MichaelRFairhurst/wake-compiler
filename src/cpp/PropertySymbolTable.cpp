@@ -176,7 +176,7 @@ string PropertySymbolTable::getSymbolNameOf(vector<pair<string, PureTypeArray*> 
 
 void PropertySymbolTable::printEntryPoints(EntryPointAnalyzer* entryanalyzer) {
 	for(map<string, ObjectProperty*>::iterator it = properties.begin(); it != properties.end(); ++it) {
-		if(entryanalyzer->checkMethodCanBeMain(it->first, &it->second->decl.typedata))
+		if(entryanalyzer->checkFQClassMethodCanBeMain(module.size() ? module + "." + classname : classname, &it->second->decl.typedata))
 			entryanalyzer->printMethod(it->first);
 	}
 }

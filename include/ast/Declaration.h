@@ -31,7 +31,7 @@ namespace wake {
 		class Declaration : public StatementNode {
 
 			public:
-				Declaration(VarDecl** declared, ExpressionNode* value, Node* node, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, ErrorTracker* errors, const vector<PureType*>& parameterizedtypes)
+				Declaration(VarDecl* declared, ExpressionNode* value, Node* node, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, ErrorTracker* errors, const vector<PureType*>& parameterizedtypes)
 					: declared(declared), value(value), node(node), classestable(classestable), scopesymtable(scopesymtable), errors(errors), parameterizedtypes(parameterizedtypes) {};
 
 				void typeCheck();
@@ -41,7 +41,7 @@ namespace wake {
 				~Declaration(){};
 
 			private:
-				VarDecl** declared;
+				VarDecl* declared;
 				std::auto_ptr<ExpressionNode> value;
 				Node* node;
 				ClassSpaceSymbolTable* classestable;

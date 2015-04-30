@@ -16,12 +16,12 @@
 #include "ast/Invocation.h"
 #include "AstCreator.h"
 
-Type* wake::ast::MethodInvocation::typeCheck(bool forceArrayIdentifier) {
+PureType* wake::ast::MethodInvocation::typeCheck(bool forceArrayIdentifier) {
 	Node* methodname = node->node_data.nodes[1];
 
 	if(node->node_data.nodes[0]->node_type == NT_THIS && methodname->subnodes < 3) {
 		string name = methodname->node_data.nodes[0]->node_data.string;
-		boost::optional<Type*> variable = scopesymtable->find(name);
+		boost::optional<PureType*> variable = scopesymtable->find(name);
 
 		if(variable) {
 			node->node_type = NT_LAMBDA_INVOCATION; // for codegen step
@@ -40,10 +40,10 @@ Type* wake::ast::MethodInvocation::typeCheck(bool forceArrayIdentifier) {
 		}
 	}
 
-	Type subject = *auto_ptr<Type>(subjectExpr->typeCheck(false));
+	PureType subject = *auto_ptr<PureType>(subjectExpr->typeCheck(false));
 
 	if(subject.type == TYPE_MATCHALL) {
-		return new Type(subject);
+		return new PureType(subject);
 	}
 
 	return typeCheckMethodInvocation(subject);

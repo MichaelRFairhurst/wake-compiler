@@ -15,37 +15,38 @@
 #include <boost/test/unit_test.hpp>
 
 #include "PropertySymbolTable.h"
+#include "PureTypeArray.h"
 
 BOOST_AUTO_TEST_SUITE(PropertySymbolTableTestSuite);
 
 BOOST_AUTO_TEST_CASE(AddingNeedsAreGotten) {
 	TypeAnalyzer analyzer;
 	PropertySymbolTable table(&analyzer, "");
-	Type* thefirsttype = MakeType(TYPE_CLASS);
-	Type* thesecondtype = MakeType(TYPE_CLASS);
-	thefirsttype->typedata._class.classname = strdup("");
-	thefirsttype->typedata._class.shadow = 0;
-	thesecondtype->typedata._class.classname = strdup("");
-	thesecondtype->typedata._class.shadow = 0;
-	table.addNeed(thefirsttype, 0, vector<Annotation*>());
-	table.addNeed(thesecondtype, 0, vector<Annotation*>());
-	BOOST_REQUIRE(table.getNeeds()->at(0) == thefirsttype);
-	BOOST_REQUIRE(table.getNeeds()->at(1) == thesecondtype);
+	SpecializableVarDecl thefirsttype;
+	thefirsttype.decl.typedata = PureType(TYPE_CLASS);
+	SpecializableVarDecl thesecondtype;
+	thesecondtype.decl.typedata = PureType(TYPE_CLASS);
+	thefirsttype.decl.typedata.typedata._class.classname = strdup("");
+	thesecondtype.decl.typedata.typedata._class.classname = strdup("");
+	table.addNeed(&thefirsttype, 0, vector<Annotation*>());
+	table.addNeed(&thesecondtype, 0, vector<Annotation*>());
+	BOOST_REQUIRE(table.getNeeds()->at(0) == &thefirsttype);
+	BOOST_REQUIRE(table.getNeeds()->at(1) == &thesecondtype);
 }
 
 BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesReturnTypes) {
 	TypeAnalyzer analyzer;
 	PropertySymbolTable table(&analyzer, "");
 	ObjectProperty* property = new ObjectProperty();
-	vector<Type*>* parameters = new vector<Type*>();
-	vector<Type*> parameterizations;
-	Type* methodtype = MakeType(TYPE_LAMBDA);
-	Type parameter(TYPE_PARAMETERIZED);
-	Type parameterization(TYPE_CLASS);
+	vector<PureType*>* parameters = new vector<PureType*>();
+	vector<PureType*> parameterizations;
+	PureType* methodtype = new PureType(TYPE_LAMBDA);
+	PureType parameter(TYPE_PARAMETERIZED);
+	PureType parameterization(TYPE_CLASS);
 
 	parameterization.typedata._class.classname = strdup("AClass");
 	parameter.typedata.parameterized.label = strdup("E");
-	methodtype->typedata.lambda.returntype = copyType(&parameter);
+	methodtype->typedata.lambda.returntype = new PureType(parameter);
 	property->type = methodtype;
 	property->casing = "myMethod";
 	parameters->push_back(&parameter);
@@ -56,7 +57,7 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesReturnTypes) {
 
 	auto_ptr<ReadOnlyPropertySymbolTable> derived(table.resolveParameters(parameterizations));
 
-	boost::optional<Type*> method = derived->find("myMethod");
+	boost::optional<PureType*> method = derived->find("myMethod");
 	BOOST_REQUIRE(method);
 	BOOST_REQUIRE(*method);
 	BOOST_REQUIRE((*method)->type == TYPE_LAMBDA);
@@ -70,16 +71,16 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesPropertyName) {
 	TypeAnalyzer analyzer;
 	PropertySymbolTable table(&analyzer, "");
 	ObjectProperty* property = new ObjectProperty();
-	vector<Type*>* parameters = new vector<Type*>();
-	vector<Type*> parameterizations;
-	Type* methodtype = MakeType(TYPE_LAMBDA);
-	Type parameter(TYPE_PARAMETERIZED);
-	Type parameterization(TYPE_CLASS);
+	vector<PureType*>* parameters = new vector<PureType*>();
+	vector<PureType*> parameterizations;
+	PureType* methodtype = new PureType(TYPE_LAMBDA);
+	PureType parameter(TYPE_PARAMETERIZED);
+	PureType parameterization(TYPE_CLASS);
 
 	parameterization.typedata._class.classname = strdup("AClass");
 	parameter.typedata.parameterized.label = strdup("E");
-	methodtype->typedata.lambda.arguments = MakeTypeArray();
-	AddTypeToTypeArray(copyType(&parameter), methodtype->typedata.lambda.arguments);
+	methodtype->typedata.lambda.arguments = new PureTypeArray();
+	addPureTypeToPureTypeArray(new PureType(parameter), methodtype->typedata.lambda.arguments);
 	property->type = methodtype;
 	property->casing = "myMethod(#)";
 	parameters->push_back(&parameter);
@@ -90,7 +91,7 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesPropertyName) {
 
 	auto_ptr<ReadOnlyPropertySymbolTable> derived(table.resolveParameters(parameterizations));
 
-	boost::optional<Type*> method = derived->find("myMethod(AClass)");
+	boost::optional<PureType*> method = derived->find("myMethod(AClass)");
 	BOOST_REQUIRE(method);
 	BOOST_REQUIRE(*method);
 	BOOST_REQUIRE((*method)->type == TYPE_LAMBDA);
@@ -104,10 +105,10 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesPropertyName) {
 BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesNeedName) {
 	TypeAnalyzer analyzer;
 	PropertySymbolTable table(&analyzer, "");
-	vector<Type*>* parameters = new vector<Type*>();
-	vector<Type*> parameterizations;
-	Type* parameter = MakeType(TYPE_PARAMETERIZED);
-	Type parameterization(TYPE_CLASS);
+	vector<PureType*>* parameters = new vector<PureType*>();
+	vector<PureType*> parameterizations;
+	PureType* parameter = new PureType(TYPE_PARAMETERIZED);
+	PureType parameterization(TYPE_CLASS);
 
 	parameterization.typedata._class.classname = strdup("AClass");
 	parameter->typedata.parameterized.label = strdup("E");
@@ -118,7 +119,7 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesNeedName) {
 
 	auto_ptr<ReadOnlyPropertySymbolTable> derived(table.resolveParameters(parameterizations));
 
-	vector<Type*>* needs = derived->getNeeds();
+	vector<SpecializableVarDecl*>* needs = derived->getNeeds();
 
 	BOOST_REQUIRE(needs->size() == 1);
 	BOOST_REQUIRE(needs->at(0)->type == TYPE_CLASS);

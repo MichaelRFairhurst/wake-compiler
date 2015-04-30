@@ -14,10 +14,11 @@
 
 #include "ast/Invocation.h"
 #include "TypeError.h"
+#include "PureTypeArray.h"
 #include <boost/lexical_cast.hpp>
 
-Type* wake::ast::Invocation::typeCheck(bool forceArrayLiteral) {
-	Type lambda = *auto_ptr<Type>(lambdaExpr->typeCheck(false));
+PureType* wake::ast::Invocation::typeCheck(bool forceArrayLiteral) {
+	PureType lambda = *auto_ptr<PureType>(lambdaExpr->typeCheck(false));
 
 	int realArgCount = 0;
 	if(lambda.typedata.lambda.arguments) {
@@ -32,13 +33,13 @@ Type* wake::ast::Invocation::typeCheck(bool forceArrayLiteral) {
 
 	int i = 0;
 	for(boost::ptr_vector<ExpressionNode>::iterator it = argumentExprs.begin(); it != argumentExprs.end(); ++it, ++i) {
-		auto_ptr<Type> actual(it->typeCheck(false));
+		auto_ptr<PureType> actual(it->typeCheck(false));
 		if(!analyzer->isASubtypeOfB(actual.get(), lambda.typedata.lambda.arguments->types[i])) {
-			EXPECTED	analyzer->getNameForType(lambda.typedata.lambda.arguments->types[i])
-			ERRONEOUS	analyzer->getNameForType(actual.get())
+			EXPECTED	lambda.typedata.lambda.arguments->types[i]->toString()
+			ERRONEOUS	actual->toString()
 			THROW		("Argument lists not compatible in function invocation");
 		}
 	}
 
-	return lambda.typedata.lambda.returntype ? new Type(*lambda.typedata.lambda.returntype) : new Type(TYPE_UNUSABLE);
+	return lambda.typedata.lambda.returntype ? new PureType(*lambda.typedata.lambda.returntype) : new PureType(TYPE_UNUSABLE);
 }

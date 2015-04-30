@@ -15,11 +15,11 @@
 
 #include "ast/ExpressionUsabilityCatcher.h"
 
-Type* wake::ast::ExpressionUsabilityCatcher::typeCheck(bool forceArrayIdentifier) {
-	Type* t = child->typeCheck(forceArrayIdentifier);
+PureType* wake::ast::ExpressionUsabilityCatcher::typeCheck(bool forceArrayIdentifier) {
+	PureType* t = child->typeCheck(forceArrayIdentifier);
 
 	if(t == NULL) {
-		return new Type(TYPE_UNUSABLE);
+		return new PureType(TYPE_UNUSABLE);
 	}
 
 	if(t->type == TYPE_UNUSABLE) {

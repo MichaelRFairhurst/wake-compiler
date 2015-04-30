@@ -18,18 +18,18 @@
 #include "TypeParameterizer.h"
 #include <boost/lexical_cast.hpp>
 
-Type* wake::ast::MethodInvocationBase::typeCheckMethodInvocation(Type& subject) {
+PureType* wake::ast::MethodInvocationBase::typeCheckMethodInvocation(PureType& subject) {
 	TypeAnalyzer* analyzer = classestable->getAnalyzer();
-	Type* boxedtype;
+	PureType* boxedtype;
 
 	if(subject.type == TYPE_OPTIONAL) {
-		errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Calling method on optional type " + analyzer->getNameForType(&subject) + ". You must first wrap object in an exists { } clause.", node));
-		return new Type(TYPE_MATCHALL);
+		errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Calling method on optional type " + subject.toString() + ". You must first wrap object in an exists { } clause.", node));
+		return new PureType(TYPE_MATCHALL);
 	}
 
 	if(analyzer->isAutoboxedType(&subject, &boxedtype)) {
 		Node* autobox = node->node_data.nodes[0];
-		node->node_data.nodes[0] = MakeTwoBranchNode(NT_AUTOBOX, autobox, MakeNodeFromString(NT_COMPILER_HINT, strdup(boxedtype->typedata._class.classname), node->loc), node->loc);
+		node->node_data.nodes[0] = makeTwoBranchNode(NT_AUTOBOX, autobox, makeNodeFromString(NT_COMPILER_HINT, strdup(boxedtype->typedata._class.classname), node->loc), node->loc);
 		subject = *boxedtype;
 		delete boxedtype;
 	}
@@ -37,14 +37,14 @@ Type* wake::ast::MethodInvocationBase::typeCheckMethodInvocation(Type& subject) 
 	auto_ptr<ReadOnlyPropertySymbolTable> methodtable;
 
 	try {
-		methodtable.reset(classestable->find(&subject));
+		methodtable.reset(classestable->findFullyQualified(subject.getFQClassname()));
 	} catch (SymbolNotFoundException* e) {
 		errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, string("Class by name of ") + subject.typedata._class.classname + " returned by another expression has not been imported and cannot be resolved", node));
-		return MakeType(TYPE_MATCHALL);
+		return new PureType(TYPE_MATCHALL);
 	}
 
-	vector<pair<string, TypeArray*> > methodSegmentTypes;
-	boost::ptr_vector<TypeArray> methodSegmentsLatch;
+	vector<pair<string, PureTypeArray*> > methodSegmentTypes;
+	boost::ptr_vector<PureTypeArray> methodSegmentsLatch;
 
 	string casing;
 	string address;
@@ -60,12 +60,12 @@ Type* wake::ast::MethodInvocationBase::typeCheckMethodInvocation(Type& subject) 
 	}
 
 	boost::optional<ObjectProperty*> lambdaprop = methodtable->findByCasing(casing);
-	std::auto_ptr<Type> lambdatype;
+	std::auto_ptr<PureType> lambdatype;
 
 	if(lambdaprop) {
 		int i = 0;
-		map<string, Type*> methodAppliedTypes;
-		lambdatype.reset(new Type((*lambdaprop)->type));
+		map<string, PureType*> methodAppliedTypes;
+		lambdatype.reset(new PureType((*lambdaprop)->decl.typedata));
 		address = (*lambdaprop)->address;
 
 		if(!((*lambdaprop)->flags & PROPERTY_PUBLIC) && node->node_data.nodes[0]->node_type != NT_THIS) {
@@ -77,26 +77,26 @@ Type* wake::ast::MethodInvocationBase::typeCheckMethodInvocation(Type& subject) 
 		for(boost::ptr_vector<MethodSegment>::iterator it = methodSegments.begin(); it != methodSegments.end(); ++it)
 		for(std::vector<std::pair<wake::ast::ExpressionNode*, wake::ast::ExpectedTypeExpression*> >::iterator argExprIt = it->arguments.begin(); argExprIt != it->arguments.end(); ++argExprIt, ++i)
 		if(argExprIt->first) {
-			auto_ptr<Type> argType(argExprIt->first->typeCheck(false));
+			auto_ptr<PureType> argType(argExprIt->first->typeCheck(false));
 			bool compatible = true;
 
 			if(analyzer->hasArgParameterization(lambdatype->typedata.lambda.arguments->types[i])) {
-				map<string, Type*> capturedParameterizations;
+				map<string, PureType*> capturedParameterizations;
 				compatible = parameterizer.captureArgumentParameterizations(argType.get(), lambdatype->typedata.lambda.arguments->types[i], capturedParameterizations, analyzer);
 				if(compatible) {
-					vector<Type*> newParameters;
-					vector<Type*> newParameterizations;
-					boost::ptr_vector<Type> latch;
+					vector<PureType*> newParameters;
+					vector<PureType*> newParameterizations;
+					boost::ptr_vector<PureType> latch;
 
-					for(map<string, Type*>::iterator it = capturedParameterizations.begin(); it != capturedParameterizations.end(); ++it) {
+					for(map<string, PureType*>::iterator it = capturedParameterizations.begin(); it != capturedParameterizations.end(); ++it) {
 						newParameterizations.push_back(it->second);
-						latch.push_back(new Type(TYPE_PARAMETERIZED));
+						latch.push_back(new PureType(TYPE_PARAMETERIZED));
 						newParameters.push_back(&latch[latch.size() - 1]);
 						latch[latch.size() - 1].typedata.parameterized.label = strdup(it->first.c_str());
 					}
 
-					Type* tempLambda = new Type(lambdatype.get());
-					parameterizer.applyParameterizations(&tempLambda, newParameters, newParameterizations);
+					PureType* tempLambda = new PureType(*lambdatype.get());
+					parameterizer.applyParameterizations(tempLambda, newParameters, newParameterizations);
 					lambdatype.reset(tempLambda);
 				}
 			}
@@ -105,9 +105,9 @@ Type* wake::ast::MethodInvocationBase::typeCheckMethodInvocation(Type& subject) 
 				errors->addError(new SemanticError(TYPE_ERROR, "Argument number "
 					+ boost::lexical_cast<std::string>(i + 1)
 					+ " has invalid type. Expected "
-					+ analyzer->getNameForType(lambdatype->typedata.lambda.arguments->types[i])
+					+ lambdatype->typedata.lambda.arguments->types[i]->toString()
 					+ ", actual was "
-					+ analyzer->getNameForType(argType.get()),
+					+ argType->toString(),
 					node
 				));
 			}
@@ -117,7 +117,7 @@ Type* wake::ast::MethodInvocationBase::typeCheckMethodInvocation(Type& subject) 
 		for(boost::ptr_vector<MethodSegment>::iterator it = methodSegments.begin(); it != methodSegments.end(); ++it)
 		for(std::vector<std::pair<wake::ast::ExpressionNode*, wake::ast::ExpectedTypeExpression*> >::iterator argExprIt = it->arguments.begin(); argExprIt != it->arguments.end(); ++argExprIt, ++i)
 		if(argExprIt->second) {
-			auto_ptr<Type> argType;
+			auto_ptr<PureType> argType;
 			if(lambdatype->typedata.lambda.arguments->types[i]->type == TYPE_LAMBDA && analyzer->hasArgParameterization(lambdatype->typedata.lambda.arguments->types[i]->typedata.lambda.arguments)) {
 				argType.reset(argExprIt->second->typeCheck(false));
 			} else {
@@ -127,22 +127,22 @@ Type* wake::ast::MethodInvocationBase::typeCheckMethodInvocation(Type& subject) 
 			bool compatible = true;
 
 			if(analyzer->hasArgParameterization(lambdatype->typedata.lambda.arguments->types[i])) {
-				map<string, Type*> capturedParameterizations;
+				map<string, PureType*> capturedParameterizations;
 				compatible = parameterizer.captureArgumentParameterizations(argType.get(), lambdatype->typedata.lambda.arguments->types[i], capturedParameterizations, analyzer);
 				if(compatible) {
-					vector<Type*> newParameters;
-					vector<Type*> newParameterizations;
-					boost::ptr_vector<Type> latch;
+					vector<PureType*> newParameters;
+					vector<PureType*> newParameterizations;
+					boost::ptr_vector<PureType> latch;
 
-					for(map<string, Type*>::iterator it = capturedParameterizations.begin(); it != capturedParameterizations.end(); ++it) {
+					for(map<string, PureType*>::iterator it = capturedParameterizations.begin(); it != capturedParameterizations.end(); ++it) {
 						newParameterizations.push_back(it->second);
-						latch.push_back(new Type(TYPE_PARAMETERIZED));
+						latch.push_back(new PureType(TYPE_PARAMETERIZED));
 						newParameters.push_back(&latch[latch.size() - 1]);
 						latch[latch.size() - 1].typedata.parameterized.label = strdup(it->first.c_str());
 					}
 
-					Type* tempLambda = new Type(lambdatype.get());
-					parameterizer.applyParameterizations(&tempLambda, newParameters, newParameterizations);
+					PureType* tempLambda = new PureType(*lambdatype.get());
+					parameterizer.applyParameterizations(tempLambda, newParameters, newParameterizations);
 					lambdatype.reset(tempLambda);
 				}
 			}
@@ -151,31 +151,31 @@ Type* wake::ast::MethodInvocationBase::typeCheckMethodInvocation(Type& subject) 
 				errors->addError(new SemanticError(TYPE_ERROR, "Argument number "
 					+ boost::lexical_cast<std::string>(i + 1)
 					+ " has invalid type. Expected "
-					+ analyzer->getNameForType(lambdatype->typedata.lambda.arguments->types[i])
+					+ lambdatype->typedata.lambda.arguments->types[i]->toString()
 					+ ", actual was "
-					+ analyzer->getNameForType(argType.get()),
+					+ argType->toString(),
 					node
 				));
 			}
 		}
 	} else {
 		for(boost::ptr_vector<MethodSegment>::iterator it = methodSegments.begin(); it != methodSegments.end(); ++it) {
-			TypeArray* args = MakeTypeArray();
+			PureTypeArray* args = new PureTypeArray();
 			methodSegmentsLatch.push_back(args);
-			methodSegmentTypes.push_back(pair<string, TypeArray*>(it->name, args));
+			methodSegmentTypes.push_back(pair<string, PureTypeArray*>(it->name, args));
 
 			for(std::vector<std::pair<wake::ast::ExpressionNode*, wake::ast::ExpectedTypeExpression*> >::iterator argExprIt = it->arguments.begin(); argExprIt != it->arguments.end(); ++argExprIt)
 			if(argExprIt->first) {
-				AddTypeToTypeArray(argExprIt->first->typeCheck(false), args);
+				addPureTypeToPureTypeArray(argExprIt->first->typeCheck(false), args);
 			} else {
-				AddTypeToTypeArray(argExprIt->second->typeCheck(false), args);
+				addPureTypeToPureTypeArray(argExprIt->second->typeCheck(false), args);
 			}
 		}
 
 		string name = methodtable->getSymbolNameOf(&methodSegmentTypes);
-		boost::optional<Type*> optlambdatype(methodtable->find(name));
+		boost::optional<PureType*> optlambdatype(methodtable->find(name));
 		if(optlambdatype) {
-			lambdatype.reset(new Type(*optlambdatype));
+			lambdatype.reset(new PureType(**optlambdatype));
 			address = methodtable->getAddress(name);
 			int flags = methodtable->getFlags(name);
 			if(!(flags & PROPERTY_PUBLIC) && node->node_data.nodes[0]->node_type != NT_THIS) {
@@ -185,16 +185,16 @@ Type* wake::ast::MethodInvocationBase::typeCheckMethodInvocation(Type& subject) 
 	}
 
 	if(lambdatype.get()) {
-		AddSubNode(node, MakeNodeFromString(NT_COMPILER_HINT, strdup(subject.typedata._class.classname), node->loc));
-		AddSubNode(node, MakeNodeFromString(NT_COMPILER_HINT, strdup(address.c_str()), node->loc));
+		addSubNode(node, makeNodeFromString(NT_COMPILER_HINT, strdup(subject.typedata._class.classname), node->loc));
+		addSubNode(node, makeNodeFromString(NT_COMPILER_HINT, strdup(address.c_str()), node->loc));
 
 		if(lambdatype->typedata.lambda.returntype == NULL) {
-			return new Type(TYPE_UNUSABLE);
+			return new PureType(TYPE_UNUSABLE);
 		} else {
-			return new Type(lambdatype->typedata.lambda.returntype);
+			return new PureType(*lambdatype->typedata.lambda.returntype);
 		}
 	}
 
 	errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Couldn't find property " + methodtable->getSymbolNameOf(&methodSegmentTypes) + " on class " + subject.typedata._class.classname, node));
-	return MakeType(TYPE_MATCHALL);
+	return new PureType(TYPE_MATCHALL);
 }

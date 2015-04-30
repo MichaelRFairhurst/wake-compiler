@@ -17,7 +17,7 @@
 #include <memory>
 
 void wake::ast::IfElseWhile::typeCheck() {
-	auto_ptr<Type> conditionType(condition->typeCheck(false));
+	auto_ptr<PureType> conditionType(condition->typeCheck(false));
 	block->typeCheck();
 
 	if(otherwise.get() != NULL) {
@@ -26,7 +26,7 @@ void wake::ast::IfElseWhile::typeCheck() {
 
 	if(!analyzer->isPrimitiveTypeNum(conditionType.get()) && !analyzer->isPrimitiveTypeBool(conditionType.get())) {
 		EXPECTED	"Bool"
-		ERRONEOUS	analyzer->getNameForType(conditionType.get())
+		ERRONEOUS	conditionType->toString()
 		THROW		("If/While conditions must be Bool or Num");
 	}
 }

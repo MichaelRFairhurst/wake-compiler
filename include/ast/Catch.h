@@ -29,7 +29,7 @@ namespace wake {
 		class Catch : public StatementNode {
 
 			public:
-				Catch(PureType* exceptionType, StatementNode* body, Node* node, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, ErrorTracker* errors)
+				Catch(VarDecl* exceptionType, StatementNode* body, Node* node, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, ErrorTracker* errors)
 					: exceptionType(exceptionType), body(body), classestable(classestable), scopesymtable(scopesymtable), errors(errors), node(node) {};
 
 				void typeCheck();
@@ -39,7 +39,7 @@ namespace wake {
 				~Catch(){};
 
 			private:
-				PureType* exceptionType;
+				VarDecl* exceptionType;
 				std::auto_ptr<StatementNode> body;
 				Node* node;
 				ClassSpaceSymbolTable* classestable;

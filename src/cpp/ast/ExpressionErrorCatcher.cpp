@@ -15,7 +15,7 @@
 #include "ast/ExpressionErrorCatcher.h"
 #include "TypeError.h"
 
-Type* wake::ast::ExpressionErrorCatcher::typeCheck(bool forceArrayIdentifier) {
+PureType* wake::ast::ExpressionErrorCatcher::typeCheck(bool forceArrayIdentifier) {
 	try {
 		return child->typeCheck(forceArrayIdentifier);
 	} catch(TypeError* error) {
@@ -30,5 +30,5 @@ Type* wake::ast::ExpressionErrorCatcher::typeCheck(bool forceArrayIdentifier) {
 		delete error;
 	}
 
-	return new Type(TYPE_MATCHALL);
+	return new PureType(TYPE_MATCHALL);
 }

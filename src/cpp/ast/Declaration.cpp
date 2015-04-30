@@ -20,15 +20,15 @@
 void wake::ast::Declaration::typeCheck() {
 	try {
 		TypeParameterizer parameterizer;
-		parameterizer.rewriteClasstypesToParameterizedtypeByLabel(declared, parameterizedtypes);
-		classestable->assertTypeIsValid(*declared);
-		Type assignment = *auto_ptr<Type>(value->typeCheck(false));
-		if(!classestable->getAnalyzer()->isASubtypeOfB(&assignment, *declared)) {
-			EXPECTED	classestable->getAnalyzer()->getNameForType(*declared)
-			ERRONEOUS	classestable->getAnalyzer()->getNameForType(&assignment)
+		parameterizer.rewriteClasstypesToParameterizedtypeByLabel(&declared->typedata, parameterizedtypes);
+		classestable->assertTypeIsValid(&declared->typedata);
+		PureType assignment = *auto_ptr<PureType>(value->typeCheck(false));
+		if(!classestable->getAnalyzer()->isASubtypeOfB(&assignment, &declared->typedata)) {
+			EXPECTED	declared->typedata.toString()
+			ERRONEOUS	assignment.toString()
 			THROW		("Invalid value in declaration of variable");
 		}
-		scopesymtable->add(*declared);
+		scopesymtable->add(declared);
 	} catch(SemanticError* e) {
 		e->token = node;
 		errors->addError(e);

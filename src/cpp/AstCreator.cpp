@@ -42,11 +42,11 @@ wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
 
 	switch(node->node_type) {
 		case NT_DECLARATION:
-			created = new wake::ast::Declaration(&node->node_data.nodes[0]->node_data.var_decl, generateExpressionAst(node->node_data.nodes[1], true), node, classestable, scopesymtable, errors, parameterizedtypes);
+			created = new wake::ast::Declaration(node->node_data.nodes[0]->node_data.var_decl, generateExpressionAst(node->node_data.nodes[1], true), node, classestable, scopesymtable, errors, parameterizedtypes);
 			break;
 
 		case NT_CATCH:
-			created = new wake::ast::Catch(node->node_data.nodes[0]->node_data.type, generateStatementAst(node->node_data.nodes[1]), node, classestable, scopesymtable, errors);
+			created = new wake::ast::Catch(node->node_data.nodes[0]->node_data.var_decl, generateStatementAst(node->node_data.nodes[1]), node, classestable, scopesymtable, errors);
 			break;
 
 		case NT_THROW:

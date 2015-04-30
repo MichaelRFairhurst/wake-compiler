@@ -18,10 +18,10 @@
 
 void wake::ast::LambdaReturn::typeCheck() {
 	if(value.get() == NULL) {
-		auto_ptr<Type> unusable(new Type(TYPE_UNUSABLE));
+		auto_ptr<PureType> unusable(new PureType(TYPE_UNUSABLE));
 		returntype->unifyWith(unusable.get());
 	} else {
-		auto_ptr<Type> returnType(value->typeCheck(false));
+		auto_ptr<PureType> returnType(value->typeCheck(false));
 		returntype->unifyWith(returnType.get());
 	}
 }

@@ -19,28 +19,33 @@
 
 void wake::ast::Exists::typeCheck() {
 	try {
-		auto_ptr<Type> existableType(existable->typeCheck(false));
-
 		if(node->node_data.nodes[0]->node_type == NT_MEMBER_ACCESS) {
 			errors->addError(new SemanticError(TYPE_ERROR, "Calling exists { } on a property is illegal as it is a shared reference and therefore might be unset amid the scope", node));
 			return;
 		}
+
+		auto_ptr<VarRef> existableRef(node->node_data.nodes[0]->node_data.var_ref);
+		auto_ptr<PureType> existableType(existable->typeCheck(false));
 
 		if(existableType->type != TYPE_OPTIONAL) {
 			errors->addError(new SemanticError(EXISTS_ON_NONOPTIONAL_TYPE, "exists { } statement uses a nonoptional type", node)); // @todo better error message!
 			return;
 		}
 
-		Type real(TYPE_MATCHALL);
-		real = *existableType->typedata.optional.contained;
-		if(existableType->alias != NULL) real.alias = strdup(existableType->alias);
+		VarDecl realDecl;
+		VarDecl origDecl;
+		realDecl.typedata = *existableType->typedata.optional.contained;
+		origDecl.typedata = *existableType.get();
+		if(existableRef->alias != NULL) {
+			realDecl.alias = strdup(existableRef->alias);
+			origDecl.alias = strdup(existableRef->alias);
+		}
 
-		Type* orig = *scopesymtable->find(existableType.get());
-		scopesymtable->addOverwriting(&real);
+		scopesymtable->addOverwriting(&realDecl);
 
 		block->typeCheck();
 
-		scopesymtable->addOverwriting(orig);
+		scopesymtable->addOverwriting(&origDecl);
 
 		if(otherwise.get() != NULL) {
 			otherwise->typeCheck();
