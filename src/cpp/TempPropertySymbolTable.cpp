@@ -14,7 +14,7 @@
 
 #include "TempPropertySymbolTable.h"
 
-boost::optional<Type*> TempPropertySymbolTable::find(string name) {
+boost::optional<PureType*> TempPropertySymbolTable::find(string name) {
 	return table.find(name);
 }
 
@@ -34,15 +34,11 @@ int TempPropertySymbolTable::getFlags(string name) {
 	return table.getFlags(name);
 }
 
-string TempPropertySymbolTable::getProvisionSymbol(Type* provided, vector<Type*> &arguments) {
-	return table.getProvisionSymbol(provided, arguments);
-}
-
-vector<Type*>* TempPropertySymbolTable::getNeeds() {
+vector<SpecializableVarDecl*>* TempPropertySymbolTable::getNeeds() {
 	return table.getNeeds();
 }
 
-string TempPropertySymbolTable::getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments) {
+string TempPropertySymbolTable::getSymbolNameOf(vector<pair<string, PureTypeArray*> >* segments_arguments) {
 	return table.getSymbolNameOf(segments_arguments);
 }
 

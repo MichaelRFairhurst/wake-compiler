@@ -16,7 +16,6 @@
 #define HEADER_AST_CATCH
 
 #include "ast/StatementNode.h"
-#include "type.h"
 #include "ClassSpaceSymbolTable.h"
 #include "ScopeSymbolTable.h"
 #include "ErrorTracker.h"
@@ -30,7 +29,7 @@ namespace wake {
 		class Catch : public StatementNode {
 
 			public:
-				Catch(Type* exceptionType, StatementNode* body, Node* node, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, ErrorTracker* errors)
+				Catch(PureType* exceptionType, StatementNode* body, Node* node, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, ErrorTracker* errors)
 					: exceptionType(exceptionType), body(body), classestable(classestable), scopesymtable(scopesymtable), errors(errors), node(node) {};
 
 				void typeCheck();
@@ -40,7 +39,7 @@ namespace wake {
 				~Catch(){};
 
 			private:
-				Type* exceptionType;
+				PureType* exceptionType;
 				std::auto_ptr<StatementNode> body;
 				Node* node;
 				ClassSpaceSymbolTable* classestable;

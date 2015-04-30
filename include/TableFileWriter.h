@@ -17,16 +17,13 @@
 
 #include <iostream>
 #include "PropertySymbolTable.h"
-extern "C" {
-	#include "type.h"
-}
 
 class TableFileWriter {
 
 	public:
 		void write(ostream& out, PropertySymbolTable* table);
 	private:
-		void writeType(ostream& out, Type* type);
+		void writeType(ostream& out, PureType* type);
 		void writeProperty(ostream& out, ObjectProperty* property);
 		void writeAnnotations(ostream& out, const boost::ptr_vector<Annotation>& annotations);
 };

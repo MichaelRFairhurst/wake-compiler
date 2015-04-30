@@ -166,10 +166,10 @@ void Linker::generateRecursiveConstructors(ostream& file, string ctedclass, Clas
 	file << "_" << classTable.getAddress(table.getFullyQualifiedClassname(ctedclass));
 	file << "(";
 
-	vector<Type*>* needs = table.find(ctedclass)->getNeeds();
-	for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
+	vector<SpecializableVarDecl*>* needs = table.findFullyQualified(ctedclass)->getNeeds();
+	for(vector<SpecializableVarDecl*>::iterator it = needs->begin(); it != needs->end(); ++it) {
 		if(it != needs->begin()) file << ",";
-		generateRecursiveConstructors(file, (*it)->typedata._class.classname, table);
+		generateRecursiveConstructors(file, (*it)->decl.typedata.typedata._class.classname, table);
 	}
 
 	file << ")";

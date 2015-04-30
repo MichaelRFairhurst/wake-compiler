@@ -39,7 +39,7 @@ namespace wake {
 
 				bool exhaustiveReturns();
 
-				virtual Type getIterationType(Type* iterableType);
+				virtual PureType getIterationType(PureType* iterableType);
 
 				virtual ~Foreach(){};
 

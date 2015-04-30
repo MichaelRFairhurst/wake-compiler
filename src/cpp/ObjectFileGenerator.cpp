@@ -16,6 +16,9 @@
 #include <sstream>
 #include <iomanip>
 #include <limits>
+#include "MethodSignatureParseTreeTraverser.h"
+#include <boost/ptr_container/ptr_vector.hpp>
+#include <memory>
 
 void ObjectFileGenerator::generate(Node* tree) {
 	if(forceArrayIdentifier && tree->node_type != NT_TYPEDATA) {
@@ -192,10 +195,10 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_THROW:
 			{
 				table.pushScope();
-				PureType* exception = new PureType(TYPE_MATCHALL);
+				auto_ptr<PureType> exception(new PureType(TYPE_MATCHALL));
 				std::stringstream exceptionname;
-				exceptionname << exception;
-				table.add(exceptionname.str(), exception);
+				exceptionname << exception.get();
+				table.add(exceptionname.str(), exception.get());
 				file << "var " << table.getAddress(exceptionname.str()) << "=";
 				generate(tree->node_data.nodes[0]);
 				file << ";" << table.getAddress(exceptionname.str()) << ".";
@@ -215,24 +218,27 @@ void ObjectFileGenerator::generate(Node* tree) {
 				file << "function(){return new ";
 				header->addClassUsage(file.tellp(), classes->getFullyQualifiedClassname(provisionname));
 				file << "(";
-				vector<SpecializableVarDecl*>* needs = classes->find(provisionname)->getNeeds();
+				vector<SpecializableVarDecl*>* needs = classes->findByImportedName(provisionname)->getNeeds();
 				for(vector<SpecializableVarDecl*>::iterator it = needs->begin(); it != needs->end(); ++it) {
-					vector<VarDecl*> no_args;
+					SpecializablePureType spType;
+					spType.specialty = strdup((*it)->specialty);
+					spType.typedata = (*it)->decl.typedata;
+					vector<PureType*> no_args;
 					if(it != needs->begin()) file << ",";
 					file << "this.";
-					header->addPropertyUsage(file.tellp(), (*it)->toProvisionSymbol(no_args));
+					header->addPropertyUsage(file.tellp(), spType.toProvisionSymbol(no_args));
 					file << "()";
 				}
 				file << ");";
 			} else {
-				if(tree->node_data.nodes[1]->node_type == NT_TYPEDATA) {
+				if(tree->node_data.nodes[1]->node_type == NT_SPECIALIZABLE_TYPEDATA) {
 					file << "function(){return this.";
-					vector<VarDecl*> no_args;
-					header->addPropertyUsage(file.tellp(), classes->find(classname)->getProvisionSymbol(tree->node_data.nodes[1]->node_data.type, no_args));
+					vector<PureType*> no_args;
+					header->addPropertyUsage(file.tellp(), tree->node_data.nodes[1]->node_data.specializable_pure_type->toProvisionSymbol(no_args));
 					file << "();";
 				} else if(tree->node_data.nodes[1]->node_type == NT_INJECTION) {
 					file << "function(";
-					vector<VarDecl*> no_args;
+					vector<PureType*> no_args;
 					Node* inj = tree->node_data.nodes[1]->node_data.nodes[1];
 					table.pushScope();
 
@@ -241,9 +247,12 @@ void ObjectFileGenerator::generate(Node* tree) {
 						if(inj->node_data.nodes[i]->node_type == NT_INJECTION_ARG) {
 							if(first) first = false;
 							else file << ",";
-							inj->node_data.nodes[i]->node_data.nodes[0]->node_data.type->alias = strdup(string('$', i).c_str()); // a variable name guarenteed unique
-							table.add(inj->node_data.nodes[i]->node_data.nodes[0]->node_data.type);
-							file << table.getAddress(inj->node_data.nodes[i]->node_data.nodes[0]->node_data.type);
+							VarDecl decl;
+							decl.typedata = *inj->node_data.nodes[i]->node_data.nodes[0]->node_data.type;
+							decl.alias = strdup(string('$', i).c_str()); // unique name for each
+							table.add(&decl);
+							VarRef ref = decl.createVarRef();
+							file << table.getAddress(&ref);
 						}
 					}
 
@@ -257,10 +266,11 @@ void ObjectFileGenerator::generate(Node* tree) {
 							}
 
 							if(inj->node_data.nodes[i]->node_type == NT_INJECTION_ARG) {
-								file << table.getAddress(inj->node_data.nodes[i]->node_data.nodes[0]->node_data.type);
+								VarRef ref(strdup(string('$', i).c_str()));
+								file << table.getAddress(&ref);
 							} else {
 								file << "this.";
-								header->addPropertyUsage(file.tellp(), classes->find(classname)->getProvisionSymbol(inj->node_data.nodes[i]->node_data.type, no_args));
+								header->addPropertyUsage(file.tellp(), inj->node_data.nodes[i]->node_data.specializable_pure_type->toProvisionSymbol(no_args));
 								file << "()";
 							}
 						}
@@ -274,11 +284,11 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 					table.pushScope();
 
-					TypeArray* argarray = tree->node_data.nodes[1]->node_data.nodes[0]->node_data.typearray;
-					for(int i = 0; i < argarray->typecount; i++) {
+					for(int i = 0; i < tree->node_data.nodes[1]->subnodes; i++) {
 						if(i != 0) file << ",";
-						table.add(argarray->types[i]);
-						file << table.getAddress(argarray->types[i]);
+						table.add(tree->node_data.nodes[1]->node_data.nodes[i]->node_data.var_decl);
+						VarRef ref = tree->node_data.nodes[1]->node_data.nodes[i]->node_data.var_decl->createVarRef();
+						file << table.getAddress(&ref);
 					}
 
 					file << "){";
@@ -297,8 +307,8 @@ void ObjectFileGenerator::generate(Node* tree) {
 					}
 
 					file << "this.";
-					vector<Type*> no_args;
-					header->addPropertyUsage(file.tellp(), classes->find(classname)->getProvisionSymbol(tree->node_data.nodes[i]->node_data.type, no_args));
+					vector<PureType*> no_args;
+					header->addPropertyUsage(file.tellp(), tree->node_data.nodes[i]->node_data.specializable_pure_type->toProvisionSymbol(no_args));
 					file << "()";
 				}
 			}
@@ -331,20 +341,21 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 		case NT_METHOD_DECLARATION:
 			{
+				MethodSignatureParseTreeTraverser traverser(classes);
 				table.pushScope();
 				string name = tree->node_data.nodes[tree->subnodes - 1]->node_data.string;
-				TypeArray* arguments = (*classes->find(classname)->find(name))->typedata.lambda.arguments;
+				vector<VarDecl*> arguments = traverser.getArgDecls(tree);
 				int i;
 
-				//file << "this." << classes->find(classname)->getAddress(name) << "=function(";
 				file << "this.";
 				header->addPropertyUsage(file.tellp(), name);
 				file << "=function(";
 
-				for(i = 0; i < arguments->typecount; i++) {
+				for(i = 0; i < arguments.size(); i++) {
 					if(i != 0) file << ",";
-					table.add(arguments->types[i]);
-					file << table.getAddress(arguments->types[i]);
+					table.add(arguments[i]);
+					VarRef ref = arguments[i]->createVarRef();
+					file << table.getAddress(&ref);
 				}
 
 				file << "){";
@@ -361,17 +372,21 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_LAMBDA_DECLARATION:
 			{
 				table.pushScope();
+				boost::ptr_vector<PureType> cleanup;
 
 				file << "(function(";
 				for(int i = 0; i < tree->node_data.nodes[0]->subnodes; i++)
-				if(tree->node_data.nodes[0]->node_data.nodes[i]->node_type == NT_TYPEDATA) {
+				if(tree->node_data.nodes[0]->node_data.nodes[i]->node_type == NT_VAR_DECL_DATA) {
 					if(i != 0) file << ",";
-					table.add(tree->node_data.nodes[0]->node_data.nodes[i]->node_data.type);
-					file << table.getAddress(tree->node_data.nodes[0]->node_data.nodes[i]->node_data.type);
+					table.add(tree->node_data.nodes[0]->node_data.nodes[i]->node_data.var_decl);
+					VarRef ref = tree->node_data.nodes[0]->node_data.nodes[i]->node_data.var_decl->createVarRef();
+					file << table.getAddress(&ref);
 				} else {
 					if(i != 0) file << ",";
-					table.add(string(tree->node_data.nodes[0]->node_data.nodes[i]->node_data.string), new Type(TYPE_MATCHALL));
-					file << table.getAddress(string(tree->node_data.nodes[0]->node_data.nodes[i]->node_data.string));
+					cleanup.push_back(new PureType(TYPE_MATCHALL));
+					table.add(string(tree->node_data.nodes[0]->node_data.nodes[i]->node_data.string), &cleanup[cleanup.size() - 1]);
+					VarRef ref(strdup(tree->node_data.nodes[0]->node_data.nodes[i]->node_data.string));
+					file << table.getAddress(&ref);
 				}
 
 				file << "){";
@@ -432,10 +447,10 @@ void ObjectFileGenerator::generate(Node* tree) {
 				string name = tree->node_data.nodes[tree->subnodes - 1]->node_data.string;
 
 				table.pushScope();
-				Type* safechecked = MakeType(TYPE_MATCHALL);
+				auto_ptr<PureType> safechecked(new PureType(TYPE_MATCHALL));
 				std::stringstream safecheckedname;
-				safecheckedname << safechecked;
-				table.add(safecheckedname.str(), safechecked);
+				safecheckedname << safechecked.get();
+				table.add(safecheckedname.str(), safechecked.get());
 
 				file << "(function(" << table.getAddress(safecheckedname.str()) << "){";
 				file << "return " << table.getAddress(safecheckedname.str()) << "===null?null:(";
@@ -465,10 +480,10 @@ void ObjectFileGenerator::generate(Node* tree) {
 			{
 
 				table.pushScope();
-				Type* safechecked = MakeType(TYPE_MATCHALL);
+				auto_ptr<PureType> safechecked(new PureType(TYPE_MATCHALL));
 				std::stringstream safecheckedname;
-				safecheckedname << safechecked;
-				table.add(safecheckedname.str(), safechecked);
+				safecheckedname << safechecked.get();
+				table.add(safecheckedname.str(), safechecked.get());
 
 				file << "(function(" << table.getAddress(safecheckedname.str()) << "){";
 				file << "return " << table.getAddress(safecheckedname.str()) << "===null?null:";
@@ -513,7 +528,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_PROPERTY:
 			{
 				file << "this.";
-				string propname = table.getNameForType(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type);
+				string propname = tree->node_data.nodes[0]->node_data.nodes[0]->node_data.var_ref->toString();
 				header->addPropertyUsage(file.tellp(), propname);
 				file << "=";
 				generate(tree->node_data.nodes[0]->node_data.nodes[1]);
@@ -522,7 +537,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_DECLARATION:
-			table.add(tree->node_data.nodes[0]->node_data.type);
+			table.add(tree->node_data.nodes[0]->node_data.var_decl);
 			file << "var ";
 			// FALL THROUGH
 		case NT_ASSIGNMENT:
@@ -584,14 +599,13 @@ void ObjectFileGenerator::generate(Node* tree) {
 			file << "]";
 			break;
 
-		case NT_TYPEDATA:
+		case NT_VAR_REF:
 			{
-				Type type = *tree->node_data.type;
-				if(forceArrayIdentifier) {
-					type = Type(TYPE_LIST);
-					type.typedata.list.contained = new Type(*tree->node_data.type);
+				VarRef ref = *tree->node_data.var_ref;
+				if(forceArrayIdentifier && ref._class != NULL) {
+					ref._class->arrayed++;
 				}
-				file << table.getAddress(&type);
+				file << table.getAddress(&ref);
 			}
 			break;
 
@@ -606,10 +620,11 @@ void ObjectFileGenerator::generate(Node* tree) {
 			{
 			header->addClassUsage(file.tellp(), classes->getFullyQualifiedClassname(tree->node_data.nodes[0]->node_data.type->typedata._class.classname));
 			file << ".call(this";
-			PropertySymbolTable* proptable = classes->findModifiable(tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
-			for(vector<Type*>::iterator it = proptable->getNeeds()->begin(); it != proptable->getNeeds()->end(); ++it) {
+			PropertySymbolTable* proptable = classes->findByImportedNameModifiable(tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
+			for(vector<SpecializableVarDecl*>::iterator it = proptable->getNeeds()->begin(); it != proptable->getNeeds()->end(); ++it) {
 				file << ",";
-				file << table.getAddress(*it);
+				VarRef ref = (*it)->decl.createVarRef();
+				file << table.getAddress(&ref);
 			}
 			file << ");";
 			}
@@ -691,21 +706,22 @@ void ObjectFileGenerator::generate(Node* tree) {
 				Node** nodebase = tree->node_type == NT_FOREACHIN ? tree->node_data.nodes + 1: tree->node_data.nodes;
 				bool iterating_expression = nodebase[0]->node_type != NT_ALIAS && nodebase[0]->node_type != NT_TYPEDATA;
 				std::stringstream valuestorename;
+				auto_ptr<PureType> latch;
 				if(iterating_expression) {
-					Type* valuestore = MakeType(TYPE_MATCHALL);
-					valuestorename << valuestore;
-					table.add(valuestorename.str(), valuestore);
+					latch.reset(new PureType(TYPE_MATCHALL));
+					valuestorename << latch.get();
+					table.add(valuestorename.str(), latch.get());
 					file << "var " << table.getAddress(valuestorename.str()) << "=";
 					generate(nodebase[0]);
 					file << ";";
 				}
 
-				Type* indexer = MakeType(TYPE_MATCHALL);
-				Type* lowered = MakeType(TYPE_MATCHALL);
+				auto_ptr<PureType> indexer(new PureType(TYPE_MATCHALL));
+				auto_ptr<PureType> lowered(new PureType(TYPE_MATCHALL));
 				std::stringstream indexername;
-				indexername << indexer;
-				table.add(indexername.str(), indexer);
-				table.add(nodebase[2]->node_data.string, lowered);
+				indexername << indexer.get();
+				table.add(indexername.str(), indexer.get());
+				table.add(nodebase[2]->node_data.string, lowered.get());
 				file << "for(var " << table.getAddress(indexername.str()) << "=0;";
 				file << table.getAddress(indexername.str()) << " < ";
 				if(iterating_expression) file << table.getAddress(valuestorename.str());

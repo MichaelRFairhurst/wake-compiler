@@ -21,7 +21,7 @@
 #include "ClassSpaceSymbolTable.h"
 #include "ScopeSymbolTable.h"
 #include "MethodSignatureParseTreeTraverser.h"
-#include "type.h"
+#include "PureType.h"
 #include "node.h"
 #include <memory>
 #include <boost/ptr_container/ptr_vector.hpp>
@@ -40,9 +40,9 @@ namespace wake {
 					ClassSpaceSymbolTable* classestable,
 					ScopeSymbolTable* scopesymtable,
 					MethodSignatureParseTreeTraverser* methodanalyzer,
-					Type* thiscontext,
-					Type* returntype,
-					const vector<Type*>& parameterizedtypes
+					PureType* thiscontext,
+					PureType* returntype,
+					const vector<PureType*>& parameterizedtypes
 				) : node(node),
 					errors(errors),
 					classestable(classestable),
@@ -55,13 +55,13 @@ namespace wake {
 					for(std::vector<ExpressionNode*>::iterator it = children.begin(); it != children.end(); ++it) this->children.push_back(*it);
 				};
 
-				Type* typeCheck(bool forceArrayIdentifier);
+				PureType* typeCheck(bool forceArrayIdentifier);
 
 				~OtherExpression(){};
 
 			private:
 				bool isValidLValue(Node* tree);
-				Type* typeCheckMemberAccess(Node* n, Type& subject, bool forceArrayIdentifier);
+				PureType* typeCheckMemberAccess(Node* n, PureType& subject, bool forceArrayIdentifier);
 
 				Node* node;
 				boost::ptr_vector<ExpressionNode> children;
@@ -69,9 +69,9 @@ namespace wake {
 				ErrorTracker* errors;
 				ClassSpaceSymbolTable* classestable;
 				ScopeSymbolTable* scopesymtable;
-				Type* returntype;
-				Type* thiscontext;
-				vector<Type*> parameterizedtypes;
+				PureType* returntype;
+				PureType* thiscontext;
+				vector<PureType*> parameterizedtypes;
 
 		};
 

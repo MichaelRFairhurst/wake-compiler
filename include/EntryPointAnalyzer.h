@@ -17,6 +17,7 @@
 
 #include <string>
 #include <vector>
+#include "SpecializableVarDecl.h"
 
 using namespace std;
 
@@ -26,8 +27,8 @@ class EntryPointAnalyzer {
 
 	public:
 		bool checkClassNeedsCanBeMain(vector<SpecializableVarDecl*>* needs);
-		bool checkMethodCanBeMain(string methodname, PureType* method);
-		bool checkMethodCanBeMain(string classname, string methodname, ClassSpaceSymbolTable* table);
+		bool checkFQClassMethodCanBeMain(string methodname, PureType* method);
+		bool checkFQClassMethodCanBeMain(string classname, string methodname, ClassSpaceSymbolTable* table);
 		bool printClass(string classname);
 		bool printMethod(string methodname);
 

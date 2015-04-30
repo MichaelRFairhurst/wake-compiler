@@ -18,7 +18,6 @@
 #include <fstream>
 
 extern "C" {
-	#include "type.h"
 	#include "node.h"
 	#include "tree.h"
 	#include "wake.tab.h"
@@ -191,7 +190,7 @@ int main(int argc, char** argv) {
 				table.printEntryPoints(&entrypointanalyzer);
 				exit(0);
 			} else {
-				if(!entrypointanalyzer.checkMethodCanBeMain(options->mainclass, options->mainmethod, &table)) {
+				if(!entrypointanalyzer.checkFQClassMethodCanBeMain(options->mainclass, options->mainmethod, &table)) {
 					printf("Entry point %s.%s in not valid, cannot continue.\nTry wake yourfile --listmains to get entry points\n", options->mainclass.c_str(), options->mainmethod.c_str());
 					exit(5);
 				}

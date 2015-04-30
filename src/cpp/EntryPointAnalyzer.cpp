@@ -17,28 +17,31 @@
 #include "ClassSpaceSymbolTable.h"
 #include "CompilationExceptions.h"
 
-bool EntryPointAnalyzer::checkClassNeedsCanBeMain(vector<Type*>* needs) {
-	for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
-		if((*it)->type == TYPE_LAMBDA) return false;
-		if((*it)->type == TYPE_OPTIONAL) return false;
-		if((*it)->type == TYPE_LIST) return false;
-		if((*it)->typedata._class.classname == string("Int")) return false;
-		if((*it)->typedata._class.classname == string("Text")) return false;
-		if((*it)->typedata._class.classname == string("Truth")) return false;
+bool EntryPointAnalyzer::checkClassNeedsCanBeMain(vector<SpecializableVarDecl*>* needs) {
+	for(vector<SpecializableVarDecl*>::iterator it = needs->begin(); it != needs->end(); ++it) {
+		PureType* type = &(*it)->decl.typedata;
+		if(type->type == TYPE_LAMBDA) return false;
+		if(type->type == TYPE_OPTIONAL) return false;
+		if(type->type == TYPE_LIST) return false;
+		if(type->type == TYPE_PARAMETERIZED) return false;
+		if(type->type == TYPE_PARAMETERIZED_ARG) return false;
+		if(type->typedata._class.classname == string("Int")) return false;
+		if(type->typedata._class.classname == string("Text")) return false;
+		if(type->typedata._class.classname == string("Truth")) return false;
 	}
 
 	return true;
 }
 
-bool EntryPointAnalyzer::checkMethodCanBeMain(string methodname, Type* method) {
+bool EntryPointAnalyzer::checkFQClassMethodCanBeMain(string methodname, PureType* method) {
 	if(methodname.find("<-") != string::npos) return false;
 	return method->typedata.lambda.arguments->typecount == 0;
 }
 
-bool EntryPointAnalyzer::checkMethodCanBeMain(string classname, string methodname, ClassSpaceSymbolTable* table) {
+bool EntryPointAnalyzer::checkFQClassMethodCanBeMain(string classname, string methodname, ClassSpaceSymbolTable* table) {
 	try {
-		boost::optional<Type*> method = table->find(classname)->find(methodname);
-		return method ? checkMethodCanBeMain(methodname, *method) : false;
+		boost::optional<PureType*> method = table->findFullyQualified(classname)->find(methodname);
+		return method ? checkFQClassMethodCanBeMain(methodname, *method) : false;
 	} catch(SymbolNotFoundException* e) {
 		delete e;
 		return false;

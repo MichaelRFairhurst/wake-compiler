@@ -18,10 +18,6 @@
 #include "ClassSpaceSymbolTable.h"
 #include "PropertySymbolTable.h"
 
-extern "C" {
-	#include "type.h"
-}
-
 class LibraryLoader {
 
 	public:

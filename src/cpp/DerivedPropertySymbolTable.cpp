@@ -13,13 +13,14 @@
  **************************************************/
 
 #include "DerivedPropertySymbolTable.h"
+#include "PureTypeArray.h"
 #include <stdexcept>
 
-boost::optional<Type*> DerivedPropertySymbolTable::find(string name) {
+boost::optional<PureType*> DerivedPropertySymbolTable::find(string name) {
 	map<string, ObjectProperty*>::iterator searcher;
 	searcher = properties->find(name);
-	if(searcher == properties->end()) return boost::optional<Type*>();
-	else return boost::optional<Type*>(searcher->second->type);
+	if(searcher == properties->end()) return boost::optional<PureType*>();
+	else return boost::optional<PureType*>(&searcher->second->decl.typedata);
 }
 
 	//@TODO not duplicate code from PropertySymbolTable
@@ -53,24 +54,20 @@ int DerivedPropertySymbolTable::getFlags(string name) {
 	return properties->find(name)->second->flags;
 }
 
-string DerivedPropertySymbolTable::getProvisionSymbol(Type* provided, vector<Type*> &arguments) {
-	return analyzer.getProvisionSymbol(provided, arguments);
-}
-
-vector<Type*>* DerivedPropertySymbolTable::getNeeds() {
+vector<SpecializableVarDecl*>* DerivedPropertySymbolTable::getNeeds() {
 	return needs;
 }
 
-string DerivedPropertySymbolTable::getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments) {
+string DerivedPropertySymbolTable::getSymbolNameOf(vector<pair<string, PureTypeArray*> >* segments_arguments) {
 	//@TODO not duplicate code from PropertySymbolTable
 	string name;
-	for(vector<pair<string, TypeArray*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
+	for(vector<pair<string, PureTypeArray*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
 		name += it->first;
 		name += "(";
 		int i;
 		for(i = 0; i < it->second->typecount; i++) {
 			if(i) name += ",";
-			name += analyzer.getNameForType(it->second->types[i]);
+			name += it->second->types[i]->toString();
 		}
 		name += ")";
 	}
@@ -92,7 +89,7 @@ const map<string, bool>& DerivedPropertySymbolTable::getParentage() {
 }
 
 DerivedPropertySymbolTable::~DerivedPropertySymbolTable() {
-	for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
+	for(vector<SpecializableVarDecl*>::iterator it = needs->begin(); it != needs->end(); ++it) {
 		delete *it;
 	}
 	for(map<string, ObjectProperty*>::iterator it = properties->begin(); it != properties->end(); ++it) {

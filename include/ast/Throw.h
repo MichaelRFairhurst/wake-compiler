@@ -17,7 +17,6 @@
 
 #include "ast/StatementNode.h"
 #include "ast/ExpressionNode.h"
-#include "type.h"
 #include "ErrorTracker.h"
 #include "TypeAnalyzer.h"
 #include <memory>

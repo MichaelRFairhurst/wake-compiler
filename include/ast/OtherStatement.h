@@ -20,7 +20,6 @@
 #include "ClassSpaceSymbolTable.h"
 #include "ScopeSymbolTable.h"
 #include "MethodSignatureParseTreeTraverser.h"
-#include "type.h"
 #include "node.h"
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <vector>

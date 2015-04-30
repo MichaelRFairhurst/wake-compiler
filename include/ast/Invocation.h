@@ -33,7 +33,7 @@ namespace wake {
 						for(std::vector<ExpressionNode*>::iterator it = argumentExprs.begin(); it != argumentExprs.end(); ++it) this->argumentExprs.push_back(*it);
 				};
 
-				Type* typeCheck(bool forceArrayIdentifier);
+				PureType* typeCheck(bool forceArrayIdentifier);
 
 
 			private:
