@@ -20,9 +20,7 @@
 #include <utility>
 #include <boost/optional/optional.hpp>
 
-extern "C" {
-	#include "tree.h"
-}
+#include "tree.h"
 
 #include "ReadOnlyPropertySymbolTable.h"
 #include "PropertySymbolTable.h"

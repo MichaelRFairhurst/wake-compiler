@@ -18,7 +18,22 @@
 #include <stdlib.h>
 #include <string.h>
 #include "node.h"
+#include "PureType.h"
+#include "PureTypeArray.h"
+#include "VarRef.h"
+#include "VarDecl.h"
+#include "SpecializableVarDecl.h"
+#include "SpecializablePureType.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "wake.tab.h"
+
+#ifdef __cplusplus
+}
+#endif
 
 #define NT_PROGRAM 0
 
@@ -161,6 +176,10 @@
 #define NT_MODNATIVE 118
 #define NT_MODALT 119
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void addSubNode(Node* parent, Node* child);
 
 void prependSubNode(Node* parent, Node* child);
@@ -184,5 +203,9 @@ Node* makeOneBranchNode(int nodetype, Node* a, YYLTYPE loc);
 void printtree (Node *n, int level);
 
 void freeNode (Node *n);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

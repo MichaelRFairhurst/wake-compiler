@@ -31,23 +31,28 @@ void wake::ast::Foreach::typeCheck() {
 	} else {
 		PureType lowered(*list->typedata.list.contained);
 
-		if(lowered.alias != NULL) free(lowered.alias);
-		PureType actualLowered = getIterationType(&lowered);
+		VarDecl actualLowered = getIterationVarDecl(&lowered);
+
+		if(node->node_data.nodes[0]->node_type == NT_VAR_REF && node->node_data.nodes[0]->node_data.var_ref->alias == NULL) {
+			actualLowered.shadow = node->node_data.nodes[0]->node_data.var_ref->_class->shadow;
+		}
 
 		scopesymtable->pushScope();
 		scopesymtable->add(&actualLowered);
 		body->typeCheck();
 		scopesymtable->popScope();
 
-		AddSubNode(node, MakeNodeFromString(NT_COMPILER_HINT, strdup(scopesymtable->getNameForType(&actualLowered).c_str()), node->loc));
+		addSubNode(node, makeNodeFromString(NT_COMPILER_HINT, strdup(actualLowered.createVarRef().toString().c_str()), node->loc));
 	}
 }
 
-PureType wake::ast::Foreach::getIterationType(PureType* iterableType) {
-	iterableType->alias = NULL;
-	return *iterableType;
+VarDecl wake::ast::Foreach::getIterationVarDecl(PureType* iterableType) {
+	VarDecl decl;
+	decl.typedata = *iterableType;
+	return decl;
 }
 
 bool wake::ast::Foreach::exhaustiveReturns() {
 	return false; // might be 0 items
 }
+

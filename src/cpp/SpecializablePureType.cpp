@@ -46,3 +46,13 @@ std::string SpecializablePureType::toProvisionSymbol(std::vector<PureType*> &arg
 	if(specialty != NULL) name += specialty;
 	return name;
 }
+
+namespace std
+{
+	template<>
+	void swap(SpecializablePureType& lhs, SpecializablePureType& rhs)
+	{
+		std::swap(lhs.typedata, rhs.typedata);
+		std::swap(lhs.specialty, rhs.specialty);
+	}
+}

@@ -18,9 +18,7 @@
 #include <string>
 #include <vector>
 
-extern "C" {
-	#include "tree.h"
-}
+#include "tree.h"
 
 #include "ErrorTracker.h"
 #include "ClassSpaceSymbolTable.h"

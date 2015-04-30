@@ -29,7 +29,7 @@ typedef struct SpecializablePureType {
 #ifdef __cplusplus
 	public:
 		~SpecializablePureType();
-		SpecializablePureType();
+		SpecializablePureType(){};
 		SpecializablePureType(SpecializablePureType& other);
 		SpecializablePureType& operator=(SpecializablePureType& other);
 
@@ -56,11 +56,7 @@ void freeSpecializablePureType(SpecializablePureType* spt);
 namespace std
 {
 	template<>
-	void swap(SpecializablePureType& lhs, SpecializablePureType& rhs)
-	{
-		std::swap(lhs.typedata, rhs.typedata);
-		std::swap(lhs.specialty, rhs.specialty);
-	}
+	void swap(SpecializablePureType& lhs, SpecializablePureType& rhs);
 }
 #endif
 

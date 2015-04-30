@@ -36,3 +36,14 @@ ClassVarRef& ClassVarRef::operator=(ClassVarRef& other) {
 ClassVarRef* makeClassVarRef(char* classname, int shadow, int arrayed) {
 	return new ClassVarRef(classname, shadow, arrayed);
 }
+
+namespace std
+{
+	template<>
+	void swap(ClassVarRef& lhs, ClassVarRef& rhs)
+	{
+		std::swap(lhs.classname, rhs.classname);
+		std::swap(lhs.shadow, rhs.shadow);
+		std::swap(lhs.arrayed, rhs.arrayed);
+	}
+}

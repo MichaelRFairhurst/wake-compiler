@@ -54,11 +54,7 @@ extern "C" {
 namespace std
 {
 	template<>
-	void swap(VarRef& lhs, VarRef& rhs)
-	{
-		std::swap(lhs.alias, rhs.alias);
-		std::swap(lhs._class, rhs._class);
-	}
+	void swap(VarRef& lhs, VarRef& rhs);
 }
 #endif
 

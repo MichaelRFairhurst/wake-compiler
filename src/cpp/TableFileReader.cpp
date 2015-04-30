@@ -17,6 +17,7 @@
 #include <iostream>
 
 void TableFileReader::read(PropertySymbolTable* table, istream& s) {
+	/*
 	//@TODO work rom tablefile
 	int version = readUInt8(s);
 	if(version != 5) throw string("Can not read table file, it has an unsupported version");
@@ -40,7 +41,7 @@ void TableFileReader::read(PropertySymbolTable* table, istream& s) {
 	}
 	//cout << "done with inheritance" << endl;
 
-	vector<Type*>* parameters = new vector<Type*>();
+	vector<PureType*>* parameters = new vector<PureType*>();
 	while(true) {
 		tag = readUInt8(s);
 		if(tag == 0x00) break;
@@ -50,17 +51,19 @@ void TableFileReader::read(PropertySymbolTable* table, istream& s) {
 	//cout << "done with parameters" << endl;
 	table->setParameters(parameters);
 	table->setAnnotations(readAnnotations(s));
+	*/
 }
 
-std::string TableFileReader::readString(istream& s) {
+std::string TableFileReader::readString(istream& s) {/*
 	char* strb = readCString(s);
 	if(strb == NULL) return string("");
 	std::string str(strb);
 	free(strb);
 	return str;
+	*/
 }
 
-char* TableFileReader::readCString(istream& s) {
+char* TableFileReader::readCString(istream& s) {/*
 	unsigned char len = readUInt8(s);
 	if(len == 0) {
 		//cout << "Read string NULL" << endl;
@@ -72,31 +75,35 @@ char* TableFileReader::readCString(istream& s) {
 	strb[len] = 0;
 	//cout << "Read string " << strb << endl;
 	return strb;
+*/
 }
 
-unsigned char TableFileReader::readUInt8(istream& s) {
+unsigned char TableFileReader::readUInt8(istream& s) {/*
 	char* uint8p = (char*) malloc(1);
 	s.read(uint8p, 1);
 	unsigned char uint8 = *uint8p;
 	free(uint8p);
 	//cout << "Read uint8 " << ((int) uint8) << endl;
 	return uint8;
+*/
 }
 
-double TableFileReader::readNum64(istream& s) {
+double TableFileReader::readNum64(istream& s) {/*
 	char buffer[4] = {0};
 	s.read(buffer, 4);
 	double num64 = 0;
 	memcpy(buffer, &num64, sizeof(double));
 	return num64;
+*/
 }
 
-Type* TableFileReader::readType(istream& s) {
+PureType* TableFileReader::readType(istream& s) {/*
 	//cout << "reading type" << endl;
 	return readTypeByTag(readUInt8(s), s);
+*/
 }
 
-Type* TableFileReader::readTypeByTag(int tag, istream& s) {
+/*PureType* TableFileReader::readTypeByTag(int tag, istream& s) {
 	//cout << "reading type by tag " << tag << endl;
 	if(tag == TYPE_CLASS) {
 		return readClassType(s);
@@ -109,11 +116,11 @@ Type* TableFileReader::readTypeByTag(int tag, istream& s) {
 	} else if(tag == TYPE_OPTIONAL) {
 		return readOptionalType(s);
 	}
-}
+}*/
 
-Type* TableFileReader::readClassType(istream &s) {
+PureType* TableFileReader::readClassType(istream &s) {/*
 	//cout << "reading class type" << endl;
-	Type* type = MakeType(TYPE_CLASS);
+	PureType* type = MakeType(TYPE_CLASS);
 	type->typedata._class.classname = readCString(s);
 
 	bool hasParams = false;
@@ -134,11 +141,12 @@ Type* TableFileReader::readClassType(istream &s) {
 	readTypeCommon(type, s);
 
 	return type;
+*/
 }
 
-Type* TableFileReader::readLambdaType(istream& s) {
+PureType* TableFileReader::readLambdaType(istream& s) {/*
 	//cout << "reading lambda" << endl;
-	Type* type = MakeType(TYPE_LAMBDA);
+	PureType* type = MakeType(TYPE_LAMBDA);
 	type->typedata.lambda.arguments = MakeTypeArray();
 
 	int tag = readUInt8(s);
@@ -157,10 +165,11 @@ Type* TableFileReader::readLambdaType(istream& s) {
 	readTypeCommon(type, s);
 
 	return type;
+*/
 }
 
-Type* TableFileReader::readParameterizedType(istream& s, int paramdtype) {
-	Type* type = MakeType(paramdtype);
+PureType* TableFileReader::readParameterizedType(istream& s, int paramdtype) {/*
+	PureType* type = MakeType(paramdtype);
 	type->typedata.parameterized.label = readCString(s);
 	int tag = readUInt8(s);
 	if(tag != 0x00) {
@@ -174,34 +183,38 @@ Type* TableFileReader::readParameterizedType(istream& s, int paramdtype) {
 
 	readTypeCommon(type, s);
 	return type;
+	*/
 }
 
-Type* TableFileReader::readListType(istream& s) {
-	Type* type = MakeType(TYPE_LIST);
+PureType* TableFileReader::readListType(istream& s) {/*
+	PureType* type = MakeType(TYPE_LIST);
 	type->typedata.list.contained = readType(s);
 	readUInt8(s); // backwards compat
 
 	readTypeCommon(type, s);
 	return type;
+	*/
 }
 
-Type* TableFileReader::readOptionalType(istream& s) {
-	Type* type = MakeType(TYPE_OPTIONAL);
+PureType* TableFileReader::readOptionalType(istream& s) {/*
+	PureType* type = MakeType(TYPE_OPTIONAL);
 	type->typedata.optional.contained = readType(s);
 	readUInt8(s); // backwards compat
 
 	readTypeCommon(type, s);
 	return type;
+	*/
 }
 
-void TableFileReader::readTypeCommon(Type* type, istream& s) {
+void TableFileReader::readTypeCommon(PureType* type, istream& s) {/*
 	//cout << "reading type common" << endl;
 	type->alias = readCString(s);
 	type->specialty = readCString(s);
 	//cout << "done reading type" << endl;
+	*/
 }
 
-void TableFileReader::readMethod(PropertySymbolTable* table, istream& s) {
+void TableFileReader::readMethod(PropertySymbolTable* table, istream& s) {/*
 	ObjectProperty* prop = new ObjectProperty();
 	string name = readString(s);
 	prop->address = name; // always true except @TODO when extending generics
@@ -213,14 +226,16 @@ void TableFileReader::readMethod(PropertySymbolTable* table, istream& s) {
 		prop->annotations.push_back(*ann);
 	table->properties[name] = prop;
 	if(prop->flags & PROPERTY_NEED) table->getNeeds()->push_back(prop->type);
+	*/
 }
 
-void TableFileReader::readInheritance(PropertySymbolTable* table, istream& s) {
+void TableFileReader::readInheritance(PropertySymbolTable* table, istream& s) {/*
 	string classname = readString(s);
 	table->parentage[classname] = readUInt8(s);;
+	*/
 }
 
-vector<Annotation*> TableFileReader::readAnnotations(istream& s) {
+vector<Annotation*> TableFileReader::readAnnotations(istream& s) {/*
 	//cout << "reading annotations" << endl;
 	vector<Annotation*> annotations;
 	while(true) {
@@ -232,9 +247,10 @@ vector<Annotation*> TableFileReader::readAnnotations(istream& s) {
 	}
 	//cout << "ending annotations" << endl;
 	return annotations;
+	*/
 }
 
-Annotation* TableFileReader::readAnnotation(istream& s) {
+Annotation* TableFileReader::readAnnotation(istream& s) {/*
 	//cout << "reading annotation" << endl;
 	Annotation* annotation = new Annotation();
 	annotation->name = strdup(readString(s).c_str());
@@ -260,4 +276,5 @@ Annotation* TableFileReader::readAnnotation(istream& s) {
 
 	//cout << "end annotation" << endl;
 	return annotation;
+	*/
 }

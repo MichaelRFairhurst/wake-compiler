@@ -91,7 +91,7 @@ wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
 				created = new wake::ast::ForeachInAliased(generateExpressionAst(node->node_data.nodes[1], true), generateStatementAst(node->node_data.nodes[2]), node->node_data.nodes[0]->node_data.string, node, scopesymtable, errors);
 				break;
 			} else {
-				created = new wake::ast::ForeachInExplicitType(generateExpressionAst(node->node_data.nodes[1], true), generateStatementAst(node->node_data.nodes[2]),  node->node_data.nodes[0]->node_data.type, node, scopesymtable, errors, classestable->getAnalyzer());
+				created = new wake::ast::ForeachInExplicitType(generateExpressionAst(node->node_data.nodes[1], true), generateStatementAst(node->node_data.nodes[2]),  node->node_data.nodes[0]->node_data.var_decl, node, scopesymtable, errors, classestable->getAnalyzer());
 				break;
 			}
 
@@ -196,19 +196,19 @@ wake::ast::ExpressionNode* wake::AstCreator::generateExpressionAst(Node* node, b
 }
 
 wake::ast::Lambda* wake::AstCreator::generateLambda(Node* node) {
-	std::vector<std::pair<boost::optional<std::string>, boost::optional<PureType> > > arguments;
+	std::vector<std::pair<boost::optional<std::string>, boost::optional<VarDecl> > > arguments;
 
 	for(int i = 0; i < node->node_data.nodes[0]->subnodes; i++)
 	if(node->node_data.nodes[0]->node_data.nodes[i]->node_type == NT_ALIAS) {
 		boost::optional<std::string> alias(node->node_data.nodes[0]->node_data.nodes[i]->node_data.string);
-		boost::optional<PureType> notype;
+		boost::optional<VarDecl> notype;
 
-		arguments.push_back(std::pair<boost::optional<std::string>, boost::optional<PureType> >(alias, notype));
+		arguments.push_back(std::pair<boost::optional<std::string>, boost::optional<VarDecl> >(alias, notype));
 	} else {
 		boost::optional<std::string> noalias;
-		boost::optional<PureType> type(PureType(*node->node_data.nodes[0]->node_data.nodes[i]->node_data.type));
+		boost::optional<VarDecl> type(VarDecl(*node->node_data.nodes[0]->node_data.nodes[i]->node_data.var_decl));
 
-		arguments.push_back(std::pair<boost::optional<std::string>, boost::optional<PureType> >(noalias, type));
+		arguments.push_back(std::pair<boost::optional<std::string>, boost::optional<VarDecl> >(noalias, type));
 	}
 
 	UnifyingType* lastLambdaReturn = lambdaReturnType;

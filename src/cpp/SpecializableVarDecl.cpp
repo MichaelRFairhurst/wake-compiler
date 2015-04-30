@@ -31,3 +31,13 @@ SpecializableVarDecl& SpecializableVarDecl::operator=(SpecializableVarDecl& othe
 	std::swap(*this, other);
 	return *this;
 }
+
+namespace std
+{
+	template<>
+	void swap(SpecializableVarDecl& lhs, SpecializableVarDecl& rhs)
+	{
+		std::swap(lhs.decl, rhs.decl);
+		std::swap(lhs.specialty, rhs.specialty);
+	}
+}

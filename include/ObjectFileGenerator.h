@@ -17,9 +17,7 @@
 
 #include <iostream>
 
-extern "C" {
-	#include "tree.h"
-}
+#include "tree.h"
 
 #include "ScopeSymbolTable.h"
 #include "ClassSpaceSymbolTable.h"

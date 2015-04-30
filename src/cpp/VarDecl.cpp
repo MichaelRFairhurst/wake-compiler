@@ -27,9 +27,9 @@ VarDecl::VarDecl(const VarDecl& other) {
 	shadow = other.shadow;
 }
 
-VarDecl& VarDecl::operator=(VarDecl& other) {
+VarDecl& VarDecl::operator=(const VarDecl& other) {
 	VarDecl temp(other);
-	std::swap(*this, other);
+	std::swap(*this, temp);
 	return *this;
 }
 
@@ -40,5 +40,16 @@ VarRef VarDecl::createVarRef() {
 		ClassVarRef ref = typedata.createClassVarRef();
 		ref.shadow = shadow;
 		return VarRef(new ClassVarRef(ref));
+	}
+}
+
+namespace std
+{
+	template<>
+	void swap(VarDecl& lhs, VarDecl& rhs)
+	{
+		std::swap(lhs.typedata, rhs.typedata);
+		std::swap(lhs.alias, rhs.alias);
+		std::swap(lhs.shadow, rhs.shadow);
 	}
 }

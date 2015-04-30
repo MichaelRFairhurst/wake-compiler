@@ -26,9 +26,9 @@ typedef struct VarDecl {
 #ifdef __cplusplus
 	public:
 		~VarDecl();
-		VarDecl();
+		VarDecl(){};
 		VarDecl(const VarDecl& other);
-		VarDecl& operator=(VarDecl& other);
+		VarDecl& operator=(const VarDecl& other);
 
 		VarRef createVarRef();
 
@@ -53,12 +53,7 @@ void freeVarDecl(VarDecl* spt);
 namespace std
 {
 	template<>
-	void swap(VarDecl& lhs, VarDecl& rhs)
-	{
-		std::swap(lhs.typedata, rhs.typedata);
-		std::swap(lhs.alias, rhs.alias);
-		std::swap(lhs.shadow, rhs.shadow);
-	}
+	void swap(VarDecl& lhs, VarDecl& rhs);
 }
 #endif
 

@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesReturnTypes) {
 	parameterization.typedata._class.classname = strdup("AClass");
 	parameter.typedata.parameterized.label = strdup("E");
 	methodtype->typedata.lambda.returntype = new PureType(parameter);
-	property->type = methodtype;
+	property->decl.typedata = *methodtype;
 	property->casing = "myMethod";
 	parameters->push_back(&parameter);
 	parameterizations.push_back(&parameterization);
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesPropertyName) {
 	parameter.typedata.parameterized.label = strdup("E");
 	methodtype->typedata.lambda.arguments = new PureTypeArray();
 	addPureTypeToPureTypeArray(new PureType(parameter), methodtype->typedata.lambda.arguments);
-	property->type = methodtype;
+	property->decl.typedata = *methodtype;
 	property->casing = "myMethod(#)";
 	parameters->push_back(&parameter);
 	parameterizations.push_back(&parameterization);
@@ -114,16 +114,18 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesNeedName) {
 	parameter->typedata.parameterized.label = strdup("E");
 	parameters->push_back(parameter);
 	parameterizations.push_back(&parameterization);
+	SpecializableVarDecl needDecl;
+	needDecl.decl.typedata = *parameter;
 	table.setParameters(parameters);
-	table.addNeed(parameter, 0, vector<Annotation*>());
+	table.addNeed(&needDecl, 0, vector<Annotation*>());
 
 	auto_ptr<ReadOnlyPropertySymbolTable> derived(table.resolveParameters(parameterizations));
 
 	vector<SpecializableVarDecl*>* needs = derived->getNeeds();
 
 	BOOST_REQUIRE(needs->size() == 1);
-	BOOST_REQUIRE(needs->at(0)->type == TYPE_CLASS);
-	BOOST_REQUIRE(needs->at(0)->typedata._class.classname == string("AClass"));
+	BOOST_REQUIRE(needs->at(0)->decl.typedata.type == TYPE_CLASS);
+	BOOST_REQUIRE(needs->at(0)->decl.typedata.typedata._class.classname == string("AClass"));
 }
 
 BOOST_AUTO_TEST_SUITE_END();

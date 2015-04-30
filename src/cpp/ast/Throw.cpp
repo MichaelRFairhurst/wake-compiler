@@ -21,7 +21,7 @@ void wake::ast::Throw::typeCheck() {
 
 	if(!analyzer->isException(exceptionType.get())) {
 		EXPECTED	"Exception"
-		ERRONEOUS	exceptionType.toString()
+		ERRONEOUS	exceptionType->toString()
 		THROW		("Can only throw subclasses of exception");
 	}
 }

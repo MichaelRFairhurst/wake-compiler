@@ -19,9 +19,7 @@
 #include <string>
 #include <vector>
 
-extern "C" {
 	#include "tree.h"
-}
 
 #include "ClassSpaceSymbolTable.h"
 

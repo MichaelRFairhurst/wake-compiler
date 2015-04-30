@@ -17,9 +17,9 @@
 #include <sstream>
 #include <fstream>
 
+#include "tree.h"
 extern "C" {
 	#include "node.h"
-	#include "tree.h"
 	#include "wake.tab.h"
 	extern int yyparse();
 	extern Node* parsetree;

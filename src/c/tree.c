@@ -111,7 +111,7 @@ void initTreeTypes() {
 	treeTypesInited = 1;
 }
 
-void AddSubNode(Node* parent, Node* child) {
+void addSubNode(Node* parent, Node* child) {
 	parent->subnodes++;
 	parent->node_data.nodes = realloc(parent->node_data.nodes, sizeof(Node*) * parent->subnodes);
 	parent->node_data.nodes[parent->subnodes - 1] = child;
@@ -135,39 +135,39 @@ Node* NodeFactory(int nodetype, YYLTYPE loc) {
 	return mynode;
 }
 
-Node* MakeEmptyNode(int nodetype, YYLTYPE loc) {
+Node* makeEmptyNode(int nodetype, YYLTYPE loc) {
 	Node* mynode = NodeFactory(nodetype, loc);
 	mynode->node_data.nodes = NULL;
 	return mynode;
 }
 
-Node* MakeNodeFromType(Type* thetype, YYLTYPE loc) {
+Node* makeNodeFromPureType(PureType* thetype, YYLTYPE loc) {
 	Node* mynode = NodeFactory(NT_TYPEDATA, loc);
 	mynode->node_data.type = thetype;
 	return mynode;
 }
 
-Node* MakeNodeFromTypeArray(TypeArray* thearray, YYLTYPE loc) {
+Node* makeNodeFromPureTypeArray(PureTypeArray* thearray, YYLTYPE loc) {
 	Node* mynode = NodeFactory(NT_TYPE_ARRAY, loc);
 	mynode->node_data.typearray = thearray;
 
 	return mynode;
 }
 
-Node* MakeNodeFromString(int nodetype, char* mystring, YYLTYPE loc) {
+Node* makeNodeFromString(int nodetype, char* mystring, YYLTYPE loc) {
 	Node* mynode = NodeFactory(nodetype, loc);
 	mynode->node_data.string = mystring;
 	//mynode->node_data.string = strdup(mystring);
 	return mynode;
 }
 
-Node* MakeNodeFromNumber(int nodetype, double number, YYLTYPE loc) {
+Node* makeNodeFromNumber(int nodetype, double number, YYLTYPE loc) {
 	Node* mynode = NodeFactory(nodetype, loc);
 	mynode->node_data.number = number;
 	return mynode;
 }
 
-Node* MakeTwoBranchNode(int nodetype, Node* a, Node* b, YYLTYPE loc) {
+Node* makeTwoBranchNode(int nodetype, Node* a, Node* b, YYLTYPE loc) {
 	Node* mynode = NodeFactory(nodetype, loc);
 	mynode->subnodes = 2;
 	mynode->node_data.nodes = malloc(2 * sizeof(Node*));
@@ -175,7 +175,7 @@ Node* MakeTwoBranchNode(int nodetype, Node* a, Node* b, YYLTYPE loc) {
 	return mynode;
 }
 
-Node* MakeOneBranchNode(int nodetype, Node* a, YYLTYPE loc) {
+Node* makeOneBranchNode(int nodetype, Node* a, YYLTYPE loc) {
 	Node* mynode = NodeFactory(nodetype, loc);
 	mynode->subnodes = 1;
 	mynode->node_data.nodes = malloc(1 * sizeof(Node*));
@@ -191,7 +191,7 @@ void printSubNodes(Node *n, int level, char* name) {
 		printtree (n->node_data.nodes[i], level+1);
 }
 
-void printtype(Type* thetype, int level) {
+void printtype(PureType* thetype, int level) {
 	/*
 	switch(thetype->type) {
 		case TYPE_LAMBDA:
@@ -270,10 +270,10 @@ void freeNode(Node* n) {
 			free(n->node_data.string);
 			break;
 		case NT_TYPEDATA:
-			freeType(n->node_data.type);
+			freePureType(n->node_data.type);
 			break;
 		case NT_TYPE_ARRAY:
-			freeTypeArray(n->node_data.typearray);
+			freePureTypeArray(n->node_data.typearray);
 			break;
 	}
 

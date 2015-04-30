@@ -25,8 +25,9 @@
 
 extern "C" {
 	#include "node.h"
-	#include "tree.h"
 }
+
+#include "tree.h"
 
 using namespace std;
 

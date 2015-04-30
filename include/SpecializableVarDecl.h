@@ -24,7 +24,7 @@ typedef struct SpecializableVarDecl {
 #ifdef __cplusplus
 	public:
 		~SpecializableVarDecl();
-		SpecializableVarDecl();
+		SpecializableVarDecl(){};
 		SpecializableVarDecl(SpecializableVarDecl& other);
 		SpecializableVarDecl& operator=(SpecializableVarDecl& other);
 	private:
@@ -48,11 +48,7 @@ void freeSpecializableVarDecl(SpecializableVarDecl* spt);
 namespace std
 {
 	template<>
-	void swap(SpecializableVarDecl& lhs, SpecializableVarDecl& rhs)
-	{
-		std::swap(lhs.decl, rhs.decl);
-		std::swap(lhs.specialty, rhs.specialty);
-	}
+	void swap(SpecializableVarDecl& lhs, SpecializableVarDecl& rhs);
 }
 #endif
 

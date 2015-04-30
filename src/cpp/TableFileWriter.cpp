@@ -16,6 +16,7 @@
 #include "PureTypeArray.h"
 
 void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
+	/*
 	char dataptr[1] = {0};
 
 	dataptr[0] = (char) 5; //version
@@ -76,9 +77,10 @@ void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 	out.write(dataptr, 1);
 
 	writeAnnotations(out, table->getAnnotations());
+	*/
 }
 
-void TableFileWriter::writeType(ostream& out, PureType* type) {
+void TableFileWriter::writeType(ostream& out, PureType* type) {/*
 	char dataptr[1] = {0};
 	if(type->type == TYPE_CLASS) {
 		dataptr[0] = TYPE_CLASS;
@@ -177,9 +179,10 @@ void TableFileWriter::writeType(ostream& out, PureType* type) {
 		dataptr[0] = 0;
 		out.write(dataptr, 1);
 	}
+*/
 }
 
-void TableFileWriter::writeProperty(ostream& out, ObjectProperty* property) {
+void TableFileWriter::writeProperty(ostream& out, ObjectProperty* property) {/*
 	char dataptr[1] = {0};
 
 	dataptr[0] = (char) property->casing.size();
@@ -193,9 +196,10 @@ void TableFileWriter::writeProperty(ostream& out, ObjectProperty* property) {
 
 	// annotations... hard coded to none
 	writeAnnotations(out, property->annotations);
+*/
 }
 
-void TableFileWriter::writeAnnotations(ostream& out, const boost::ptr_vector<Annotation>& annotations) {
+void TableFileWriter::writeAnnotations(ostream& out, const boost::ptr_vector<Annotation>& annotations) {/*
 	char dataptr[1];
 	for(boost::ptr_vector<Annotation>::const_iterator ann = annotations.begin(); ann != annotations.end(); ++ann) {
 		dataptr[0] = (char) strlen(ann->name);
@@ -231,4 +235,5 @@ void TableFileWriter::writeAnnotations(ostream& out, const boost::ptr_vector<Ann
 
 	dataptr[0] = (char) 0x00;
 	out.write(dataptr, 1);
+*/
 }

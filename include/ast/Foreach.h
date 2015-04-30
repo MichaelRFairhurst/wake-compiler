@@ -21,9 +21,7 @@
 #include "ErrorTracker.h"
 #include <memory>
 
-extern "C" {
-	#include "tree.h"
-}
+#include "tree.h"
 
 namespace wake {
 
@@ -39,7 +37,7 @@ namespace wake {
 
 				bool exhaustiveReturns();
 
-				virtual PureType getIterationType(PureType* iterableType);
+				virtual VarDecl getIterationVarDecl(PureType* iterableType);
 
 				virtual ~Foreach(){};
 
