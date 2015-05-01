@@ -1,3 +1,8 @@
+body {
+	font-family: "Roboto";
+	font-weight: 300;
+}
+
 .inner-content {
 	max-width: 1100px;
 	margin: auto;
@@ -5,8 +10,8 @@
 }
 
 @media only screen and (max-width: 800px) {
-
 	/* Force table to not be like tables anymore */
+
 	table,
 	thead,
 	tbody,
@@ -18,56 +23,59 @@
 	th {
 		display: none;
 	}
-
 	/* Hide table headers (but not display: none;, for accessibility) */
+
 	thead tr {
 		position: absolute;
 		top: -9999px;
 		left: -9999px;
 	}
-
-	tr { border: 1px solid #ccc; }
-
+	tr {
+		border: 1px solid #ccc;
+	}
 	td {
 		/* Behave  like a "row" */
+
 		border: none;
 		border-bottom: 1px solid #eee;
 		position: relative;
 		padding-left: 50%;
 		white-space: normal;
-		text-align:left;
+		text-align: left;
 	}
-
 	td:before {
 		/* Now like a table header */
+
 		position: absolute;
 		/* Top/left values mimic padding */
+
 		top: 6px;
 		left: 6px;
 		width: 45%;
 		padding-right: 10px;
 		white-space: nowrap;
-		text-align:left;
+		text-align: left;
 		font-weight: bold;
 	}
-
 	/*
 	Label the data
 	*/
-	td:before { content: attr(data-title); }
 
+	td:before {
+		content: attr(data-title);
+	}
 	.logo-label-label {
 		display: none;
 	}
 	h2 a.logo-label {
 		font-size: 25px;
 	}
-
 	.inner-content {
 		overflow-x: hidden;
 	}
 }
-.mynavbar {
+
+div.mynavbar {
 	position: fixed;
 	z-index: 200;
 	padding: 15px;
@@ -75,14 +83,17 @@
 	bottom: 0px;
 	overflow-x: hidden;
 	overflow-y: auto;
-	background: rgb(255,255,255); /* Old browsers */
-	background: -moz-linear-gradient(-45deg,  rgba(255,255,255,1) 0%, rgba(243,243,243,1) 50%, rgba(237,237,237,1) 51%, rgba(255,255,255,1) 100%); /* FF3.6+ */
-	background: -webkit-gradient(linear, left top, right bottom, color-stop(0%,rgba(255,255,255,1)), color-stop(50%,rgba(243,243,243,1)), color-stop(51%,rgba(237,237,237,1)), color-stop(100%,rgba(255,255,255,1))); /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(-45deg,  rgba(255,255,255,1) 0%,rgba(243,243,243,1) 50%,rgba(237,237,237,1) 51%,rgba(255,255,255,1) 100%); /* Chrome10+,Safari5.1+ */
-	background: -o-linear-gradient(-45deg,  rgba(255,255,255,1) 0%,rgba(243,243,243,1) 50%,rgba(237,237,237,1) 51%,rgba(255,255,255,1) 100%); /* Opera 11.10+ */
-	background: -ms-linear-gradient(-45deg,  rgba(255,255,255,1) 0%,rgba(243,243,243,1) 50%,rgba(237,237,237,1) 51%,rgba(255,255,255,1) 100%); /* IE10+ */
-	background: linear-gradient(135deg,  rgba(255,255,255,1) 0%,rgba(243,243,243,1) 50%,rgba(237,237,237,1) 51%,rgba(255,255,255,1) 100%); /* W3C */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ffffff',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+	background: rgb(249, 249, 249);
+}
+
+div.mynavbar .nav-tabs.nav-stacked > li > a {
+	color: #00aeef;
+	border: 0;
+}
+
+div.mynavbar .nav-tabs.nav-stacked > li > a:hover {
+	background: white;
+	border-radius: 4px;
 }
 
 .opennav {
@@ -111,7 +122,7 @@
 }
 
 span.bold {
-	font-weight:bold;
+	font-weight: bold;
 	color: #3F3FA3;
 }
 
@@ -128,6 +139,7 @@ span.badcode {
 	font-weight: bold;
 	border-bottom: 2px dotted rgba(128, 0, 0, .7);
 	/*background: #E6A4A4;*/
+
 	background: rgba(230, 164, 164, 0.44);
 	border-radius: 4px;
 }
@@ -135,8 +147,10 @@ span.badcode {
 span.goodcode {
 	/*text-shadow: 1px 1px 1px rgba(253, 253, 253, 0.37);
 	font-weight: bold;*/
+
 	border-bottom: 2px dotted rgba(0, 128, 0, .7);
 	/*background: #DDFFFF;*/
+
 	border-radius: 4px;
 }
 
@@ -144,7 +158,8 @@ pre {
 	margin-bottom: 45px;
 }
 
-.label-info, .label-important {
+.label-info,
+.label-important {
 	margin-top: 20px;
 	padding-bottom: 8px;
 	margin-bottom: -5px;
@@ -161,72 +176,49 @@ code {
 }
 
 #intro {
-    border-bottom: 4px solid #A6A6A6;
-    height: 97px;
-    margin: -10px -50% 25px;
-    padding-left: 50%;
-    width: 200%;
-background: #529eea; /* Old browsers */
-
-background: -moz-linear-gradient(top,  #529eea 0%, #7ebaf7 56%, #96caff 100%); /* FF3.6+ */
-
-background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#529eea), color-stop(56%,#7ebaf7), color-stop(100%,#96caff)); /* Chrome,Safari4+ */
-
-background: -webkit-linear-gradient(top,  #529eea 0%,#7ebaf7 56%,#96caff 100%); /* Chrome10+,Safari5.1+ */
-
-background: -o-linear-gradient(top,  #529eea 0%,#7ebaf7 56%,#96caff 100%); /* Opera 11.10+ */
-
-background: -ms-linear-gradient(top,  #529eea 0%,#7ebaf7 56%,#96caff 100%); /* IE10+ */
-
-background: linear-gradient(to bottom,  #529eea 0%,#7ebaf7 56%,#96caff 100%); /* W3C */
-
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#529eea', endColorstr='#96caff',GradientType=0 ); /* IE6-9 */
-
-
-}
-
-#intro a {
-	text-decoration: none;
-	text-shadow: 0px 0px 10px grey;
-	color: #FFFFFF;
-    font-family: 'Roboto';
-    font-size: 62px;
-    font-weight: 100;
-}
-
-#intro a:hover {
-	color: #eee;
+	display: table;
+	width: 100%;
+	background: #00aeef;
+	height: 70px;
+	padding: 10px;
 }
 
 #logo {
-    background-image: url("/wake_logo.png");
-    background-position: 0 -85px;
-    background-repeat: no-repeat;
-    background-size: 300px 317px;
-    display: inline-block;
-    float: left;
-    height: 102px;
-    width: 300px;
-	margin-left: -40px;
+	display: table-cell;
+	vertical-align: middle;
+	/*.5 * 70 - 56*/
+
+	margin-top: 7px;
+	cursor: pointer;
+	width: 210px;
+	height: 100%;
 }
 
-#intro h2 {
-    display: block;
-    float: left;
-    margin-left: 23px;
-    margin-top: 53px;
+#logo img {
+	display: block;
+	width: 210px;
+	height: 56px;
 }
 
 .logo-label-label {
-    color: #666666;
-    float: left;
-    margin-left: 40px;
-    margin-top: 47px;
-    width: 274px;
-	line-height: 25px;
+	color: white;
+	display: table-cell;
+	vertical-align: middle;
+	font-size: 18px;
+	height: 100%;
 }
 
-.logo-label-label .accent {
-    color: #4C4C4C;
-    font-style: italic;
+.logo-label-label span {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.logo-label-label span.divider {
+	display: inline-block;
+	vertical-align: middle;
+	width: 1px;
+	height: 70%;
+	background: white;
+	margin-left: 20px;
+	margin-right: 20px;
 }
