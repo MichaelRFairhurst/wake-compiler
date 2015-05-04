@@ -189,7 +189,7 @@ std::string PureType::toString() {
 			name += "}";
 		}
 	} else if(type == TYPE_LAMBDA) {
-		name = typedata.lambda.returntype->toString();
+		name = typedata.lambda.returntype != NULL ? typedata.lambda.returntype->toString() : "";
 		name += "--(";
 
 		if(typedata.lambda.arguments != NULL) {
@@ -227,6 +227,20 @@ std::string PureType::getFQClassname() {
 
 PureType* makePureType(int type) {
 	return new PureType(type);
+}
+
+PureType* makeTypeFromClassVarRef(ClassVarRef* ref) {
+	if(ref->arrayed) {
+		PureType* outer = new PureType(TYPE_LIST);
+		ref->arrayed--;
+		outer->typedata.list.contained = makeTypeFromClassVarRef(ref);
+		return outer;
+	}
+
+	PureType* type = new PureType(TYPE_CLASS);
+	type->typedata._class.classname = strdup(ref->classname);
+	delete ref;
+	return type;
 }
 
 void freePureType(PureType* t) {

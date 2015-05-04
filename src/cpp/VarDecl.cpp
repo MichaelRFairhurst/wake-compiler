@@ -18,7 +18,9 @@
 #include <string.h>
 
 VarDecl::~VarDecl() {
-	free(alias);
+	if(alias != NULL) {
+		free(alias);
+	}
 }
 
 VarDecl::VarDecl(const VarDecl& other) {
@@ -52,4 +54,11 @@ namespace std
 		std::swap(lhs.alias, rhs.alias);
 		std::swap(lhs.shadow, rhs.shadow);
 	}
+}
+
+VarDecl* makeVarDecl(PureType* innerType) {
+	VarDecl* decl = new VarDecl();
+	decl->typedata = *innerType;
+	delete innerType;
+	return decl;
 }

@@ -42,7 +42,7 @@ typedef struct VarDecl {
 extern "C" {
 #endif
 
-VarDecl* makeVarDecl();
+VarDecl* makeVarDecl(PureType* innerType);
 void freeVarDecl(VarDecl* spt);
 
 #ifdef __cplusplus

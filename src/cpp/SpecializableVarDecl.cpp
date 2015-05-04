@@ -41,3 +41,10 @@ namespace std
 		std::swap(lhs.specialty, rhs.specialty);
 	}
 }
+
+SpecializableVarDecl* makeSpecializableVarDecl(PureType* type) {
+	SpecializableVarDecl* spDecl = new SpecializableVarDecl();
+	spDecl->decl.typedata = *type;
+	delete type;
+	return spDecl;
+}

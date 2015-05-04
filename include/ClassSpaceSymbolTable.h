@@ -48,9 +48,9 @@ class ClassSpaceSymbolTable {
 		PropertySymbolTable* findFullyQualifiedModifiable(string fqclassname);
 		ReadOnlyPropertySymbolTable* findFullyQualified(string fqclassname);
 		ReadOnlyPropertySymbolTable* findFullyQualified(string fqclassname, vector<PureType*> args);
-		PropertySymbolTable* findByImportedNameModifiable(string fqclassname);
-		ReadOnlyPropertySymbolTable* findByImportedName(string fqclassname);
-		ReadOnlyPropertySymbolTable* findByImportedName(string fqclassname, vector<PureType*> args);
+		PropertySymbolTable* findByImportedNameModifiable(string classname);
+		ReadOnlyPropertySymbolTable* findByImportedName(string classname);
+		ReadOnlyPropertySymbolTable* findByImportedName(string classname, vector<PureType*> args);
 		void assertTypeIsValid(PureType* type);
 		void assertNoNeedsAreCircular();
 		TypeAnalyzer* getAnalyzer();

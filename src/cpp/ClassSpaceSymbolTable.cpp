@@ -262,3 +262,16 @@ void ClassSpaceSymbolTable::setModulesOnType(PureType* type) {
 		}
 	}
 }
+
+PropertySymbolTable* ClassSpaceSymbolTable::findByImportedNameModifiable(string classname) {
+	return findFullyQualifiedModifiable(getFullyQualifiedClassname(classname));
+}
+
+ReadOnlyPropertySymbolTable* ClassSpaceSymbolTable::findByImportedName(string classname) {
+	return findFullyQualified(getFullyQualifiedClassname(classname));
+}
+
+ReadOnlyPropertySymbolTable* ClassSpaceSymbolTable::findByImportedName(string classname, vector<PureType*> args) {
+	return findFullyQualified(getFullyQualifiedClassname(classname), args);
+
+}

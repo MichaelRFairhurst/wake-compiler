@@ -31,6 +31,8 @@
 struct PureTypeArray;
 struct ClassVarRef;
 
+typedef struct ClassVarRef ClassVarRef; // C necessity...
+
 typedef struct PureType {
 	int type;							// 1 lambda 2 class
 	union {
@@ -59,7 +61,7 @@ typedef struct PureType {
 #ifdef __cplusplus
 	public:
 		~PureType();
-		PureType(){};
+		PureType() : type(TYPE_MATCHALL) {};
 		PureType(int type);
 		PureType(const PureType& other);
 		PureType& operator=(const PureType& other);
@@ -80,6 +82,7 @@ extern "C" {
 
 PureType* makePureType(int type);
 PureType* copyPureType(PureType* type);
+PureType* makeTypeFromClassVarRef(ClassVarRef* ref);
 void freePureType(PureType* t);
 
 #ifdef __cplusplus

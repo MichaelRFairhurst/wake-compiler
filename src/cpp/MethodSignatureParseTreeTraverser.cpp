@@ -84,6 +84,7 @@ Node* MethodSignatureParseTreeTraverser::getBody(Node* methoddef) {
 }
 
 vector<VarDecl*> MethodSignatureParseTreeTraverser::getArgDecls(Node* methoddef) {
+	return vector<VarDecl*>();
 }
 
 PureType* MethodSignatureParseTreeTraverser::getReturn(Node* methoddef) {

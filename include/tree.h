@@ -190,6 +190,8 @@ Node* makeNodeFromPureType(PureType* thetype, YYLTYPE loc);
 
 Node* makeNodeFromPureTypeArray(PureTypeArray* thearray, YYLTYPE loc);
 
+Node* makeNodeFromSpecalizablePureType(SpecializablePureType* thetype, YYLTYPE loc);
+
 Node* makeNodeFromString(int nodetype, char* mystring, YYLTYPE loc);
 
 Node* makeNodeFromNumber(int nodetype, double number, YYLTYPE loc);

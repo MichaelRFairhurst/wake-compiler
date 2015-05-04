@@ -37,7 +37,7 @@ typedef struct SpecializableVarDecl {
 extern "C" {
 #endif
 
-SpecializableVarDecl* makeSpecializableVarDecl();
+SpecializableVarDecl* makeSpecializableVarDecl(PureType* type);
 void freeSpecializableVarDecl(SpecializableVarDecl* spt);
 
 #ifdef __cplusplus

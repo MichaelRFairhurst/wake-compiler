@@ -154,6 +154,12 @@ Node* makeNodeFromPureTypeArray(PureTypeArray* thearray, YYLTYPE loc) {
 	return mynode;
 }
 
+Node* makeNodeFromSpecalizablePureType(SpecializablePureType* thetype, YYLTYPE loc) {
+	Node* mynode = NodeFactory(NT_SPECIALIZABLE_TYPEDATA, loc);
+	mynode->node_data.specializable_pure_type = thetype;
+	return mynode;
+}
+
 Node* makeNodeFromString(int nodetype, char* mystring, YYLTYPE loc) {
 	Node* mynode = NodeFactory(nodetype, loc);
 	mynode->node_data.string = mystring;
