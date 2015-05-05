@@ -165,11 +165,8 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 					tree = tree->node_data.nodes[0];
 				}
 				TypeParameterizer parameterizer;
-				throw "fixme";
-				//parameterizer.rewriteClasstypesToParameterizedtypeByLabel(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.var_decl->typedata, propertysymtable->getParameters());
-				VarDecl decl;
-				throw "fixme";
-				//Type prop = *tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type;
+				parameterizer.rewriteClasstypesToParameterizedtypeByLabel(&tree->node_data.nodes[0]->node_data.nodes[0]->node_data.var_decl->typedata, propertysymtable->getParameters());
+				VarDecl decl = *tree->node_data.nodes[0]->node_data.nodes[0]->node_data.var_decl;
 				classestable->assertTypeIsValid(&decl.typedata);
 				boost::optional<SemanticError*> error = propertysymtable->addProperty(new VarDecl(decl), tree->subnodes == 2 ? PROPERTY_PUBLIC : 0, annotations);
 				if(error) {
@@ -192,7 +189,7 @@ void ClassParseTreeTraverser::secondPass(Node* tree) {
 				scopesymtable->pushScope();
 				for(vector<SpecializableVarDecl*>::iterator it = propertysymtable->getNeeds()->begin(); it != propertysymtable->getNeeds()->end(); ++it) {
 					try {
-						scopesymtable->add(&(*it)->decl);
+						scopesymtable->add(new VarDecl((*it)->decl));
 					} catch(SemanticError* e) {
 						errors->addError(e);
 					}
@@ -245,12 +242,11 @@ void ClassParseTreeTraverser::checkCtorArgs(Node* tree) {
 						}
 
 						SpecializableVarDecl needDecl = *typeNode->node_data.specializable_var_decl;
-						throw "fixme";
-						//parameterizer.rewriteClasstypesToParameterizedtypeByLabel(&needDecl.decl.typedata, propertysymtable->getParameters());
+						parameterizer.rewriteClasstypesToParameterizedtypeByLabel(&typeNode->node_data.specializable_var_decl->decl.typedata, propertysymtable->getParameters());
 						PureType* needtype = &needDecl.decl.typedata;
 						classestable->assertTypeIsValid(needtype);
 						//classestable->getAnalyzer()->assertNeedIsNotCircular(classname, needtype); DISABLED because we can't tell without importing everything
-						propertysymtable->addNeed(&needDecl, needNode->node_data.nodes[1]->node_type == NT_PUBLIC ? PROPERTY_PUBLIC : 0, annotations);
+						propertysymtable->addNeed(new SpecializableVarDecl(needDecl), needNode->node_data.nodes[1]->node_type == NT_PUBLIC ? PROPERTY_PUBLIC : 0, annotations);
 					} catch(SymbolNotFoundException* e) {
 						errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
 						delete e;
@@ -422,7 +418,7 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 
 									case NT_INJECTION_ARG:
 										{
-											actual = *injections->node_data.nodes[i]->node_data.nodes[0]->node_data.specializable_pure_type;
+											actual.typedata = *injections->node_data.nodes[i]->node_data.nodes[0]->node_data.pure_type;
 											classestable->assertTypeIsValid(&actual.typedata);
 										}
 										break;
