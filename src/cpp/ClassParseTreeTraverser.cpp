@@ -78,8 +78,8 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 					if(tree->node_data.nodes[1]->node_type == NT_PROVISION_BEHAVIOR) {
 						flags |= PROPERTY_BLOCKPROVISION;
 						Node* argnodes = tree->node_data.nodes[1]->node_data.nodes[0];
-						for(int i = 0; i < argnodes->node_data.typearray->typecount; i++) {
-							arguments.push_back(argnodes->node_data.typearray->types[i]);
+						for(int i = 0; i < argnodes->subnodes; i++) {
+							arguments.push_back(&argnodes->node_data.nodes[i]->node_data.var_decl->typedata);
 						}
 					} else if(tree->node_data.nodes[1]->node_type == NT_INJECTION) {
 						Node* subinjections = tree->node_data.nodes[1]->node_data.nodes[1];

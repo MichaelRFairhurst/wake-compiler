@@ -24,7 +24,7 @@ void wake::ast::Exists::typeCheck() {
 			return;
 		}
 
-		auto_ptr<VarRef> existableRef(node->node_data.nodes[0]->node_data.var_ref);
+		auto_ptr<VarRef> existableRef(new VarRef(*node->node_data.nodes[0]->node_data.var_ref));
 		auto_ptr<PureType> existableType(existable->typeCheck(false));
 
 		if(existableType->type != TYPE_OPTIONAL) {
