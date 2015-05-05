@@ -241,8 +241,8 @@ void ClassParseTreeTraverser::checkCtorArgs(Node* tree) {
 							typeNode = needNode->node_data.nodes[0];
 						}
 
-						SpecializableVarDecl needDecl = *typeNode->node_data.specializable_var_decl;
 						parameterizer.rewriteClasstypesToParameterizedtypeByLabel(&typeNode->node_data.specializable_var_decl->decl.typedata, propertysymtable->getParameters());
+						SpecializableVarDecl needDecl = *typeNode->node_data.specializable_var_decl;
 						PureType* needtype = &needDecl.decl.typedata;
 						classestable->assertTypeIsValid(needtype);
 						//classestable->getAnalyzer()->assertNeedIsNotCircular(classname, needtype); DISABLED because we can't tell without importing everything

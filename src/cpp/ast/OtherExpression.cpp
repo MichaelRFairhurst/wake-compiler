@@ -46,29 +46,8 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 			ret->typedata._class.classname = strdup("Bool");
 			break;
 
-		case NT_ALIAS:
-			{
-				throw "this should be redundant now";
-				char* name = node->node_data.string;
-				boost::optional<PureType*> variable = scopesymtable->find(name);
-				if(!variable && thiscontext != NULL) {
-					throw "need to inject proptable";
-					PropertySymbolTable* proptable = NULL; //classestable->findModifiable(thiscontext);
-					variable = proptable->find(name);
-					if(variable) {
-						name = strdup(name);
-						node->node_type = NT_MEMBER_ACCESS;
-						addSubNode(node, makeEmptyNode(NT_THIS, node->loc));
-						addSubNode(node, makeNodeFromString(NT_COMPILER_HINT, name, node->loc));
-					}
-				}
-				if(!variable) {
-					ret = new PureType(TYPE_MATCHALL);
-					errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Symbol by name of " + string(name) + " not found", node));
-				} else {
-					ret = new PureType(**variable);
-				}
-			}
+		case NT_VAR_DECL_DATA:
+			ret = new PureType(node->node_data.var_decl->typedata);
 			break;
 
 		case NT_VAR_REF:
@@ -524,7 +503,8 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 bool wake::ast::OtherExpression::isValidLValue(Node* n) {
 	switch(n->node_type) {
 		case NT_ALIAS:
-		case NT_TYPEDATA:
+		case NT_VAR_REF:
+		case NT_VAR_DECL_DATA:
 		case NT_MEMBER_ACCESS:
 		case NT_ARRAY_ACCESS_LVAL:
 			return true;

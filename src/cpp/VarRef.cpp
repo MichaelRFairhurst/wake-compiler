@@ -43,7 +43,7 @@ std::string VarRef::toString() {
 		return alias;
 	} else {
 		std::string name = std::string(_class->shadow, '$') + _class->classname;
-		for (int i = 0; i < _class->arrayed; i++) {
+		if (_class->arrayed) {
 			name += "[]";
 		}
 		return name;

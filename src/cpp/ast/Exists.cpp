@@ -41,11 +41,11 @@ void wake::ast::Exists::typeCheck() {
 			origDecl.alias = strdup(existableRef->alias);
 		}
 
-		scopesymtable->addOverwriting(&realDecl);
+		scopesymtable->addOverwriting(new VarDecl(realDecl));
 
 		block->typeCheck();
 
-		scopesymtable->addOverwriting(&origDecl);
+		scopesymtable->addOverwriting(new VarDecl(origDecl));
 
 		if(otherwise.get() != NULL) {
 			otherwise->typeCheck();
