@@ -24,7 +24,7 @@ typedef struct SpecializableVarDecl {
 #ifdef __cplusplus
 	public:
 		~SpecializableVarDecl();
-		SpecializableVarDecl(){};
+		SpecializableVarDecl() : specialty(NULL) {};
 		SpecializableVarDecl(SpecializableVarDecl& other);
 		SpecializableVarDecl& operator=(SpecializableVarDecl& other);
 	private:
@@ -38,6 +38,7 @@ extern "C" {
 #endif
 
 SpecializableVarDecl* makeSpecializableVarDecl(PureType* type);
+SpecializableVarDecl* makeSpecializableVarDeclFromVarDecl(VarDecl* decl);
 void freeSpecializableVarDecl(SpecializableVarDecl* spt);
 
 #ifdef __cplusplus

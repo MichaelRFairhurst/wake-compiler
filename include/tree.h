@@ -80,7 +80,9 @@ extern "C" {
 #define NT_TYPEDATA 31
 #define NT_SPECIALIZABLE_TYPEDATA 121
 #define NT_VAR_DECL_DATA 122
+#define NT_VAR_DECLS 125
 #define NT_VAR_REF 123
+#define NT_SPECIALIZABLE_VAR_DECL 124
 #define NT_CLASSNAME 32
 #define NT_CURRIED 33
 #define NT_STRINGLIT 34
@@ -188,9 +190,15 @@ Node* makeEmptyNode(int nodetype, YYLTYPE loc);
 
 Node* makeNodeFromPureType(PureType* thetype, YYLTYPE loc);
 
+Node* makeNodeFromVarDecl(VarDecl* decl, YYLTYPE loc);
+
+Node* makeNodeFromClassVarRef(ClassVarRef* ref, YYLTYPE loc);
+
+Node* makeNodeFromSpecializableVarDecl(SpecializableVarDecl* decl, YYLTYPE loc);
+
 Node* makeNodeFromPureTypeArray(PureTypeArray* thearray, YYLTYPE loc);
 
-Node* makeNodeFromSpecalizablePureType(SpecializablePureType* thetype, YYLTYPE loc);
+Node* makeNodeFromSpecializablePureType(SpecializablePureType* thetype, YYLTYPE loc);
 
 Node* makeNodeFromString(int nodetype, char* mystring, YYLTYPE loc);
 

@@ -147,6 +147,18 @@ Node* makeNodeFromPureType(PureType* thetype, YYLTYPE loc) {
 	return mynode;
 }
 
+Node* makeNodeFromVarDecl(VarDecl* decl, YYLTYPE loc) {
+	Node* mynode = NodeFactory(NT_VAR_DECL_DATA, loc);
+	mynode->node_data.var_decl = decl;
+	return mynode;
+}
+
+Node* makeNodeFromSpecializableVarDecl(SpecializableVarDecl* decl, YYLTYPE loc) {
+	Node* mynode = NodeFactory(NT_SPECIALIZABLE_VAR_DECL, loc);
+	mynode->node_data.specializable_var_decl = decl;
+	return mynode;
+}
+
 Node* makeNodeFromPureTypeArray(PureTypeArray* thearray, YYLTYPE loc) {
 	Node* mynode = NodeFactory(NT_TYPE_ARRAY, loc);
 	mynode->node_data.typearray = thearray;
@@ -154,9 +166,15 @@ Node* makeNodeFromPureTypeArray(PureTypeArray* thearray, YYLTYPE loc) {
 	return mynode;
 }
 
-Node* makeNodeFromSpecalizablePureType(SpecializablePureType* thetype, YYLTYPE loc) {
+Node* makeNodeFromSpecializablePureType(SpecializablePureType* thetype, YYLTYPE loc) {
 	Node* mynode = NodeFactory(NT_SPECIALIZABLE_TYPEDATA, loc);
 	mynode->node_data.specializable_pure_type = thetype;
+	return mynode;
+}
+
+Node* makeNodeFromClassVarRef(ClassVarRef* ref, YYLTYPE loc) {
+	Node* mynode = NodeFactory(NT_VAR_REF, loc);
+	mynode->node_data.var_ref = makeVarRefFromClass(ref);
 	return mynode;
 }
 

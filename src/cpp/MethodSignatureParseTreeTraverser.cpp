@@ -29,14 +29,13 @@ void MethodSignatureParseTreeTraverser::convertParameterizedTypes(Node* methodde
 	}
 
 	for(i = 0; i < methodname->subnodes; i++) {
-		PureTypeArray* args;
+		Node* args;
 		i++;
 
 		if(i < methodname->subnodes) {
-			args = methodname->node_data.nodes[i]->node_data.typearray;
-			for(int b = 0; b < args->typecount; b++) {
-				parameterizer.rewriteClasstypesToParameterizedtypeByLabel(args->types[b], parameterizedtypes);
-
+			args = methodname->node_data.nodes[i];
+			for(int b = 0; b < args->subnodes; b++) {
+				parameterizer.rewriteClasstypesToParameterizedtypeByLabel(&args->node_data.nodes[b]->node_data.var_decl->typedata, parameterizedtypes);
 			}
 		}
 	}
@@ -52,14 +51,15 @@ vector<pair<string, PureTypeArray*> >* MethodSignatureParseTreeTraverser::getNam
 		];
 
 		for(i = 0; i < methodname->subnodes; i++) {
-			PureTypeArray* argshere;
+			PureTypeArray* argshere = makePureTypeArray();
 			string namesegment = methodname->node_data.nodes[i]->node_data.string;
 			i++;
 
 			if(i < methodname->subnodes) {
-				argshere = methodname->node_data.nodes[i]->node_data.typearray;
-				for(int b = 0; b < argshere->typecount; b++) {
-					classestable->assertTypeIsValid(argshere->types[b]);
+				Node* args = methodname->node_data.nodes[i];
+				for(int b = 0; b < args->subnodes; b++) {
+					classestable->assertTypeIsValid(&args->node_data.nodes[b]->node_data.var_decl->typedata);
+					addPureTypeToPureTypeArray(new PureType(args->node_data.nodes[b]->node_data.var_decl->typedata), argshere);
 				}
 			} else {
 				argshere = emptytypearray;

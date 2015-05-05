@@ -29,7 +29,7 @@ typedef struct SpecializablePureType {
 #ifdef __cplusplus
 	public:
 		~SpecializablePureType();
-		SpecializablePureType(){};
+		SpecializablePureType() : specialty(NULL) {};
 		SpecializablePureType(SpecializablePureType& other);
 		SpecializablePureType& operator=(SpecializablePureType& other);
 
@@ -45,7 +45,7 @@ typedef struct SpecializablePureType {
 extern "C" {
 #endif
 
-SpecializablePureType* makeSpecializablePureType();
+SpecializablePureType* makeSpecializablePureType(PureType* inner);
 void freeSpecializablePureType(SpecializablePureType* spt);
 
 #ifdef __cplusplus

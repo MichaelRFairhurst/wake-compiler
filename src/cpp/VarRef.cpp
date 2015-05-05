@@ -18,13 +18,18 @@
 #include <string.h>
 
 VarRef::~VarRef() {
-	free(alias);
-	free(_class);
+	if(alias != NULL) {
+		free(alias);
+	}
+
+	if(_class != NULL) {
+		delete _class;
+	}
 }
 
 VarRef::VarRef(const VarRef& other) {
-	_class = new ClassVarRef(*other._class);
-	alias = strdup(other.alias);
+	_class = other._class == NULL ? NULL: new ClassVarRef(*other._class);
+	alias = other.alias == NULL ? NULL : strdup(other.alias);
 }
 
 VarRef& VarRef::operator=(VarRef& other) {

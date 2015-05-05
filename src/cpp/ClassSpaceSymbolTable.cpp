@@ -145,7 +145,7 @@ ReadOnlyPropertySymbolTable* ClassSpaceSymbolTable::findFullyQualified(string fq
 }
 
 ReadOnlyPropertySymbolTable* ClassSpaceSymbolTable::findFullyQualified(string fqclassname) {
-	return findFullyQualifiedModifiable(fqclassname);
+	return new TempPropertySymbolTable(*findFullyQualifiedModifiable(fqclassname));
 }
 
 PropertySymbolTable* ClassSpaceSymbolTable::findFullyQualifiedModifiable(string fqclassname) {

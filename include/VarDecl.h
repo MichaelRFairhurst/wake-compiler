@@ -26,7 +26,7 @@ typedef struct VarDecl {
 #ifdef __cplusplus
 	public:
 		~VarDecl();
-		VarDecl(){};
+		VarDecl() : alias(NULL), shadow(0) {};
 		VarDecl(const VarDecl& other);
 		VarDecl& operator=(const VarDecl& other);
 
@@ -43,6 +43,7 @@ extern "C" {
 #endif
 
 VarDecl* makeVarDecl(PureType* innerType);
+VarDecl* copyVarDecl(VarDecl* toBeCopied);
 void freeVarDecl(VarDecl* spt);
 
 #ifdef __cplusplus

@@ -34,6 +34,7 @@ extern "C" {
 #endif
 
 	ClassVarRef* makeClassVarRef(char* classname, int shadow, int arrayed);
+	void freeClassVarRef(ClassVarRef* ref);
 
 #ifdef __cplusplus
 }

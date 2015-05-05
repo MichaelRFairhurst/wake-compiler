@@ -23,7 +23,7 @@ SpecializableVarDecl::~SpecializableVarDecl() {
 
 SpecializableVarDecl::SpecializableVarDecl(SpecializableVarDecl& other) {
 	decl = other.decl;
-	specialty = strdup(other.specialty);
+	specialty = other.specialty == NULL ? NULL : strdup(other.specialty);
 }
 
 SpecializableVarDecl& SpecializableVarDecl::operator=(SpecializableVarDecl& other) {
@@ -45,6 +45,11 @@ namespace std
 SpecializableVarDecl* makeSpecializableVarDecl(PureType* type) {
 	SpecializableVarDecl* spDecl = new SpecializableVarDecl();
 	spDecl->decl.typedata = *type;
-	delete type;
+	return spDecl;
+}
+
+SpecializableVarDecl* makeSpecializableVarDeclFromVarDecl(VarDecl* decl) {
+	SpecializableVarDecl* spDecl = new SpecializableVarDecl();
+	spDecl->decl = *decl;
 	return spDecl;
 }

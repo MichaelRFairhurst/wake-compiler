@@ -23,7 +23,7 @@ SpecializablePureType::~SpecializablePureType() {
 
 SpecializablePureType::SpecializablePureType(SpecializablePureType& other) {
 	typedata = other.typedata;
-	specialty = strdup(other.specialty);
+	specialty = other.specialty == NULL ? NULL : strdup(other.specialty);
 }
 
 SpecializablePureType& SpecializablePureType::operator=(SpecializablePureType& other) {
@@ -55,4 +55,10 @@ namespace std
 		std::swap(lhs.typedata, rhs.typedata);
 		std::swap(lhs.specialty, rhs.specialty);
 	}
+}
+
+SpecializablePureType* makeSpecializablePureType(PureType* inner) {
+	SpecializablePureType* type = new SpecializablePureType();
+	type->typedata = *inner;
+	return type;
 }

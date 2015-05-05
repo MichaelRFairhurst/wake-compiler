@@ -37,6 +37,10 @@ ClassVarRef* makeClassVarRef(char* classname, int shadow, int arrayed) {
 	return new ClassVarRef(classname, shadow, arrayed);
 }
 
+void freeClassVarRef(ClassVarRef* ref) {
+	delete ref;
+}
+
 namespace std
 {
 	template<>

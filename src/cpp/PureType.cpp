@@ -49,6 +49,7 @@ PureType::PureType(int type) {
 		case TYPE_CLASS:
 			typedata._class.parameters = NULL;
 			typedata._class.classname = NULL;
+			typedata._class.modulename = NULL;
 			break;
 		case TYPE_LAMBDA:
 			typedata.lambda.returntype = NULL;
@@ -72,13 +73,13 @@ ClassVarRef PureType::createClassVarRef() {
 	switch(type) {
 		case TYPE_CLASS:
 			{
-				return ClassVarRef(typedata._class.classname, 0, 0);
+				return ClassVarRef(strdup(typedata._class.classname), 0, 0);
 			}
 
 		case TYPE_PARAMETERIZED:
 		case TYPE_PARAMETERIZED_ARG:
 			{
-				return ClassVarRef(typedata.parameterized.label, 0, 0);
+				return ClassVarRef(strdup(typedata.parameterized.label), 0, 0);
 			}
 
 		case TYPE_OPTIONAL:
@@ -108,6 +109,11 @@ void PureType::deepCopy(const PureType& other) {
 	switch(type) {
 		case TYPE_CLASS:
 			typedata._class.classname = other.typedata._class.classname ? strdup(other.typedata._class.classname) : NULL;
+			if(other.typedata._class.modulename != NULL) {
+				typedata._class.modulename = strdup(other.typedata._class.modulename);
+			} else {
+				typedata._class.modulename = NULL;
+			}
 			if(other.typedata._class.parameters != NULL) {
 				typedata._class.parameters = new PureTypeArray(*other.typedata._class.parameters);
 			} else {
@@ -217,12 +223,18 @@ std::string PureType::toString() {
 
 
 std::string PureType::getFQClassname() {
-	std::string fqname = typedata._class.modulename;
+	if(type != TYPE_CLASS) {
+		return "";
+	}
+
+	std::string fqname = typedata._class.modulename != NULL ? typedata._class.modulename : "";
 
 	if(fqname.size()) {
 		fqname += ".";
 	}
 	fqname += typedata._class.classname;
+
+	return fqname;
 }
 
 PureType* makePureType(int type) {
@@ -234,12 +246,12 @@ PureType* makeTypeFromClassVarRef(ClassVarRef* ref) {
 		PureType* outer = new PureType(TYPE_LIST);
 		ref->arrayed--;
 		outer->typedata.list.contained = makeTypeFromClassVarRef(ref);
+		ref->arrayed++;
 		return outer;
 	}
 
 	PureType* type = new PureType(TYPE_CLASS);
 	type->typedata._class.classname = strdup(ref->classname);
-	delete ref;
 	return type;
 }
 

@@ -25,7 +25,7 @@ VarDecl::~VarDecl() {
 
 VarDecl::VarDecl(const VarDecl& other) {
 	typedata = other.typedata;
-	alias = strdup(other.alias);
+	alias = other.alias == NULL ? NULL : strdup(other.alias);
 	shadow = other.shadow;
 }
 
@@ -37,7 +37,7 @@ VarDecl& VarDecl::operator=(const VarDecl& other) {
 
 VarRef VarDecl::createVarRef() {
 	if(alias != NULL) {
-		return VarRef(alias);
+		return VarRef(strdup(alias));
 	} else {
 		ClassVarRef ref = typedata.createClassVarRef();
 		ref.shadow = shadow;
@@ -59,6 +59,9 @@ namespace std
 VarDecl* makeVarDecl(PureType* innerType) {
 	VarDecl* decl = new VarDecl();
 	decl->typedata = *innerType;
-	delete innerType;
 	return decl;
+}
+
+VarDecl* copyVarDecl(VarDecl* toBeCopied) {
+	return new VarDecl(*toBeCopied);
 }
