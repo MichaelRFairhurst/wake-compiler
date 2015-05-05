@@ -194,6 +194,8 @@ Node* makeNodeFromVarDecl(VarDecl* decl, YYLTYPE loc);
 
 Node* makeNodeFromClassVarRef(ClassVarRef* ref, YYLTYPE loc);
 
+Node* makeNodeFromAlias(char* alias, YYLTYPE loc);
+
 Node* makeNodeFromSpecializableVarDecl(SpecializableVarDecl* decl, YYLTYPE loc);
 
 Node* makeNodeFromPureTypeArray(PureTypeArray* thearray, YYLTYPE loc);

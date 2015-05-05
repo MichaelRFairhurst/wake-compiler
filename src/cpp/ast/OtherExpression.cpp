@@ -100,7 +100,7 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				} else {
 					// detect if they wrote Printer[] instead of Printer[][]
 					// Either way Printer[x] would work, so if forceArrayIdentifier skip this step
-					if(!forceArrayIdentifier && (*variable)->type == TYPE_LIST && ref._class->arrayed != analyzer->getArrayReferenceLevel(**variable))
+					if(!forceArrayIdentifier && (*variable)->type == TYPE_LIST && ref._class != NULL && ref._class->arrayed != analyzer->getArrayReferenceLevel(**variable))
 						errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Accessed arrayed variable " + ref.toString() + " with wrong number of [] brackets.", node));
 
 					ret = new PureType(**variable);

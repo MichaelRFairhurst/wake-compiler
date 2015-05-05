@@ -178,6 +178,12 @@ Node* makeNodeFromClassVarRef(ClassVarRef* ref, YYLTYPE loc) {
 	return mynode;
 }
 
+Node* makeNodeFromAlias(char* alias, YYLTYPE loc) {
+	Node* mynode = NodeFactory(NT_VAR_REF, loc);
+	mynode->node_data.var_ref = makeVarRefFromAlias(alias);
+	return mynode;
+}
+
 Node* makeNodeFromString(int nodetype, char* mystring, YYLTYPE loc) {
 	Node* mynode = NodeFactory(nodetype, loc);
 	mynode->node_data.string = mystring;

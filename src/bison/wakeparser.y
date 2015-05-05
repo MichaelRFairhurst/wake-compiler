@@ -341,15 +341,15 @@ value:
 	;
 
 value_invokable:
-	alias																			{ $$ = makeNodeFromString(NT_ALIAS, $1, @$); }
+	alias																			{ $$ = makeNodeFromAlias($1, @$); }
 	| value '[' expression ']'														{ $$ = makeTwoBranchNode(NT_ARRAY_ACCESS, $1, $3, @$); }
 	| value SYM_TYPESAFE_INDEX expression ']'										{ $$ = makeTwoBranchNode(NT_TYPESAFE_ARRAY_ACCESS, $1, $3, @$); }
-	| objectable '.' alias															{ $$ = makeTwoBranchNode(NT_MEMBER_ACCESS, $1, makeNodeFromString(NT_ALIAS, $3, @3), @$); }
-	| objectable SYM_EARLYBAILOUT_DOT alias											{ $$ = makeTwoBranchNode(NT_EARLYBAILOUT_MEMBER_ACCESS, $1, makeNodeFromString(NT_ALIAS, $3, @3), @$); }
+	| objectable '.' alias															{ $$ = makeTwoBranchNode(NT_MEMBER_ACCESS, $1, makeNodeFromAlias($3, @3), @$); }
+	| objectable SYM_EARLYBAILOUT_DOT alias											{ $$ = makeTwoBranchNode(NT_EARLYBAILOUT_MEMBER_ACCESS, $1, makeNodeFromAlias($3, @3), @$); }
 	| '(' expression ')'															{ $$ = $2; }
 	| value_invokable methodcallsegments											{
-																						if ($1->node_type == NT_ALIAS) {
-																							// Turn (NT_ALIAS) and (NT_INVOCATION_PARTS_TEMP (expressions) [NT_METHOD_NAME_SEGMENT (METHOD_NAME) (expressions)])
+																						if ($1->node_type == NT_VAR_REF) {
+																							// Turn (NT_VAR_REF) and (NT_INVOCATION_PARTS_TEMP (expressions) [NT_METHOD_NAME_SEGMENT (METHOD_NAME) (expressions)])
 																							// into (NT_METHOD_INVOCATION (NT_THIS) [NT_METHOD_NAME_SEGMENT (METHOD_NAME) (expressions)])
 																							$1->node_type == NT_METHOD_NAME_SEGMENT;
 																							$$ = makeTwoBranchNode(NT_METHOD_INVOCATION, makeEmptyNode(NT_THIS, @$), makeOneBranchNode(NT_METHOD_NAME, $1, @$), @$);
@@ -367,11 +367,11 @@ value_invokable:
 																								//free($2->node_data.nodes);
 																								//free($2);
 																							}
-																						} else if ($1->node_type == NT_MEMBER_ACCESS || $1->node_type == NT_EARLYBAILOUT_MEMBER_ACCESS && $1->node_data.nodes[1]->node_type == NT_ALIAS) {
-																							// Turn (NT_MEMBER_ACCESS (expression) (NT_ALIAS)) and (NT_INVOCATION_PARTS_TEMP (expressions) [NT_METHOD_NAME_SEGMENT (METHOD_NAME) (expressions)])
+																						} else if ($1->node_type == NT_MEMBER_ACCESS || $1->node_type == NT_EARLYBAILOUT_MEMBER_ACCESS && $1->node_data.nodes[1]->node_type == NT_VAR_REF) {
+																							// Turn (NT_MEMBER_ACCESS (expression) (NT_VAR_REF)) and (NT_INVOCATION_PARTS_TEMP (expressions) [NT_METHOD_NAME_SEGMENT (METHOD_NAME) (expressions)])
 																							// into (NT_METHOD_INVOCATION (expression) [NT_METHOD_NAME_SEGMENT (METHOD_NAME) (expressions)])
 																							$$ = makeOneBranchNode($1->node_type == NT_MEMBER_ACCESS ? NT_METHOD_INVOCATION : NT_EARLYBAILOUT_METHOD_INVOCATION, $1->node_data.nodes[0], @$);
-																							addSubNode($$, makeOneBranchNode(NT_METHOD_NAME, makeNodeFromString(NT_METHOD_NAME_SEGMENT, strdup($1->node_data.nodes[1]->node_data.string), $1->node_data.nodes[1]->loc), @1));
+																							addSubNode($$, makeOneBranchNode(NT_METHOD_NAME, makeNodeFromString(NT_METHOD_NAME_SEGMENT, strdup($1->node_data.nodes[1]->node_data.var_ref->alias), $1->node_data.nodes[1]->loc), @1));
 
 																							if($2 != NULL) {
 																								addSubNode($$->node_data.nodes[1], $2->node_data.nodes[0]);
@@ -467,9 +467,9 @@ labelstatement:
 
 existsstatement:
 	IF usable_as_variable_type EXISTS statement_or_block							{ $$ = makeTwoBranchNode(NT_EXISTS, makeNodeFromClassVarRef($2, @2), $4, @$); }
-	| IF alias EXISTS statement_or_block											{ $$ = makeTwoBranchNode(NT_EXISTS, makeNodeFromString(NT_ALIAS, $2, @2), $4, @$); }
+	| IF alias EXISTS statement_or_block											{ $$ = makeTwoBranchNode(NT_EXISTS, makeNodeFromAlias($2, @2), $4, @$); }
 	| IF usable_as_variable_type EXISTS statement_or_block ELSE statement_or_block	{ $$ = makeTwoBranchNode(NT_EXISTS, makeNodeFromClassVarRef($2, @2), $4, @$); addSubNode($$, $6); }
-	| IF alias EXISTS statement_or_block ELSE statement_or_block					{ $$ = makeTwoBranchNode(NT_EXISTS, makeNodeFromString(NT_ALIAS, $2, @2), $4, @$); addSubNode($$, $6); }
+	| IF alias EXISTS statement_or_block ELSE statement_or_block					{ $$ = makeTwoBranchNode(NT_EXISTS, makeNodeFromAlias($2, @2), $4, @$); addSubNode($$, $6); }
 	;
 
 selectionstatement:
@@ -487,7 +487,7 @@ iterationstatement:
 
 member:
 	usable_as_variable_type															{ $$ = makeNodeFromClassVarRef($1, @$); }
-	| alias																			{ $$ = makeNodeFromString(NT_ALIAS, $1, @$); }
+	| alias																			{ $$ = makeNodeFromAlias($1, @$); }
 	;
 
 forinit:
