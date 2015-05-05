@@ -53,3 +53,7 @@ SpecializableVarDecl* makeSpecializableVarDeclFromVarDecl(VarDecl* decl) {
 	spDecl->decl = *decl;
 	return spDecl;
 }
+
+SpecializableVarDecl* copySpecializableVarDecl(SpecializableVarDecl* decl) {
+	return new SpecializableVarDecl(*decl);
+}

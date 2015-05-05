@@ -66,7 +66,7 @@ PureType* wake::ast::Lambda::typeCheckCommon(PureType* hint) {
 				VarDecl decl;
 				decl.alias = strdup(alias.c_str());
 				decl.typedata = *lambdaType->typedata.lambda.arguments->types[lambdaType->typedata.lambda.arguments->typecount - 1];
-				scopesymtable->add(&decl);
+				scopesymtable->add(new VarDecl(decl));
 			}
 		}
 

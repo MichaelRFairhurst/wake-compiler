@@ -62,17 +62,17 @@ void ParseTreeTraverser::traverse(Node* tree) {
 		case NT_CLASS_EXTERN:
 		case NT_CLASS:
 			{
-				errors.pushContext("In declaration of 'every " + string(tree->node_data.nodes[0]->node_data.type->typedata._class.classname) + "'");
-				boost::optional<SemanticError*> error = objectsymtable->addClass(tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
+				errors.pushContext("In declaration of 'every " + string(tree->node_data.nodes[0]->node_data.pure_type->typedata._class.classname) + "'");
+				boost::optional<SemanticError*> error = objectsymtable->addClass(tree->node_data.nodes[0]->node_data.pure_type->typedata._class.classname);
 
 				if(error) {
 					(*error)->token = tree;
 					errors.addError(*error);
 				}
 
-				PropertySymbolTable* proptable = objectsymtable->findByImportedNameModifiable(tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
+				PropertySymbolTable* proptable = objectsymtable->findByImportedNameModifiable(tree->node_data.nodes[0]->node_data.pure_type->typedata._class.classname);
 
-				PureType* classtype = tree->node_data.nodes[0]->node_data.type;
+				PureType* classtype = tree->node_data.nodes[0]->node_data.pure_type;
 				vector<PureType*>* parameters = new vector<PureType*>();
 
 				vector<string> usedGenericNames;
@@ -94,7 +94,7 @@ void ParseTreeTraverser::traverse(Node* tree) {
 		case NT_INTERFACE:
 		case NT_SUBCLASS:
 			{
-				boost::optional<SemanticError*> error = objectsymtable->addInheritance(tree->node_data.nodes[0]->node_data.type->typedata._class.classname, tree->node_type == NT_SUBCLASS);
+				boost::optional<SemanticError*> error = objectsymtable->addInheritance(tree->node_data.nodes[0]->node_data.pure_type->typedata._class.classname, tree->node_type == NT_SUBCLASS);
 				if(error) {
 					(*error)->token = tree;
 					errors.addError((*error));
@@ -127,7 +127,7 @@ void ParseTreeTraverser::secondPass(Node* tree) {
 					tree = tree->node_data.nodes[0];
 				}
 
-				PureType* classtype = tree->node_data.nodes[0]->node_data.type;
+				PureType* classtype = tree->node_data.nodes[0]->node_data.pure_type;
 				string classname = classtype->typedata._class.classname;
 				errors.pushContext("In declaration of '" + string(tree->node_type == NT_CLASS ? "every" : "extern") + " " + classname + "'");
 
@@ -146,7 +146,7 @@ void ParseTreeTraverser::secondPass(Node* tree) {
 		case NT_INTERFACE:
 		case NT_SUBCLASS:
 			try {
-				objectsymtable->findByImportedName(tree->node_data.nodes[0]->node_data.type->typedata._class.classname);
+				objectsymtable->findByImportedName(tree->node_data.nodes[0]->node_data.pure_type->typedata._class.classname);
 			} catch(SymbolNotFoundException* e) {
 				errors.addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
 				delete e;
@@ -175,7 +175,7 @@ void ParseTreeTraverser::thirdPass(Node* tree) {
 		case NT_CLASS:
 		case NT_CLASS_EXTERN:
 			{
-				PureType* classtype = tree->node_data.nodes[0]->node_data.type;
+				PureType* classtype = tree->node_data.nodes[0]->node_data.pure_type;
 				string classname = classtype->typedata._class.classname;
 				errors.pushContext("In declaration of '" + string(tree->node_type == NT_CLASS ? "every" : "extern") + " " + classname + "'");
 

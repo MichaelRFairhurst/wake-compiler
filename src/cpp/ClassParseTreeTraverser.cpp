@@ -126,13 +126,13 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 				}
 
 				if(lastnode->node_type == NT_TYPE_ARRAY)
-				for(int i = 0; i < lastnode->node_data.typearray->typecount; i++)
-				if(std::find(usedGenericNames.begin(), usedGenericNames.end(), lastnode->node_data.typearray->types[i]->typedata.parameterized.label) == usedGenericNames.end()) {
+				for(int i = 0; i < lastnode->node_data.pure_type_array->typecount; i++)
+				if(std::find(usedGenericNames.begin(), usedGenericNames.end(), lastnode->node_data.pure_type_array->types[i]->typedata.parameterized.label) == usedGenericNames.end()) {
 					lastnode->node_data.pure_type_array->types[i]->type = TYPE_PARAMETERIZED_ARG;
-					parameterizedtypes.push_back(lastnode->node_data.typearray->types[i]);
-					usedGenericNames.push_back(lastnode->node_data.typearray->types[i]->typedata.parameterized.label);
+					parameterizedtypes.push_back(lastnode->node_data.pure_type_array->types[i]);
+					usedGenericNames.push_back(lastnode->node_data.pure_type_array->types[i]->typedata.parameterized.label);
 				} else {
-					errors->addError(new SemanticError(GENERIC_TYPE_COLLISION, string("Generic type with label ") + lastnode->node_data.typearray->types[i]->typedata.parameterized.label + " is declared more than once", tree));
+					errors->addError(new SemanticError(GENERIC_TYPE_COLLISION, string("Generic type with label ") + lastnode->node_data.pure_type_array->types[i]->typedata.parameterized.label + " is declared more than once", tree));
 				}
 
 				methodanalyzer->convertParameterizedTypes(tree, parameterizedtypes);
@@ -171,7 +171,7 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 				throw "fixme";
 				//Type prop = *tree->node_data.nodes[0]->node_data.nodes[0]->node_data.type;
 				classestable->assertTypeIsValid(&decl.typedata);
-				boost::optional<SemanticError*> error = propertysymtable->addProperty(&decl, tree->subnodes == 2 ? PROPERTY_PUBLIC : 0, annotations);
+				boost::optional<SemanticError*> error = propertysymtable->addProperty(new VarDecl(decl), tree->subnodes == 2 ? PROPERTY_PUBLIC : 0, annotations);
 				if(error) {
 					(*error)->token = tree;
 					errors->addError(*error);
@@ -500,8 +500,8 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 
 				Node* lastnode = tree->node_data.nodes[tree->subnodes - 1];
 				if(lastnode->node_type == NT_TYPE_ARRAY)
-				for(int i = 0; i < lastnode->node_data.typearray->typecount; i++) {
-					parameterizedtypes.push_back(lastnode->node_data.typearray->types[i]);
+				for(int i = 0; i < lastnode->node_data.pure_type_array->typecount; i++) {
+					parameterizedtypes.push_back(lastnode->node_data.pure_type_array->types[i]);
 				}
 
 				typechecker->setParameterizedTypes(parameterizedtypes);

@@ -143,7 +143,7 @@ Node* makeEmptyNode(int nodetype, YYLTYPE loc) {
 
 Node* makeNodeFromPureType(PureType* thetype, YYLTYPE loc) {
 	Node* mynode = NodeFactory(NT_TYPEDATA, loc);
-	mynode->node_data.type = thetype;
+	mynode->node_data.pure_type = thetype;
 	return mynode;
 }
 
@@ -161,7 +161,7 @@ Node* makeNodeFromSpecializableVarDecl(SpecializableVarDecl* decl, YYLTYPE loc) 
 
 Node* makeNodeFromPureTypeArray(PureTypeArray* thearray, YYLTYPE loc) {
 	Node* mynode = NodeFactory(NT_TYPE_ARRAY, loc);
-	mynode->node_data.typearray = thearray;
+	mynode->node_data.pure_type_array = thearray;
 
 	return mynode;
 }
@@ -223,7 +223,7 @@ void printSubNodes(Node *n, int level, char* name) {
 
 void printtype(PureType* thetype, int level) {
 	/*
-	switch(thetype->type) {
+	switch(thetype->pure_type) {
 		case TYPE_LAMBDA:
 			printf("%*c lambda, []^%d, {%s}, @%s\n", level, ' ', thetype->arrayed, thetype->specialty, thetype->alias);
 			if(thetype->typedata.lambda.returntype != NULL) {
@@ -267,14 +267,14 @@ void printtree (Node *n, int level) {
 			printf("%*c %s %s\n", level, ' ', myname, n->node_data.string);
 			break;
 		case NT_TYPEDATA:
-			printtype(n->node_data.type, level);
+			printtype(n->node_data.pure_type, level);
 			break;
 		case NT_TYPE_ARRAY:
 			printf("%*c %s\n", level, ' ', myname);
 			{
 				int i;
-				for(i = 0; i < n->node_data.typearray->typecount; i++)
-					printtype(n->node_data.typearray->types[i], level + 1);
+				for(i = 0; i < n->node_data.pure_type_array->typecount; i++)
+					printtype(n->node_data.pure_type_array->types[i], level + 1);
 			}
 			break;
 		default:
@@ -300,10 +300,10 @@ void freeNode(Node* n) {
 			free(n->node_data.string);
 			break;
 		case NT_TYPEDATA:
-			freePureType(n->node_data.type);
+			freePureType(n->node_data.pure_type);
 			break;
 		case NT_TYPE_ARRAY:
-			freePureTypeArray(n->node_data.typearray);
+			freePureTypeArray(n->node_data.pure_type_array);
 			break;
 	}
 

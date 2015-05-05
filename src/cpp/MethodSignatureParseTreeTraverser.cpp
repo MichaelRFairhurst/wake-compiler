@@ -23,7 +23,7 @@ void MethodSignatureParseTreeTraverser::convertParameterizedTypes(Node* methodde
 
 	if(methoddef->node_data.nodes[1]->node_type == NT_METHOD_RETURN_TYPE) {
 		methodname = methoddef->node_data.nodes[2];
-		parameterizer.rewriteClasstypesToParameterizedtypeByLabel(methoddef->node_data.nodes[1]->node_data.nodes[0]->node_data.type, parameterizedtypes);
+		parameterizer.rewriteClasstypesToParameterizedtypeByLabel(methoddef->node_data.nodes[1]->node_data.nodes[0]->node_data.pure_type, parameterizedtypes);
 	} else {
 		methodname = methoddef->node_data.nodes[1];
 	}
@@ -91,7 +91,7 @@ PureType* MethodSignatureParseTreeTraverser::getReturn(Node* methoddef) {
 	PureType* returntype;
 
 	if(methoddef->node_data.nodes[1]->node_type == NT_METHOD_RETURN_TYPE) {
-		returntype = methoddef->node_data.nodes[1]->node_data.nodes[0]->node_data.type;
+		returntype = methoddef->node_data.nodes[1]->node_data.nodes[0]->node_data.pure_type;
 		classestable->assertTypeIsValid(returntype);
 	} else {
 		returntype = NULL;

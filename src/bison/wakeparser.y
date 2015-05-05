@@ -348,10 +348,12 @@ value_invokable:
 	| objectable SYM_EARLYBAILOUT_DOT alias											{ $$ = makeTwoBranchNode(NT_EARLYBAILOUT_MEMBER_ACCESS, $1, makeNodeFromAlias($3, @3), @$); }
 	| '(' expression ')'															{ $$ = $2; }
 	| value_invokable methodcallsegments											{
-																						if ($1->node_type == NT_VAR_REF) {
+																						if ($1->node_type == NT_VAR_REF && $1->node_data.var_ref->alias != NULL) {
 																							// Turn (NT_VAR_REF) and (NT_INVOCATION_PARTS_TEMP (expressions) [NT_METHOD_NAME_SEGMENT (METHOD_NAME) (expressions)])
 																							// into (NT_METHOD_INVOCATION (NT_THIS) [NT_METHOD_NAME_SEGMENT (METHOD_NAME) (expressions)])
 																							$1->node_type == NT_METHOD_NAME_SEGMENT;
+																							char* alias = $1->node_data.var_ref->alias;
+																							$1->node_data.string = alias;
 																							$$ = makeTwoBranchNode(NT_METHOD_INVOCATION, makeEmptyNode(NT_THIS, @$), makeOneBranchNode(NT_METHOD_NAME, $1, @$), @$);
 
 																							if($2 != NULL) {
@@ -367,7 +369,8 @@ value_invokable:
 																								//free($2->node_data.nodes);
 																								//free($2);
 																							}
-																						} else if ($1->node_type == NT_MEMBER_ACCESS || $1->node_type == NT_EARLYBAILOUT_MEMBER_ACCESS && $1->node_data.nodes[1]->node_type == NT_VAR_REF) {
+																						} else if ($1->node_type == NT_MEMBER_ACCESS || $1->node_type == NT_EARLYBAILOUT_MEMBER_ACCESS
+																								&& ($1->node_data.nodes[1]->node_type == NT_VAR_REF && $1->node_data.nodes[1]->node_data.var_ref->alias != NULL)) {
 																							// Turn (NT_MEMBER_ACCESS (expression) (NT_VAR_REF)) and (NT_INVOCATION_PARTS_TEMP (expressions) [NT_METHOD_NAME_SEGMENT (METHOD_NAME) (expressions)])
 																							// into (NT_METHOD_INVOCATION (expression) [NT_METHOD_NAME_SEGMENT (METHOD_NAME) (expressions)])
 																							$$ = makeOneBranchNode($1->node_type == NT_MEMBER_ACCESS ? NT_METHOD_INVOCATION : NT_EARLYBAILOUT_METHOD_INVOCATION, $1->node_data.nodes[0], @$);
@@ -421,7 +424,8 @@ decl_or_stmt:
 
 decl:
 	VAR decl_type '=' expression ';'												{ $$ = makeTwoBranchNode(NT_DECLARATION, makeNodeFromVarDecl($2, @2), $4, @$); }
-	| VAR specializable_decl_type retrievalargs expression ';'						{	Node* retrieval = makeTwoBranchNode(NT_RETRIEVAL, makeNodeFromSpecializableVarDecl($2, @2), $3, @$);
+	| VAR specializable_decl_type retrievalargs expression ';'						{	SpecializablePureType* spPureType = makeSpecializablePureType(&$2->decl.typedata); spPureType->specialty = $2->specialty;
+																						Node* retrieval = makeTwoBranchNode(NT_RETRIEVAL, makeNodeFromSpecializablePureType(spPureType, @2), $3, @$);
 																						addSubNode(retrieval, $4);
 																						$$ = makeTwoBranchNode(NT_DECLARATION, makeNodeFromVarDecl(copyVarDecl(&$2->decl), @2), retrieval, @$);		}
 	;

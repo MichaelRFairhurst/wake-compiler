@@ -39,6 +39,7 @@ extern "C" {
 
 SpecializableVarDecl* makeSpecializableVarDecl(PureType* type);
 SpecializableVarDecl* makeSpecializableVarDeclFromVarDecl(VarDecl* decl);
+SpecializableVarDecl* copySpecializableVarDecl(SpecializableVarDecl* decl);
 void freeSpecializableVarDecl(SpecializableVarDecl* spt);
 
 #ifdef __cplusplus

@@ -74,7 +74,7 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 		case NT_VAR_REF:
 			{
 				//TypeParameterizer parameterizer;
-				//parameterizer.rewriteClasstypesToParameterizedtypeByLabel(node->node_data.type, parameterizedtypes);
+				//parameterizer.rewriteClasstypesToParameterizedtypeByLabel(node->node_data.pure_type, parameterizedtypes);
 
 				VarRef ref = *node->node_data.var_ref;
 				if(forceArrayIdentifier && ref.alias == NULL) {
@@ -88,7 +88,7 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 					variable = proptable->find(ref.toString());
 					if(variable) {
 						char* propname = strdup(ref.toString().c_str());
-						delete node->node_data.type; node->node_data.nodes = NULL;
+						delete node->node_data.var_ref; node->node_data.nodes = NULL;
 						node->node_type = NT_MEMBER_ACCESS;
 						addSubNode(node, makeEmptyNode(NT_THIS, node->loc));
 						addSubNode(node, makeNodeFromString(NT_COMPILER_HINT, propname, node->loc));
@@ -383,8 +383,8 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 		case NT_CAST:
 			try {
 				TypeParameterizer parameterizer;
-				parameterizer.rewriteClasstypesToParameterizedtypeByLabel(node->node_data.nodes[0]->node_data.type, parameterizedtypes);
-				ret = new PureType(*node->node_data.nodes[0]->node_data.type);
+				parameterizer.rewriteClasstypesToParameterizedtypeByLabel(node->node_data.nodes[0]->node_data.pure_type, parameterizedtypes);
+				ret = new PureType(*node->node_data.nodes[0]->node_data.pure_type);
 				classestable->assertTypeIsValid(ret);
 				PureType casted = *auto_ptr<PureType>(children[1].typeCheck(false));
 				if(!analyzer->isASubtypeOfB(&casted, ret)) {
@@ -554,7 +554,7 @@ PureType* wake::ast::OtherExpression::typeCheckMemberAccess(Node* tree, PureType
 
 	string name = tree->node_data.nodes[1]->node_type == NT_ALIAS
 		? tree->node_data.nodes[1]->node_data.string
-		: tree->node_data.nodes[1]->node_data.type->toString();
+		: tree->node_data.nodes[1]->node_data.pure_type->toString();
 
 	if(forceArrayIdentifier && tree->node_data.nodes[1]->node_type != NT_ALIAS) name += "[]";
 
@@ -577,7 +577,7 @@ PureType* wake::ast::OtherExpression::typeCheckMemberAccess(Node* tree, PureType
 		ret = new PureType(TYPE_MATCHALL);
 		errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Symbol by name of " + name + " not found", tree));
 	} else {
-		PureType* member = tree->node_data.nodes[1]->node_data.type;
+		PureType* member = tree->node_data.nodes[1]->node_data.pure_type;
 		if(!forceArrayIdentifier && tree->node_data.nodes[1]->node_type != NT_ALIAS && member->type == TYPE_LIST && analyzer->getArrayReferenceLevel(*member) != analyzer->getArrayReferenceLevel(**variable))
 			errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Accessed arrayed variable " + name + " with wrong number of [] brackets.", tree));
 
