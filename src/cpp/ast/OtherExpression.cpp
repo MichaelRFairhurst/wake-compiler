@@ -25,7 +25,7 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 
 	// read Printer as Printer[] from ARRAY_ACCESS nodes
 	// but not if there are ANY nodes before the next TYPEDATA
-	if(forceArrayIdentifier && !(node->node_type == NT_TYPEDATA || node->node_type == NT_MEMBER_ACCESS)) {
+	if(forceArrayIdentifier && !(node->node_type == NT_VAR_REF || node->node_type == NT_MEMBER_ACCESS)) {
 		forceArrayIdentifier = false;
 	}
 

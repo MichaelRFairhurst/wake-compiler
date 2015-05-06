@@ -270,7 +270,7 @@ ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<PureT
 		newprop->decl = it->second->decl;
 		newprop->flags = it->second->flags;
 		newprop->address = it->second->address;
-		//parameterizer.applyParameterizations(&newprop->type, getParameters(), parameters);
+		parameterizer.applyParameterizations(&newprop->decl.typedata, getParameters(), parameters);
 		if(newprop->decl.typedata.type == TYPE_LAMBDA) {
 			int i = 0, c = 0;
 			while(c < oldcasing.length()) {
@@ -293,7 +293,7 @@ ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<PureT
 	vector<SpecializableVarDecl*>* newneeds = new vector<SpecializableVarDecl*>();
 	for(vector<SpecializableVarDecl*>::iterator it = needs->begin(); it != needs->end(); ++it) {
 		SpecializableVarDecl* newneed = new SpecializableVarDecl(**it);
-		//parameterizer.applyParameterizations(&newneed->decl.typedata, getParameters(), parameters);
+		parameterizer.applyParameterizations(&newneed->decl.typedata, getParameters(), parameters);
 		newneeds->push_back(newneed);
 	}
 

@@ -166,6 +166,6 @@ BOOST_AUTO_TEST_CASE( TestArrayedSymbolsAddedByType ) {
 	table.add(&onearraydecl);
 	table.add(&twoarraydecl);
 
-	BOOST_CHECK(&onearray == table.find("One[]"));
-	BOOST_CHECK(&twoarray == table.find("Two[]"));
+	BOOST_CHECK(&onearraydecl.typedata == table.find("One[]"));
+	BOOST_CHECK(&twoarraydecl.typedata == table.find("Two[]"));
 }
