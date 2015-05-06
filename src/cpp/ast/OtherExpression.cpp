@@ -62,8 +62,7 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 
 				boost::optional<PureType*> variable = scopesymtable->find(&ref);
 				if(!variable && thiscontext != NULL) {
-					throw "need to inject proptable";
-					PropertySymbolTable* proptable = NULL; //classestable->findModifiable(thiscontext);
+					auto_ptr<ReadOnlyPropertySymbolTable> proptable(classestable->findFullyQualified(thiscontext->getFQClassname()));
 					variable = proptable->find(ref.toString());
 					if(variable) {
 						char* propname = strdup(ref.toString().c_str());
@@ -532,11 +531,12 @@ PureType* wake::ast::OtherExpression::typeCheckMemberAccess(Node* tree, PureType
 		delete boxedtype;
 	}
 
-	string name = tree->node_data.nodes[1]->node_type == NT_ALIAS
-		? tree->node_data.nodes[1]->node_data.string
-		: tree->node_data.nodes[1]->node_data.pure_type->toString();
+	VarRef ref = *tree->node_data.nodes[1]->node_data.var_ref;
+	if(forceArrayIdentifier && ref.alias == NULL) {
+		ref._class->arrayed = 1;
+	}
 
-	if(forceArrayIdentifier && tree->node_data.nodes[1]->node_type != NT_ALIAS) name += "[]";
+	string name = ref.toString();
 
 	if(subject.type == TYPE_OPTIONAL) {
 		errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Accessing property " + name + " on nonoptional type " + subject.toString() + ". You must first wrap object in an exists { } clause.", tree));
@@ -557,8 +557,8 @@ PureType* wake::ast::OtherExpression::typeCheckMemberAccess(Node* tree, PureType
 		ret = new PureType(TYPE_MATCHALL);
 		errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Symbol by name of " + name + " not found", tree));
 	} else {
-		PureType* member = tree->node_data.nodes[1]->node_data.pure_type;
-		if(!forceArrayIdentifier && tree->node_data.nodes[1]->node_type != NT_ALIAS && member->type == TYPE_LIST && analyzer->getArrayReferenceLevel(*member) != analyzer->getArrayReferenceLevel(**variable))
+		PureType* member = *variable;
+		if(!forceArrayIdentifier && ref.alias == NULL && member->type == TYPE_LIST && analyzer->getArrayReferenceLevel(**variable) != ref._class->arrayed)
 			errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Accessed arrayed variable " + name + " with wrong number of [] brackets.", tree));
 
 		if(tree->node_data.nodes[0]->node_type != NT_THIS) {

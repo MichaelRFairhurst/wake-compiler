@@ -20,6 +20,12 @@
 PureType* wake::ast::Invocation::typeCheck(bool forceArrayLiteral) {
 	PureType lambda = *auto_ptr<PureType>(lambdaExpr->typeCheck(false));
 
+	if(lambda.type != TYPE_LAMBDA) {
+		EXPECTED	"a function"
+		ERRONEOUS	lambda.toString()
+		THROW 		("Tried to invoke a value which is not a function");
+	}
+
 	int realArgCount = 0;
 	if(lambda.typedata.lambda.arguments) {
 		realArgCount = lambda.typedata.lambda.arguments->typecount;

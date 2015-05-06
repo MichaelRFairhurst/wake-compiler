@@ -303,6 +303,7 @@ ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<PureT
 PureType* PropertySymbolTable::getAsPureType() {
 	PureType* ret = new PureType(TYPE_CLASS);
 	ret->typedata._class.classname = strdup(classname.c_str());
+	ret->typedata._class.modulename = strdup(module.c_str());
 	if(getParameters().size()) {
 		ret->typedata._class.parameters = new PureTypeArray();
 		for(vector<PureType*>::const_iterator it = getParameters().begin(); it != getParameters().end(); ++it) {

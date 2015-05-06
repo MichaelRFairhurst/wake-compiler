@@ -14,7 +14,9 @@
 
 #include "ast/ForeachInAliased.h"
 
-VarDecl wake::ast::ForeachInAliased::getIterationVarDecl(VarDecl* iterableType) {
-	iterableType->alias = strdup(alias);
-	return *iterableType;
+VarDecl wake::ast::ForeachInAliased::getIterationVarDecl(PureType* iterableType) {
+	VarDecl decl;
+	decl.typedata = *iterableType;
+	decl.alias = strdup(alias);
+	return decl;
 }

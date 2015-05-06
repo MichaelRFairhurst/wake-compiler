@@ -28,7 +28,7 @@ namespace wake {
 				ForeachInExplicitType(ExpressionNode* iterable, StatementNode* body, VarDecl* explicitType, Node* node, ScopeSymbolTable* scopesymtable, ErrorTracker* errors, TypeAnalyzer* analyzer)
 					: Foreach(iterable, body, node, scopesymtable, errors), analyzer(analyzer), explicitType(explicitType) {};
 
-				VarDecl getIterationVarDecl(VarDecl* iterableType);
+				VarDecl getIterationVarDecl(PureType* iterableType);
 
 				~ForeachInExplicitType(){};
 

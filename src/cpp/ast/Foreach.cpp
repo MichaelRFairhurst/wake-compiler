@@ -33,8 +33,8 @@ void wake::ast::Foreach::typeCheck() {
 
 		VarDecl actualLowered = getIterationVarDecl(&lowered);
 
-		if(node->node_data.nodes[0]->node_type == NT_VAR_REF && node->node_data.nodes[0]->node_data.var_ref->alias == NULL) {
-			actualLowered.shadow = node->node_data.nodes[0]->node_data.var_ref->_class->shadow;
+		if(node->node_data.nodes[0]->node_type == NT_VAR_DECL_DATA && node->node_data.nodes[0]->node_data.var_decl->alias == NULL) {
+			actualLowered.shadow = node->node_data.nodes[0]->node_data.var_decl->shadow;
 		}
 
 		scopesymtable->pushScope();

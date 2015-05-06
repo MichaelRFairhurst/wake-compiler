@@ -87,8 +87,8 @@ wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
 			break;
 
 		case NT_FOREACHIN:
-			if(node->node_data.nodes[0]->node_type == NT_ALIAS) {
-				created = new wake::ast::ForeachInAliased(generateExpressionAst(node->node_data.nodes[1], true), generateStatementAst(node->node_data.nodes[2]), node->node_data.nodes[0]->node_data.string, node, scopesymtable, errors);
+			if(node->node_data.nodes[0]->node_type == NT_VAR_REF) {
+				created = new wake::ast::ForeachInAliased(generateExpressionAst(node->node_data.nodes[1], true), generateStatementAst(node->node_data.nodes[2]), node->node_data.nodes[0]->node_data.var_ref->alias, node, scopesymtable, errors);
 				break;
 			} else {
 				created = new wake::ast::ForeachInExplicitType(generateExpressionAst(node->node_data.nodes[1], true), generateStatementAst(node->node_data.nodes[2]),  node->node_data.nodes[0]->node_data.var_decl, node, scopesymtable, errors, classestable->getAnalyzer());

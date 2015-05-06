@@ -94,7 +94,7 @@ bool TypeAnalyzer::isASubtypeOfB(PureType* a, PureType* b) {
 		}
 
 		try {
-			string fqname = a->typedata._class.modulename;
+			string fqname = a->typedata._class.modulename == NULL ? "" : a->typedata._class.modulename;
 
 			if(fqname.size()) {
 				fqname += ".";
@@ -203,7 +203,7 @@ void TypeAnalyzer::assertFQClassCanProvide(string provider, SpecializablePureTyp
 		return;
 	}
 
-	string fqname = binding->typedata.typedata._class.modulename;
+	string fqname = binding->typedata.typedata._class.modulename == NULL ? "" : binding->typedata.typedata._class.modulename;
 	if(fqname.size()) {
 		fqname += ".";
 	}
@@ -213,7 +213,7 @@ void TypeAnalyzer::assertFQClassCanProvide(string provider, SpecializablePureTyp
 	for(vector<SpecializableVarDecl*>::iterator it = recurse->begin(); it != recurse->end(); ++it)
 	try {
 		SpecializablePureType recursable;
-		recursable.specialty = strdup((*it)->specialty);
+		recursable.specialty = (*it)->specialty == NULL ? NULL : strdup((*it)->specialty);
 		recursable.typedata = (*it)->decl.typedata;
 		assertFQClassCanProvide(provider, &recursable);
 	} catch(SemanticError* e) {

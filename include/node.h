@@ -23,7 +23,7 @@ typedef struct Node {
 	YYLTYPE loc;
 	int node_type;
 	int subnodes;
-	union {
+	struct {
 		char* string;
 		double number;
 		struct Node** nodes;

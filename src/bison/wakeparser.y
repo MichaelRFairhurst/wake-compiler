@@ -490,7 +490,7 @@ iterationstatement:
 	;
 
 member:
-	usable_as_variable_type															{ $$ = makeNodeFromClassVarRef($1, @$); }
+	decl_type																		{ $$ = makeNodeFromVarDecl($1, @$); }
 	| alias																			{ $$ = makeNodeFromAlias($1, @$); }
 	;
 

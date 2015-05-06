@@ -23,7 +23,10 @@ PureType* wake::ast::MethodInvocation::typeCheck(bool forceArrayIdentifier) {
 		string name = methodname->node_data.nodes[0]->node_data.string;
 		boost::optional<PureType*> variable = scopesymtable->find(name);
 
+
 		if(variable) {
+			// this means we saw 'something(...)' which got converted into 'this.something()' where 'something' is a member of this which is a function
+			// turn it into (this.something)() for the codegen step
 			node->node_type = NT_LAMBDA_INVOCATION; // for codegen step
 			node->node_data.nodes[0] = methodname->node_data.nodes[0];
 			if(methodname->subnodes == 2) {
@@ -34,7 +37,8 @@ PureType* wake::ast::MethodInvocation::typeCheck(bool forceArrayIdentifier) {
 			methodname->subnodes = 0;
 			freeNode(methodname);
 
-			node->node_data.nodes[0]->node_type = NT_ALIAS; // for codegen step
+			node->node_data.nodes[0]->node_type = NT_VAR_REF; // for codegen step
+			node->node_data.nodes[0]->node_data.var_ref = new VarRef(node->node_data.nodes[0]->node_data.string);
 			auto_ptr<ExpressionNode> lambda(astCreator->generateExpressionAst(node, false)); // Don't ensure its a usable type -- this node will have such a wrapper already if it matters
 			return lambda->typeCheck(false);
 		}

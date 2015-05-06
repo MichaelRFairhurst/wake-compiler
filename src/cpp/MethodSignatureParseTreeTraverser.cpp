@@ -84,7 +84,22 @@ Node* MethodSignatureParseTreeTraverser::getBody(Node* methoddef) {
 }
 
 vector<VarDecl*> MethodSignatureParseTreeTraverser::getArgDecls(Node* methoddef) {
-	return vector<VarDecl*>();
+	vector<VarDecl*> args;
+	Node* methodname;
+
+	if(methoddef->node_data.nodes[1]->node_type == NT_METHOD_RETURN_TYPE) {
+		methodname = methoddef->node_data.nodes[2];
+	} else {
+		methodname = methoddef->node_data.nodes[1];
+	}
+
+	for(int i = 1; i < methodname->subnodes; i += 2) {
+		for(int b = 0; b < methodname->node_data.nodes[i]->subnodes; b++) {
+			args.push_back(methodname->node_data.nodes[i]->node_data.nodes[b]->node_data.var_decl);
+		}
+	}
+
+	return args;
 }
 
 PureType* MethodSignatureParseTreeTraverser::getReturn(Node* methoddef) {
