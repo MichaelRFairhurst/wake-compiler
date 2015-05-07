@@ -21,6 +21,8 @@
 #include "SpecializableVarDecl.h"
 #include "SpecializablePureType.h"
 
+#include <iostream>
+
 const map<string, bool>& PropertySymbolTable::getParentage() {
 	return parentage;
 }

@@ -75,7 +75,16 @@ boost::optional<SemanticError*> ClassSpaceSymbolTable::addInheritance(string chi
 		return boost::optional<SemanticError*>(new SemanticError(MORE_THAN_ONE_SUBCLASS));
 	}
 
-	childname = fullQualifications[childname];
+	if(fullQualifications.count(childname)) {
+		// careful! undefined behavior if we don't check this exists first
+		childname = fullQualifications[childname];
+	} else {
+		// either they forgot to import it, or they are about to define it
+		// which means its in the current module. Continue as if its just
+		// not defined yet, it will fail later if they don't
+		childname = module.size() ? module + "." + childname : childname;
+	}
+
 	if(childname == addingclass_name) {
 		return boost::optional<SemanticError*>(new SemanticError(SELF_INHERITANCE));
 	}
@@ -231,7 +240,13 @@ string ClassSpaceSymbolTable::getModule() {
 }
 
 string ClassSpaceSymbolTable::getFullyQualifiedClassname(string classname) {
-	return fullQualifications[classname];
+	if(fullQualifications.count(classname)) {
+		return fullQualifications[classname];
+	} else {
+		SymbolNotFoundException* error = new SymbolNotFoundException();
+		error->errormsg = "Type " + classname + " was not found in loaded class space";;
+		throw error;
+	}
 }
 
 void ClassSpaceSymbolTable::setModulesOnType(PureType* type) {
