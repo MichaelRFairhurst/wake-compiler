@@ -429,7 +429,7 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 
 								if(!classestable->getAnalyzer()->isASubtypeOfB(&actual.typedata, &required->decl.typedata)) {
 									errors->addError(new SemanticError(TYPE_ERROR, "Injection is not a proper subtype for class dependencies", tree));
-								} else if(injections->node_data.nodes[i]->node_type == NT_TYPEDATA) {
+								} else if(injections->node_data.nodes[i]->node_type == NT_SPECIALIZABLE_TYPEDATA) {
 									classestable->getAnalyzer()->assertFQClassCanProvide(classname, &actual);
 								}
 							} else {

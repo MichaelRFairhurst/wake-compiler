@@ -19,13 +19,13 @@
 
 void wake::ast::Exists::typeCheck() {
 	try {
+		auto_ptr<VarRef> existableRef(new VarRef(*node->node_data.nodes[0]->node_data.var_ref));
+		auto_ptr<PureType> existableType(existable->typeCheck(false));
+
 		if(node->node_data.nodes[0]->node_type == NT_MEMBER_ACCESS) {
 			errors->addError(new SemanticError(TYPE_ERROR, "Calling exists { } on a property is illegal as it is a shared reference and therefore might be unset amid the scope", node));
 			return;
 		}
-
-		auto_ptr<VarRef> existableRef(new VarRef(*node->node_data.nodes[0]->node_data.var_ref));
-		auto_ptr<PureType> existableType(existable->typeCheck(false));
 
 		if(existableType->type != TYPE_OPTIONAL) {
 			errors->addError(new SemanticError(EXISTS_ON_NONOPTIONAL_TYPE, "exists { } statement uses a nonoptional type", node)); // @todo better error message!
