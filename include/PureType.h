@@ -26,6 +26,7 @@
 
 #ifdef __cplusplus
 #include <string>
+#include <vector>
 #endif
 
 struct PureTypeArray;
@@ -69,6 +70,7 @@ typedef struct PureType {
 		ClassVarRef createClassVarRef();
 		std::string getFQClassname();
 		std::string toString();
+		std::vector<PureType*> getClassParametersAsVector();
 
 	private:
 		void releaseData();

@@ -37,7 +37,7 @@ PureType* wake::ast::MethodInvocationBase::typeCheckMethodInvocation(PureType& s
 	auto_ptr<ReadOnlyPropertySymbolTable> methodtable;
 
 	try {
-		methodtable.reset(classestable->findFullyQualified(subject.getFQClassname()));
+		methodtable.reset(classestable->findFullyQualified(subject.getFQClassname(), subject.getClassParametersAsVector()));
 	} catch (SymbolNotFoundException* e) {
 		errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, string("Class by name of ") + subject.typedata._class.classname + " returned by another expression has not been imported and cannot be resolved", node));
 		return new PureType(TYPE_MATCHALL);

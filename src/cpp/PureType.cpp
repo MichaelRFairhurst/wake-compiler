@@ -100,6 +100,21 @@ ClassVarRef PureType::createClassVarRef() {
 	}
 }
 
+std::vector<PureType*> PureType::getClassParametersAsVector() {
+	if(type != TYPE_CLASS) {
+		throw std::runtime_error(std::string("Only class types, parameterized types, and lists/optionals around those types can be class references. All others require an alias"));
+	}
+
+	std::vector<PureType*> parameters;
+	if(typedata._class.parameters != NULL) {
+		for (int i = 0; i < typedata._class.parameters->typecount; i++) {
+			parameters.push_back(typedata._class.parameters->types[i]);
+		}
+	}
+
+	return parameters;
+}
+
 PureType::PureType(const PureType& other) {
 	deepCopy(other);
 }
