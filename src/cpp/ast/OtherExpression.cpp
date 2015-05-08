@@ -551,7 +551,7 @@ PureType* wake::ast::OtherExpression::typeCheckMemberAccess(Node* tree, PureType
 		return ret;
 	}
 
-	auto_ptr<ReadOnlyPropertySymbolTable> proptable(classestable->findFullyQualified(subject.getFQClassname()));
+	auto_ptr<ReadOnlyPropertySymbolTable> proptable(classestable->findFullyQualified(subject.getFQClassname(), subject.getClassParametersAsVector()));
 	boost::optional<PureType*> variable = proptable->find(name);
 	if(!variable) {
 		ret = new PureType(TYPE_MATCHALL);

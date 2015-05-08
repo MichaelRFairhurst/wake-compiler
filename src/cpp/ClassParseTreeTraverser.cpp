@@ -370,9 +370,9 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 						if(!classestable->getAnalyzer()->isPrimitiveTypeNum(&provision->typedata))
 							errors->addError(new SemanticError(TYPE_ERROR, "Bound an Num value to something that is not an Num", tree));
 						break;
-					case NT_TYPEDATA:
+					case NT_SPECIALIZABLE_TYPEDATA:
 						try {
-							PureType* servedType = served->node_data.pure_type;
+							PureType* servedType = &served->node_data.specializable_pure_type->typedata;
 							classestable->assertTypeIsValid(servedType);
 
 							if(!classestable->getAnalyzer()->isASubtypeOfB(servedType, &provision->typedata)) {
