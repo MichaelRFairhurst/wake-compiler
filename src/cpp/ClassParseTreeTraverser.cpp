@@ -505,8 +505,13 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 				// Begin Method Scope For Type Analysis
 				scopesymtable->pushScope();
 				vector<VarDecl*> argDecls = methodanalyzer->getArgDecls(tree);
-				for(std::vector<VarDecl*>::iterator it = argDecls.begin(); it != argDecls.end(); ++it) {
-					scopesymtable->add(*it);
+				try {
+					for(std::vector<VarDecl*>::iterator it = argDecls.begin(); it != argDecls.end(); ++it) {
+						scopesymtable->add(*it);
+					}
+				} catch(std::runtime_error e) {
+					errors->addError(new SemanticError(ALIAS_REQUIRED, "Method has an function type argument which is missing an alias", tree));
+					break;
 				}
 
 				if(is_extern && methodbody->node_type != NT_ABSTRACT_METHOD) {
