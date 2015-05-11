@@ -33,7 +33,7 @@ class TableFileReader {
 		void readMethod(PropertySymbolTable* table, istream& s);
 		void readInheritance(PropertySymbolTable* table, istream& s);
 		PureType* readType(istream& s);
-		void readTypeCommon(PureType* type, istream& s);
+		PureType* readTypeByTag(int tag, istream& s);
 		PureType* readPureTypeByTag(int tag, istream& s);
 		PureType* readClassType(istream& s);
 		PureType* readLambdaType(istream& s);

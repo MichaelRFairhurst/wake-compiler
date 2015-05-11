@@ -1,17 +1,19 @@
-file = version (1 byte) | namelength (1 byte) | name | Properties | 0x00 | Inheritances | 0x00 | Parameters | Annotations | 0x00
+file = version (1 byte) | modulelen | module | namelength (1 byte) | name | Num Properties | Properties | Num Inheritances | Inheritances | Num Parameters | Parameters | Num Annotations | Annotations
   where
 	Inheritance = parentnamelength (1 byte) | parentname | Bool extends (1 byte)
-	Properties = propertynamelength (1 byte) | propertyname | casinglength | casing | flags (1 byte) | Type | Annotations | 0x00
+	Properties = propertynamelength (1 byte) | propertyname | casinglength | casing | flags (1 byte) | decl | Num Annotations | Annotations
+	Decl = Type | shadow | aliaslen | alias
+	SpecializableDecl | Decl | specialtylen | specialty
+	Needs = SpecializabeDecl*
 	Types = Type*
 	Type = ClassType or LambdaType or ParameterizedType or ListType or OptionalType
-    ClassType = 0x01 | classnamelength (1 byte) | classname | shadow (1 byte int) | TypeCommon
-	LambdaType = 0x02 | ReturnType | Types | 0x00 | TypeCommon
-	ParameterizedType = 0x03 | labellength | label | (Type upper OR 0x00) | (Type lower OR 0x00) | shadow | typecommon
+    ClassType = 0x01 | classnamelength (1 byte) | classname | Num Params | Param types
+	LambdaType = 0x02 | ReturnType | Num Args| Arg Types
+	ParameterizedType = 0x03 | labellength | label | (Type upper OR 0x00) | (Type lower OR 0x00)
 	ListType = 0x04 | Type | levels (1 byte)
 	OptionalType = 0x05 | Type | levels (1 byte)
 	ReturnType = (0x01 | Type) or (0x00)
-	TypeCommon = aliaslength | alias | specialtylength | specialty
-	Annotation = NameLength (1 byte) | Name | AnnotationVals | 0x00
+	Annotation = NameLength (1 byte) | Name | Num AnnotationVals | AnnotationVals
 	AnnotationVals = (StrAnnotationVal | NumAnnotationVal | BoolAnnotationVal | NothingAnnotationVal)*
 	StrAnnotationVal = 0x01 | len (1 byte) | value
 	NumAnnotationVal = 0x02 | value (4 bytes)
@@ -22,36 +24,46 @@ Latest version: 4
 
 Memory Layout
 
-     File          Property       Classtype          Lambda      Parameterized     ListType      OptionalType     ReturnType      Typecommon      Inheritance
- ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------
-|   version  |  | namelength |  |    0x01    |  |    0x02    |  |    0x03    |  |    0x04    |  |    0x05    |  |    0x01    |  |  aliaslen  |  | NameLength |
- ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------
-| namelength |  |    name    |  | namelength |  | ReturnType |  |  labellen  |  |    Type    |  |    Type    |  |    Type    |  |   alias    |  |    Name    |
- ------------   |    ...     |   ------------   |    ....    |   ------------   |     ...    |  |     ...    |  |     ...    |  |    ...     |  |    ....    |
-|    name    |   ------------   |    name    |   ------------   |    label   |   ------------    ------------    ------------    ------------    ------------
-|    ...     |  |   casingl  |  |    ....    |  |    Types   |  |     ...    |  |   levels   |  |   levels   |        OR        | specialtyl |  | Bool extend|
- ------------    ------------    ------------   |    ....    |   ------------    ------------    ------------    ------------    ------------    ------------
-|   0x00     |  |   casing   |  | ParamTypes |   ------------   | Type upper |  | Typecommon |  | Typecommon |  |    0x00    |  | specialty  |
- ------------    ------------   |    ...     |  |    0x00    |  |     ...    |  |    ...     |  |    ...     |   ------------   |    ....    |
-| Properties |  |   flags    |   ------------    ------------    ------------    ------------    ------------                    ------------
-|    ...     |   ------------   |    0x00    |  | Typecommon |  | Type lower |
- ------------   |    Type    |   ------------   |    ...     |  |     ...    |
-|   0x00     |  |    ...     |  | Typecommon |   ------------    ------------
- ------------    ------------   |    ...     |                  |   shadow   |
-|Inheritances|  | Annotations|   ------------                    ------------
-|    ...     |  |    ...     |                                  | Typecommon |
- ------------    ------------                                   |     ...    |
-|   0x00     |  |    0x00    |                                   ------------
+     File          Property       Classtype          Lambda      Parameterized     ListType      OptionalType     ReturnType      Inheritance
+ ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------
+|   version  |  | namelength |  |    0x01    |  |    0x02    |  |    0x03    |  |    0x04    |  |    0x05    |  |    0x01    |  | NameLength |
+ ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------
+|  modulelen |  |    name    |  | namelength |  | ReturnType |  |  labellen  |  |    Type    |  |    Type    |  |    Type    |  |    Name    |
+ ------------   |    ...     |   ------------   |    ....    |   ------------   |     ...    |  |     ...    |  |     ...    |  |    ....    |
+|   module   |   ------------   |    name    |   ------------   |    label   |   ------------    ------------    ------------    ------------
+|    ...     |  |   casingl  |  |    ....    |  |  Num Args  |  |     ...    |  |   levels   |  |   levels   |        OR        | Bool extend|
+ ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------
+| namelength |  |   casing   |  | Num Params |  |    Types   |  | Type upper |                                  |    0x00    |
+ ------------    ------------    ------------   |    ....    |  |     ...    |                                   ------------
+|    name    |  |   flags    |  | ParamTypes |   ------------    ------------
+|    ...     |   ------------   |    ...     |                  | Type lower |
+ ------------   |    Decl    |   ------------                   |     ...    |
+| is abstract|  |    ...     |                                   ------------
  ------------    ------------
+|  Num props |  |  Num Anns  |
+ ------------    ------------
+| Properties |  | Annotations|
+|    ...     |  |    ...     |
+ ------------    ------------
+|  Num needs |
+ ------------
+|   Needs    |
+|    ...     |
+ ------------
+|Num inheritn|
+ ------------
+|Inheritances|
+|    ...     |
+ ------------
+| Num Params |
+ ------------
 | Parameters |
 |    ...     |
  ------------
-|    0x00    |
+| Num Annota |
  ------------
 | Annotations|
 |    ...     |
- ------------
-|   0x00     |
  ------------
 
   Annotation     StrAnnotnVal    NumAnnotnVal    BoolAnnotVal    NothingAnntV
@@ -60,8 +72,8 @@ Memory Layout
  ------------    ------------    ------------    ------------    ------------
 |    Name    |  |     len    |  |   value    |  |   value    |
  ------------    ------------   |    ...     |   ------------
-|    Vals    |  |   value    |   ------------
-|    ....    |  |    ....    |
- ------------    ------------
-|    0x00    |
+|  Num Vals  |  |   value    |   ------------
+ ------------   |    ....    |
+|    Vals    |   ------------
+|    ....    |
  ------------
