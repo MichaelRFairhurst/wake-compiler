@@ -110,6 +110,7 @@ TESTNAMES=CompilerTests.cpp \
 	OptionsParserTest.cpp \
 	ObjectFileHeaderDataTest.cpp \
 	TableFileWriterTest.cpp \
+	TableFileDataSets.cpp \
 	TableFileReaderTest.cpp \
 	DerivedPropertySymbolTableTest.cpp
 endif
