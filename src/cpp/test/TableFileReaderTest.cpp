@@ -82,9 +82,63 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 	BOOST_CHECK((*table.find("print(Text)"))->typedata.lambda.returntype == NULL);
 	BOOST_CHECK((*table.find("print(Text)"))->typedata.lambda.arguments->typecount == 1);
 	BOOST_CHECK((*table.find("print(Text)"))->typedata.lambda.arguments->types[0]->type == TYPE_CLASS);
+	BOOST_CHECK((*table.find("print(Text)"))->typedata.lambda.arguments->types[0]->typedata._class.modulename == string("lang"));
 	BOOST_CHECK((*table.find("print(Text)"))->typedata.lambda.arguments->types[0]->typedata._class.classname == string("Text"));
 	BOOST_CHECK((*table.find("print(Text)"))->typedata.lambda.arguments->types[0]->typedata._class.parameters == NULL);
 	BOOST_CHECK(table.properties["print(Text)"]->decl.alias == NULL);
+}
+
+BOOST_AUTO_TEST_CASE(TestWritesShadowedMember)
+{
+	std::stringstream in;
+	in.write(TABLE_WITH_SHADOWED_VAR, sizeof(TABLE_WITH_SHADOWED_VAR));
+
+	TableFileReader reader;
+
+	TypeAnalyzer tanalyzer;
+	PropertySymbolTable table(&tanalyzer, "");
+	reader.read(&table, in);
+
+	BOOST_CHECK(table.classname == string("classname"));
+	BOOST_CHECK(table.isAbstract() == false);
+	BOOST_CHECK(table.getNeeds()->size() == 0);
+	BOOST_CHECK(table.properties.size() == 1);
+	BOOST_CHECK(table.parentage.size() == 0);
+	BOOST_CHECK(table.getParameters().size() == 0);
+	BOOST_CHECK(table.isPublic("$Printer") == true);
+	BOOST_CHECK((*table.find("$Printer"))->type == TYPE_CLASS);
+	BOOST_CHECK((*table.find("$Printer"))->typedata._class.modulename == string("io"));
+	BOOST_CHECK((*table.find("$Printer"))->typedata._class.classname == string("Printer"));
+	BOOST_CHECK((*table.find("$Printer"))->typedata._class.modulename == string("io"));
+	BOOST_CHECK((*table.find("$Printer"))->typedata._class.parameters == NULL);
+	BOOST_CHECK(table.properties["$Printer"]->decl.alias == NULL);
+	BOOST_CHECK(table.properties["$Printer"]->decl.shadow == 1);
+}
+
+BOOST_AUTO_TEST_CASE(TestWritesAliasedMember)
+{
+	std::stringstream in;
+	in.write(TABLE_WITH_ALIASED_VAR, sizeof(TABLE_WITH_ALIASED_VAR));
+
+	TableFileReader reader;
+
+	TypeAnalyzer tanalyzer;
+	PropertySymbolTable table(&tanalyzer, "");
+	reader.read(&table, in);
+
+	BOOST_CHECK(table.classname == string("classname"));
+	BOOST_CHECK(table.isAbstract() == false);
+	BOOST_CHECK(table.getNeeds()->size() == 0);
+	BOOST_CHECK(table.properties.size() == 1);
+	BOOST_CHECK(table.parentage.size() == 0);
+	BOOST_CHECK(table.getParameters().size() == 0);
+	BOOST_CHECK(table.isPublic("mPrinter") == true);
+	BOOST_CHECK((*table.find("mPrinter"))->type == TYPE_CLASS);
+	BOOST_CHECK((*table.find("mPrinter"))->typedata._class.modulename == string("io"));
+	BOOST_CHECK((*table.find("mPrinter"))->typedata._class.classname == string("Printer"));
+	BOOST_CHECK((*table.find("mPrinter"))->typedata._class.parameters == NULL);
+	BOOST_CHECK(table.properties["mPrinter"]->decl.alias == string("mPrinter"));
+	BOOST_CHECK(table.properties["mPrinter"]->decl.shadow == 0);
 }
 
 BOOST_AUTO_TEST_CASE(TestWritesNeed)
@@ -103,13 +157,15 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 	BOOST_CHECK(table.isAbstract() == false);
 	BOOST_CHECK(table.getNeeds()->size() == 1);
 	BOOST_CHECK(table.getNeeds()->at(0)->decl.typedata.type == TYPE_CLASS);
+	BOOST_CHECK(table.getNeeds()->at(0)->decl.typedata.typedata._class.modulename == string("lang"));
 	BOOST_CHECK(table.getNeeds()->at(0)->decl.typedata.typedata._class.classname == string("Text"));
 	BOOST_CHECK(table.getNeeds()->at(0)->decl.typedata.typedata._class.parameters == NULL);
 	BOOST_CHECK(table.getNeeds()->at(0)->decl.alias == NULL);
 	BOOST_CHECK(table.getNeeds()->at(0)->decl.shadow == 0);
-	BOOST_CHECK(table.getNeeds()->at(0)->specialty == NULL);
+	BOOST_CHECK(table.getNeeds()->at(0)->specialty == string("special"));
 	BOOST_CHECK(table.properties.size() == 1);
 	BOOST_CHECK(table.properties["Text"]->decl.typedata.type == TYPE_CLASS);
+	BOOST_CHECK(table.properties["Text"]->decl.typedata.typedata._class.modulename == string("lang"));
 	BOOST_CHECK(table.properties["Text"]->decl.typedata.typedata._class.classname == string("Text"));
 	BOOST_CHECK(table.properties["Text"]->decl.typedata.typedata._class.parameters == NULL);
 	BOOST_CHECK(table.properties["Text"]->decl.alias == NULL);
@@ -133,12 +189,14 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	BOOST_CHECK(table.isAbstract() == false);
 	BOOST_CHECK(table.getNeeds()->size() == 2);
 	BOOST_CHECK(table.getNeeds()->at(0)->decl.typedata.type == TYPE_CLASS);
+	BOOST_CHECK(table.getNeeds()->at(0)->decl.typedata.typedata._class.modulename == string("lang"));
 	BOOST_CHECK(table.getNeeds()->at(0)->decl.typedata.typedata._class.classname == string("Text"));
 	BOOST_CHECK(table.getNeeds()->at(0)->decl.typedata.typedata._class.parameters == NULL);
 	BOOST_CHECK(table.getNeeds()->at(0)->decl.shadow == 0);
 	BOOST_CHECK(table.getNeeds()->at(0)->decl.alias == NULL);
 	BOOST_CHECK(table.getNeeds()->at(0)->specialty == string("name"));
 	BOOST_CHECK(table.getNeeds()->at(1)->decl.typedata.type == TYPE_CLASS);
+	BOOST_CHECK(table.getNeeds()->at(1)->decl.typedata.typedata._class.modulename == string("io"));
 	BOOST_CHECK(table.getNeeds()->at(1)->decl.typedata.typedata._class.classname == string("Printer"));
 	BOOST_CHECK(table.getNeeds()->at(1)->decl.typedata.typedata._class.parameters == NULL);
 	BOOST_CHECK(table.getNeeds()->at(1)->decl.shadow == 0);
@@ -146,11 +204,13 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	BOOST_CHECK(table.getNeeds()->at(1)->specialty == string("disabled"));
 	BOOST_CHECK(table.properties.size() == 2);
 	BOOST_CHECK(table.properties["Text"]->decl.typedata.type == TYPE_CLASS);
+	BOOST_CHECK(table.properties["Text"]->decl.typedata.typedata._class.modulename == string("lang"));
 	BOOST_CHECK(table.properties["Text"]->decl.typedata.typedata._class.classname == string("Text"));
 	BOOST_CHECK(table.properties["Text"]->decl.typedata.typedata._class.parameters == NULL);
 	BOOST_CHECK(table.properties["Text"]->decl.shadow == 0);
 	BOOST_CHECK(table.properties["Text"]->decl.alias == NULL);
 	BOOST_CHECK(table.properties["Printer"]->decl.typedata.type == TYPE_CLASS);
+	BOOST_CHECK(table.properties["Printer"]->decl.typedata.typedata._class.modulename == string("io"));
 	BOOST_CHECK(table.properties["Printer"]->decl.typedata.typedata._class.classname == string("Printer"));
 	BOOST_CHECK(table.properties["Printer"]->decl.typedata.typedata._class.parameters == NULL);
 	BOOST_CHECK(table.properties["Printer"]->decl.shadow == 0);
@@ -204,9 +264,11 @@ BOOST_AUTO_TEST_CASE(TestReadsParameters)
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.label == string("B"));
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.upperbound != NULL);
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.upperbound->type == TYPE_CLASS);
+	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.upperbound->typedata._class.modulename == string("lang"));
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.upperbound->typedata._class.classname == string("Text"));
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.upperbound->typedata._class.parameters == NULL);
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.lowerbound != NULL);
+	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.lowerbound->typedata._class.modulename == string("lang"));
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.lowerbound->typedata._class.classname == string("Bool"));
 	BOOST_CHECK(table.getParameters()[1]->typedata.parameterized.lowerbound->typedata._class.parameters == NULL);
 }

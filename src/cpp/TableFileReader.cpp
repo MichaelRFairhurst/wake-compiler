@@ -32,7 +32,10 @@ void TableFileReader::read(PropertySymbolTable* table, istream& s) {
 
 	int numNeeds = readUInt8(s);
 	while(numNeeds--) {
-		//readMethod(table, s);
+		int flags = readUInt8(s);
+		SpecializableVarDecl* decl = readSpecializableVarDecl(s);
+		vector<Annotation*> anns = readAnnotations(s);
+		table->addNeed(decl, flags, anns);
 	}
 
 	int numInheritance = readUInt8(s);
@@ -113,6 +116,7 @@ PureType* TableFileReader::readTypeByTag(int tag, istream& s) {
 PureType* TableFileReader::readClassType(istream &s) {
 	//cout << "reading class type" << endl;
 	PureType* type = new PureType(TYPE_CLASS);
+	type->typedata._class.modulename = readCString(s);
 	type->typedata._class.classname = readCString(s);
 
 	bool hasParams = false;
@@ -184,12 +188,27 @@ void TableFileReader::readMethod(PropertySymbolTable* table, istream& s) {
 	prop->address = name; // always true except @TODO when extending generics
 	prop->casing = readString(s);
 	prop->flags = readUInt8(s);
-	prop->decl.typedata = *readType(s);
+	prop->decl = *readVarDecl(s);
 	vector<Annotation*> annotations = readAnnotations(s);
 	for(vector<Annotation*>::iterator ann = annotations.begin(); ann != annotations.end(); ++ann)
 		prop->annotations.push_back(*ann);
 	table->properties[name] = prop;
 	//if(prop->flags & PROPERTY_NEED) table->getNeeds()->push_back(prop->type);
+}
+
+VarDecl* TableFileReader::readVarDecl(istream& s) {
+	VarDecl* decl = new VarDecl();
+	decl->typedata = *readType(s);
+	decl->shadow = readUInt8(s);
+	decl->alias = readCString(s);
+	return decl;
+}
+
+SpecializableVarDecl* TableFileReader::readSpecializableVarDecl(istream& s) {
+	SpecializableVarDecl* spDecl = new SpecializableVarDecl();
+	spDecl->decl = *readVarDecl(s);
+	spDecl->specialty = readCString(s);
+	return spDecl;
 }
 
 void TableFileReader::readInheritance(PropertySymbolTable* table, istream& s) {

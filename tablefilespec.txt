@@ -28,21 +28,21 @@ Memory Layout
  ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------
 |   version  |  | namelength |  |    0x01    |  |    0x02    |  |    0x03    |  |    0x04    |  |    0x05    |  |    0x01    |  | NameLength |
  ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------
-|  modulelen |  |    name    |  | namelength |  | ReturnType |  |  labellen  |  |    Type    |  |    Type    |  |    Type    |  |    Name    |
+|  modulelen |  |    name    |  | module len |  | ReturnType |  |  labellen  |  |    Type    |  |    Type    |  |    Type    |  |    Name    |
  ------------   |    ...     |   ------------   |    ....    |   ------------   |     ...    |  |     ...    |  |     ...    |  |    ....    |
-|   module   |   ------------   |    name    |   ------------   |    label   |   ------------    ------------    ------------    ------------
+|   module   |   ------------   |   module   |   ------------   |    label   |   ------------    ------------    ------------    ------------
 |    ...     |  |   casingl  |  |    ....    |  |  Num Args  |  |     ...    |  |   levels   |  |   levels   |        OR        | Bool extend|
  ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------    ------------
-| namelength |  |   casing   |  | Num Params |  |    Types   |  | Type upper |                                  |    0x00    |
+| namelength |  |   casing   |  | namelength |  |    Types   |  | Type upper |                                  |    0x00    |
  ------------    ------------    ------------   |    ....    |  |     ...    |                                   ------------
-|    name    |  |   flags    |  | ParamTypes |   ------------    ------------
-|    ...     |   ------------   |    ...     |                  | Type lower |
+|    name    |  |   flags    |  |    name    |   ------------    ------------
+|    ...     |   ------------   |    ....    |                  | Type lower |
  ------------   |    Decl    |   ------------                   |     ...    |
-| is abstract|  |    ...     |                                   ------------
- ------------    ------------
-|  Num props |  |  Num Anns  |
- ------------    ------------
-| Properties |  | Annotations|
+| is abstract|  |    ...     |  | Num Params |                   ------------
+ ------------    ------------    ------------
+|  Num props |  |  Num Anns  |  | ParamTypes |
+ ------------    ------------   |    ...     |
+| Properties |  | Annotations|   ------------
 |    ...     |  |    ...     |
  ------------    ------------
 |  Num needs |
@@ -65,6 +65,25 @@ Memory Layout
 | Annotations|
 |    ...     |
  ------------
+
+     Need          Var Decl
+ ------------    ------------
+|   Flags    |  |  PureType  |
+ ------------   |    ...     |
+|  Var Decl  |   ------------
+|    ...     |  |   Shadow   |
+ ------------    ------------
+| Specialtyl |  |  alias len |
+ ------------    ------------
+| Specialty  |  |   alias    |
+|    ...     |  |    ...     |
+ ------------    ------------
+| NumAnnotat |
+ ------------
+| Annotations|
+|    ...     |
+ ------------
+
 
   Annotation     StrAnnotnVal    NumAnnotnVal    BoolAnnotVal    NothingAnntV
  ------------    ------------    ------------    ------------    ------------

@@ -19,6 +19,8 @@
 #include <string>
 #include "PropertySymbolTable.h"
 #include "PureType.h"
+#include "VarDecl.h"
+#include "SpecializableVarDecl.h"
 
 class TableFileReader {
 
@@ -32,6 +34,8 @@ class TableFileReader {
 		double readNum64(istream& s);
 		void readMethod(PropertySymbolTable* table, istream& s);
 		void readInheritance(PropertySymbolTable* table, istream& s);
+		VarDecl* readVarDecl(istream& s);
+		SpecializableVarDecl* readSpecializableVarDecl(istream& s);
 		PureType* readType(istream& s);
 		PureType* readTypeByTag(int tag, istream& s);
 		PureType* readPureTypeByTag(int tag, istream& s);
