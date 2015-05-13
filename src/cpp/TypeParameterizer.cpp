@@ -19,17 +19,19 @@
 #include <memory>
 
 using namespace std;
+using namespace wake;
 
-void TypeParameterizer::rewriteClasstypesToParameterizedtypeByLabel(PureType* pType, const std::vector<PureType*>& parameters) {
-	PureType typeOrig = *pType;
+template<TypeQualification isQualified>
+void TypeParameterizer::rewriteClasstypesToParameterizedtypeByLabel(PureType<isQualified>* pType, const std::vector<PureType<isQualified>*>& parameters) {
+	PureType<isQualified> typeOrig = *pType;
 
 	if(pType->type == TYPE_CLASS) {
 		if(pType->typedata._class.parameters != NULL) {
 			rewriteClasstypesToParameterizedtypeByLabel(pType->typedata._class.parameters, parameters);
 		} else {
-			for(vector<PureType*>::const_iterator it = parameters.begin(); it != parameters.end(); ++it) {
+			for(typename vector<PureType<isQualified>*>::const_iterator it = parameters.begin(); it != parameters.end(); ++it) {
 				if(pType->typedata._class.classname == string((*it)->typedata.parameterized.label)) {
-					*pType = PureType(**it);
+					*pType = PureType<isQualified>(**it);
 					break; // We've found it, move along
 				}
 			}
@@ -46,15 +48,19 @@ void TypeParameterizer::rewriteClasstypesToParameterizedtypeByLabel(PureType* pT
 	}
 }
 
-void TypeParameterizer::rewriteClasstypesToParameterizedtypeByLabel(PureTypeArray* types, const std::vector<PureType*>& parameters) {
+template void TypeParameterizer::rewriteClasstypesToParameterizedtypeByLabel(PureType<QUALIFIED>* pType, const std::vector<PureType<QUALIFIED>*>& parameters);
+template void TypeParameterizer::rewriteClasstypesToParameterizedtypeByLabel(PureType<UNQUALIFIED>* pType, const std::vector<PureType<UNQUALIFIED>*>& parameters);
+
+template<TypeQualification isQualified>
+void TypeParameterizer::rewriteClasstypesToParameterizedtypeByLabel(PureTypeArray<isQualified>* types, const std::vector<PureType<isQualified>*>& parameters) {
 	int i;
 	for(i = 0; i < types->typecount; i++) {
 		rewriteClasstypesToParameterizedtypeByLabel(types->types[i], parameters);
 	}
 }
 
-void TypeParameterizer::applyParameterizations(PureType* pType, const std::vector<PureType*>& parameters, const std::vector<PureType*>& parameterizations) {
-	PureType typeOrig = *pType;
+void TypeParameterizer::applyParameterizations(PureType<QUALIFIED>* pType, const std::vector<PureType<QUALIFIED>*>& parameters, const std::vector<PureType<QUALIFIED>*>& parameterizations) {
+	PureType<QUALIFIED> typeOrig = *pType;
 
 	if(pType->type == TYPE_CLASS) {
 		if(pType->typedata._class.parameters != NULL) {
@@ -63,7 +69,7 @@ void TypeParameterizer::applyParameterizations(PureType* pType, const std::vecto
 	} else if(pType->type == TYPE_PARAMETERIZED || pType->type == TYPE_PARAMETERIZED_ARG) {
 		for(int i = 0; i < parameters.size(); i++) {
 			if(pType->typedata.parameterized.label == string(parameters.at(i)->typedata.parameterized.label)) {
-				*pType = PureType(*parameterizations.at(i));
+				*pType = PureType<QUALIFIED>(*parameterizations.at(i));
 				// Shadows don't matter because applied parameterizations don't have to do with scopes
 				break; // We've found it, move along
 			}
@@ -80,14 +86,14 @@ void TypeParameterizer::applyParameterizations(PureType* pType, const std::vecto
 	}
 }
 
-void TypeParameterizer::applyParameterizations(PureTypeArray* types, const std::vector<PureType*>& parameters, const std::vector<PureType*>& parameterizations) {
+void TypeParameterizer::applyParameterizations(PureTypeArray<QUALIFIED>* types, const std::vector<PureType<QUALIFIED>*>& parameters, const std::vector<PureType<QUALIFIED>*>& parameterizations) {
 	int i;
 	for(i = 0; i < types->typecount; i++) {
 		applyParameterizations(types->types[i], parameters, parameterizations);
 	}
 }
 
-bool TypeParameterizer::captureArgumentParameterizations(PureType* actual, PureType* argument, std::map<std::string, PureType*>& parameters, TypeAnalyzer* analyzer) {
+bool TypeParameterizer::captureArgumentParameterizations(PureType<QUALIFIED>* actual, PureType<QUALIFIED>* argument, std::map<std::string, PureType<QUALIFIED>*>& parameters, TypeAnalyzer* analyzer) {
 	if((actual == NULL) != (argument == NULL)) {
 		return false;
 	}
@@ -129,7 +135,7 @@ bool TypeParameterizer::captureArgumentParameterizations(PureType* actual, PureT
 	return false; // maybe this should be vacuously true, but I don't think so...
 }
 
-bool TypeParameterizer::captureArgumentParameterizations(PureTypeArray* actual, PureTypeArray* argument, std::map<std::string, PureType*>& parameters, TypeAnalyzer* analyzer) {
+bool TypeParameterizer::captureArgumentParameterizations(PureTypeArray<QUALIFIED>* actual, PureTypeArray<QUALIFIED>* argument, std::map<std::string, PureType<QUALIFIED>*>& parameters, TypeAnalyzer* analyzer) {
 	int i;
 	int actualCount = actual == NULL ? 0 : actual->typecount;
 	int argumentCount = argument == NULL ? 0 : argument->typecount;

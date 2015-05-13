@@ -16,16 +16,18 @@
 #include "TypeError.h"
 #include <memory>
 
-void wake::ast::LambdaReturn::typeCheck() {
+using namespace wake;
+
+void ast::LambdaReturn::typeCheck() {
 	if(value.get() == NULL) {
-		auto_ptr<PureType> unusable(new PureType(TYPE_UNUSABLE));
+		auto_ptr<PureType<QUALIFIED> > unusable(new PureType<QUALIFIED>(TYPE_UNUSABLE));
 		returntype->unifyWith(unusable.get());
 	} else {
-		auto_ptr<PureType> returnType(value->typeCheck(false));
+		auto_ptr<PureType<QUALIFIED> > returnType(value->typeCheck(false));
 		returntype->unifyWith(returnType.get());
 	}
 }
 
-bool wake::ast::LambdaReturn::exhaustiveReturns() {
+bool ast::LambdaReturn::exhaustiveReturns() {
 	return true;
 }

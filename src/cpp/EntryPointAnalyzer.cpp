@@ -17,9 +17,11 @@
 #include "ClassSpaceSymbolTable.h"
 #include "CompilationExceptions.h"
 
-bool EntryPointAnalyzer::checkClassNeedsCanBeMain(vector<SpecializableVarDecl*>* needs) {
-	for(vector<SpecializableVarDecl*>::iterator it = needs->begin(); it != needs->end(); ++it) {
-		PureType* type = &(*it)->decl.typedata;
+using namespace wake;
+
+bool EntryPointAnalyzer::checkClassNeedsCanBeMain(vector<SpecializableVarDecl<QUALIFIED>*>* needs) {
+	for(vector<SpecializableVarDecl<QUALIFIED>*>::iterator it = needs->begin(); it != needs->end(); ++it) {
+		PureType<QUALIFIED>* type = &(*it)->decl.typedata;
 		if(type->type == TYPE_LAMBDA) return false;
 		if(type->type == TYPE_OPTIONAL) return false;
 		if(type->type == TYPE_LIST) return false;
@@ -33,14 +35,14 @@ bool EntryPointAnalyzer::checkClassNeedsCanBeMain(vector<SpecializableVarDecl*>*
 	return true;
 }
 
-bool EntryPointAnalyzer::checkFQClassMethodCanBeMain(string methodname, PureType* method) {
+bool EntryPointAnalyzer::checkFQClassMethodCanBeMain(string methodname, PureType<QUALIFIED>* method) {
 	if(methodname.find("<-") != string::npos) return false;
 	return method->typedata.lambda.arguments->typecount == 0;
 }
 
 bool EntryPointAnalyzer::checkFQClassMethodCanBeMain(string classname, string methodname, ClassSpaceSymbolTable* table) {
 	try {
-		boost::optional<PureType*> method = table->findFullyQualified(classname)->find(methodname);
+		boost::optional<PureType<QUALIFIED>*> method = table->findFullyQualified(classname)->find(methodname);
 		return method ? checkFQClassMethodCanBeMain(methodname, *method) : false;
 	} catch(SymbolNotFoundException* e) {
 		delete e;

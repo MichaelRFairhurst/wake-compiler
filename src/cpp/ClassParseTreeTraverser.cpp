@@ -104,7 +104,7 @@ void ClassParseTreeTraverser::firstPass(Node* tree) {
 					(*error)->token = tree;
 					errors->addError(*error);
 				}
-				classestable->assertTypeIsValid(&tree->node_data.nodes[0]->node_data.specializable_pure_type->typedata);
+				classestable->assertTypeIsValid(&providedType->typedata);
 			} catch(SemanticError* e) {
 				e->token = tree;
 				errors->addError(e);

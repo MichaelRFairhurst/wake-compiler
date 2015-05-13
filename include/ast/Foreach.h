@@ -37,7 +37,7 @@ namespace wake {
 
 				bool exhaustiveReturns();
 
-				virtual VarDecl getIterationVarDecl(PureType* iterableType);
+				virtual VarDecl<wake::QUALIFIED> getIterationVarDecl(PureType<wake::QUALIFIED>* iterableType);
 
 				virtual ~Foreach(){};
 

@@ -23,6 +23,7 @@
 
 using namespace std;
 using namespace boost::filesystem;
+using namespace wake;
 
 extern "C" {
 	#include "objectfile.tab.h"
@@ -166,8 +167,8 @@ void Linker::generateRecursiveConstructors(ostream& file, string ctedclass, Clas
 	file << "_" << classTable.getAddress(table.getFullyQualifiedClassname(ctedclass));
 	file << "(";
 
-	vector<SpecializableVarDecl*>* needs = table.findFullyQualified(ctedclass)->getNeeds();
-	for(vector<SpecializableVarDecl*>::iterator it = needs->begin(); it != needs->end(); ++it) {
+	vector<SpecializableVarDecl<QUALIFIED>*>* needs = table.findFullyQualified(ctedclass)->getNeeds();
+	for(vector<SpecializableVarDecl<QUALIFIED>*>::iterator it = needs->begin(); it != needs->end(); ++it) {
 		if(it != needs->begin()) file << ",";
 		generateRecursiveConstructors(file, (*it)->decl.typedata.typedata._class.classname, table);
 	}

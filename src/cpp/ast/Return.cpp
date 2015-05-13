@@ -16,11 +16,13 @@
 #include "TypeError.h"
 #include <memory>
 
-void wake::ast::Return::typeCheck() {
+using namespace wake;
+
+void ast::Return::typeCheck() {
 	if(returntype == NULL) {
 		if(value.get() == NULL) return;
 
-		auto_ptr<PureType> actualReturn(value->typeCheck(false));
+		auto_ptr<PureType<QUALIFIED> > actualReturn(value->typeCheck(false));
 
 		EXPECTED	"VOID"
 		ERRONEOUS	actualReturn->toString()
@@ -33,7 +35,7 @@ void wake::ast::Return::typeCheck() {
 		THROW		("Method is not allowed to return without a value");
 	}
 
-	auto_ptr<PureType> actualReturn(value->typeCheck(false));
+	auto_ptr<PureType<QUALIFIED> > actualReturn(value->typeCheck(false));
 
 	if(!analyzer->isASubtypeOfB(actualReturn.get(), returntype)) {
 		EXPECTED	returntype->toString()
@@ -42,6 +44,6 @@ void wake::ast::Return::typeCheck() {
 	}
 }
 
-bool wake::ast::Return::exhaustiveReturns() {
+bool ast::Return::exhaustiveReturns() {
 	return true;
 }

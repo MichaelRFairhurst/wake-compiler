@@ -33,9 +33,9 @@ namespace wake {
 					for(std::vector<MethodSegment*>::iterator it = methodSegments.begin(); it != methodSegments.end(); ++it) this->methodSegments.push_back(*it);
 				}
 
-				virtual PureType* typeCheck(bool forceArrayIdentifier)=0;
+				virtual PureType<wake::QUALIFIED>* typeCheck(bool forceArrayIdentifier)=0;
 				virtual ~MethodInvocationBase(){};
-				PureType* typeCheckMethodInvocation(PureType& subject);
+				PureType<wake::QUALIFIED>* typeCheckMethodInvocation(PureType<wake::QUALIFIED>& subject);
 
 			protected:
 				boost::ptr_vector<MethodSegment> methodSegments;

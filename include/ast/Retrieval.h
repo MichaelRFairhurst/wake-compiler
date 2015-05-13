@@ -30,18 +30,18 @@ namespace wake {
 		class Retrieval : public ExpressionNode {
 
 			public:
-				Retrieval(ExpressionNode* providerExp, SpecializablePureType* retrievalType, std::vector<ExpressionNode*> argumentExprs, Node* node, ClassSpaceSymbolTable* classestable, TypeAnalyzer* analyzer, ErrorTracker* errors)
+				Retrieval(ExpressionNode* providerExp, SpecializablePureType<wake::QUALIFIED>* retrievalType, std::vector<ExpressionNode*> argumentExprs, Node* node, ClassSpaceSymbolTable* classestable, TypeAnalyzer* analyzer, ErrorTracker* errors)
 					: providerExp(providerExp), retrievalType(retrievalType), node(node), classestable(classestable), analyzer(analyzer), errors(errors) {
 						for(std::vector<ExpressionNode*>::iterator it = argumentExprs.begin(); it != argumentExprs.end(); ++it) this->argumentExprs.push_back(*it);
 					};
 
 				~Retrieval(){};
 
-				PureType* typeCheck(bool forceArrayIdentifier);
+				PureType<wake::QUALIFIED>* typeCheck(bool forceArrayIdentifier);
 
 			private:
 				std::auto_ptr<ExpressionNode> providerExp;
-				SpecializablePureType* retrievalType;
+				SpecializablePureType<wake::QUALIFIED>* retrievalType;
 				boost::ptr_vector<ExpressionNode> argumentExprs;
 				Node* node;
 				ClassSpaceSymbolTable* classestable;

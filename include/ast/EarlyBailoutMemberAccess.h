@@ -24,7 +24,7 @@ namespace wake::ast {
 	class EarlyBailoutMemberAccess : public MemberAccessBase {
 
 		public:
-			PureType* typeCheck(bool forceArrayIdentifier);
+			PureType<wake::QUALIFIED>* typeCheck(bool forceArrayIdentifier);
 
 	};
 

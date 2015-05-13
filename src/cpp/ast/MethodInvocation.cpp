@@ -16,12 +16,14 @@
 #include "ast/Invocation.h"
 #include "AstCreator.h"
 
-PureType* wake::ast::MethodInvocation::typeCheck(bool forceArrayIdentifier) {
+using namespace wake;
+
+PureType<QUALIFIED>* ast::MethodInvocation::typeCheck(bool forceArrayIdentifier) {
 	Node* methodname = node->node_data.nodes[1];
 
 	if(node->node_data.nodes[0]->node_type == NT_THIS && methodname->subnodes < 3) {
 		string name = methodname->node_data.nodes[0]->node_data.string;
-		boost::optional<PureType*> variable = scopesymtable->find(name);
+		boost::optional<PureType<QUALIFIED>*> variable = scopesymtable->find(name);
 
 
 		if(variable) {
@@ -44,10 +46,10 @@ PureType* wake::ast::MethodInvocation::typeCheck(bool forceArrayIdentifier) {
 		}
 	}
 
-	PureType subject = *auto_ptr<PureType>(subjectExpr->typeCheck(false));
+	PureType<QUALIFIED> subject = *auto_ptr<PureType<QUALIFIED> >(subjectExpr->typeCheck(false));
 
 	if(subject.type == TYPE_MATCHALL) {
-		return new PureType(subject);
+		return new PureType<QUALIFIED>(subject);
 	}
 
 	return typeCheckMethodInvocation(subject);

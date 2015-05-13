@@ -19,9 +19,11 @@
 #include <iostream>
 #include "CompilationExceptions.h"
 
-PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
+using namespace wake;
+
+PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 	TypeAnalyzer* analyzer = classestable->getAnalyzer();
-	PureType* ret = NULL;
+	PureType<QUALIFIED>* ret = NULL;
 
 	// read Printer as Printer[] from ARRAY_ACCESS nodes
 	// but not if there are ANY nodes before the next TYPEDATA
@@ -32,22 +34,25 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 	switch(node->node_type) {
 		// Here is where the recursion ends
 		case NT_STRINGLIT:
-			ret = new PureType(TYPE_CLASS);
+			ret = new PureType<QUALIFIED>(TYPE_CLASS);
 			ret->typedata._class.classname = strdup("Text");
+			ret->typedata._class.modulename = strdup("lang");
 			break;
 
 		case NT_NUMBERLIT:
-			ret = new PureType(TYPE_CLASS);
+			ret = new PureType<QUALIFIED>(TYPE_CLASS);
 			ret->typedata._class.classname = strdup("Num");
+			ret->typedata._class.modulename = strdup("lang");
 			break;
 
 		case NT_BOOLLIT:
-			ret = new PureType(TYPE_CLASS);
+			ret = new PureType<QUALIFIED>(TYPE_CLASS);
 			ret->typedata._class.classname = strdup("Bool");
+			ret->typedata._class.modulename = strdup("lang");
 			break;
 
 		case NT_VAR_DECL_DATA:
-			ret = new PureType(node->node_data.var_decl->typedata);
+			ret = new PureType<QUALIFIED>(*classestable->setModulesOnType(&node->node_data.var_decl->typedata));
 			break;
 
 		case NT_VAR_REF:
@@ -60,7 +65,7 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 					ref._class->arrayed = 1;
 				}
 
-				boost::optional<PureType*> variable = scopesymtable->find(&ref);
+				boost::optional<PureType<QUALIFIED>*> variable = scopesymtable->find(&ref);
 				if(!variable && thiscontext != NULL) {
 					auto_ptr<ReadOnlyPropertySymbolTable> proptable(classestable->findFullyQualified(thiscontext->getFQClassname()));
 					variable = proptable->find(ref.toString());
@@ -73,7 +78,7 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 					}
 				}
 				if(!variable) {
-					ret = new PureType(TYPE_MATCHALL);
+					ret = new PureType<QUALIFIED>(TYPE_MATCHALL);
 					errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Symbol by name of " + ref.toString() + " not found", node));
 				} else {
 					// detect if they wrote Printer[] instead of Printer[][]
@@ -81,18 +86,18 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 					if(!forceArrayIdentifier && (*variable)->type == TYPE_LIST && ref._class != NULL && ref._class->arrayed != analyzer->getArrayReferenceLevel(**variable))
 						errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Accessed arrayed variable " + ref.toString() + " with wrong number of [] brackets.", node));
 
-					ret = new PureType(**variable);
+					ret = new PureType<QUALIFIED>(**variable);
 				}
 			}
 			break;
 
 		case NT_THIS:
-			ret = new PureType(*thiscontext);
+			ret = new PureType<QUALIFIED>(*thiscontext);
 			break;
 
 		case NT_NOTHING:
-			ret = new PureType(TYPE_OPTIONAL);
-			ret->typedata.optional.contained = new PureType(TYPE_MATCHALL);
+			ret = new PureType<QUALIFIED>(TYPE_OPTIONAL);
+			ret->typedata.optional.contained = new PureType<QUALIFIED>(TYPE_MATCHALL);
 			break;
 
 		case NT_PARENT:
@@ -113,14 +118,14 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 		case NT_ADD:
 			{
 				ret = children[0].typeCheck(false);
-				PureType additive = *auto_ptr<PureType>(children[1].typeCheck(false));
+				PureType<QUALIFIED> additive = *auto_ptr<PureType<QUALIFIED> >(children[1].typeCheck(false));
 
 				// Ensure the left operand is never a matchall when the right is
 				// this way, when ret is matchall, so we can run all typechecks by the
 				// lefthand side
 				if(ret->type == TYPE_MATCHALL) {
-					auto_ptr<PureType> temp(ret);
-					ret = new PureType(additive);
+					auto_ptr<PureType<QUALIFIED> > temp(ret);
+					ret = new PureType<QUALIFIED>(additive);
 					additive = *temp;
 				}
 
@@ -141,7 +146,7 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				} else {
 					string erroneousstring = ret->toString();
 					delete ret;
-					ret = new PureType(TYPE_ERROR);
+					ret = new PureType<QUALIFIED>(TYPE_ERROR);
 
 					EXPECTED	"Num' or 'Text"
 					ERRONEOUS	erroneousstring
@@ -171,7 +176,7 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 		case NT_SUBTRACT:
 			{
 				ret = children[0].typeCheck(false);
-				PureType factor = *auto_ptr<PureType>(children[1].typeCheck(false));
+				PureType<QUALIFIED> factor = *auto_ptr<PureType<QUALIFIED> >(children[1].typeCheck(false));
 
 				if(!analyzer->isPrimitiveTypeNum(ret) || !analyzer->isPrimitiveTypeNum(&factor)) {
 					string erroneousstring;
@@ -181,7 +186,7 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 					} else {
 						erroneousstring = ret->toString();
 						delete ret;
-						ret = new PureType(TYPE_CLASS);
+						ret = new PureType<QUALIFIED>(TYPE_CLASS);
 						ret->typedata._class.classname = strdup("Num");
 					}
 
@@ -199,7 +204,7 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 				if(!analyzer->isPrimitiveTypeNum(ret)) {
 					string erroneousstring = ret->toString();
 					delete ret;
-					ret = new PureType(TYPE_CLASS);
+					ret = new PureType<QUALIFIED>(TYPE_CLASS);
 					ret->typedata._class.classname = strdup("Num");
 
 					EXPECTED	"Num"
@@ -215,11 +220,11 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 		case NT_GREATERTHAN:
 		case NT_GREATERTHANEQUAL:
 			{
-				ret = new PureType(TYPE_CLASS);
+				ret = new PureType<QUALIFIED>(TYPE_CLASS);
 				ret->typedata._class.classname = strdup("Bool");
 
-				PureType a = *auto_ptr<PureType>(children[0].typeCheck(false));
-				PureType b = *auto_ptr<PureType>(children[1].typeCheck(false));
+				PureType<QUALIFIED> a = *auto_ptr<PureType<QUALIFIED> >(children[0].typeCheck(false));
+				PureType<QUALIFIED> b = *auto_ptr<PureType<QUALIFIED> >(children[1].typeCheck(false));
 
 				if(!analyzer->isPrimitiveTypeNum(&a) || !analyzer->isPrimitiveTypeNum(&b)) {
 					string erroneousstring;
@@ -240,9 +245,9 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 		case NT_EQUALITY:
 		case NT_INEQUALITY:
 			{
-				PureType a = *auto_ptr<PureType>(children[0].typeCheck(false));
-				PureType b = *auto_ptr<PureType>(children[1].typeCheck(false));
-				ret = new PureType(TYPE_CLASS);
+				PureType<QUALIFIED> a = *auto_ptr<PureType<QUALIFIED> >(children[0].typeCheck(false));
+				PureType<QUALIFIED> b = *auto_ptr<PureType<QUALIFIED> >(children[1].typeCheck(false));
+				ret = new PureType<QUALIFIED>(TYPE_CLASS);
 				ret->typedata._class.classname = strdup("Bool");
 
 				if(!analyzer->isASubtypeOfB(&a, &b) && !analyzer->isASubtypeOfB(&b, &a)) {
@@ -257,7 +262,7 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 		case NT_OR:
 			{
 				ret = children[0].typeCheck(false);
-				PureType cmp = *auto_ptr<PureType>(children[1].typeCheck(false));
+				PureType<QUALIFIED> cmp = *auto_ptr<PureType<QUALIFIED> >(children[1].typeCheck(false));
 
 				if(!analyzer->isPrimitiveTypeBool(ret) || !analyzer->isPrimitiveTypeBool(&cmp)) {
 					string erroneousstring;
@@ -267,7 +272,7 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 					} else {
 						erroneousstring = ret->toString();
 						delete ret;
-						ret = new PureType(TYPE_CLASS);
+						ret = new PureType<QUALIFIED>(TYPE_CLASS);
 						ret->typedata._class.classname = strdup("Bool");
 					}
 
@@ -284,7 +289,7 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 			if(!analyzer->isPrimitiveTypeBool(ret)) {
 				string erroneousstring = ret->toString();
 				delete ret;
-				ret = new PureType(TYPE_CLASS);
+				ret = new PureType<QUALIFIED>(TYPE_CLASS);
 				ret->typedata._class.classname = strdup("Bool");
 
 				EXPECTED	"Bool"
@@ -296,16 +301,16 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 		case NT_TYPESAFE_ARRAY_ACCESS:
 			{
 				ret = children[0].typeCheck(true);
-				PureType index = *auto_ptr<PureType>(children[1].typeCheck(false));
+				PureType<QUALIFIED> index = *auto_ptr<PureType<QUALIFIED> >(children[1].typeCheck(false));
 				if(ret->type != TYPE_LIST && ret->type != TYPE_MATCHALL) {
 					EXPECTED	"A list"
 					ERRONEOUS	ret->toString()
 					THROW		("Getting index of non-array");
 				} else if(ret->type == TYPE_LIST) { // Otherwise we're a matchall
-					PureType temp = *ret->typedata.list.contained;
+					PureType<QUALIFIED> temp = *ret->typedata.list.contained;
 					delete ret;
-					ret = new PureType(TYPE_OPTIONAL);
-					ret->typedata.optional.contained = new PureType(temp);
+					ret = new PureType<QUALIFIED>(TYPE_OPTIONAL);
+					ret->typedata.optional.contained = new PureType<QUALIFIED>(temp);
 				}
 
 				if(!analyzer->isPrimitiveTypeNum(&index) && index.type != TYPE_MATCHALL) {
@@ -320,15 +325,15 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 		case NT_ARRAY_ACCESS_LVAL:
 			{
 				ret = children[0].typeCheck(true);
-				PureType index = *auto_ptr<PureType>(children[1].typeCheck(false));
+				PureType<QUALIFIED> index = *auto_ptr<PureType<QUALIFIED> >(children[1].typeCheck(false));
 				if(ret->type != TYPE_LIST && ret->type != TYPE_MATCHALL) {
 					EXPECTED	"A list"
 					ERRONEOUS	ret->toString()
 					THROW		("Getting index of non-array");
 				} else if(ret->type == TYPE_LIST) { // Otherwise we're a matchall
-					PureType temp = *ret->typedata.list.contained;
+					PureType<QUALIFIED> temp = *ret->typedata.list.contained;
 					delete ret;
-					ret = new PureType(temp);
+					ret = new PureType<QUALIFIED>(temp);
 				}
 
 				if(!analyzer->isPrimitiveTypeNum(&index) && index.type != TYPE_MATCHALL) {
@@ -344,11 +349,11 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 			{
 				if(!isValidLValue(node->node_data.nodes[0])) {
 					errors->addError(new SemanticError(INVALID_ASSIGNMENT, "", node));
-					ret = new PureType(node->node_type == NT_ASSIGNMENT ? TYPE_UNUSABLE : TYPE_MATCHALL);
+					ret = new PureType<QUALIFIED>(node->node_type == NT_ASSIGNMENT ? TYPE_UNUSABLE : TYPE_MATCHALL);
 				} else {
-					PureType subject = *auto_ptr<PureType>(children[0].typeCheck(false));
-					ret = node->node_type == NT_ASSIGNMENT ? new PureType(TYPE_UNUSABLE) : new PureType(subject);
-					PureType assignment = *auto_ptr<PureType>(children[1].typeCheck(false));
+					PureType<QUALIFIED> subject = *auto_ptr<PureType<QUALIFIED> >(children[0].typeCheck(false));
+					ret = node->node_type == NT_ASSIGNMENT ? new PureType<QUALIFIED>(TYPE_UNUSABLE) : new PureType<QUALIFIED>(subject);
+					PureType<QUALIFIED> assignment = *auto_ptr<PureType<QUALIFIED> >(children[1].typeCheck(false));
 					if(!analyzer->isASubtypeOfB(&assignment, &subject)) {
 						EXPECTED	subject.toString()
 						ERRONEOUS	assignment.toString()
@@ -361,10 +366,11 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 		case NT_CAST:
 			try {
 				TypeParameterizer parameterizer;
-				parameterizer.rewriteClasstypesToParameterizedtypeByLabel(node->node_data.nodes[0]->node_data.pure_type, parameterizedtypes);
-				ret = new PureType(*node->node_data.nodes[0]->node_data.pure_type);
+				PureType<QUALIFIED>* castType = classestable->setModulesOnType(node->node_data.nodes[0]->node_data.pure_type);
+				parameterizer.rewriteClasstypesToParameterizedtypeByLabel(castType, parameterizedtypes);
+				ret = new PureType<QUALIFIED>(*castType);
 				classestable->assertTypeIsValid(ret);
-				PureType casted = *auto_ptr<PureType>(children[1].typeCheck(false));
+				PureType<QUALIFIED> casted = *auto_ptr<PureType<QUALIFIED> >(children[1].typeCheck(false));
 				if(!analyzer->isASubtypeOfB(&casted, ret)) {
 					EXPECTED	ret->toString()
 					ERRONEOUS	casted.toString()
@@ -379,15 +385,15 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 		case NT_ARRAY_DECLARATION:
 			// These should all be specially handled in the other cases
 			if(!node->subnodes) {
-				ret = new PureType(TYPE_LIST);
-				ret->typedata.list.contained = new PureType(TYPE_MATCHALL);
+				ret = new PureType<QUALIFIED>(TYPE_LIST);
+				ret->typedata.list.contained = new PureType<QUALIFIED>(TYPE_MATCHALL);
 			} else if(node->subnodes == 1) {
-				ret = new PureType(TYPE_LIST);
+				ret = new PureType<QUALIFIED>(TYPE_LIST);
 				ret->typedata.list.contained = children[0].typeCheck(false);;
 			} else {
-				auto_ptr<PureType> first(children[0].typeCheck(false));
-				auto_ptr<PureType> second(children[1].typeCheck(false));
-				boost::optional<PureType*> common;
+				auto_ptr<PureType<QUALIFIED> > first(children[0].typeCheck(false));
+				auto_ptr<PureType<QUALIFIED> > second(children[1].typeCheck(false));
+				boost::optional<PureType<QUALIFIED>*> common;
 
 				int i = 1;
 				while(true) {
@@ -396,7 +402,7 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 					if(!common) {
 						string expectedstring = "Types with a common ancestor";
 						string erroneousstring = first->toString() + " and " + second->toString();
-						ret = new PureType(TYPE_MATCHALL);
+						ret = new PureType<QUALIFIED>(TYPE_MATCHALL);
 
 						EXPECTED	expectedstring
 						ERRONEOUS	erroneousstring
@@ -409,25 +415,25 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 					second.reset(children[i].typeCheck(false));
 				}
 
-				ret = new PureType(TYPE_LIST);
+				ret = new PureType<QUALIFIED>(TYPE_LIST);
 				ret->typedata.list.contained = *common;
 			}
 			break;
 
 		case NT_EARLYBAILOUT_MEMBER_ACCESS:
 			{
-				PureType subject = *auto_ptr<PureType>(children[0].typeCheck(false));
+				PureType<QUALIFIED> subject = *auto_ptr<PureType<QUALIFIED> >(children[0].typeCheck(false));
 				if(subject.type == TYPE_MATCHALL) {
-					ret = new PureType(subject);
+					ret = new PureType<QUALIFIED>(subject);
 					break;
 				} else if(subject.type != TYPE_OPTIONAL) {
 					errors->addError(new SemanticError(OPTIONAL_USE_OF_NONOPTIONAL_TYPE, "using .? on a nonoptional", node));
-					ret = new PureType(TYPE_MATCHALL);
+					ret = new PureType<QUALIFIED>(TYPE_MATCHALL);
 					break;
 				} else {
-					ret = new PureType(TYPE_OPTIONAL);
+					ret = new PureType<QUALIFIED>(TYPE_OPTIONAL);
 
-					PureType* nonoptional = subject.typedata.optional.contained;
+					PureType<QUALIFIED>* nonoptional = subject.typedata.optional.contained;
 					while(nonoptional->type == TYPE_OPTIONAL) {
 						nonoptional = nonoptional->typedata.optional.contained;
 					}
@@ -440,9 +446,9 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 
 		case NT_MEMBER_ACCESS:
 			{
-				PureType subject = *auto_ptr<PureType>(children[0].typeCheck(false));
+				PureType<QUALIFIED> subject = *auto_ptr<PureType<QUALIFIED> >(children[0].typeCheck(false));
 				if(subject.type == TYPE_MATCHALL) {
-					ret = new PureType(subject);
+					ret = new PureType<QUALIFIED>(subject);
 					break;
 				}
 
@@ -452,12 +458,12 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 
 		case NT_IF_THEN_ELSE:
 			{
-				auto_ptr<PureType> condition(children[1].typeCheck(false));
-				auto_ptr<PureType> left(children[0].typeCheck(false));
-				auto_ptr<PureType> right(children[2].typeCheck(false));
-				boost::optional<PureType*> common = analyzer->getCommonSubtypeOf(left.get(), right.get());
+				auto_ptr<PureType<QUALIFIED> > condition(children[1].typeCheck(false));
+				auto_ptr<PureType<QUALIFIED> > left(children[0].typeCheck(false));
+				auto_ptr<PureType<QUALIFIED> > right(children[2].typeCheck(false));
+				boost::optional<PureType<QUALIFIED>*> common = analyzer->getCommonSubtypeOf(left.get(), right.get());
 				if(!common) {
-					ret = new PureType(TYPE_MATCHALL);
+					ret = new PureType<QUALIFIED>(TYPE_MATCHALL);
 					EXPECTED	"Two types with a single closest common ancestor"
 					ERRONEOUS	left->toString() + " and " + right->toString()
 					THROW		("Only booleans can go inside a ternary operator");
@@ -499,7 +505,7 @@ PureType* wake::ast::OtherExpression::typeCheck(bool forceArrayIdentifier) {
 	return ret;
 }
 
-bool wake::ast::OtherExpression::isValidLValue(Node* n) {
+bool ast::OtherExpression::isValidLValue(Node* n) {
 	switch(n->node_type) {
 		case NT_ALIAS:
 		case NT_VAR_REF:
@@ -519,10 +525,10 @@ bool wake::ast::OtherExpression::isValidLValue(Node* n) {
 	}
 }
 
-PureType* wake::ast::OtherExpression::typeCheckMemberAccess(Node* tree, PureType& subject, bool forceArrayIdentifier) {
+PureType<QUALIFIED>* ast::OtherExpression::typeCheckMemberAccess(Node* tree, PureType<QUALIFIED>& subject, bool forceArrayIdentifier) {
 	TypeAnalyzer* analyzer = classestable->getAnalyzer();
-	PureType* ret;
-	PureType* boxedtype;
+	PureType<QUALIFIED>* ret;
+	PureType<QUALIFIED>* boxedtype;
 
 	if(analyzer->isAutoboxedType(&subject, &boxedtype)) {
 		Node* node = tree->node_data.nodes[0];
@@ -540,24 +546,24 @@ PureType* wake::ast::OtherExpression::typeCheckMemberAccess(Node* tree, PureType
 
 	if(subject.type == TYPE_OPTIONAL) {
 		errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Accessing property " + name + " on nonoptional type " + subject.toString() + ". You must first wrap object in an exists { } clause.", tree));
-		ret = new PureType(TYPE_MATCHALL);
+		ret = new PureType<QUALIFIED>(TYPE_MATCHALL);
 		return ret;
 	}
 
 	// sanity...
 	if(subject.type != TYPE_CLASS) {
 		errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, "Accessing property " + name + ", the subject type " + subject.toString() + " could not be autoboxed into a class with methods.", tree));
-		ret = new PureType(TYPE_MATCHALL);
+		ret = new PureType<QUALIFIED>(TYPE_MATCHALL);
 		return ret;
 	}
 
 	auto_ptr<ReadOnlyPropertySymbolTable> proptable(classestable->findFullyQualified(subject.getFQClassname(), subject.getClassParametersAsVector()));
-	boost::optional<PureType*> variable = proptable->find(name);
+	boost::optional<PureType<QUALIFIED>*> variable = proptable->find(name);
 	if(!variable) {
-		ret = new PureType(TYPE_MATCHALL);
+		ret = new PureType<QUALIFIED>(TYPE_MATCHALL);
 		errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Symbol by name of " + name + " not found", tree));
 	} else {
-		PureType* member = *variable;
+		PureType<QUALIFIED>* member = *variable;
 		if(!forceArrayIdentifier && ref.alias == NULL && member->type == TYPE_LIST && analyzer->getArrayReferenceLevel(**variable) != ref._class->arrayed)
 			errors->addError(new SemanticError(SYMBOL_NOT_DEFINED, "Accessed arrayed variable " + name + " with wrong number of [] brackets.", tree));
 
@@ -568,7 +574,7 @@ PureType* wake::ast::OtherExpression::typeCheckMemberAccess(Node* tree, PureType
 			}
 		}
 
-		ret = new PureType(**variable);
+		ret = new PureType<QUALIFIED>(**variable);
 		addSubNode(tree, makeNodeFromString(NT_COMPILER_HINT, strdup(proptable->getAddress(name).c_str()), tree->loc));
 	}
 

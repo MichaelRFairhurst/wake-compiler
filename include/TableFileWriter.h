@@ -23,9 +23,9 @@ class TableFileWriter {
 	public:
 		void write(ostream& out, PropertySymbolTable* table);
 	private:
-		void writeType(ostream& out, PureType* type);
+		void writeType(ostream& out, PureType<wake::QUALIFIED>* type);
 		void writeProperty(ostream& out, ObjectProperty* property);
-		void writeVarDecl(ostream& out, VarDecl& decl);
+		void writeVarDecl(ostream& out, VarDecl<wake::QUALIFIED>& decl);
 		void writeAnnotations(ostream& out, const boost::ptr_vector<Annotation>& annotations);
 };
 

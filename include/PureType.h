@@ -45,6 +45,7 @@ typedef struct ClassVarRef ClassVarRef; // C necessity...
 template<wake::TypeQualification isQualified = wake::UNQUALIFIED>
 #else
 #define TEMPL_RECURSE
+#define TEMPL_UNQUALIFIED
 typedef
 #endif
 struct PureType {

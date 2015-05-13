@@ -61,8 +61,11 @@ namespace std
 	}
 }
 
-SpecializablePureType<wake::QUALIFIED>* makeSpecializablePureType(PureType<wake::QUALIFIED>* inner) {
-	SpecializablePureType<wake::QUALIFIED>* type = new SpecializablePureType<wake::QUALIFIED>();
+SpecializablePureType<wake::UNQUALIFIED>* makeSpecializablePureType(PureType<wake::UNQUALIFIED>* inner) {
+	SpecializablePureType<wake::UNQUALIFIED>* type = new SpecializablePureType<wake::UNQUALIFIED>();
 	type->typedata = *inner;
 	return type;
 }
+
+template class SpecializablePureType<wake::QUALIFIED>;
+template class SpecializablePureType<wake::UNQUALIFIED>;

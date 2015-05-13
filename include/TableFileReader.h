@@ -34,16 +34,16 @@ class TableFileReader {
 		double readNum64(istream& s);
 		void readMethod(PropertySymbolTable* table, istream& s);
 		void readInheritance(PropertySymbolTable* table, istream& s);
-		VarDecl* readVarDecl(istream& s);
-		SpecializableVarDecl* readSpecializableVarDecl(istream& s);
-		PureType* readType(istream& s);
-		PureType* readTypeByTag(int tag, istream& s);
-		PureType* readPureTypeByTag(int tag, istream& s);
-		PureType* readClassType(istream& s);
-		PureType* readLambdaType(istream& s);
-		PureType* readParameterizedType(istream& s, int tag);
-		PureType* readListType(istream& s);
-		PureType* readOptionalType(istream& s);
+		VarDecl<wake::QUALIFIED>* readVarDecl(istream& s);
+		SpecializableVarDecl<wake::QUALIFIED>* readSpecializableVarDecl(istream& s);
+		PureType<wake::QUALIFIED>* readType(istream& s);
+		PureType<wake::QUALIFIED>* readTypeByTag(int tag, istream& s);
+		PureType<wake::QUALIFIED>* readPureTypeByTag(int tag, istream& s);
+		PureType<wake::QUALIFIED>* readClassType(istream& s);
+		PureType<wake::QUALIFIED>* readLambdaType(istream& s);
+		PureType<wake::QUALIFIED>* readParameterizedType(istream& s, int tag);
+		PureType<wake::QUALIFIED>* readListType(istream& s);
+		PureType<wake::QUALIFIED>* readOptionalType(istream& s);
 		vector<Annotation*> readAnnotations(istream& s);
 		Annotation* readAnnotation(istream& s);
 

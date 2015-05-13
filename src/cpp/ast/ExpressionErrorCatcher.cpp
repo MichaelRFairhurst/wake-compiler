@@ -15,7 +15,9 @@
 #include "ast/ExpressionErrorCatcher.h"
 #include "TypeError.h"
 
-PureType* wake::ast::ExpressionErrorCatcher::typeCheck(bool forceArrayIdentifier) {
+using namespace wake;
+
+PureType<QUALIFIED>* ast::ExpressionErrorCatcher::typeCheck(bool forceArrayIdentifier) {
 	try {
 		return child->typeCheck(forceArrayIdentifier);
 	} catch(TypeError* error) {
@@ -30,5 +32,5 @@ PureType* wake::ast::ExpressionErrorCatcher::typeCheck(bool forceArrayIdentifier
 		delete error;
 	}
 
-	return new PureType(TYPE_MATCHALL);
+	return new PureType<QUALIFIED>(TYPE_MATCHALL);
 }

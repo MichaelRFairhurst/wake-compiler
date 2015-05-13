@@ -17,10 +17,12 @@
 #include "tree.h"
 #include <memory>
 
-void wake::ast::Exists::typeCheck() {
+using namespace wake;
+
+void ast::Exists::typeCheck() {
 	try {
 		auto_ptr<VarRef> existableRef(new VarRef(*node->node_data.nodes[0]->node_data.var_ref));
-		auto_ptr<PureType> existableType(existable->typeCheck(false));
+		auto_ptr<PureType<QUALIFIED> > existableType(existable->typeCheck(false));
 
 		if(node->node_data.nodes[0]->node_type == NT_MEMBER_ACCESS) {
 			errors->addError(new SemanticError(TYPE_ERROR, "Calling exists { } on a property is illegal as it is a shared reference and therefore might be unset amid the scope", node));
@@ -32,8 +34,8 @@ void wake::ast::Exists::typeCheck() {
 			return;
 		}
 
-		VarDecl realDecl;
-		VarDecl origDecl;
+		VarDecl<QUALIFIED> realDecl;
+		VarDecl<QUALIFIED> origDecl;
 		realDecl.typedata = *existableType->typedata.optional.contained;
 		origDecl.typedata = *existableType.get();
 		if(existableRef->alias != NULL) {
@@ -41,11 +43,11 @@ void wake::ast::Exists::typeCheck() {
 			origDecl.alias = strdup(existableRef->alias);
 		}
 
-		scopesymtable->addOverwriting(new VarDecl(realDecl));
+		scopesymtable->addOverwriting(new VarDecl<QUALIFIED> (realDecl));
 
 		block->typeCheck();
 
-		scopesymtable->addOverwriting(new VarDecl(origDecl));
+		scopesymtable->addOverwriting(new VarDecl<QUALIFIED> (origDecl));
 
 		if(otherwise.get() != NULL) {
 			otherwise->typeCheck();
@@ -56,7 +58,7 @@ void wake::ast::Exists::typeCheck() {
 	}
 }
 
-bool wake::ast::Exists::exhaustiveReturns() {
+bool ast::Exists::exhaustiveReturns() {
 	if(otherwise.get() == NULL) {
 		return false;
 	}

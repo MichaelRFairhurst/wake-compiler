@@ -21,12 +21,14 @@
 #include <string>
 #include <stdexcept>
 
-template<wake::TypeQualification isQualified>
+using namespace wake;
+
+template<TypeQualification isQualified>
 PureType<isQualified>::~PureType() {
 	releaseData();
 }
 
-template<wake::TypeQualification isQualified>
+template<TypeQualification isQualified>
 void PureType<isQualified>::releaseData() {
 	if(type == TYPE_LAMBDA) {
 		delete typedata.lambda.arguments;
@@ -45,7 +47,7 @@ void PureType<isQualified>::releaseData() {
 	}
 }
 
-template<wake::TypeQualification isQualified>
+template<TypeQualification isQualified>
 PureType<isQualified>::PureType(int type) {
 	this->type = type;
 	switch(type) {
@@ -72,7 +74,7 @@ PureType<isQualified>::PureType(int type) {
 	}
 }
 
-template<wake::TypeQualification isQualified>
+template<TypeQualification isQualified>
 ClassVarRef PureType<isQualified>::createClassVarRef() {
 	switch(type) {
 		case TYPE_CLASS:
@@ -104,7 +106,7 @@ ClassVarRef PureType<isQualified>::createClassVarRef() {
 	}
 }
 
-template<wake::TypeQualification isQualified>
+template<TypeQualification isQualified>
 std::vector<PureType<isQualified>*> PureType<isQualified>::getClassParametersAsVector() {
 	if(type != TYPE_CLASS) {
 		throw std::runtime_error(std::string("Only class types, parameterized types, and lists/optionals around those types can be class references. All others require an alias"));
@@ -120,12 +122,12 @@ std::vector<PureType<isQualified>*> PureType<isQualified>::getClassParametersAsV
 	return parameters;
 }
 
-template<wake::TypeQualification isQualified>
+template<TypeQualification isQualified>
 PureType<isQualified>::PureType(const PureType<isQualified>& other) {
 	deepCopy(other);
 }
 
-template<wake::TypeQualification isQualified>
+template<TypeQualification isQualified>
 void PureType<isQualified>::deepCopy(const PureType<isQualified>& other) {
 	type = other.type;
 	switch(type) {
@@ -185,13 +187,13 @@ void PureType<isQualified>::deepCopy(const PureType<isQualified>& other) {
 	}
 }
 
-template<wake::TypeQualification isQualified>
+template<TypeQualification isQualified>
 PureType<isQualified>& PureType<isQualified>::operator=(const PureType<isQualified>& other) {
 	releaseData();
 	deepCopy(other);
 }
 
-template<wake::TypeQualification isQualified>
+template<TypeQualification isQualified>
 std::string PureType<isQualified>::toString() {
 	std::string name;
 
@@ -245,7 +247,7 @@ std::string PureType<isQualified>::toString() {
 	return name;
 }
 
-template<wake::TypeQualification isQualified>
+template<TypeQualification isQualified>
 std::string PureType<isQualified>::getFQClassname() {
 	if(type != TYPE_CLASS) {
 		return "";
@@ -261,34 +263,34 @@ std::string PureType<isQualified>::getFQClassname() {
 	return fqname;
 }
 
-PureType<wake::UNQUALIFIED>* makePureType(int type) {
-	return new PureType<wake::UNQUALIFIED>(type);
+PureType<UNQUALIFIED>* makePureType(int type) {
+	return new PureType<UNQUALIFIED>(type);
 }
 
-PureType<wake::UNQUALIFIED>* makeTypeFromClassVarRef(ClassVarRef* ref) {
+PureType<UNQUALIFIED>* makeTypeFromClassVarRef(ClassVarRef* ref) {
 	if(ref->arrayed) {
-		PureType<wake::UNQUALIFIED>* outer = new PureType<wake::UNQUALIFIED>(TYPE_LIST);
+		PureType<UNQUALIFIED>* outer = new PureType<UNQUALIFIED>(TYPE_LIST);
 		ref->arrayed--;
 		outer->typedata.list.contained = makeTypeFromClassVarRef(ref);
 		ref->arrayed++;
 		return outer;
 	}
 
-	PureType<wake::UNQUALIFIED>* type = new PureType<wake::UNQUALIFIED>(TYPE_CLASS);
+	PureType<UNQUALIFIED>* type = new PureType<UNQUALIFIED>(TYPE_CLASS);
 	type->typedata._class.classname = strdup(ref->classname);
 	return type;
 }
 
-void freePureType(PureType<wake::UNQUALIFIED>* t) {
+void freePureType(PureType<UNQUALIFIED>* t) {
 	delete t;
 }
 
-PureType<wake::UNQUALIFIED>* copyPureType(PureType<wake::UNQUALIFIED>* t) {
-	return new PureType<wake::UNQUALIFIED>(*t);
+PureType<UNQUALIFIED>* copyPureType(PureType<UNQUALIFIED>* t) {
+	return new PureType<UNQUALIFIED>(*t);
 }
 
 namespace std {
-	template<wake::TypeQualification isQualified>
+	template<TypeQualification isQualified>
 	void swap(PureType<isQualified>& lhs, PureType<isQualified>& rhs) {
 		void* ptr1;
 		void* ptr2;
@@ -348,3 +350,8 @@ namespace std {
 		std::swap(lhs.type, rhs.type);
 	}
 }
+
+template class PureType<QUALIFIED>;
+template class PureType<UNQUALIFIED>;
+template void std::swap(PureType<QUALIFIED>& lhs, PureType<QUALIFIED>& rhs);
+template void std::swap(PureType<UNQUALIFIED>& lhs, PureType<UNQUALIFIED>& rhs);

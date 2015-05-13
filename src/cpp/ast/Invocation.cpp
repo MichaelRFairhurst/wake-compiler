@@ -17,8 +17,10 @@
 #include "PureTypeArray.h"
 #include <boost/lexical_cast.hpp>
 
-PureType* wake::ast::Invocation::typeCheck(bool forceArrayLiteral) {
-	PureType lambda = *auto_ptr<PureType>(lambdaExpr->typeCheck(false));
+using namespace wake;
+
+PureType<QUALIFIED>* ast::Invocation::typeCheck(bool forceArrayLiteral) {
+	PureType<QUALIFIED> lambda = *auto_ptr<PureType<QUALIFIED> >(lambdaExpr->typeCheck(false));
 
 	if(lambda.type != TYPE_LAMBDA) {
 		EXPECTED	"a function"
@@ -39,7 +41,7 @@ PureType* wake::ast::Invocation::typeCheck(bool forceArrayLiteral) {
 
 	int i = 0;
 	for(boost::ptr_vector<ExpressionNode>::iterator it = argumentExprs.begin(); it != argumentExprs.end(); ++it, ++i) {
-		auto_ptr<PureType> actual(it->typeCheck(false));
+		auto_ptr<PureType<QUALIFIED> > actual(it->typeCheck(false));
 		if(!analyzer->isASubtypeOfB(actual.get(), lambda.typedata.lambda.arguments->types[i])) {
 			EXPECTED	lambda.typedata.lambda.arguments->types[i]->toString()
 			ERRONEOUS	actual->toString()
@@ -47,5 +49,5 @@ PureType* wake::ast::Invocation::typeCheck(bool forceArrayLiteral) {
 		}
 	}
 
-	return lambda.typedata.lambda.returntype ? new PureType(*lambda.typedata.lambda.returntype) : new PureType(TYPE_UNUSABLE);
+	return lambda.typedata.lambda.returntype ? new PureType<QUALIFIED>(*lambda.typedata.lambda.returntype) : new PureType<QUALIFIED>(TYPE_UNUSABLE);
 }

@@ -69,3 +69,6 @@ VarDecl<wake::UNQUALIFIED>* makeVarDecl(PureType<wake::UNQUALIFIED>* innerType) 
 VarDecl<wake::UNQUALIFIED>* copyVarDecl(VarDecl<wake::UNQUALIFIED>* toBeCopied) {
 	return new VarDecl<wake::UNQUALIFIED>(*toBeCopied);
 }
+
+template struct VarDecl<wake::QUALIFIED>;
+template struct VarDecl<wake::UNQUALIFIED>;

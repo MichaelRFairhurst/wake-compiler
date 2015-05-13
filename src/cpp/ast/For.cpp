@@ -16,11 +16,13 @@
 #include "TypeError.h"
 #include <memory>
 
-void wake::ast::For::typeCheck() {
+using namespace wake;
+
+void ast::For::typeCheck() {
 	scopesymtable->pushScope();
 
 	init->typeCheck();
-	std::auto_ptr<PureType> conditionType(condition->typeCheck(false));
+	std::auto_ptr<PureType<QUALIFIED> > conditionType(condition->typeCheck(false));
 	incr->typeCheck();
 	block->typeCheck();
 
@@ -33,6 +35,6 @@ void wake::ast::For::typeCheck() {
 	}
 }
 
-bool wake::ast::For::exhaustiveReturns() {
+bool ast::For::exhaustiveReturns() {
 	return false; // all loops are conditional
 }

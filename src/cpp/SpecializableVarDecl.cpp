@@ -60,3 +60,6 @@ SpecializableVarDecl<wake::UNQUALIFIED>* makeSpecializableVarDeclFromVarDecl(Var
 SpecializableVarDecl<wake::UNQUALIFIED>* copySpecializableVarDecl(SpecializableVarDecl<wake::UNQUALIFIED>* decl) {
 	return new SpecializableVarDecl<wake::UNQUALIFIED>(*decl);
 }
+
+template struct SpecializableVarDecl<wake::QUALIFIED>;
+template struct SpecializableVarDecl<wake::UNQUALIFIED>;

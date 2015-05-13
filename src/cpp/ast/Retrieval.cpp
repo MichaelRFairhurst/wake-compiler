@@ -16,15 +16,17 @@
 #include "CompilationExceptions.h"
 #include <boost/ptr_container/ptr_vector.hpp>
 
-PureType* wake::ast::Retrieval::typeCheck(bool forceArrayIdentifier) {
+using namespace wake;
+
+PureType<QUALIFIED>* wake::ast::Retrieval::typeCheck(bool forceArrayIdentifier) {
 	// TypeParameterizer parameterizer;
 	// parameterizer.writeInParameterizations(&node->node_data.nodes[0]->node_data.type, parameterizedtypes);
 	// @TODO what here can be parameterized? I'm pretty sure only the type parameters, but even then, not totally sure
 	try {
-		PureType provider = *auto_ptr<PureType>(providerExp->typeCheck(false));
+		PureType<QUALIFIED> provider = *auto_ptr<PureType<QUALIFIED> >(providerExp->typeCheck(false));
 		classestable->assertTypeIsValid(&retrievalType->typedata);
-		vector<PureType*> arguments;
-		boost::ptr_vector<PureType> arguments_latch;
+		vector<PureType<QUALIFIED>*> arguments;
+		boost::ptr_vector<PureType<QUALIFIED> > arguments_latch;
 
 		for(boost::ptr_vector<wake::ast::ExpressionNode>::iterator it = argumentExprs.begin(); it != argumentExprs.end(); ++it) {
 			arguments_latch.push_back((*it).typeCheck(false));
@@ -38,7 +40,7 @@ PureType* wake::ast::Retrieval::typeCheck(bool forceArrayIdentifier) {
 				errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Provision " + name + " cannot be called on non class type " + provider.toString(), node));
 			}
 			auto_ptr<ReadOnlyPropertySymbolTable> table(classestable->findFullyQualified(provider.getFQClassname()));
-			boost::optional<PureType*> provision = table->find(name);
+			boost::optional<PureType<QUALIFIED>*> provision = table->find(name);
 			if(!provision) {
 				errors->addError(new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Provision " + name + " does not exist on class " + provider.toString(), node));
 			}
@@ -51,5 +53,5 @@ PureType* wake::ast::Retrieval::typeCheck(bool forceArrayIdentifier) {
 		delete e;
 	}
 
-	return new PureType(retrievalType->typedata);
+	return new PureType<QUALIFIED>(retrievalType->typedata);
 }

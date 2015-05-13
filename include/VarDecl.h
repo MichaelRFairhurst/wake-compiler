@@ -38,14 +38,12 @@ struct VarDecl {
 		VarDecl<isQualified>& operator=(const VarDecl<isQualified>& other);
 
 		VarRef createVarRef();
-#endif
-}
-
-#ifndef __cplusplus
-VarDecl;
+};
 #else
-;
+} VarDecl;
+#endif
 
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -63,6 +61,7 @@ namespace std
 	template<wake::TypeQualification isQualified>
 	void swap(VarDecl<isQualified>& lhs, VarDecl<isQualified>& rhs);
 }
+
 #endif
 
 #endif

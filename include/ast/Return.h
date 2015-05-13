@@ -27,7 +27,7 @@ namespace wake {
 		class Return : public StatementNode {
 
 			public:
-				Return(ExpressionNode* value, PureType* returntype, TypeAnalyzer* analyzer)
+				Return(ExpressionNode* value, PureType<wake::QUALIFIED>* returntype, TypeAnalyzer* analyzer)
 					: value(value), returntype(returntype), analyzer(analyzer) {};
 
 				void typeCheck();
@@ -38,7 +38,7 @@ namespace wake {
 
 			private:
 				std::auto_ptr<ExpressionNode> value;
-				PureType* returntype;
+				PureType<wake::QUALIFIED>* returntype;
 				TypeAnalyzer* analyzer;
 
 		};

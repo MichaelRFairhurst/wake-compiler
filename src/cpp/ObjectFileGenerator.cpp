@@ -20,6 +20,8 @@
 #include <boost/ptr_container/ptr_vector.hpp>
 #include <memory>
 
+using namespace wake;
+
 void ObjectFileGenerator::generate(Node* tree) {
 	if(forceArrayIdentifier && tree->node_type != NT_TYPEDATA) {
 		forceArrayIdentifier = false;
@@ -110,8 +112,8 @@ void ObjectFileGenerator::generate(Node* tree) {
 				header->addClassUsage(file.tellp(), classes->getFullyQualifiedClassname(classname));
 				file << "(";
 
-				vector<SpecializableVarDecl*>* needs = classes->findByImportedName(classname)->getNeeds();
-				for(vector<SpecializableVarDecl*>::iterator it = needs->begin(); it != needs->end(); ++it) {
+				vector<SpecializableVarDecl<QUALIFIED>*>* needs = classes->findByImportedName(classname)->getNeeds();
+				for(vector<SpecializableVarDecl<QUALIFIED>*>::iterator it = needs->begin(); it != needs->end(); ++it) {
 					table.add(&(*it)->decl);
 					if(it != needs->begin()) file << ",";
 					VarRef ref = (*it)->decl.createVarRef();
@@ -120,7 +122,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 				file << "){";
 
-				for(vector<SpecializableVarDecl*>::iterator it = needs->begin(); it != needs->end(); ++it) {
+				for(vector<SpecializableVarDecl<QUALIFIED>*>::iterator it = needs->begin(); it != needs->end(); ++it) {
 					file << "this.";
 					VarRef ref = (*it)->decl.createVarRef();
 					header->addPropertyUsage(file.tellp(), ref.toString());
@@ -164,7 +166,8 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_CATCH:
 			table.pushScope();
 			{
-				VarDecl* decl = tree->node_data.nodes[0]->node_data.var_decl;
+				// its ok that we have to manually cast, its been qualified earlier
+				VarDecl<QUALIFIED>* decl = (VarDecl<QUALIFIED>*) tree->node_data.nodes[0]->node_data.var_decl;
 				VarRef ref = decl->createVarRef();
 				table.add(decl);
 				file << "catch(" << table.getAddress(&ref) << "){";
@@ -195,7 +198,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_THROW:
 			{
 				table.pushScope();
-				auto_ptr<PureType> exception(new PureType(TYPE_MATCHALL));
+				auto_ptr<PureType<QUALIFIED> > exception(new PureType<QUALIFIED>(TYPE_MATCHALL));
 				std::stringstream exceptionname;
 				exceptionname << exception.get();
 				table.add(exceptionname.str(), exception.get());
@@ -218,12 +221,12 @@ void ObjectFileGenerator::generate(Node* tree) {
 				file << "function(){return new ";
 				header->addClassUsage(file.tellp(), classes->getFullyQualifiedClassname(provisionname));
 				file << "(";
-				vector<SpecializableVarDecl*>* needs = classes->findByImportedName(provisionname)->getNeeds();
-				for(vector<SpecializableVarDecl*>::iterator it = needs->begin(); it != needs->end(); ++it) {
-					SpecializablePureType spType;
+				vector<SpecializableVarDecl<QUALIFIED>*>* needs = classes->findByImportedName(provisionname)->getNeeds();
+				for(vector<SpecializableVarDecl<QUALIFIED>*>::iterator it = needs->begin(); it != needs->end(); ++it) {
+					SpecializablePureType<QUALIFIED> spType;
 					spType.specialty = strdup((*it)->specialty);
 					spType.typedata = (*it)->decl.typedata;
-					vector<PureType*> no_args;
+					vector<PureType<QUALIFIED>*> no_args;
 					if(it != needs->begin()) file << ",";
 					file << "this.";
 					header->addPropertyUsage(file.tellp(), spType.toProvisionSymbol(no_args));
@@ -233,12 +236,12 @@ void ObjectFileGenerator::generate(Node* tree) {
 			} else {
 				if(tree->node_data.nodes[1]->node_type == NT_SPECIALIZABLE_TYPEDATA) {
 					file << "function(){return this.";
-					vector<PureType*> no_args;
+					vector<PureType<QUALIFIED>*> no_args;
 					header->addPropertyUsage(file.tellp(), tree->node_data.nodes[1]->node_data.specializable_pure_type->toProvisionSymbol(no_args));
 					file << "();";
 				} else if(tree->node_data.nodes[1]->node_type == NT_INJECTION) {
 					file << "function(";
-					vector<PureType*> no_args;
+					vector<PureType<QUALIFIED>*> no_args;
 					Node* inj = tree->node_data.nodes[1]->node_data.nodes[1];
 					table.pushScope();
 
@@ -247,8 +250,9 @@ void ObjectFileGenerator::generate(Node* tree) {
 						if(inj->node_data.nodes[i]->node_type == NT_INJECTION_ARG) {
 							if(first) first = false;
 							else file << ",";
-							VarDecl decl;
-							decl.typedata = *inj->node_data.nodes[i]->node_data.nodes[0]->node_data.pure_type;
+							VarDecl<QUALIFIED> decl;
+							// its ok that we have to cast, its been qualified elswhere
+							decl.typedata = *(PureType<QUALIFIED>*) inj->node_data.nodes[i]->node_data.nodes[0]->node_data.pure_type;
 							decl.alias = strdup(string('$', i).c_str()); // unique name for each
 							table.add(&decl);
 							VarRef ref = decl.createVarRef();
@@ -286,7 +290,8 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 					for(int i = 0; i < tree->node_data.nodes[1]->subnodes; i++) {
 						if(i != 0) file << ",";
-						table.add(tree->node_data.nodes[1]->node_data.nodes[i]->node_data.var_decl);
+						// its ok that we have to cast, its been qualified elsewhere
+						table.add((VarDecl<QUALIFIED>*) tree->node_data.nodes[1]->node_data.nodes[i]->node_data.var_decl);
 						VarRef ref = tree->node_data.nodes[1]->node_data.nodes[i]->node_data.var_decl->createVarRef();
 						file << table.getAddress(&ref);
 					}
@@ -307,7 +312,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 					}
 
 					file << "this.";
-					vector<PureType*> no_args;
+					vector<PureType<QUALIFIED>*> no_args;
 					header->addPropertyUsage(file.tellp(), tree->node_data.nodes[i]->node_data.specializable_pure_type->toProvisionSymbol(no_args));
 					file << "()";
 				}
@@ -344,7 +349,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 				MethodSignatureParseTreeTraverser traverser(classes);
 				table.pushScope();
 				string name = tree->node_data.nodes[tree->subnodes - 1]->node_data.string;
-				vector<VarDecl*> arguments = traverser.getArgDecls(tree);
+				vector<VarDecl<QUALIFIED>*> arguments = traverser.getArgDecls(tree);
 				int i;
 
 				file << "this.";
@@ -372,18 +377,19 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_LAMBDA_DECLARATION:
 			{
 				table.pushScope();
-				boost::ptr_vector<PureType> cleanup;
+				boost::ptr_vector<PureType<QUALIFIED> > cleanup;
 
 				file << "(function(";
 				for(int i = 0; i < tree->node_data.nodes[0]->subnodes; i++)
 				if(tree->node_data.nodes[0]->node_data.nodes[i]->node_type == NT_VAR_DECL_DATA) {
 					if(i != 0) file << ",";
-					table.add(tree->node_data.nodes[0]->node_data.nodes[i]->node_data.var_decl);
+					// its ok that we have to cast, its been qualified elsewhere
+					table.add((VarDecl<QUALIFIED>*) tree->node_data.nodes[0]->node_data.nodes[i]->node_data.var_decl);
 					VarRef ref = tree->node_data.nodes[0]->node_data.nodes[i]->node_data.var_decl->createVarRef();
 					file << table.getAddress(&ref);
 				} else {
 					if(i != 0) file << ",";
-					cleanup.push_back(new PureType(TYPE_MATCHALL));
+					cleanup.push_back(new PureType<QUALIFIED>(TYPE_MATCHALL));
 					table.add(string(tree->node_data.nodes[0]->node_data.nodes[i]->node_data.string), &cleanup[cleanup.size() - 1]);
 					VarRef ref(strdup(tree->node_data.nodes[0]->node_data.nodes[i]->node_data.string));
 					file << table.getAddress(&ref);
@@ -447,7 +453,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 				string name = tree->node_data.nodes[tree->subnodes - 1]->node_data.string;
 
 				table.pushScope();
-				auto_ptr<PureType> safechecked(new PureType(TYPE_MATCHALL));
+				auto_ptr<PureType<QUALIFIED> > safechecked(new PureType<QUALIFIED>(TYPE_MATCHALL));
 				std::stringstream safecheckedname;
 				safecheckedname << safechecked.get();
 				table.add(safecheckedname.str(), safechecked.get());
@@ -480,7 +486,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 			{
 
 				table.pushScope();
-				auto_ptr<PureType> safechecked(new PureType(TYPE_MATCHALL));
+				auto_ptr<PureType<QUALIFIED> > safechecked(new PureType<QUALIFIED>(TYPE_MATCHALL));
 				std::stringstream safecheckedname;
 				safecheckedname << safechecked.get();
 				table.add(safecheckedname.str(), safechecked.get());
@@ -537,7 +543,8 @@ void ObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_DECLARATION:
-			table.add(tree->node_data.nodes[0]->node_data.var_decl);
+			// its ok that we have to cast, its been qualified elsewhere
+			table.add((VarDecl<QUALIFIED>*) tree->node_data.nodes[0]->node_data.var_decl);
 			file << "var ";
 			// FALL THROUGH
 		case NT_ASSIGNMENT:
@@ -621,7 +628,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 			header->addClassUsage(file.tellp(), classes->getFullyQualifiedClassname(tree->node_data.nodes[0]->node_data.pure_type->typedata._class.classname));
 			file << ".call(this";
 			PropertySymbolTable* proptable = classes->findByImportedNameModifiable(tree->node_data.nodes[0]->node_data.pure_type->typedata._class.classname);
-			for(vector<SpecializableVarDecl*>::iterator it = proptable->getNeeds()->begin(); it != proptable->getNeeds()->end(); ++it) {
+			for(vector<SpecializableVarDecl<QUALIFIED>*>::iterator it = proptable->getNeeds()->begin(); it != proptable->getNeeds()->end(); ++it) {
 				file << ",";
 				VarRef ref = (*it)->decl.createVarRef();
 				file << table.getAddress(&ref);
@@ -706,9 +713,9 @@ void ObjectFileGenerator::generate(Node* tree) {
 				Node** nodebase = tree->node_type == NT_FOREACHIN ? tree->node_data.nodes + 1: tree->node_data.nodes;
 				bool iterating_expression = nodebase[0]->node_type != NT_ALIAS && nodebase[0]->node_type != NT_TYPEDATA;
 				std::stringstream valuestorename;
-				auto_ptr<PureType> latch;
+				auto_ptr<PureType<QUALIFIED> > latch;
 				if(iterating_expression) {
-					latch.reset(new PureType(TYPE_MATCHALL));
+					latch.reset(new PureType<QUALIFIED>(TYPE_MATCHALL));
 					valuestorename << latch.get();
 					table.add(valuestorename.str(), latch.get());
 					file << "var " << table.getAddress(valuestorename.str()) << "=";
@@ -716,8 +723,8 @@ void ObjectFileGenerator::generate(Node* tree) {
 					file << ";";
 				}
 
-				auto_ptr<PureType> indexer(new PureType(TYPE_MATCHALL));
-				auto_ptr<PureType> lowered(new PureType(TYPE_MATCHALL));
+				auto_ptr<PureType<QUALIFIED> > indexer(new PureType<QUALIFIED>(TYPE_MATCHALL));
+				auto_ptr<PureType<QUALIFIED> > lowered(new PureType<QUALIFIED>(TYPE_MATCHALL));
 				std::stringstream indexername;
 				indexername << indexer.get();
 				table.add(indexername.str(), indexer.get());

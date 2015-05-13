@@ -16,8 +16,10 @@
 #include "TypeError.h"
 #include <memory>
 
-void wake::ast::Throw::typeCheck() {
-	auto_ptr<PureType> exceptionType(exception->typeCheck(false));
+using namespace wake;
+
+void ast::Throw::typeCheck() {
+	auto_ptr<PureType<QUALIFIED> > exceptionType(exception->typeCheck(false));
 
 	if(!analyzer->isException(exceptionType.get())) {
 		EXPECTED	"Exception"
@@ -26,6 +28,6 @@ void wake::ast::Throw::typeCheck() {
 	}
 }
 
-bool wake::ast::Throw::exhaustiveReturns() {
+bool ast::Throw::exhaustiveReturns() {
 	return true;
 }

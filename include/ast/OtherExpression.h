@@ -40,9 +40,9 @@ namespace wake {
 					ClassSpaceSymbolTable* classestable,
 					ScopeSymbolTable* scopesymtable,
 					MethodSignatureParseTreeTraverser* methodanalyzer,
-					PureType* thiscontext,
-					PureType* returntype,
-					const vector<PureType*>& parameterizedtypes
+					PureType<wake::QUALIFIED>* thiscontext,
+					PureType<wake::QUALIFIED>* returntype,
+					const vector<PureType<wake::QUALIFIED>*>& parameterizedtypes
 				) : node(node),
 					errors(errors),
 					classestable(classestable),
@@ -55,13 +55,13 @@ namespace wake {
 					for(std::vector<ExpressionNode*>::iterator it = children.begin(); it != children.end(); ++it) this->children.push_back(*it);
 				};
 
-				PureType* typeCheck(bool forceArrayIdentifier);
+				PureType<wake::QUALIFIED>* typeCheck(bool forceArrayIdentifier);
 
 				~OtherExpression(){};
 
 			private:
 				bool isValidLValue(Node* tree);
-				PureType* typeCheckMemberAccess(Node* n, PureType& subject, bool forceArrayIdentifier);
+				PureType<wake::QUALIFIED>* typeCheckMemberAccess(Node* n, PureType<wake::QUALIFIED>& subject, bool forceArrayIdentifier);
 
 				Node* node;
 				boost::ptr_vector<ExpressionNode> children;
@@ -69,9 +69,9 @@ namespace wake {
 				ErrorTracker* errors;
 				ClassSpaceSymbolTable* classestable;
 				ScopeSymbolTable* scopesymtable;
-				PureType* returntype;
-				PureType* thiscontext;
-				vector<PureType*> parameterizedtypes;
+				PureType<wake::QUALIFIED>* returntype;
+				PureType<wake::QUALIFIED>* thiscontext;
+				vector<PureType<wake::QUALIFIED>*> parameterizedtypes;
 
 		};
 

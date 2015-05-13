@@ -15,6 +15,8 @@
 #include "TableFileWriter.h"
 #include "PureTypeArray.h"
 
+using namespace wake;
+
 void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 	char dataptr[1] = {0};
 
@@ -48,7 +50,7 @@ void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 	out.write(dataptr, 1);
 
 	// Its very important that our methods section has our needs listed in order!
-	for(vector<SpecializableVarDecl*>::iterator need = table->getNeeds()->begin(); need != table->getNeeds()->end(); ++need) {
+	for(vector<SpecializableVarDecl<QUALIFIED>*>::iterator need = table->getNeeds()->begin(); need != table->getNeeds()->end(); ++need) {
 		for(map<string, ObjectProperty*>::iterator it = table->properties.begin(); it != table->properties.end(); ++it) {
 			if((*need)->decl.createVarRef().toString() != it->second->decl.createVarRef().toString()) continue;
 			dataptr[0] = (char) it->second->flags;
@@ -83,14 +85,14 @@ void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 
 	dataptr[0] = table->getParameters().size();
 	out.write(dataptr, 1);
-	for(vector<PureType*>::const_iterator it = table->getParameters().begin(); it != table->getParameters().end(); ++it) {
+	for(vector<PureType<QUALIFIED>*>::const_iterator it = table->getParameters().begin(); it != table->getParameters().end(); ++it) {
 		writeType(out, *it);
 	}
 
 	writeAnnotations(out, table->getAnnotations());
 }
 
-void TableFileWriter::writeType(ostream& out, PureType* type) {
+void TableFileWriter::writeType(ostream& out, PureType<QUALIFIED>* type) {
 	char dataptr[1] = {0};
 	if(type->type == TYPE_CLASS) {
 		dataptr[0] = TYPE_CLASS;
@@ -193,7 +195,7 @@ void TableFileWriter::writeProperty(ostream& out, ObjectProperty* property) {
 	writeAnnotations(out, property->annotations);
 }
 
-void TableFileWriter::writeVarDecl(ostream& out, VarDecl& decl) {
+void TableFileWriter::writeVarDecl(ostream& out, VarDecl<QUALIFIED>& decl) {
 	writeType(out, &decl.typedata);
 
 	char dataptr[1] = {0};

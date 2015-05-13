@@ -27,22 +27,23 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
 // SUPER HACK
 #define PureType PureType<wake::UNQUALIFIED>
 #define PureTypeArray PureTypeArray<wake::UNQUALIFIED>
 #define VarDecl VarDecl<wake::UNQUALIFIED>
 #define SpecializableVarDecl SpecializableVarDecl<wake::UNQUALIFIED>
 #define SpecializablePureType SpecializablePureType<wake::UNQUALIFIED>
+#endif
+
 #include "wake.tab.h"
+
+// SUPER HACK
+#ifdef __cplusplus
 #undef PureType
 #undef PureTypeArray
 #undef VarDecl
 #undef SpecializableVarDecl
 #undef SpecializablePureType
-
-#ifdef __cplusplus
 }
 #endif
 

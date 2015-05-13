@@ -16,11 +16,13 @@
 #include "PureTypeArray.h"
 #include <stdexcept>
 
-boost::optional<PureType*> DerivedPropertySymbolTable::find(string name) {
+using namespace wake;
+
+boost::optional<PureType<QUALIFIED>*> DerivedPropertySymbolTable::find(string name) {
 	map<string, ObjectProperty*>::iterator searcher;
 	searcher = properties->find(name);
-	if(searcher == properties->end()) return boost::optional<PureType*>();
-	else return boost::optional<PureType*>(&searcher->second->decl.typedata);
+	if(searcher == properties->end()) return boost::optional<PureType<QUALIFIED>*>();
+	else return boost::optional<PureType<QUALIFIED>*>(&searcher->second->decl.typedata);
 }
 
 	//@TODO not duplicate code from PropertySymbolTable
@@ -54,14 +56,14 @@ int DerivedPropertySymbolTable::getFlags(string name) {
 	return properties->find(name)->second->flags;
 }
 
-vector<SpecializableVarDecl*>* DerivedPropertySymbolTable::getNeeds() {
+vector<SpecializableVarDecl<QUALIFIED>*>* DerivedPropertySymbolTable::getNeeds() {
 	return needs;
 }
 
-string DerivedPropertySymbolTable::getSymbolNameOf(vector<pair<string, PureTypeArray*> >* segments_arguments) {
+string DerivedPropertySymbolTable::getSymbolNameOf(vector<pair<string, PureTypeArray<QUALIFIED>*> >* segments_arguments) {
 	//@TODO not duplicate code from PropertySymbolTable
 	string name;
-	for(vector<pair<string, PureTypeArray*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
+	for(vector<pair<string, PureTypeArray<QUALIFIED>*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
 		name += it->first;
 		name += "(";
 		int i;
@@ -89,7 +91,7 @@ const map<string, bool>& DerivedPropertySymbolTable::getParentage() {
 }
 
 DerivedPropertySymbolTable::~DerivedPropertySymbolTable() {
-	for(vector<SpecializableVarDecl*>::iterator it = needs->begin(); it != needs->end(); ++it) {
+	for(vector<SpecializableVarDecl<QUALIFIED>*>::iterator it = needs->begin(); it != needs->end(); ++it) {
 		delete *it;
 	}
 	for(map<string, ObjectProperty*>::iterator it = properties->begin(); it != properties->end(); ++it) {

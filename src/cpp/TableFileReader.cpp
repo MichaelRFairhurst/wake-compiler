@@ -17,6 +17,8 @@
 #include "ObjectProperty.h"
 #include <iostream>
 
+using namespace wake;
+
 void TableFileReader::read(PropertySymbolTable* table, istream& s) {
 	int version = readUInt8(s);
 	if(version != 5) throw string("Can not read table file, it has an unsupported version");
@@ -33,7 +35,7 @@ void TableFileReader::read(PropertySymbolTable* table, istream& s) {
 	int numNeeds = readUInt8(s);
 	while(numNeeds--) {
 		int flags = readUInt8(s);
-		SpecializableVarDecl* decl = readSpecializableVarDecl(s);
+		SpecializableVarDecl<QUALIFIED>* decl = readSpecializableVarDecl(s);
 		vector<Annotation*> anns = readAnnotations(s);
 		table->addNeed(decl, flags, anns);
 	}
@@ -45,7 +47,7 @@ void TableFileReader::read(PropertySymbolTable* table, istream& s) {
 	//cout << "done with inheritance" << endl;
 
 	int numParameters = readUInt8(s);
-	vector<PureType*>* parameters = new vector<PureType*>();
+	vector<PureType<QUALIFIED>*>* parameters = new vector<PureType<QUALIFIED>*>();
 	while(numParameters--) {
 		parameters->push_back(readType(s));
 	}
@@ -93,12 +95,12 @@ double TableFileReader::readNum64(istream& s) {
 	return num64;
 }
 
-PureType* TableFileReader::readType(istream& s) {
+PureType<QUALIFIED>* TableFileReader::readType(istream& s) {
 	//cout << "reading type" << endl;
 	return readTypeByTag(readUInt8(s), s);
 }
 
-PureType* TableFileReader::readTypeByTag(int tag, istream& s) {
+PureType<QUALIFIED>* TableFileReader::readTypeByTag(int tag, istream& s) {
 	//cout << "reading type by tag " << tag << endl;
 	if(tag == TYPE_CLASS) {
 		return readClassType(s);
@@ -113,9 +115,9 @@ PureType* TableFileReader::readTypeByTag(int tag, istream& s) {
 	}
 }
 
-PureType* TableFileReader::readClassType(istream &s) {
+PureType<QUALIFIED>* TableFileReader::readClassType(istream &s) {
 	//cout << "reading class type" << endl;
-	PureType* type = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED>* type = new PureType<QUALIFIED>(TYPE_CLASS);
 	type->typedata._class.modulename = readCString(s);
 	type->typedata._class.classname = readCString(s);
 
@@ -125,19 +127,19 @@ PureType* TableFileReader::readClassType(istream &s) {
 		//cout << "reading lambda arg" << endl;
 		if(!hasParams) {
 			hasParams = true;
-			type->typedata._class.parameters = new PureTypeArray();
+			type->typedata._class.parameters = new PureTypeArray<QUALIFIED>();
 		}
 
-		addPureTypeToPureTypeArray(readType(s), type->typedata._class.parameters);
+		type->typedata._class.parameters->addType(readType(s));
 	}
 
 	return type;
 }
 
-PureType* TableFileReader::readLambdaType(istream& s) {
+PureType<QUALIFIED>* TableFileReader::readLambdaType(istream& s) {
 	//cout << "reading lambda" << endl;
-	PureType* type = new PureType(TYPE_LAMBDA);
-	type->typedata.lambda.arguments = new PureTypeArray();
+	PureType<QUALIFIED>* type = new PureType<QUALIFIED>(TYPE_LAMBDA);
+	type->typedata.lambda.arguments = new PureTypeArray<QUALIFIED>();
 
 	int tag = readUInt8(s);
 	if(tag == 0x01) {
@@ -149,15 +151,15 @@ PureType* TableFileReader::readLambdaType(istream& s) {
 
 	while(numArgTypes--) {
 		//cout << "reading lambda arg" << endl;
-		addPureTypeToPureTypeArray(readType(s), type->typedata.lambda.arguments);
+		type->typedata.lambda.arguments->addType(readType(s));
 		tag = readUInt8(s);
 	}
 
 	return type;
 }
 
-PureType* TableFileReader::readParameterizedType(istream& s, int paramdtype) {
-	PureType* type = new PureType(paramdtype);
+PureType<QUALIFIED>* TableFileReader::readParameterizedType(istream& s, int paramdtype) {
+	PureType<QUALIFIED>* type = new PureType<QUALIFIED>(paramdtype);
 	type->typedata.parameterized.label = readCString(s);
 	int tag = readUInt8(s);
 	if(tag != 0x00) {
@@ -170,14 +172,14 @@ PureType* TableFileReader::readParameterizedType(istream& s, int paramdtype) {
 	return type;
 }
 
-PureType* TableFileReader::readListType(istream& s) {
-	PureType* type = new PureType(TYPE_LIST);
+PureType<QUALIFIED>* TableFileReader::readListType(istream& s) {
+	PureType<QUALIFIED>* type = new PureType<QUALIFIED>(TYPE_LIST);
 	type->typedata.list.contained = readType(s);
 	return type;
 }
 
-PureType* TableFileReader::readOptionalType(istream& s) {
-	PureType* type = new PureType(TYPE_OPTIONAL);
+PureType<QUALIFIED>* TableFileReader::readOptionalType(istream& s) {
+	PureType<QUALIFIED>* type = new PureType<QUALIFIED>(TYPE_OPTIONAL);
 	type->typedata.optional.contained = readType(s);
 	return type;
 }
@@ -196,16 +198,16 @@ void TableFileReader::readMethod(PropertySymbolTable* table, istream& s) {
 	//if(prop->flags & PROPERTY_NEED) table->getNeeds()->push_back(prop->type);
 }
 
-VarDecl* TableFileReader::readVarDecl(istream& s) {
-	VarDecl* decl = new VarDecl();
+VarDecl<QUALIFIED>* TableFileReader::readVarDecl(istream& s) {
+	VarDecl<QUALIFIED>* decl = new VarDecl<QUALIFIED>();
 	decl->typedata = *readType(s);
 	decl->shadow = readUInt8(s);
 	decl->alias = readCString(s);
 	return decl;
 }
 
-SpecializableVarDecl* TableFileReader::readSpecializableVarDecl(istream& s) {
-	SpecializableVarDecl* spDecl = new SpecializableVarDecl();
+SpecializableVarDecl<QUALIFIED>* TableFileReader::readSpecializableVarDecl(istream& s) {
+	SpecializableVarDecl<QUALIFIED>* spDecl = new SpecializableVarDecl<QUALIFIED>();
 	spDecl->decl = *readVarDecl(s);
 	spDecl->specialty = readCString(s);
 	return spDecl;

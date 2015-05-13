@@ -17,12 +17,14 @@
 #include "TypeError.h"
 #include "CompilationExceptions.h"
 
-void wake::ast::Declaration::typeCheck() {
+using namespace wake;
+
+void ast::Declaration::typeCheck() {
 	try {
 		TypeParameterizer parameterizer;
 		parameterizer.rewriteClasstypesToParameterizedtypeByLabel(&declared->typedata, parameterizedtypes);
 		classestable->assertTypeIsValid(&declared->typedata);
-		PureType assignment = *auto_ptr<PureType>(value->typeCheck(false));
+		PureType<QUALIFIED> assignment = *auto_ptr<PureType<QUALIFIED> >(value->typeCheck(false));
 		if(!classestable->getAnalyzer()->isASubtypeOfB(&assignment, &declared->typedata)) {
 			EXPECTED	declared->typedata.toString()
 			ERRONEOUS	assignment.toString()
@@ -38,6 +40,6 @@ void wake::ast::Declaration::typeCheck() {
 	}
 }
 
-bool wake::ast::Declaration::exhaustiveReturns() {
+bool ast::Declaration::exhaustiveReturns() {
 	return false;
 }

@@ -28,7 +28,7 @@ namespace wake {
 			public:
 				ExpressionUsabilityCatcher(ExpressionNode* child, ErrorTracker* errors, Node* node) : child(child), errors(errors), node(node) {};
 
-				PureType* typeCheck(bool forceArrayIdentifier);
+				PureType<wake::QUALIFIED>* typeCheck(bool forceArrayIdentifier);
 
 				ExpressionUsabilityCatcher(){};
 

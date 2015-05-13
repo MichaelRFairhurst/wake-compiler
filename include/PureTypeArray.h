@@ -31,6 +31,7 @@ struct PureTypeArray {
 		~PureTypeArray();
 		PureTypeArray(const PureTypeArray<isQualified>& other);
 		PureTypeArray& operator=(const PureTypeArray<isQualified>& other);
+		void addType(PureType<isQualified>* other);
 };
 #else
 } PureTypeArray;

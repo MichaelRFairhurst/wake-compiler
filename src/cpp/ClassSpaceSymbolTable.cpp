@@ -280,6 +280,22 @@ PureType<wake::QUALIFIED>* ClassSpaceSymbolTable::setModulesOnType(PureType<wake
 	return (PureType<wake::QUALIFIED>*) type;
 }
 
+SpecializablePureType<wake::QUALIFIED>* ClassSpaceSymbolTable::setModulesOnType(SpecializablePureType<wake::UNQUALIFIED>* type) {
+	setModulesOnType(&type->typedata);
+	return (SpecializablePureType<wake::QUALIFIED>*) type;
+}
+
+SpecializableVarDecl<wake::QUALIFIED>* ClassSpaceSymbolTable::setModulesOnType(SpecializableVarDecl<wake::UNQUALIFIED>* type) {
+	setModulesOnType(&type->decl);
+	return (SpecializableVarDecl<wake::QUALIFIED>*) type;
+}
+
+VarDecl<wake::QUALIFIED>* ClassSpaceSymbolTable::setModulesOnType(VarDecl<wake::UNQUALIFIED>* type) {
+	setModulesOnType(&type->typedata);
+	return (VarDecl<wake::QUALIFIED>*) type;
+}
+
+
 PropertySymbolTable* ClassSpaceSymbolTable::findByImportedNameModifiable(string classname) {
 	return findFullyQualifiedModifiable(getFullyQualifiedClassname(classname));
 }

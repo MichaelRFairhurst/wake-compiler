@@ -25,15 +25,20 @@ PureTypeArray<isQualified>::PureTypeArray() {
 }
 
 template<wake::TypeQualification isQualified>
+void PureTypeArray<isQualified>::addType(PureType<isQualified>* type) {
+		// Remember: this template is purely for the typesystem, we can cast without borking mem safety
+	addPureTypeToPureTypeArray(
+		new PureType<wake::UNQUALIFIED>(*(PureType<wake::UNQUALIFIED>*) type),
+		(PureTypeArray<wake::UNQUALIFIED>*) this
+	);
+}
+
+template<wake::TypeQualification isQualified>
 PureTypeArray<isQualified>::PureTypeArray(const PureTypeArray<isQualified>& other) {
 	typecount = 0;
 	types = NULL;
 	for(int i = 0; i < other.typecount; i++) {
-		// Remember: this template is purely for the typesystem, we can cast without borking mem safety
-		addPureTypeToPureTypeArray(
-			new PureType<wake::UNQUALIFIED>((PureType<wake::UNQUALIFIED>) *other.types[i]),
-			(PureTypeArray<wake::UNQUALIFIED>*) this
-		);
+		this->addType(new PureType<isQualified>(*other.types[i]));
 	}
 	typecount = other.typecount;
 }
@@ -41,11 +46,7 @@ PureTypeArray<isQualified>::PureTypeArray(const PureTypeArray<isQualified>& othe
 template<wake::TypeQualification isQualified>
 PureTypeArray<isQualified>& PureTypeArray<isQualified>::operator=(const PureTypeArray& other) {
 	for(int i = 0; i < other.typecount; i++) {
-		// Remember: this template is purely for the typesystem, we can cast without borking mem safety
-		addPureTypeToPureTypeArray(
-			new PureType<wake::UNQUALIFIED>((PureType<wake::UNQUALIFIED>) *other.types[i]),
-			(PureTypeArray<wake::UNQUALIFIED>*) this
-		);
+		this->addType(new PureType<isQualified>(*other.types[i]));
 	}
 	typecount = other.typecount;
 	return *this;
@@ -70,3 +71,6 @@ void freePureTypeArray(PureTypeArray<wake::UNQUALIFIED>* ta) {
 PureTypeArray<wake::UNQUALIFIED>* copyPureTypeArray(PureTypeArray<wake::UNQUALIFIED>* ta) {
 	return new PureTypeArray<wake::UNQUALIFIED>(*ta);
 }
+
+template struct PureTypeArray<wake::QUALIFIED>;
+template struct PureTypeArray<wake::UNQUALIFIED>;

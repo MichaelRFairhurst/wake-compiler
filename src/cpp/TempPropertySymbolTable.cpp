@@ -14,7 +14,9 @@
 
 #include "TempPropertySymbolTable.h"
 
-boost::optional<PureType*> TempPropertySymbolTable::find(string name) {
+using namespace wake;
+
+boost::optional<PureType<QUALIFIED>*> TempPropertySymbolTable::find(string name) {
 	return table.find(name);
 }
 
@@ -34,11 +36,11 @@ int TempPropertySymbolTable::getFlags(string name) {
 	return table.getFlags(name);
 }
 
-vector<SpecializableVarDecl*>* TempPropertySymbolTable::getNeeds() {
+vector<SpecializableVarDecl<QUALIFIED>*>* TempPropertySymbolTable::getNeeds() {
 	return table.getNeeds();
 }
 
-string TempPropertySymbolTable::getSymbolNameOf(vector<pair<string, PureTypeArray*> >* segments_arguments) {
+string TempPropertySymbolTable::getSymbolNameOf(vector<pair<string, PureTypeArray<QUALIFIED>*> >* segments_arguments) {
 	return table.getSymbolNameOf(segments_arguments);
 }
 
