@@ -35,13 +35,13 @@ using namespace std;
 
 class ReadOnlyPropertySymbolTable {
 	public:
-		virtual boost::optional<PureType*> find(string name)=0;
+		virtual boost::optional<PureType<wake::QUALIFIED>*> find(string name)=0;
 		virtual boost::optional<ObjectProperty*> findByCasing(string casing)=0;
 		virtual bool isPublic(string name)=0;
 		virtual string getAddress(string name)=0;
 		virtual int getFlags(string name)=0;
-		virtual vector<SpecializableVarDecl*>* getNeeds()=0;
-		virtual string getSymbolNameOf(vector<pair<string, PureTypeArray*> >* segments_arguments)=0;
+		virtual vector<SpecializableVarDecl<wake::QUALIFIED>*>* getNeeds()=0;
+		virtual string getSymbolNameOf(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments)=0;
 		virtual bool isAbstract()=0;
 		virtual ~ReadOnlyPropertySymbolTable() {};
 		virtual const map<string, bool>& getParentage()=0;

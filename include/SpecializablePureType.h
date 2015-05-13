@@ -22,31 +22,42 @@
 #include <vector>
 #endif
 
-typedef struct SpecializablePureType {
-	PureType typedata;
+#ifdef __cplusplus
+#define TEMPL_UNQUALIFIED <wake::UNQUALIFIED>
+#define TEMPL_RECURSE <isQualified>
+template<wake::TypeQualification isQualified>
+#else
+#define TEMPL_UNQUALIFIED
+#define TEMPL_RECURSE
+typedef
+#endif
+struct SpecializablePureType {
+	PureType TEMPL_RECURSE typedata;
 	char* specialty;
 
 #ifdef __cplusplus
 	public:
 		~SpecializablePureType();
 		SpecializablePureType() : specialty(NULL) {};
-		SpecializablePureType(SpecializablePureType& other);
-		SpecializablePureType& operator=(SpecializablePureType& other);
+		SpecializablePureType(SpecializablePureType<isQualified>& other);
+		SpecializablePureType& operator=(SpecializablePureType<isQualified>& other);
 
-		std::string toProvisionSymbol(std::vector<PureType*> &arguments);
+		std::string toProvisionSymbol(std::vector<PureType<wake::QUALIFIED>*> &arguments);
 
 	private:
 		void releaseData();
-		void deepCopy(const SpecializablePureType& other);
-#endif
+		void deepCopy(const SpecializablePureType<isQualified>& other);
+};
+#else
 } SpecializablePureType;
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-SpecializablePureType* makeSpecializablePureType(PureType* inner);
-void freeSpecializablePureType(SpecializablePureType* spt);
+SpecializablePureType TEMPL_UNQUALIFIED* makeSpecializablePureType(PureType TEMPL_UNQUALIFIED* inner);
+void freeSpecializablePureType(SpecializablePureType TEMPL_UNQUALIFIED* spt);
 
 #ifdef __cplusplus
 }
@@ -55,8 +66,8 @@ void freeSpecializablePureType(SpecializablePureType* spt);
 
 namespace std
 {
-	template<>
-	void swap(SpecializablePureType& lhs, SpecializablePureType& rhs);
+	template<wake::TypeQualification isQualified>
+	void swap(SpecializablePureType<isQualified>& lhs, SpecializablePureType<isQualified>& rhs);
 }
 #endif
 

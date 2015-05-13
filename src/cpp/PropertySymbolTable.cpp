@@ -27,7 +27,7 @@ const map<string, bool>& PropertySymbolTable::getParentage() {
 	return parentage;
 }
 
-boost::optional<SemanticError*> PropertySymbolTable::addMethod(PureType* returntype, vector<pair<string, PureTypeArray*> >* segments_arguments, int flags, vector<Annotation*> annotations) {
+boost::optional<SemanticError*> PropertySymbolTable::addMethod(PureType<wake::QUALIFIED>* returntype, vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments, int flags, vector<Annotation*> annotations) {
 	string name = getSymbolNameOf(segments_arguments);
 
 	if(properties.count(name)) {
@@ -39,14 +39,18 @@ boost::optional<SemanticError*> PropertySymbolTable::addMethod(PureType* returnt
 		abstract = true;
 	}
 
-	PureType* method = new PureType(TYPE_LAMBDA);
-	method->typedata.lambda.returntype = returntype == NULL ? NULL : new PureType(*returntype);
+	PureType<wake::QUALIFIED>* method = new PureType<wake::QUALIFIED>(TYPE_LAMBDA);
+	method->typedata.lambda.returntype = returntype == NULL ? NULL : new PureType<wake::QUALIFIED>(*returntype);
 
-	PureTypeArray* conglomerate = new PureTypeArray();
-	for(vector<pair<string, PureTypeArray*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
+	PureTypeArray<wake::QUALIFIED>* conglomerate = new PureTypeArray<wake::QUALIFIED>();
+	for(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
 		int i;
 		for(i = 0; i < it->second->typecount; i++)
-			addPureTypeToPureTypeArray(new PureType(*it->second->types[i]), conglomerate);
+			// the templates are just a typesafety thing, we can safely cross cast them
+			addPureTypeToPureTypeArray(
+				new PureType<wake::UNQUALIFIED>(*(PureType<wake::UNQUALIFIED>*) it->second->types[i]),
+				(PureTypeArray<wake::UNQUALIFIED>*) conglomerate
+			);
 	}
 
 	method->typedata.lambda.arguments = conglomerate;
@@ -64,7 +68,7 @@ boost::optional<SemanticError*> PropertySymbolTable::addMethod(PureType* returnt
 	return boost::optional<SemanticError*>();
 }
 
-boost::optional<SemanticError*> PropertySymbolTable::addProperty(VarDecl* property, int flags, vector<Annotation*> annotations) {
+boost::optional<SemanticError*> PropertySymbolTable::addProperty(VarDecl<wake::QUALIFIED>* property, int flags, vector<Annotation*> annotations) {
 	VarRef refOfDecl = property->createVarRef();
 	string name = refOfDecl.toString();
 
@@ -85,7 +89,7 @@ boost::optional<SemanticError*> PropertySymbolTable::addProperty(VarDecl* proper
 	return boost::optional<SemanticError*>();
 }
 
-boost::optional<SemanticError*> PropertySymbolTable::addProvision(SpecializablePureType* provided, vector<PureType*> &arguments, int flags, vector<Annotation*> annotations) {
+boost::optional<SemanticError*> PropertySymbolTable::addProvision(SpecializablePureType<wake::QUALIFIED>* provided, vector<PureType<wake::QUALIFIED>*> &arguments, int flags, vector<Annotation*> annotations) {
 	string name = provided->toProvisionSymbol(arguments);
 
 	if(properties.count(name)) {
@@ -93,10 +97,10 @@ boost::optional<SemanticError*> PropertySymbolTable::addProvision(SpecializableP
 		return boost::optional<SemanticError*>(new SemanticError(DUPLICATE_PROPERTY_DEFINITION, temp));
 	}
 
-	PureType* method = new PureType(TYPE_LAMBDA);
-	method->typedata.lambda.returntype = new PureType(provided->typedata);
+	PureType<wake::QUALIFIED>* method = new PureType<wake::QUALIFIED>(TYPE_LAMBDA);
+	method->typedata.lambda.returntype = new PureType<wake::QUALIFIED>(provided->typedata);
 
-	method->typedata.lambda.arguments = new PureTypeArray(); //TODO injections with curried ctors or arguments!
+	method->typedata.lambda.arguments = new PureTypeArray<wake::QUALIFIED>(); //TODO injections with curried ctors or arguments!
 
 	ObjectProperty* prop = new ObjectProperty;
 	prop->decl.typedata = *method;
@@ -110,12 +114,12 @@ boost::optional<SemanticError*> PropertySymbolTable::addProvision(SpecializableP
 	return boost::optional<SemanticError*>();
 }
 
-boost::optional<PureType*> PropertySymbolTable::find(string name) {
+boost::optional<PureType<wake::QUALIFIED>*> PropertySymbolTable::find(string name) {
 	if(!properties.count(name))
 		//throw new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Cannot find method with signature " + name);
-		return boost::optional<PureType*>();
+		return boost::optional<PureType<wake::QUALIFIED>*>();
 
-	return boost::optional<PureType*>(&properties.find(name)->second->decl.typedata);
+	return boost::optional<PureType<wake::QUALIFIED>*>(&properties.find(name)->second->decl.typedata);
 }
 
 boost::optional<ObjectProperty*> PropertySymbolTable::findByCasing(string casing) {
@@ -144,9 +148,9 @@ int PropertySymbolTable::getFlags(string name) {
 	return properties.find(name)->second->flags;
 }
 
-string PropertySymbolTable::getCasingNameOf(vector<pair<string, PureTypeArray*> >* segments_arguments) {
+string PropertySymbolTable::getCasingNameOf(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments) {
 	string name;
-	for(vector<pair<string, PureTypeArray*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
+	for(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
 		name += it->first;
 		name += "(";
 		int i;
@@ -160,9 +164,9 @@ string PropertySymbolTable::getCasingNameOf(vector<pair<string, PureTypeArray*> 
 	return name;
 }
 
-string PropertySymbolTable::getSymbolNameOf(vector<pair<string, PureTypeArray*> >* segments_arguments) {
+string PropertySymbolTable::getSymbolNameOf(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments) {
 	string name;
-	for(vector<pair<string, PureTypeArray*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
+	for(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
 		name += it->first;
 		name += "(";
 		int i;
@@ -183,12 +187,12 @@ void PropertySymbolTable::printEntryPoints(EntryPointAnalyzer* entryanalyzer) {
 	}
 }
 
-void PropertySymbolTable::addNeed(SpecializableVarDecl* needed, int flags, vector<Annotation*> annotations) {
+void PropertySymbolTable::addNeed(SpecializableVarDecl<wake::QUALIFIED>* needed, int flags, vector<Annotation*> annotations) {
 	needs->push_back(needed);
 	addProperty(&needed->decl, flags | PROPERTY_NEED, annotations);
 }
 
-vector<SpecializableVarDecl*>* PropertySymbolTable::getNeeds() {
+vector<SpecializableVarDecl<wake::QUALIFIED>*>* PropertySymbolTable::getNeeds() {
 	return needs;
 }
 
@@ -229,7 +233,7 @@ void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable*
 					child->analyzer->assertFQNeedIsNotCircular(fqname, propagate->decl.typedata.getFQClassname());
 				}
 
-				SpecializableVarDecl* spdecl = new SpecializableVarDecl();
+				SpecializableVarDecl<wake::QUALIFIED>* spdecl = new SpecializableVarDecl<wake::QUALIFIED>();
 				spdecl->decl = propagate->decl;
 				child->getNeeds()->push_back(spdecl);
 			}
@@ -254,16 +258,16 @@ bool PropertySymbolTable::isPublic(string name) {
 	return properties.find(name)->second->flags & PROPERTY_PUBLIC;
 }
 
-void PropertySymbolTable::setParameters(vector<PureType*>* parameters) {
+void PropertySymbolTable::setParameters(vector<PureType<wake::QUALIFIED>*>* parameters) {
 	delete declaredtypeparameters;
 	declaredtypeparameters = parameters;
 }
 
-const vector<PureType*>& PropertySymbolTable::getParameters() {
+const vector<PureType<wake::QUALIFIED>*>& PropertySymbolTable::getParameters() {
 	return *declaredtypeparameters;
 }
 
-ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<PureType*>& parameters) {
+ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<PureType<wake::QUALIFIED>*>& parameters) {
 	TypeParameterizer parameterizer;
 	map<string, ObjectProperty*>* newprops = new map<string, ObjectProperty*>();
 	for(map<string, ObjectProperty*>::iterator it = properties.begin(); it != properties.end(); ++it) {
@@ -292,9 +296,9 @@ ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<PureT
 		(*newprops)[newname] = newprop;
 	}
 
-	vector<SpecializableVarDecl*>* newneeds = new vector<SpecializableVarDecl*>();
-	for(vector<SpecializableVarDecl*>::iterator it = needs->begin(); it != needs->end(); ++it) {
-		SpecializableVarDecl* newneed = new SpecializableVarDecl(**it);
+	vector<SpecializableVarDecl<wake::QUALIFIED>*>* newneeds = new vector<SpecializableVarDecl<wake::QUALIFIED>*>();
+	for(vector<SpecializableVarDecl<wake::QUALIFIED>*>::iterator it = needs->begin(); it != needs->end(); ++it) {
+		SpecializableVarDecl<wake::QUALIFIED>* newneed = new SpecializableVarDecl<wake::QUALIFIED>(**it);
 		parameterizer.applyParameterizations(&newneed->decl.typedata, getParameters(), parameters);
 		newneeds->push_back(newneed);
 	}
@@ -302,14 +306,18 @@ ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<PureT
 	return new DerivedPropertySymbolTable(*analyzer, newneeds, newprops, parentage);
 }
 
-PureType* PropertySymbolTable::getAsPureType() {
-	PureType* ret = new PureType(TYPE_CLASS);
+PureType<wake::QUALIFIED>* PropertySymbolTable::getAsPureType() {
+	PureType<wake::QUALIFIED>* ret = new PureType<wake::QUALIFIED>(TYPE_CLASS);
 	ret->typedata._class.classname = strdup(classname.c_str());
 	ret->typedata._class.modulename = strdup(module.c_str());
 	if(getParameters().size()) {
-		ret->typedata._class.parameters = new PureTypeArray();
-		for(vector<PureType*>::const_iterator it = getParameters().begin(); it != getParameters().end(); ++it) {
-			addPureTypeToPureTypeArray(*it, ret->typedata._class.parameters);
+		ret->typedata._class.parameters = new PureTypeArray<wake::QUALIFIED>();
+		for(vector<PureType<wake::QUALIFIED>*>::const_iterator it = getParameters().begin(); it != getParameters().end(); ++it) {
+			// these template params are for type safety only, we can freely cast them back and forth
+			addPureTypeToPureTypeArray(
+				(PureType<wake::UNQUALIFIED>*) *it,
+				(PureTypeArray<wake::UNQUALIFIED>*) ret->typedata._class.parameters
+			);
 		}
 	}
 

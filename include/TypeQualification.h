@@ -2,7 +2,7 @@
  * Source Code for the Original Compiler for the
  * Programming Language Wake
  *
- * ExpressionNode.h
+ * TypeQualification.h
  *
  * Licensed under the MIT license
  * See LICENSE.TXT for details
@@ -12,25 +12,15 @@
  *
  **************************************************/
 
-#ifndef HEADER_EXPRESSION_NODE
-#define HEADER_EXPRESSION_NODE
-
-#include "PureType.h"
+#ifndef HEADER_TYPE_QUALIFICATION
+#define HEADER_TYPE_QUALIFICATION
 
 namespace wake {
 
-	namespace ast {
-
-		class ExpressionNode {
-
-			public:
-				virtual PureType<wake::QUALIFIED>* typeCheck(bool forceArrayIdentifier)=0;
-				virtual ~ExpressionNode(){};
-
-			private:
-		};
-
-	}
+	enum TypeQualification {
+		QUALIFIED,
+		UNQUALIFIED
+	};
 
 }
 

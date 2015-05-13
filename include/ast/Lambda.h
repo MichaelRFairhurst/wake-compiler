@@ -29,16 +29,16 @@ namespace wake {
 
 		class Lambda : public ExpectedTypeExpression {
 			public:
-				Lambda(std::vector<std::pair<boost::optional<std::string>, boost::optional<VarDecl> > > arguments, StatementNode* body, UnifyingType* returntype, ScopeSymbolTable* scopesymtable, ErrorTracker* errors, Node* node, TypeAnalyzer* analyzer)
+				Lambda(std::vector<std::pair<boost::optional<std::string>, boost::optional<VarDecl<QUALIFIED> > > > arguments, StatementNode* body, UnifyingType* returntype, ScopeSymbolTable* scopesymtable, ErrorTracker* errors, Node* node, TypeAnalyzer* analyzer)
 				: analyzer(analyzer), arguments(arguments), body(body), scopesymtable(scopesymtable), errors(errors), returntype(returntype), node(node) {};
 
-				PureType* typeCheck(bool forceArrayIdentifier);
-				PureType* typeCheckExpecting(PureType* hint);
-				PureType* typeCheckCommon(PureType* hint);
+				PureType<QUALIFIED>* typeCheck(bool forceArrayIdentifier);
+				PureType<QUALIFIED>* typeCheckExpecting(PureType<QUALIFIED>* hint);
+				PureType<QUALIFIED>* typeCheckCommon(PureType<QUALIFIED>* hint);
 
 			private:
 				std::auto_ptr<UnifyingType> returntype;
-				std::vector<std::pair<boost::optional<std::string>, boost::optional<VarDecl> > > arguments;
+				std::vector<std::pair<boost::optional<std::string>, boost::optional<VarDecl<QUALIFIED> > > > arguments;
 				std::auto_ptr<StatementNode> body;
 				ScopeSymbolTable* scopesymtable;
 				ErrorTracker* errors;

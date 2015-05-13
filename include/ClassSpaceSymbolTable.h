@@ -47,11 +47,12 @@ class ClassSpaceSymbolTable {
 		//ReadOnlyPropertySymbolTable* find(Type* type);
 		PropertySymbolTable* findFullyQualifiedModifiable(string fqclassname);
 		ReadOnlyPropertySymbolTable* findFullyQualified(string fqclassname);
-		ReadOnlyPropertySymbolTable* findFullyQualified(string fqclassname, vector<PureType*> args);
+		ReadOnlyPropertySymbolTable* findFullyQualified(string fqclassname, vector<PureType<wake::QUALIFIED>*> args);
 		PropertySymbolTable* findByImportedNameModifiable(string classname);
 		ReadOnlyPropertySymbolTable* findByImportedName(string classname);
-		ReadOnlyPropertySymbolTable* findByImportedName(string classname, vector<PureType*> args);
-		void assertTypeIsValid(PureType* type);
+		ReadOnlyPropertySymbolTable* findByImportedName(string classname, vector<PureType<wake::QUALIFIED>*> args);
+		void assertTypeIsValid(PureType<wake::QUALIFIED>* type);
+		void assertTypeIsValid(PureType<wake::UNQUALIFIED>* type);
 		void assertNoNeedsAreCircular();
 		TypeAnalyzer* getAnalyzer();
 		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);
@@ -60,7 +61,11 @@ class ClassSpaceSymbolTable {
 		void setModule(string module);
 		string getModule();
 		string getFullyQualifiedClassname(string classname);
-		void setModulesOnType(PureType* type);
+		PureType<wake::QUALIFIED>* setModulesOnType(PureType<wake::UNQUALIFIED>* type);
+		SpecializablePureType<wake::QUALIFIED>* setModulesOnType(SpecializablePureType<wake::UNQUALIFIED>* type);
+		SpecializableVarDecl<wake::QUALIFIED>* setModulesOnType(SpecializableVarDecl<wake::UNQUALIFIED>* type);
+		VarDecl<wake::QUALIFIED>* setModulesOnType(VarDecl<wake::UNQUALIFIED>* type);
+		PureTypeArray<wake::QUALIFIED>* setModulesOnType(PureTypeArray<wake::UNQUALIFIED>* type);
 
 	private:
 

@@ -17,25 +17,32 @@
 
 #include "PureType.h"
 
-typedef struct PureTypeArray {
-	PureType** types;
+#ifdef __cplusplus
+template<wake::TypeQualification isQualified>
+#else
+typedef
+#endif
+struct PureTypeArray {
+	PureType TEMPL_RECURSE** types;
 	int typecount;
 #ifdef __cplusplus
 	public:
 		PureTypeArray();
 		~PureTypeArray();
-		PureTypeArray(const PureTypeArray& other);
-		PureTypeArray& operator=(const PureTypeArray& other);
-#endif
+		PureTypeArray(const PureTypeArray<isQualified>& other);
+		PureTypeArray& operator=(const PureTypeArray<isQualified>& other);
+};
+#else
 } PureTypeArray;
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-PureTypeArray* makePureTypeArray();
-void addPureTypeToPureTypeArray(PureType* nexttype, PureTypeArray* container);
-void freePureTypeArray(PureTypeArray* ta);
+PureTypeArray TEMPL_UNQUALIFIED* makePureTypeArray();
+void addPureTypeToPureTypeArray(PureType TEMPL_UNQUALIFIED* nexttype, PureTypeArray TEMPL_UNQUALIFIED* container);
+void freePureTypeArray(PureTypeArray TEMPL_UNQUALIFIED* ta);
 
 #ifdef __cplusplus
 }

@@ -132,7 +132,7 @@ void ClassSpaceSymbolTable::propagateInheritanceToParent(string childname, Error
 	current->second = true;
 }
 
-ReadOnlyPropertySymbolTable* ClassSpaceSymbolTable::findFullyQualified(string fqclassname, vector<PureType*> parameters) {
+ReadOnlyPropertySymbolTable* ClassSpaceSymbolTable::findFullyQualified(string fqclassname, vector<PureType<wake::QUALIFIED>*> parameters) {
 	PropertySymbolTable* table = findFullyQualifiedModifiable(fqclassname);
 	if(!parameters.size()) {
 		if(table->getParameters().size()) {
@@ -170,14 +170,14 @@ PropertySymbolTable* ClassSpaceSymbolTable::findFullyQualifiedModifiable(string 
 	return searcher->second.first;
 }
 
-void ClassSpaceSymbolTable::assertTypeIsValid(PureType* type) {
+void ClassSpaceSymbolTable::assertTypeIsValid(PureType<wake::QUALIFIED>* type) {
 	if(type->type == TYPE_PARAMETERIZED) return;
 
 	if(type->type == TYPE_CLASS) {
 		if(classes.count(type->typedata._class.classname)) {
 			std::map<string, pair<PropertySymbolTable*, bool> >::iterator searcher = classes.find(type->typedata._class.classname);
 			PropertySymbolTable* table = searcher->second.first;
-			vector<PureType*> parameterizations;
+			vector<PureType<wake::QUALIFIED>*> parameterizations;
 
 			if(type->typedata._class.parameters != NULL) {
 				int i;
@@ -225,7 +225,7 @@ TypeAnalyzer* ClassSpaceSymbolTable::getAnalyzer() {
 
 void ClassSpaceSymbolTable::assertNoNeedsAreCircular() {
 	for(map<string, pair<PropertySymbolTable*, bool> >::iterator it = classes.begin(); it != classes.end(); ++it)
-	for(vector<SpecializableVarDecl*>::iterator needit = it->second.first->getNeeds()->begin(); needit != it->second.first->getNeeds()->end(); ++needit)
+	for(vector<SpecializableVarDecl<wake::QUALIFIED>*>::iterator needit = it->second.first->getNeeds()->begin(); needit != it->second.first->getNeeds()->end(); ++needit)
 	if((*needit)->decl.typedata.type == TYPE_CLASS) {
 		analyzer.assertFQNeedIsNotCircular(it->first, (*needit)->decl.typedata.getFQClassname());
 	}
@@ -249,7 +249,7 @@ string ClassSpaceSymbolTable::getFullyQualifiedClassname(string classname) {
 	}
 }
 
-void ClassSpaceSymbolTable::setModulesOnType(PureType* type) {
+PureType<wake::QUALIFIED>* ClassSpaceSymbolTable::setModulesOnType(PureType<wake::UNQUALIFIED>* type) {
 	if(type->type == TYPE_CLASS) {
 		if(type->typedata._class.modulename != NULL) {
 			type->typedata._class.modulename = strdup(getFullyQualifiedClassname(type->typedata._class.classname).c_str());
@@ -276,6 +276,8 @@ void ClassSpaceSymbolTable::setModulesOnType(PureType* type) {
 			}
 		}
 	}
+
+	return (PureType<wake::QUALIFIED>*) type;
 }
 
 PropertySymbolTable* ClassSpaceSymbolTable::findByImportedNameModifiable(string classname) {
@@ -286,7 +288,7 @@ ReadOnlyPropertySymbolTable* ClassSpaceSymbolTable::findByImportedName(string cl
 	return findFullyQualified(getFullyQualifiedClassname(classname));
 }
 
-ReadOnlyPropertySymbolTable* ClassSpaceSymbolTable::findByImportedName(string classname, vector<PureType*> args) {
+ReadOnlyPropertySymbolTable* ClassSpaceSymbolTable::findByImportedName(string classname, vector<PureType<wake::QUALIFIED>*> args) {
 	return findFullyQualified(getFullyQualifiedClassname(classname), args);
 
 }

@@ -26,18 +26,18 @@ namespace wake {
 		public:
 			UnifyingType(TypeAnalyzer* analyzer) : analyzer(analyzer) {};
 
-			void unifyWith(PureType* unifyWithType);
+			void unifyWith(PureType<wake::QUALIFIED>* unifyWithType);
 
-			PureType* getCurrentUnification();
+			PureType<wake::QUALIFIED>* getCurrentUnification();
 
-			PureType* getUnificationFailure1();
+			PureType<wake::QUALIFIED>* getUnificationFailure1();
 
-			PureType* getUnificationFailure2();
+			PureType<wake::QUALIFIED>* getUnificationFailure2();
 
 		private:
-			std::auto_ptr<PureType> currentUnification;
-			std::auto_ptr<PureType> failedToUnify1;
-			std::auto_ptr<PureType> failedToUnify2;
+			std::auto_ptr<PureType<wake::QUALIFIED> > currentUnification;
+			std::auto_ptr<PureType<wake::QUALIFIED> > failedToUnify1;
+			std::auto_ptr<PureType<wake::QUALIFIED> > failedToUnify2;
 			TypeAnalyzer* analyzer;
 
 	};

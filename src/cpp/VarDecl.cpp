@@ -17,25 +17,29 @@
 #include <cstdlib>
 #include <string.h>
 
-VarDecl::~VarDecl() {
+template<wake::TypeQualification isQualified>
+VarDecl<isQualified>::~VarDecl() {
 	if(alias != NULL) {
 		free(alias);
 	}
 }
 
-VarDecl::VarDecl(const VarDecl& other) {
+template<wake::TypeQualification isQualified>
+VarDecl<isQualified>::VarDecl(const VarDecl<isQualified>& other) {
 	typedata = other.typedata;
 	alias = other.alias == NULL ? NULL : strdup(other.alias);
 	shadow = other.shadow;
 }
 
-VarDecl& VarDecl::operator=(const VarDecl& other) {
-	VarDecl temp(other);
+template<wake::TypeQualification isQualified>
+VarDecl<isQualified>& VarDecl<isQualified>::operator=(const VarDecl<isQualified>& other) {
+	VarDecl<isQualified> temp(other);
 	std::swap(*this, temp);
 	return *this;
 }
 
-VarRef VarDecl::createVarRef() {
+template<wake::TypeQualification isQualified>
+VarRef VarDecl<isQualified>::createVarRef() {
 	if(alias != NULL) {
 		return VarRef(strdup(alias));
 	} else {
@@ -47,8 +51,8 @@ VarRef VarDecl::createVarRef() {
 
 namespace std
 {
-	template<>
-	void swap(VarDecl& lhs, VarDecl& rhs)
+	template<wake::TypeQualification isQualified>
+	void swap(VarDecl<isQualified>& lhs, VarDecl<isQualified>& rhs)
 	{
 		std::swap(lhs.typedata, rhs.typedata);
 		std::swap(lhs.alias, rhs.alias);
@@ -56,12 +60,12 @@ namespace std
 	}
 }
 
-VarDecl* makeVarDecl(PureType* innerType) {
-	VarDecl* decl = new VarDecl();
+VarDecl<wake::UNQUALIFIED>* makeVarDecl(PureType<wake::UNQUALIFIED>* innerType) {
+	VarDecl<wake::UNQUALIFIED>* decl = new VarDecl<wake::UNQUALIFIED>();
 	decl->typedata = *innerType;
 	return decl;
 }
 
-VarDecl* copyVarDecl(VarDecl* toBeCopied) {
-	return new VarDecl(*toBeCopied);
+VarDecl<wake::UNQUALIFIED>* copyVarDecl(VarDecl<wake::UNQUALIFIED>* toBeCopied) {
+	return new VarDecl<wake::UNQUALIFIED>(*toBeCopied);
 }

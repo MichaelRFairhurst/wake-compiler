@@ -72,14 +72,14 @@ void ParseTreeTraverser::traverse(Node* tree) {
 
 				PropertySymbolTable* proptable = objectsymtable->findByImportedNameModifiable(tree->node_data.nodes[0]->node_data.pure_type->typedata._class.classname);
 
-				PureType* classtype = tree->node_data.nodes[0]->node_data.pure_type;
-				vector<PureType*>* parameters = new vector<PureType*>();
+				PureType<wake::UNQUALIFIED>* classtype = tree->node_data.nodes[0]->node_data.pure_type;
+				vector<PureType<wake::QUALIFIED>*>* parameters = new vector<PureType<wake::QUALIFIED>*>();
 
 				vector<string> usedGenericNames;
 				if(classtype->typedata._class.parameters != NULL)
 				for(int i = 0; i < classtype->typedata._class.parameters->typecount; i++)
 				if(std::find(usedGenericNames.begin(), usedGenericNames.end(), classtype->typedata._class.parameters->types[i]->typedata.parameterized.label) == usedGenericNames.end()) {
-					parameters->push_back(classtype->typedata._class.parameters->types[i]);
+					parameters->push_back(objectsymtable->setModulesOnType(classtype->typedata._class.parameters->types[i]));
 					usedGenericNames.push_back(classtype->typedata._class.parameters->types[i]->typedata.parameterized.label);
 				} else {
 					errors.addError(new SemanticError(GENERIC_TYPE_COLLISION, string("Generic type with label ") + classtype->typedata._class.parameters->types[i]->typedata.parameterized.label + " is declared more than once", tree));
@@ -127,7 +127,7 @@ void ParseTreeTraverser::secondPass(Node* tree) {
 					tree = tree->node_data.nodes[0];
 				}
 
-				PureType* classtype = tree->node_data.nodes[0]->node_data.pure_type;
+				PureType<wake::UNQUALIFIED>* classtype = tree->node_data.nodes[0]->node_data.pure_type;
 				string classname = classtype->typedata._class.classname;
 				errors.pushContext("In declaration of '" + string(tree->node_type == NT_CLASS ? "every" : "extern") + " " + classname + "'");
 
@@ -175,7 +175,7 @@ void ParseTreeTraverser::thirdPass(Node* tree) {
 		case NT_CLASS:
 		case NT_CLASS_EXTERN:
 			{
-				PureType* classtype = tree->node_data.nodes[0]->node_data.pure_type;
+				PureType<wake::UNQUALIFIED>* classtype = tree->node_data.nodes[0]->node_data.pure_type;
 				string classname = classtype->typedata._class.classname;
 				errors.pushContext("In declaration of '" + string(tree->node_type == NT_CLASS ? "every" : "extern") + " " + classname + "'");
 

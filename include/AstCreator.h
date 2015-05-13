@@ -31,7 +31,7 @@ namespace wake {
 	class AstCreator {
 
 		public:
-			AstCreator(ErrorTracker* errors, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, MethodSignatureParseTreeTraverser* methodanalyzer, PureType* returntype, PureType* thiscontext, vector<PureType*>& parameterizedtypes)
+			AstCreator(ErrorTracker* errors, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, MethodSignatureParseTreeTraverser* methodanalyzer, PureType<QUALIFIED>* returntype, PureType<QUALIFIED>* thiscontext, vector<PureType<QUALIFIED>*>& parameterizedtypes)
 				: errors(errors), classestable(classestable), scopesymtable(scopesymtable), methodanalyzer(methodanalyzer), returntype(returntype), thiscontext(thiscontext), parameterizedtypes(parameterizedtypes), lambdaReturnType(NULL) {};
 
 			ast::StatementNode* generateStatementAst(Node* node);
@@ -44,9 +44,9 @@ namespace wake {
 			ErrorTracker* errors;
 			ClassSpaceSymbolTable* classestable;
 			ScopeSymbolTable* scopesymtable;
-			PureType* returntype;
-			PureType* thiscontext;
-			vector<PureType*>& parameterizedtypes;
+			PureType<QUALIFIED>* returntype;
+			PureType<QUALIFIED>* thiscontext;
+			vector<PureType<QUALIFIED>*>& parameterizedtypes;
 			UnifyingType* lambdaReturnType;
 
 	};

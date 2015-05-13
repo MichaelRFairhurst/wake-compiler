@@ -43,8 +43,6 @@ class ClassParseTreeTraverser {
 		void typeCheckProperties(Node* tree);
 		void typeCheckMethods(Node* tree);
 		Node* getMethodBody(Node* methoddef);
-		PureType* getMethodReturn(Node* methoddef);
-		vector<pair<string, PureTypeArray*> >* getMethodName(Node* methoddef);
 
 		string classname;
 

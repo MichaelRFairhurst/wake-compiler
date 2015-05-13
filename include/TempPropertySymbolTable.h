@@ -32,14 +32,13 @@ using namespace std;
 class TempPropertySymbolTable : public ReadOnlyPropertySymbolTable {
 	public:
 		TempPropertySymbolTable(PropertySymbolTable& table) : table(table) {};
-		boost::optional<PureType*> find(string name);
+		boost::optional<PureType<wake::QUALIFIED>*> find(string name);
 		boost::optional<ObjectProperty*> findByCasing(string casing);
 		bool isPublic(string name);
 		string getAddress(string name);
 		int getFlags(string name);
-		string getProvisionSymbol(SpecializablePureType* provided, vector<PureType*> &arguments);
-		vector<SpecializableVarDecl*>* getNeeds();
-		string getSymbolNameOf(vector<pair<string, PureTypeArray*> >* segments_arguments);
+		vector<SpecializableVarDecl<wake::QUALIFIED>*>* getNeeds();
+		string getSymbolNameOf(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments);
 		bool isAbstract();
 		const map<string, bool>& getParentage();
 		~TempPropertySymbolTable() {};

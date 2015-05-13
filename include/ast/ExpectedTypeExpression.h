@@ -24,8 +24,8 @@ namespace wake {
 		class ExpectedTypeExpression : public ExpressionNode {
 
 			public:
-				virtual PureType* typeCheckExpecting(PureType* hint)=0;
-				virtual PureType* typeCheck(bool forceArrayIdentifier)=0;
+				virtual PureType<wake::QUALIFIED>* typeCheckExpecting(PureType<wake::QUALIFIED>* hint)=0;
+				virtual PureType<wake::QUALIFIED>* typeCheck(bool forceArrayIdentifier)=0;
 				virtual ~ExpectedTypeExpression(){};
 
 		};

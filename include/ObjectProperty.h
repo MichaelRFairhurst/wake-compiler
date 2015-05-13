@@ -26,7 +26,7 @@ struct ObjectProperty {
 	string address;
 	string casing;
 	int flags;
-	VarDecl decl;
+	VarDecl<wake::QUALIFIED> decl;
 	boost::ptr_vector<Annotation> annotations;
 };
 

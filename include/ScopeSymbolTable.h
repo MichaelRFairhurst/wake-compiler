@@ -33,12 +33,12 @@ class ScopeSymbolTable {
 			scopes.push_back(vector<string>());
 		}
 
-		void add(string name, PureType* type);
-		void add(VarDecl* type);
-		void addOverwriting(string name, PureType* type);
-		void addOverwriting(VarDecl* type);
-		boost::optional<PureType*> find(string name);
-		boost::optional<PureType*> find(VarRef* type);
+		void add(string name, PureType<wake::QUALIFIED>* type);
+		void add(VarDecl<wake::QUALIFIED>* type);
+		void addOverwriting(string name, PureType<wake::QUALIFIED>* type);
+		void addOverwriting(VarDecl<wake::QUALIFIED>* type);
+		boost::optional<PureType<wake::QUALIFIED>*> find(string name);
+		boost::optional<PureType<wake::QUALIFIED>*> find(VarRef* type);
 		string getAddress(VarRef* type);
 		string getAddress(string name);
 		void pushScope();
@@ -46,7 +46,7 @@ class ScopeSymbolTable {
 
 	private:
 		AddressAllocator allocator;
-		map<string, pair<PureType*, string> > table;
+		map<string, pair<PureType<wake::QUALIFIED>*, string> > table;
 		vector<vector<string> > scopes;
 };
 

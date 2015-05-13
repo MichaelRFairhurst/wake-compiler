@@ -15,62 +15,62 @@
 #include "ScopeSymbolTable.h"
 #include "SemanticError.h"
 
-void ScopeSymbolTable::add(string name, PureType* type) {
+void ScopeSymbolTable::add(string name, PureType<wake::QUALIFIED>* type) {
 	if(table.count(name)) {
 		string temp = "Symbol " + name + " already defined in this scope.";
 		throw new SemanticError(SYMBOL_ALREADY_DEFINED, temp);
 	}
 
-	table[name] = pair<PureType*, string>(type, allocator.allocate());
+	table[name] = pair<PureType<wake::QUALIFIED>*, string>(type, allocator.allocate());
 	scopes.back().push_back(name);
 }
 
-void ScopeSymbolTable::add(VarDecl* type) {
+void ScopeSymbolTable::add(VarDecl<wake::QUALIFIED>* type) {
 	VarRef ref(type->createVarRef());
 	add(ref.toString(), &type->typedata);
 }
 
-void ScopeSymbolTable::addOverwriting(string name, PureType* type) {
-	table[name] = pair<PureType*, string>(type, allocator.allocate());
+void ScopeSymbolTable::addOverwriting(string name, PureType<wake::QUALIFIED>* type) {
+	table[name] = pair<PureType<wake::QUALIFIED>*, string>(type, allocator.allocate());
 	//scopes.back().push_back(name);
 }
 
-void ScopeSymbolTable::addOverwriting(VarDecl* type) {
+void ScopeSymbolTable::addOverwriting(VarDecl<wake::QUALIFIED>* type) {
 	VarRef ref(type->createVarRef());
 	addOverwriting(ref.toString(), &type->typedata);
 }
 
-boost::optional<PureType*> ScopeSymbolTable::find(string name) {
+boost::optional<PureType<wake::QUALIFIED>*> ScopeSymbolTable::find(string name) {
 	if(!table.count(name)) {
 		string temp = "Symbol " + name + " not defined in this scope.";
 		//throw new SemanticError(SYMBOL_NOT_DEFINED, temp);
-		return boost::optional<PureType*>();
+		return boost::optional<PureType<wake::QUALIFIED>*>();
 	}
 
-	map<string, pair<PureType*, string> >::iterator it = table.find(name);
-	return boost::optional<PureType*>(it->second.first);
+	map<string, pair<PureType<wake::QUALIFIED>*, string> >::iterator it = table.find(name);
+	return boost::optional<PureType<wake::QUALIFIED>*>(it->second.first);
 }
 
-boost::optional<PureType*> ScopeSymbolTable::find(VarRef* type) {
+boost::optional<PureType<wake::QUALIFIED>*> ScopeSymbolTable::find(VarRef* type) {
 	string name = type->toString();
 	if(!table.count(name)) {
 		string temp = "Symbol " + name + " not defined in this scope.";
-		return boost::optional<PureType*>();
+		return boost::optional<PureType<wake::QUALIFIED>*>();
 		throw new SemanticError(SYMBOL_NOT_DEFINED, temp);
 	}
 
-	map<string, pair<PureType*, string> >::iterator it = table.find(name);
-	return boost::optional<PureType*>(it->second.first);
+	map<string, pair<PureType<wake::QUALIFIED>*, string> >::iterator it = table.find(name);
+	return boost::optional<PureType<wake::QUALIFIED>*>(it->second.first);
 }
 
 string ScopeSymbolTable::getAddress(VarRef* type) {
 	string name = type->toString();
-	map<string, pair<PureType*, string> >::iterator it = table.find(name);
+	map<string, pair<PureType<wake::QUALIFIED>*, string> >::iterator it = table.find(name);
 	return it->second.second;
 }
 
 string ScopeSymbolTable::getAddress(string name) {
-	map<string, pair<PureType*, string> >::iterator it = table.find(name);
+	map<string, pair<PureType<wake::QUALIFIED>*, string> >::iterator it = table.find(name);
 	return it->second.second;
 }
 

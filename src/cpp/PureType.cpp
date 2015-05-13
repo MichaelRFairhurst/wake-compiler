@@ -21,11 +21,13 @@
 #include <string>
 #include <stdexcept>
 
-PureType::~PureType() {
+template<wake::TypeQualification isQualified>
+PureType<isQualified>::~PureType() {
 	releaseData();
 }
 
-void PureType::releaseData() {
+template<wake::TypeQualification isQualified>
+void PureType<isQualified>::releaseData() {
 	if(type == TYPE_LAMBDA) {
 		delete typedata.lambda.arguments;
 		delete typedata.lambda.returntype;
@@ -43,7 +45,8 @@ void PureType::releaseData() {
 	}
 }
 
-PureType::PureType(int type) {
+template<wake::TypeQualification isQualified>
+PureType<isQualified>::PureType(int type) {
 	this->type = type;
 	switch(type) {
 		case TYPE_CLASS:
@@ -69,7 +72,8 @@ PureType::PureType(int type) {
 	}
 }
 
-ClassVarRef PureType::createClassVarRef() {
+template<wake::TypeQualification isQualified>
+ClassVarRef PureType<isQualified>::createClassVarRef() {
 	switch(type) {
 		case TYPE_CLASS:
 			{
@@ -100,12 +104,13 @@ ClassVarRef PureType::createClassVarRef() {
 	}
 }
 
-std::vector<PureType*> PureType::getClassParametersAsVector() {
+template<wake::TypeQualification isQualified>
+std::vector<PureType<isQualified>*> PureType<isQualified>::getClassParametersAsVector() {
 	if(type != TYPE_CLASS) {
 		throw std::runtime_error(std::string("Only class types, parameterized types, and lists/optionals around those types can be class references. All others require an alias"));
 	}
 
-	std::vector<PureType*> parameters;
+	std::vector<PureType<isQualified>*> parameters;
 	if(typedata._class.parameters != NULL) {
 		for (int i = 0; i < typedata._class.parameters->typecount; i++) {
 			parameters.push_back(typedata._class.parameters->types[i]);
@@ -115,11 +120,13 @@ std::vector<PureType*> PureType::getClassParametersAsVector() {
 	return parameters;
 }
 
-PureType::PureType(const PureType& other) {
+template<wake::TypeQualification isQualified>
+PureType<isQualified>::PureType(const PureType<isQualified>& other) {
 	deepCopy(other);
 }
 
-void PureType::deepCopy(const PureType& other) {
+template<wake::TypeQualification isQualified>
+void PureType<isQualified>::deepCopy(const PureType<isQualified>& other) {
 	type = other.type;
 	switch(type) {
 		case TYPE_CLASS:
@@ -130,19 +137,19 @@ void PureType::deepCopy(const PureType& other) {
 				typedata._class.modulename = NULL;
 			}
 			if(other.typedata._class.parameters != NULL) {
-				typedata._class.parameters = new PureTypeArray(*other.typedata._class.parameters);
+				typedata._class.parameters = new PureTypeArray<isQualified>(*other.typedata._class.parameters);
 			} else {
 				typedata._class.parameters = NULL;
 			}
 			break;
 		case TYPE_LAMBDA:
 			if(other.typedata.lambda.returntype != NULL) {
-				typedata.lambda.returntype = new PureType(*other.typedata.lambda.returntype);
+				typedata.lambda.returntype = new PureType<isQualified>(*other.typedata.lambda.returntype);
 			} else {
 				typedata.lambda.returntype = NULL;
 			}
 			if(other.typedata.lambda.arguments != NULL) {
-				typedata.lambda.arguments = new PureTypeArray(*other.typedata.lambda.arguments);
+				typedata.lambda.arguments = new PureTypeArray<isQualified>(*other.typedata.lambda.arguments);
 			} else {
 				typedata.lambda.arguments = NULL;
 			}
@@ -150,12 +157,12 @@ void PureType::deepCopy(const PureType& other) {
 		case TYPE_PARAMETERIZED:
 		case TYPE_PARAMETERIZED_ARG:
 			if(other.typedata.parameterized.upperbound != NULL) {
-				typedata.parameterized.upperbound = new PureType(*other.typedata.parameterized.upperbound);
+				typedata.parameterized.upperbound = new PureType<isQualified>(*other.typedata.parameterized.upperbound);
 			} else {
 				typedata.parameterized.upperbound = NULL;
 			}
 			if(other.typedata.parameterized.lowerbound != NULL) {
-				typedata.parameterized.lowerbound = new PureType(*other.typedata.parameterized.lowerbound);
+				typedata.parameterized.lowerbound = new PureType<isQualified>(*other.typedata.parameterized.lowerbound);
 			} else {
 				typedata.parameterized.lowerbound = NULL;
 			}
@@ -163,14 +170,14 @@ void PureType::deepCopy(const PureType& other) {
 			break;
 		case TYPE_LIST:
 			if(other.typedata.list.contained != NULL) {
-				typedata.list.contained = new PureType(*other.typedata.list.contained);
+				typedata.list.contained = new PureType<isQualified>(*other.typedata.list.contained);
 			} else {
 				typedata.list.contained = NULL;
 			}
 			break;
 		case TYPE_OPTIONAL:
 			if(other.typedata.optional.contained != NULL) {
-				typedata.optional.contained = new PureType(*other.typedata.optional.contained);
+				typedata.optional.contained = new PureType<isQualified>(*other.typedata.optional.contained);
 			} else {
 				typedata.optional.contained = NULL;
 			}
@@ -178,12 +185,14 @@ void PureType::deepCopy(const PureType& other) {
 	}
 }
 
-PureType& PureType::operator=(const PureType& other) {
+template<wake::TypeQualification isQualified>
+PureType<isQualified>& PureType<isQualified>::operator=(const PureType<isQualified>& other) {
 	releaseData();
 	deepCopy(other);
 }
 
-std::string PureType::toString() {
+template<wake::TypeQualification isQualified>
+std::string PureType<isQualified>::toString() {
 	std::string name;
 
 	if(type == TYPE_UNUSABLE) {
@@ -236,8 +245,8 @@ std::string PureType::toString() {
 	return name;
 }
 
-
-std::string PureType::getFQClassname() {
+template<wake::TypeQualification isQualified>
+std::string PureType<isQualified>::getFQClassname() {
 	if(type != TYPE_CLASS) {
 		return "";
 	}
@@ -252,35 +261,35 @@ std::string PureType::getFQClassname() {
 	return fqname;
 }
 
-PureType* makePureType(int type) {
-	return new PureType(type);
+PureType<wake::UNQUALIFIED>* makePureType(int type) {
+	return new PureType<wake::UNQUALIFIED>(type);
 }
 
-PureType* makeTypeFromClassVarRef(ClassVarRef* ref) {
+PureType<wake::UNQUALIFIED>* makeTypeFromClassVarRef(ClassVarRef* ref) {
 	if(ref->arrayed) {
-		PureType* outer = new PureType(TYPE_LIST);
+		PureType<wake::UNQUALIFIED>* outer = new PureType<wake::UNQUALIFIED>(TYPE_LIST);
 		ref->arrayed--;
 		outer->typedata.list.contained = makeTypeFromClassVarRef(ref);
 		ref->arrayed++;
 		return outer;
 	}
 
-	PureType* type = new PureType(TYPE_CLASS);
+	PureType<wake::UNQUALIFIED>* type = new PureType<wake::UNQUALIFIED>(TYPE_CLASS);
 	type->typedata._class.classname = strdup(ref->classname);
 	return type;
 }
 
-void freePureType(PureType* t) {
+void freePureType(PureType<wake::UNQUALIFIED>* t) {
 	delete t;
 }
 
-PureType* copyPureType(PureType* t) {
-	return new PureType(*t);
+PureType<wake::UNQUALIFIED>* copyPureType(PureType<wake::UNQUALIFIED>* t) {
+	return new PureType<wake::UNQUALIFIED>(*t);
 }
 
 namespace std {
-	template<>
-	void swap(PureType& lhs, PureType& rhs) {
+	template<wake::TypeQualification isQualified>
+	void swap(PureType<isQualified>& lhs, PureType<isQualified>& rhs) {
 		void* ptr1;
 		void* ptr2;
 		void* ptr3;
@@ -320,20 +329,20 @@ namespace std {
 		}
 
 		if(rhs.type == TYPE_LAMBDA) {
-			lhs.typedata.lambda.arguments = (PureTypeArray*) ptr1;
-			lhs.typedata.lambda.returntype = (PureType*) ptr2;
+			lhs.typedata.lambda.arguments = (PureTypeArray<isQualified>*) ptr1;
+			lhs.typedata.lambda.returntype = (PureType<isQualified>*) ptr2;
 		} else if(rhs.type == TYPE_CLASS) {
 			lhs.typedata._class.classname = (char*) ptr1;
 			lhs.typedata._class.modulename = (char*) ptr2;
-			lhs.typedata._class.parameters = (PureTypeArray*) ptr3;
+			lhs.typedata._class.parameters = (PureTypeArray<isQualified>*) ptr3;
 		} else if(rhs.type == TYPE_PARAMETERIZED || rhs.type == TYPE_PARAMETERIZED_ARG) {
 			lhs.typedata.parameterized.label = (char*) ptr1;
-			lhs.typedata.parameterized.upperbound = (PureType*) ptr2;
-			lhs.typedata.parameterized.lowerbound = (PureType*) ptr3;
+			lhs.typedata.parameterized.upperbound = (PureType<isQualified>*) ptr2;
+			lhs.typedata.parameterized.lowerbound = (PureType<isQualified>*) ptr3;
 		} else if(rhs.type == TYPE_LIST) {
-			lhs.typedata.list.contained = (PureType*) ptr1;
+			lhs.typedata.list.contained = (PureType<isQualified>*) ptr1;
 		} else if(rhs.type == TYPE_OPTIONAL) {
-			lhs.typedata.optional.contained = (PureType*) ptr1;
+			lhs.typedata.optional.contained = (PureType<isQualified>*) ptr1;
 		}
 
 		std::swap(lhs.type, rhs.type);

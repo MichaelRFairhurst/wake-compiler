@@ -26,8 +26,8 @@ class ClassSpaceSymbolTable;
 class EntryPointAnalyzer {
 
 	public:
-		bool checkClassNeedsCanBeMain(vector<SpecializableVarDecl*>* needs);
-		bool checkFQClassMethodCanBeMain(string methodname, PureType* method);
+		bool checkClassNeedsCanBeMain(vector<SpecializableVarDecl<wake::QUALIFIED>*>* needs);
+		bool checkFQClassMethodCanBeMain(string methodname, PureType<wake::QUALIFIED>* method);
 		bool checkFQClassMethodCanBeMain(string classname, string methodname, ClassSpaceSymbolTable* table);
 		bool printClass(string classname);
 		bool printMethod(string methodname);

@@ -25,14 +25,19 @@
 class TypeParameterizer {
 
 	public:
-		void rewriteClasstypesToParameterizedtypeByLabel(PureType* pType, const std::vector<PureType*>& parameters);
-		void rewriteClasstypesToParameterizedtypeByLabel(PureTypeArray* types, const std::vector<PureType*>& parameters);
+		// these work on qualified or unqualified types
+		template<wake::TypeQualification isQualified>
+		void rewriteClasstypesToParameterizedtypeByLabel(PureType<isQualified>* pType, const std::vector<PureType<isQualified>*>& parameters);
+		template<wake::TypeQualification isQualified>
+		void rewriteClasstypesToParameterizedtypeByLabel(PureTypeArray<isQualified>* types, const std::vector<PureType<isQualified>*>& parameters);
 
-		void applyParameterizations(PureType* pType, const std::vector<PureType*>& parameters, const std::vector<PureType*>& parameterizations);
-		void applyParameterizations(PureTypeArray* types, const std::vector<PureType*>& parameters, const std::vector<PureType*>& parameterizations);
+		// these should really only be done after qualification has completed
+		void applyParameterizations(PureType<wake::QUALIFIED>* pType, const std::vector<PureType<wake::QUALIFIED>*>& parameters, const std::vector<PureType<wake::QUALIFIED>*>& parameterizations);
+		void applyParameterizations(PureTypeArray<wake::QUALIFIED>* types, const std::vector<PureType<wake::QUALIFIED>*>& parameters, const std::vector<PureType<wake::QUALIFIED>*>& parameterizations);
 
-		bool captureArgumentParameterizations(PureType* actual, PureType* argument, std::map<std::string, PureType*>& parameters, TypeAnalyzer* analyzer);
-		bool captureArgumentParameterizations(PureTypeArray* actual, PureTypeArray* argument, std::map<std::string, PureType*>& parameters, TypeAnalyzer* analyzer);
+		// this one definitely should only be done after qualification has completed
+		bool captureArgumentParameterizations(PureType<wake::QUALIFIED>* actual, PureType<wake::QUALIFIED>* argument, std::map<std::string, PureType<wake::QUALIFIED>*>& parameters, TypeAnalyzer* analyzer);
+		bool captureArgumentParameterizations(PureTypeArray<wake::QUALIFIED>* actual, PureTypeArray<wake::QUALIFIED>* argument, std::map<std::string, PureType<wake::QUALIFIED>*>& parameters, TypeAnalyzer* analyzer);
 
 };
 

@@ -17,26 +17,30 @@
 #include <cstdlib>
 #include <string.h>
 
-SpecializablePureType::~SpecializablePureType() {
+template<wake::TypeQualification isQualified>
+SpecializablePureType<isQualified>::~SpecializablePureType() {
 	free(specialty);
 }
 
-SpecializablePureType::SpecializablePureType(SpecializablePureType& other) {
+template<wake::TypeQualification isQualified>
+SpecializablePureType<isQualified>::SpecializablePureType(SpecializablePureType<isQualified>& other) {
 	typedata = other.typedata;
 	specialty = other.specialty == NULL ? NULL : strdup(other.specialty);
 }
 
-SpecializablePureType& SpecializablePureType::operator=(SpecializablePureType& other) {
-	SpecializablePureType temp(other);
+template<wake::TypeQualification isQualified>
+SpecializablePureType<isQualified>& SpecializablePureType<isQualified>::operator=(SpecializablePureType<isQualified>& other) {
+	SpecializablePureType<isQualified> temp(other);
 	std::swap(*this, other);
 	return *this;
 }
 
-std::string SpecializablePureType::toProvisionSymbol(std::vector<PureType*> &arguments) {
+template<wake::TypeQualification isQualified>
+std::string SpecializablePureType<isQualified>::toProvisionSymbol(std::vector<PureType<wake::QUALIFIED>*> &arguments) {
 	std::string name = typedata.toString();
 	if(arguments.size()) {
 		name += "(";
-		for(std::vector<PureType*>::iterator it = arguments.begin(); it != arguments.end(); ++it) {
+		for(std::vector<PureType<wake::QUALIFIED>*>::iterator it = arguments.begin(); it != arguments.end(); ++it) {
 			if(it != arguments.begin()) name += ",";
 			name += (*it)->toString();
 		}
@@ -49,16 +53,16 @@ std::string SpecializablePureType::toProvisionSymbol(std::vector<PureType*> &arg
 
 namespace std
 {
-	template<>
-	void swap(SpecializablePureType& lhs, SpecializablePureType& rhs)
+	template<wake::TypeQualification isQualified>
+	void swap(SpecializablePureType<isQualified>& lhs, SpecializablePureType<isQualified>& rhs)
 	{
 		std::swap(lhs.typedata, rhs.typedata);
 		std::swap(lhs.specialty, rhs.specialty);
 	}
 }
 
-SpecializablePureType* makeSpecializablePureType(PureType* inner) {
-	SpecializablePureType* type = new SpecializablePureType();
+SpecializablePureType<wake::QUALIFIED>* makeSpecializablePureType(PureType<wake::QUALIFIED>* inner) {
+	SpecializablePureType<wake::QUALIFIED>* type = new SpecializablePureType<wake::QUALIFIED>();
 	type->typedata = *inner;
 	return type;
 }

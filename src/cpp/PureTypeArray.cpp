@@ -18,43 +18,55 @@
 #include <cstdlib>
 #include <string.h>
 
-PureTypeArray::PureTypeArray() {
+template<wake::TypeQualification isQualified>
+PureTypeArray<isQualified>::PureTypeArray() {
 	typecount = 0;
 	types = NULL;
 }
 
-PureTypeArray::PureTypeArray(const PureTypeArray& other) {
+template<wake::TypeQualification isQualified>
+PureTypeArray<isQualified>::PureTypeArray(const PureTypeArray<isQualified>& other) {
 	typecount = 0;
 	types = NULL;
 	for(int i = 0; i < other.typecount; i++) {
-		addPureTypeToPureTypeArray(new PureType(*other.types[i]), this);
+		// Remember: this template is purely for the typesystem, we can cast without borking mem safety
+		addPureTypeToPureTypeArray(
+			new PureType<wake::UNQUALIFIED>((PureType<wake::UNQUALIFIED>) *other.types[i]),
+			(PureTypeArray<wake::UNQUALIFIED>*) this
+		);
 	}
 	typecount = other.typecount;
 }
 
-PureTypeArray& PureTypeArray::operator=(const PureTypeArray& other) {
+template<wake::TypeQualification isQualified>
+PureTypeArray<isQualified>& PureTypeArray<isQualified>::operator=(const PureTypeArray& other) {
 	for(int i = 0; i < other.typecount; i++) {
-		addPureTypeToPureTypeArray(new PureType(*other.types[i]), this);
+		// Remember: this template is purely for the typesystem, we can cast without borking mem safety
+		addPureTypeToPureTypeArray(
+			new PureType<wake::UNQUALIFIED>((PureType<wake::UNQUALIFIED>) *other.types[i]),
+			(PureTypeArray<wake::UNQUALIFIED>*) this
+		);
 	}
 	typecount = other.typecount;
 	return *this;
 }
 
-PureTypeArray::~PureTypeArray() {
+template<wake::TypeQualification isQualified>
+PureTypeArray<isQualified>::~PureTypeArray() {
 	for(int i = 0; i < typecount; i++) {
 		delete types[i];
 	}
 	free(types);
 }
 
-PureTypeArray* makePureTypeArray() {
-	return new PureTypeArray();
+PureTypeArray<wake::UNQUALIFIED>* makePureTypeArray() {
+	return new PureTypeArray<wake::UNQUALIFIED>();
 }
 
-void freePureTypeArray(PureTypeArray* ta) {
+void freePureTypeArray(PureTypeArray<wake::UNQUALIFIED>* ta) {
 	delete ta;
 }
 
-PureTypeArray* copyPureTypeArray(PureTypeArray* ta) {
-	return new PureTypeArray(*ta);
+PureTypeArray<wake::UNQUALIFIED>* copyPureTypeArray(PureTypeArray<wake::UNQUALIFIED>* ta) {
+	return new PureTypeArray<wake::UNQUALIFIED>(*ta);
 }

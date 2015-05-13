@@ -17,43 +17,46 @@
 #include <cstdlib>
 #include <string.h>
 
-SpecializableVarDecl::~SpecializableVarDecl() {
+template<wake::TypeQualification isQualified>
+SpecializableVarDecl<isQualified>::~SpecializableVarDecl() {
 	free(specialty);
 }
 
-SpecializableVarDecl::SpecializableVarDecl(SpecializableVarDecl& other) {
+template<wake::TypeQualification isQualified>
+SpecializableVarDecl<isQualified>::SpecializableVarDecl(SpecializableVarDecl<isQualified>& other) {
 	decl = other.decl;
 	specialty = other.specialty == NULL ? NULL : strdup(other.specialty);
 }
 
-SpecializableVarDecl& SpecializableVarDecl::operator=(SpecializableVarDecl& other) {
-	SpecializableVarDecl temp(other);
+template<wake::TypeQualification isQualified>
+SpecializableVarDecl<isQualified>& SpecializableVarDecl<isQualified>::operator=(SpecializableVarDecl<isQualified>& other) {
+	SpecializableVarDecl<isQualified> temp(other);
 	std::swap(*this, other);
 	return *this;
 }
 
 namespace std
 {
-	template<>
-	void swap(SpecializableVarDecl& lhs, SpecializableVarDecl& rhs)
+	template<wake::TypeQualification isQualified>
+	void swap(SpecializableVarDecl<isQualified>& lhs, SpecializableVarDecl<isQualified>& rhs)
 	{
 		std::swap(lhs.decl, rhs.decl);
 		std::swap(lhs.specialty, rhs.specialty);
 	}
 }
 
-SpecializableVarDecl* makeSpecializableVarDecl(PureType* type) {
-	SpecializableVarDecl* spDecl = new SpecializableVarDecl();
+SpecializableVarDecl<wake::UNQUALIFIED>* makeSpecializableVarDecl(PureType<wake::UNQUALIFIED>* type) {
+	SpecializableVarDecl<wake::UNQUALIFIED>* spDecl = new SpecializableVarDecl<wake::UNQUALIFIED>();
 	spDecl->decl.typedata = *type;
 	return spDecl;
 }
 
-SpecializableVarDecl* makeSpecializableVarDeclFromVarDecl(VarDecl* decl) {
-	SpecializableVarDecl* spDecl = new SpecializableVarDecl();
+SpecializableVarDecl<wake::UNQUALIFIED>* makeSpecializableVarDeclFromVarDecl(VarDecl<wake::UNQUALIFIED>* decl) {
+	SpecializableVarDecl<wake::UNQUALIFIED>* spDecl = new SpecializableVarDecl<wake::UNQUALIFIED>();
 	spDecl->decl = *decl;
 	return spDecl;
 }
 
-SpecializableVarDecl* copySpecializableVarDecl(SpecializableVarDecl* decl) {
-	return new SpecializableVarDecl(*decl);
+SpecializableVarDecl<wake::UNQUALIFIED>* copySpecializableVarDecl(SpecializableVarDecl<wake::UNQUALIFIED>* decl) {
+	return new SpecializableVarDecl<wake::UNQUALIFIED>(*decl);
 }

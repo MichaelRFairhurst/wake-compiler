@@ -25,37 +25,50 @@
 #define TYPE_OPTIONAL 8
 
 #ifdef __cplusplus
+#include "TypeQualification.h"
 #include <string>
 #include <vector>
-#endif
 
+template<wake::TypeQualification isQualified>
+#endif
 struct PureTypeArray;
 struct ClassVarRef;
 
 typedef struct ClassVarRef ClassVarRef; // C necessity...
 
-typedef struct PureType {
+// Make PureType<IsQualified> so we have compiletime safety
+// in mixing up unqualified vs fully qualified types
+
+#ifdef __cplusplus
+#define TEMPL_RECURSE <isQualified>
+#define TEMPL_UNQUALIFIED <wake::UNQUALIFIED>
+template<wake::TypeQualification isQualified = wake::UNQUALIFIED>
+#else
+#define TEMPL_RECURSE
+typedef
+#endif
+struct PureType {
 	int type;							// 1 lambda 2 class
 	union {
 		struct {
-			struct PureTypeArray* arguments;// the args nbd
-			struct PureType* returntype;	// returns an X
+			struct PureTypeArray TEMPL_RECURSE* arguments;// the args nbd
+			struct PureType TEMPL_RECURSE* returntype;	// returns an X
 		} lambda;
 		struct {
 			char* classname;			// Bongo
 			char* modulename;			// com.bongo
-			struct PureTypeArray* parameters; // For tracking declarations with parameters
+			struct PureTypeArray TEMPL_RECURSE* parameters; // For tracking declarations with parameters
 		} _class;
 		struct {
 			char* label;				// T
-			struct PureType* upperbound;	// Container{T from List}
-			struct PureType* lowerbound;	// Container{T to List}
+			struct PureType TEMPL_RECURSE* upperbound;	// Container{T from List}
+			struct PureType TEMPL_RECURSE* lowerbound;	// Container{T to List}
 		} parameterized;
 		struct {
-			struct PureType* contained;
+			struct PureType TEMPL_RECURSE* contained;
 		} list;
 		struct {
-			struct PureType* contained;
+			struct PureType TEMPL_RECURSE* contained;
 		} optional;
 	} typedata;
 
@@ -64,28 +77,31 @@ typedef struct PureType {
 		~PureType();
 		PureType() : type(TYPE_MATCHALL) {};
 		PureType(int type);
-		PureType(const PureType& other);
-		PureType& operator=(const PureType& other);
+		PureType(const PureType<isQualified>& other);
+		PureType& operator=(const PureType<isQualified>& other);
 
 		ClassVarRef createClassVarRef();
 		std::string getFQClassname();
 		std::string toString();
-		std::vector<PureType*> getClassParametersAsVector();
+		std::vector<PureType<isQualified>*> getClassParametersAsVector();
 
 	private:
 		void releaseData();
-		void deepCopy(const PureType& other);
+		void deepCopy(const PureType<isQualified>& other);
 #endif
-} PureType;
+}
+#ifndef __cplusplus
+PureType;
+#else
+;
 
-#ifdef __cplusplus
 extern "C" {
 #endif
 
-PureType* makePureType(int type);
-PureType* copyPureType(PureType* type);
-PureType* makeTypeFromClassVarRef(ClassVarRef* ref);
-void freePureType(PureType* t);
+PureType TEMPL_UNQUALIFIED* makePureType(int type);
+PureType TEMPL_UNQUALIFIED* copyPureType(PureType TEMPL_UNQUALIFIED* type);
+PureType TEMPL_UNQUALIFIED* makeTypeFromClassVarRef(ClassVarRef* ref);
+void freePureType(PureType TEMPL_UNQUALIFIED* t);
 
 #ifdef __cplusplus
 }
@@ -94,8 +110,8 @@ void freePureType(PureType* t);
 
 namespace std
 {
-	template<>
-	void swap(PureType& lhs, PureType& rhs);
+	template<wake::TypeQualification isQualified>
+	void swap(PureType<isQualified>& lhs, PureType<isQualified>& rhs);
 
 }
 

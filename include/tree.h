@@ -29,7 +29,18 @@
 extern "C" {
 #endif
 
+// SUPER HACK
+#define PureType PureType<wake::UNQUALIFIED>
+#define PureTypeArray PureTypeArray<wake::UNQUALIFIED>
+#define VarDecl VarDecl<wake::UNQUALIFIED>
+#define SpecializableVarDecl SpecializableVarDecl<wake::UNQUALIFIED>
+#define SpecializablePureType SpecializablePureType<wake::UNQUALIFIED>
 #include "wake.tab.h"
+#undef PureType
+#undef PureTypeArray
+#undef VarDecl
+#undef SpecializableVarDecl
+#undef SpecializablePureType
 
 #ifdef __cplusplus
 }
@@ -188,19 +199,19 @@ void prependSubNode(Node* parent, Node* child);
 
 Node* makeEmptyNode(int nodetype, YYLTYPE loc);
 
-Node* makeNodeFromPureType(PureType* thetype, YYLTYPE loc);
+Node* makeNodeFromPureType(PureType TEMPL_UNQUALIFIED* thetype, YYLTYPE loc);
 
-Node* makeNodeFromVarDecl(VarDecl* decl, YYLTYPE loc);
+Node* makeNodeFromVarDecl(VarDecl TEMPL_UNQUALIFIED* decl, YYLTYPE loc);
 
 Node* makeNodeFromClassVarRef(ClassVarRef* ref, YYLTYPE loc);
 
 Node* makeNodeFromAlias(char* alias, YYLTYPE loc);
 
-Node* makeNodeFromSpecializableVarDecl(SpecializableVarDecl* decl, YYLTYPE loc);
+Node* makeNodeFromSpecializableVarDecl(SpecializableVarDecl TEMPL_UNQUALIFIED* decl, YYLTYPE loc);
 
-Node* makeNodeFromPureTypeArray(PureTypeArray* thearray, YYLTYPE loc);
+Node* makeNodeFromPureTypeArray(PureTypeArray TEMPL_UNQUALIFIED* thearray, YYLTYPE loc);
 
-Node* makeNodeFromSpecializablePureType(SpecializablePureType* thetype, YYLTYPE loc);
+Node* makeNodeFromSpecializablePureType(SpecializablePureType TEMPL_UNQUALIFIED* thetype, YYLTYPE loc);
 
 Node* makeNodeFromString(int nodetype, char* mystring, YYLTYPE loc);
 

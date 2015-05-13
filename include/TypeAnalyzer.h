@@ -32,26 +32,26 @@ class TypeAnalyzer {
 	public:
 		ClassSpaceSymbolTable* reference;
 		bool isASubtypeOfB(string a, string b);
-		bool isASubtypeOfB(PureType* a, PureType* b);
-		bool isAExactlyB(PureType* a, PureType* b);
-		void assertFQClassCanProvide(string provider, SpecializablePureType* binding);
+		bool isASubtypeOfB(PureType<wake::QUALIFIED>* a, PureType<wake::QUALIFIED>* b);
+		bool isAExactlyB(PureType<wake::QUALIFIED>* a, PureType<wake::QUALIFIED>* b);
+		void assertFQClassCanProvide(string provider, SpecializablePureType<wake::QUALIFIED>* binding);
 		void assertFQClassCanBeProvided(string fullyqualifiedclassname);
 		void assertFQNeedIsNotCircular(string classname, string otherclassname);
-		boost::optional<PureType*> getCommonSubtypeOf(PureType* a, PureType* b);
-		bool isPrimitiveTypeNum(PureType* theint);
-		bool isPrimitiveTypeText(PureType* theint);
-		bool isPrimitiveTypeBool(PureType* theint);
-		bool isAutoboxedType(PureType* type, PureType** boxedtype);
-		bool isException(PureType* type);
-		bool hasArgParameterization(PureType* type);
-		bool hasArgParameterization(PureTypeArray* typearray);
+		boost::optional<PureType<wake::QUALIFIED>*> getCommonSubtypeOf(PureType<wake::QUALIFIED>* a, PureType<wake::QUALIFIED>* b);
+		bool isPrimitiveTypeNum(PureType<wake::QUALIFIED>* theint);
+		bool isPrimitiveTypeText(PureType<wake::QUALIFIED>* theint);
+		bool isPrimitiveTypeBool(PureType<wake::QUALIFIED>* theint);
+		bool isAutoboxedType(PureType<wake::QUALIFIED>* type, PureType<wake::QUALIFIED>** boxedtype);
+		bool isException(PureType<wake::QUALIFIED>* type);
+		bool hasArgParameterization(PureType<wake::QUALIFIED>* type);
+		bool hasArgParameterization(PureTypeArray<wake::QUALIFIED>* typearray);
 
 		/**
 		 * Text[][] -- 2
 		 * Text[]?[] -- 2
 		 * Text?[] -- 1
 		 */
-		int getArrayReferenceLevel(PureType& type);
+		int getArrayReferenceLevel(PureType<wake::QUALIFIED>& type);
 
 	private:
 		boost::optional<pair<int, string> > getCommonFQClassnamesWithDepth(string a, string b, int depth);
