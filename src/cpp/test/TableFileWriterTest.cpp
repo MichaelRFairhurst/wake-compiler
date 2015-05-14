@@ -19,6 +19,8 @@
 #include <boost/lexical_cast.hpp>
 #include "TableFileDataSets.h"
 
+using namespace wake;
+
 #define ASSERT_CHAR(v) \
 	BOOST_CHECK_MESSAGE(dataptr[i] == v, \
 	string("Expected ") \
@@ -76,13 +78,13 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 	TypeAnalyzer tanalyzer;
 	PropertySymbolTable table(&tanalyzer, "test");
 
-	vector<pair<string, PureTypeArray*> > segments_arguments;
-	PureTypeArray* arguments = new PureTypeArray();
-	PureType* text = new PureType(TYPE_CLASS);
+	vector<pair<string, PureTypeArray<QUALIFIED>*> > segments_arguments;
+	PureTypeArray<QUALIFIED>* arguments = new PureTypeArray<QUALIFIED>();
+	PureType<QUALIFIED>* text = new PureType<QUALIFIED>(TYPE_CLASS);
 	text->typedata._class.classname = strdup("Text");
 	text->typedata._class.modulename = strdup("lang");
-	addPureTypeToPureTypeArray(text, arguments);
-	segments_arguments.push_back(pair<string, PureTypeArray*>("print", arguments));
+	arguments->addType(text);
+	segments_arguments.push_back(pair<string, PureTypeArray<QUALIFIED>*>("print", arguments));
 	table.addMethod(NULL, &segments_arguments, PROPERTY_PUBLIC, vector<Annotation*>());
 	table.classname = "classname";
 	//freeTypeArray(arguments);
@@ -99,11 +101,11 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 	TypeAnalyzer tanalyzer;
 	PropertySymbolTable table(&tanalyzer, "test");
 
-	PureType* text = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED>* text = new PureType<QUALIFIED>(TYPE_CLASS);
 	text->typedata._class.classname = strdup("Text");
 	text->typedata._class.modulename = strdup("lang");
-	VarDecl textNeed; textNeed.typedata = *text;
-	SpecializableVarDecl textNeedDecl; textNeedDecl.decl = textNeed;
+	VarDecl<QUALIFIED> textNeed; textNeed.typedata = *text;
+	SpecializableVarDecl<QUALIFIED> textNeedDecl; textNeedDecl.decl = textNeed;
 	textNeedDecl.specialty = strdup("special");
 
 	table.addNeed(&textNeedDecl, PROPERTY_PUBLIC, vector<Annotation*>());
@@ -121,17 +123,17 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	TypeAnalyzer tanalyzer;
 	PropertySymbolTable table(&tanalyzer, "test");
 
-	PureType* text = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED>* text = new PureType<QUALIFIED>(TYPE_CLASS);
 	text->typedata._class.classname = strdup("Text");
 	text->typedata._class.modulename = strdup("lang");
-	PureType* printer = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED>* printer = new PureType<QUALIFIED>(TYPE_CLASS);
 	printer->typedata._class.classname = strdup("Printer");
 	printer->typedata._class.modulename = strdup("io");
-	VarDecl textDecl; textDecl.typedata = *text;
-	SpecializableVarDecl textNeedDecl; textNeedDecl.decl = textDecl;
+	VarDecl<QUALIFIED> textDecl; textDecl.typedata = *text;
+	SpecializableVarDecl<QUALIFIED> textNeedDecl; textNeedDecl.decl = textDecl;
 	textNeedDecl.specialty = strdup("name");
-	VarDecl printerDecl; printerDecl.typedata = *printer;
-	SpecializableVarDecl printerNeedDecl; printerNeedDecl.decl = printerDecl;
+	VarDecl<QUALIFIED> printerDecl; printerDecl.typedata = *printer;
+	SpecializableVarDecl<QUALIFIED> printerNeedDecl; printerNeedDecl.decl = printerDecl;
 	printerNeedDecl.specialty = strdup("disabled");
 	table.addNeed(&textNeedDecl, PROPERTY_PUBLIC, vector<Annotation*>());
 	table.addNeed(&printerNeedDecl, PROPERTY_PUBLIC, vector<Annotation*>());
@@ -163,11 +165,11 @@ BOOST_AUTO_TEST_CASE(TestWritesParameters)
 	TypeAnalyzer tanalyzer;
 	PropertySymbolTable table(&tanalyzer, "test");
 	table.classname = "classname";
-	vector<PureType*>* parameters = new vector<PureType*>();
-	PureType t(TYPE_PARAMETERIZED); t.typedata.parameterized.label = strdup("T");
-	PureType b(TYPE_PARAMETERIZED); b.typedata.parameterized.label = strdup("B");
-	PureType* text = new PureType(TYPE_CLASS);
-	PureType* booll = new PureType(TYPE_CLASS);
+	vector<PureType<QUALIFIED>*>* parameters = new vector<PureType<QUALIFIED>*>();
+	PureType<QUALIFIED> t(TYPE_PARAMETERIZED); t.typedata.parameterized.label = strdup("T");
+	PureType<QUALIFIED> b(TYPE_PARAMETERIZED); b.typedata.parameterized.label = strdup("B");
+	PureType<QUALIFIED>* text = new PureType<QUALIFIED>(TYPE_CLASS);
+	PureType<QUALIFIED>* booll = new PureType<QUALIFIED>(TYPE_CLASS);
 	b.typedata.parameterized.upperbound = text;
 	text->typedata._class.classname = strdup("Text");
 	text->typedata._class.modulename = strdup("lang");
@@ -279,7 +281,7 @@ BOOST_AUTO_TEST_CASE(TestWritesClassAnnotations)
 	TypeAnalyzer tanalyzer;
 	PropertySymbolTable table(&tanalyzer, "test");
 	table.classname = "classname";
-	vector<PureType*> parameters;
+	vector<PureType<QUALIFIED>*> parameters;
 	vector<Annotation*> annotations;
 	annotations.push_back(new Annotation());
 	annotations.push_back(new Annotation());
@@ -314,7 +316,7 @@ BOOST_AUTO_TEST_CASE(TestWritesMethodAnnotations)
 	TypeAnalyzer tanalyzer;
 	PropertySymbolTable table(&tanalyzer, "test");
 	table.classname = "classname";
-	vector<PureType*> parameters;
+	vector<PureType<QUALIFIED>*> parameters;
 	vector<Annotation*> annotations;
 	annotations.push_back(new Annotation());
 	annotations.push_back(new Annotation());
@@ -337,9 +339,9 @@ BOOST_AUTO_TEST_CASE(TestWritesMethodAnnotations)
 	annotations[1]->vals[1].valdata.num = 1;
 	annotations[1]->vals[2].type = ANNOTATION_VAL_TYPE_NOTHING;
 
-	vector<pair<string, PureTypeArray*> > segments_arguments;
-	PureTypeArray* arguments = new PureTypeArray();
-	segments_arguments.push_back(pair<string, PureTypeArray*>("prop", arguments));
+	vector<pair<string, PureTypeArray<QUALIFIED>*> > segments_arguments;
+	PureTypeArray<QUALIFIED>* arguments = new PureTypeArray<QUALIFIED>();
+	segments_arguments.push_back(pair<string, PureTypeArray<QUALIFIED>*>("prop", arguments));
 	table.addMethod(NULL, &segments_arguments, 0, annotations);
 
 	writer.write(out, &table);

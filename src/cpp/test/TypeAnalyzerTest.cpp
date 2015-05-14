@@ -17,6 +17,8 @@
 #include "TypeAnalyzer.h"
 #include "ClassSpaceSymbolTable.h"
 
+using namespace wake;
+
 /**
  *  NOTE!!! This functionality used to be part of ClassSpaceSymbolTable
  * and therefore many test cases for this class exist in ClassSpaceSymbolTableTest
@@ -32,12 +34,12 @@ BOOST_AUTO_TEST_CASE(TypesAreTheirOwnSubtypes) {
 BOOST_AUTO_TEST_CASE(RealTypeIsSubtypesOfOptionalType) {
 	TypeAnalyzer analyzer;
 
-	PureType realtype(TYPE_CLASS);
+	PureType<QUALIFIED> realtype(TYPE_CLASS);
 	realtype.typedata._class.classname = strdup("test");
 
-	PureType* wrappedtype = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED>* wrappedtype = new PureType<QUALIFIED>(TYPE_CLASS);
 	wrappedtype->typedata._class.classname = strdup("test");
-	PureType optionaltype(TYPE_OPTIONAL);
+	PureType<QUALIFIED> optionaltype(TYPE_OPTIONAL);
 	optionaltype.typedata.optional.contained = wrappedtype;
 
 	BOOST_REQUIRE(analyzer.isASubtypeOfB(&realtype, &optionaltype));
@@ -46,12 +48,12 @@ BOOST_AUTO_TEST_CASE(RealTypeIsSubtypesOfOptionalType) {
 BOOST_AUTO_TEST_CASE(OptionalTypeIsNotSubtypeOfRealType) {
 	TypeAnalyzer analyzer;
 
-	PureType* wrappedtype = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED>* wrappedtype = new PureType<QUALIFIED>(TYPE_CLASS);
 	wrappedtype->typedata._class.classname = strdup("test");
-	PureType optionaltype(TYPE_OPTIONAL);
+	PureType<QUALIFIED> optionaltype(TYPE_OPTIONAL);
 	optionaltype.typedata.optional.contained = wrappedtype;
 
-	PureType realtype(TYPE_CLASS);
+	PureType<QUALIFIED> realtype(TYPE_CLASS);
 	realtype.typedata._class.classname = strdup("test");
 
 	BOOST_REQUIRE(!analyzer.isASubtypeOfB(&optionaltype, &realtype));
@@ -59,38 +61,38 @@ BOOST_AUTO_TEST_CASE(OptionalTypeIsNotSubtypeOfRealType) {
 
 BOOST_AUTO_TEST_CASE(NothingIsSubtypesOfOptionalType) {
 	TypeAnalyzer analyzer;
-	PureType optionaltype(TYPE_OPTIONAL);
-	optionaltype.typedata.optional.contained = new PureType(TYPE_CLASS);
-	PureType nothing(TYPE_OPTIONAL);
-	nothing.typedata.optional.contained = new PureType(TYPE_MATCHALL);
+	PureType<QUALIFIED> optionaltype(TYPE_OPTIONAL);
+	optionaltype.typedata.optional.contained = new PureType<QUALIFIED>(TYPE_CLASS);
+	PureType<QUALIFIED> nothing(TYPE_OPTIONAL);
+	nothing.typedata.optional.contained = new PureType<QUALIFIED>(TYPE_MATCHALL);
 	BOOST_REQUIRE(analyzer.isASubtypeOfB(&nothing, &optionaltype));
 }
 
 BOOST_AUTO_TEST_CASE(NothingIsNotSubtypeOfRealType) {
 	TypeAnalyzer analyzer;
-	PureType nothing(TYPE_OPTIONAL);
-	nothing.typedata.optional.contained = new PureType(TYPE_MATCHALL);
-	PureType realtype(TYPE_CLASS);
+	PureType<QUALIFIED> nothing(TYPE_OPTIONAL);
+	nothing.typedata.optional.contained = new PureType<QUALIFIED>(TYPE_MATCHALL);
+	PureType<QUALIFIED> realtype(TYPE_CLASS);
 	realtype.typedata._class.classname = strdup("test");
 	BOOST_REQUIRE(!analyzer.isASubtypeOfB(&nothing, &realtype));
 }
 
 BOOST_AUTO_TEST_CASE(MatchallNameIsErroneousType) {
-	PureType matchall(TYPE_MATCHALL);
+	PureType<QUALIFIED> matchall(TYPE_MATCHALL);
 	BOOST_REQUIRE(matchall.toString() == "{inferencing failed}");
 }
 
 BOOST_AUTO_TEST_CASE(ParameterizedClassTypesUnequalParametersNotSubtypes) {
 	TypeAnalyzer analyzer;
-	PureType a(TYPE_CLASS);
-	PureType b(TYPE_CLASS);
+	PureType<QUALIFIED> a(TYPE_CLASS);
+	PureType<QUALIFIED> b(TYPE_CLASS);
 	a.typedata._class.classname = strdup("hello");
 	b.typedata._class.classname = strdup("hello");
-	a.typedata._class.parameters = new PureTypeArray();
-	addPureTypeToPureTypeArray(new PureType(TYPE_MATCHALL), a.typedata._class.parameters);
-	addPureTypeToPureTypeArray(new PureType(TYPE_MATCHALL), a.typedata._class.parameters);
-	b.typedata._class.parameters = new PureTypeArray();
-	addPureTypeToPureTypeArray(new PureType(TYPE_MATCHALL), b.typedata._class.parameters);
+	a.typedata._class.parameters = new PureTypeArray<QUALIFIED>();
+	a.typedata._class.parameters->addType(new PureType<QUALIFIED>(TYPE_MATCHALL));
+	a.typedata._class.parameters->addType(new PureType<QUALIFIED>(TYPE_MATCHALL));
+	b.typedata._class.parameters = new PureTypeArray<QUALIFIED>();
+	b.typedata._class.parameters->addType(new PureType<QUALIFIED>(TYPE_MATCHALL));
 
 	BOOST_REQUIRE(!analyzer.isASubtypeOfB(&a,&b));
 	BOOST_REQUIRE(!analyzer.isASubtypeOfB(&b,&a));
@@ -100,19 +102,19 @@ BOOST_AUTO_TEST_CASE(ParameterizedClassTypesRequireDifferentArgumentsAreSubtypes
 	TypeAnalyzer analyzer;
 	ClassSpaceSymbolTable table;
 	analyzer.reference = &table;
-	PureType a(TYPE_CLASS);
-	PureType b(TYPE_CLASS);
-	PureType* asub = new PureType(TYPE_CLASS);
-	PureType* bsub = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED> a(TYPE_CLASS);
+	PureType<QUALIFIED> b(TYPE_CLASS);
+	PureType<QUALIFIED>* asub = new PureType<QUALIFIED>(TYPE_CLASS);
+	PureType<QUALIFIED>* bsub = new PureType<QUALIFIED>(TYPE_CLASS);
 	a.typedata._class.classname = strdup("hello");
 	b.typedata._class.classname = strdup("hello");
 	asub->typedata._class.classname = strdup("hellosub");
 	bsub->typedata._class.classname = strdup("hellosub");
-	a.typedata._class.parameters = new PureTypeArray();
-	b.typedata._class.parameters = new PureTypeArray();
+	a.typedata._class.parameters = new PureTypeArray<QUALIFIED>();
+	b.typedata._class.parameters = new PureTypeArray<QUALIFIED>();
 
-	addPureTypeToPureTypeArray(asub, a.typedata._class.parameters);
-	addPureTypeToPureTypeArray(bsub, b.typedata._class.parameters);
+	a.typedata._class.parameters->addType(asub);
+	b.typedata._class.parameters->addType(bsub);
 
 	BOOST_REQUIRE(analyzer.isASubtypeOfB(&a,&b));
 	BOOST_REQUIRE(analyzer.isASubtypeOfB(&b,&a));
@@ -131,12 +133,12 @@ BOOST_AUTO_TEST_CASE(ParameterizedClassTypesArentCovariantOrContravariant) {
 	ClassSpaceSymbolTable table;
 	analyzer.reference = &table;
 
-	PureType a(TYPE_CLASS);
-	PureType b(TYPE_CLASS);
+	PureType<QUALIFIED> a(TYPE_CLASS);
+	PureType<QUALIFIED> b(TYPE_CLASS);
 
-	PureType* asubwrapped = new PureType(TYPE_CLASS);
-	PureType* asub = new PureType(TYPE_OPTIONAL);
-	PureType* bsub = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED>* asubwrapped = new PureType<QUALIFIED>(TYPE_CLASS);
+	PureType<QUALIFIED>* asub = new PureType<QUALIFIED>(TYPE_OPTIONAL);
+	PureType<QUALIFIED>* bsub = new PureType<QUALIFIED>(TYPE_CLASS);
 
 	a.typedata._class.classname = strdup("hello");
 	b.typedata._class.classname = strdup("hello");
@@ -144,11 +146,11 @@ BOOST_AUTO_TEST_CASE(ParameterizedClassTypesArentCovariantOrContravariant) {
 	asubwrapped->typedata._class.classname = strdup("hellosub");
 	bsub->typedata._class.classname = strdup("hellosub");
 	asub->typedata.optional.contained = asubwrapped; // easiest way to make asub a subtype of bsub, and bsub a supertype of asub
-	a.typedata._class.parameters = new PureTypeArray();
-	b.typedata._class.parameters = new PureTypeArray();
+	a.typedata._class.parameters = new PureTypeArray<QUALIFIED>();
+	b.typedata._class.parameters = new PureTypeArray<QUALIFIED>();
 
-	addPureTypeToPureTypeArray(asub, a.typedata._class.parameters);
-	addPureTypeToPureTypeArray(bsub, b.typedata._class.parameters);
+	a.typedata._class.parameters->addType(asub);
+	b.typedata._class.parameters->addType(bsub);
 
 	BOOST_REQUIRE(!analyzer.isASubtypeOfB(&a,&b));
 	BOOST_REQUIRE(!analyzer.isASubtypeOfB(&b,&a));
@@ -156,8 +158,8 @@ BOOST_AUTO_TEST_CASE(ParameterizedClassTypesArentCovariantOrContravariant) {
 
 BOOST_AUTO_TEST_CASE(TwoClassesAreExactTypes) {
 	TypeAnalyzer analyzer;
-	PureType a(TYPE_CLASS);
-	PureType b(TYPE_CLASS);
+	PureType<QUALIFIED> a(TYPE_CLASS);
+	PureType<QUALIFIED> b(TYPE_CLASS);
 	a.typedata._class.classname = strdup("hello");
 	b.typedata._class.classname = strdup("hello");
 	BOOST_REQUIRE(analyzer.isAExactlyB(&a, &b));
@@ -167,14 +169,14 @@ BOOST_AUTO_TEST_CASE(TwoClassesAreExactTypes) {
 BOOST_AUTO_TEST_CASE(MismatchedArrayTypesArentExact) {
 	TypeAnalyzer analyzer;
 
-	PureType* acontained = new PureType(TYPE_CLASS);
-	PureType* bcontained = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED>* acontained = new PureType<QUALIFIED>(TYPE_CLASS);
+	PureType<QUALIFIED>* bcontained = new PureType<QUALIFIED>(TYPE_CLASS);
 	acontained->typedata._class.classname = strdup("hello");
 	bcontained->typedata._class.classname = strdup("hello");
 
-	PureType a(TYPE_LIST);
-	PureType b(TYPE_LIST);
-	PureType* binner = new PureType(TYPE_LIST);
+	PureType<QUALIFIED> a(TYPE_LIST);
+	PureType<QUALIFIED> b(TYPE_LIST);
+	PureType<QUALIFIED>* binner = new PureType<QUALIFIED>(TYPE_LIST);
 	a.typedata.list.contained = acontained;
 	b.typedata.list.contained = binner;
 	binner->typedata.list.contained = bcontained;
@@ -187,18 +189,18 @@ BOOST_AUTO_TEST_CASE(MismatchedArrayTypesArentExact) {
 
 BOOST_AUTO_TEST_CASE(MismatchedOptionalTypesArentExact) {
 	TypeAnalyzer analyzer;
-	PureType* awrapped = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED>* awrapped = new PureType<QUALIFIED>(TYPE_CLASS);
 	awrapped->typedata._class.classname = strdup("hello");
 
-	PureType* bwrapped = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED>* bwrapped = new PureType<QUALIFIED>(TYPE_CLASS);
 	bwrapped->typedata._class.classname = strdup("hello");
 
-	PureType a(TYPE_OPTIONAL);
-	PureType* ainner = new PureType(TYPE_OPTIONAL);
+	PureType<QUALIFIED> a(TYPE_OPTIONAL);
+	PureType<QUALIFIED>* ainner = new PureType<QUALIFIED>(TYPE_OPTIONAL);
 	ainner->typedata.optional.contained = awrapped;
 	a.typedata.optional.contained = ainner;
 
-	PureType b(TYPE_OPTIONAL);
+	PureType<QUALIFIED> b(TYPE_OPTIONAL);
 	b.typedata.optional.contained = bwrapped;
 
 	BOOST_REQUIRE(!analyzer.isAExactlyB(awrapped, &b));
@@ -209,8 +211,8 @@ BOOST_AUTO_TEST_CASE(MismatchedOptionalTypesArentExact) {
 
 BOOST_AUTO_TEST_CASE(MismatchedNamesArentExact) {
 	TypeAnalyzer analyzer;
-	PureType a(TYPE_CLASS);
-	PureType b(TYPE_CLASS);
+	PureType<QUALIFIED> a(TYPE_CLASS);
+	PureType<QUALIFIED> b(TYPE_CLASS);
 	a.typedata._class.classname = strdup("hello");
 	b.typedata._class.classname = strdup("nothello");
 	BOOST_REQUIRE(!analyzer.isAExactlyB(&a, &b));
@@ -219,8 +221,8 @@ BOOST_AUTO_TEST_CASE(MismatchedNamesArentExact) {
 
 BOOST_AUTO_TEST_CASE(MismatchedTypesArentExact) {
 	TypeAnalyzer analyzer;
-	PureType a(TYPE_CLASS);
-	PureType b(TYPE_PARAMETERIZED);
+	PureType<QUALIFIED> a(TYPE_CLASS);
+	PureType<QUALIFIED> b(TYPE_PARAMETERIZED);
 	a.typedata._class.classname = strdup("hello");
 	b.typedata._class.classname = strdup("hello");
 	BOOST_REQUIRE(!analyzer.isAExactlyB(&a, &b));
@@ -229,71 +231,71 @@ BOOST_AUTO_TEST_CASE(MismatchedTypesArentExact) {
 
 BOOST_AUTO_TEST_CASE(OnlyOneParameterizedArentExact) {
 	TypeAnalyzer analyzer;
-	PureType a(TYPE_CLASS);
-	PureType b(TYPE_CLASS);
+	PureType<QUALIFIED> a(TYPE_CLASS);
+	PureType<QUALIFIED> b(TYPE_CLASS);
 	a.typedata._class.classname = strdup("hello");
 	b.typedata._class.classname = strdup("hello");
-	a.typedata._class.parameters = new PureTypeArray();
-	addPureTypeToPureTypeArray(new PureType(TYPE_MATCHALL), a.typedata._class.parameters);
+	a.typedata._class.parameters = new PureTypeArray<QUALIFIED>();
+	a.typedata._class.parameters->addType(new PureType<QUALIFIED>(TYPE_MATCHALL));
 	BOOST_REQUIRE(!analyzer.isAExactlyB(&a, &b));
 	BOOST_REQUIRE(!analyzer.isAExactlyB(&b, &a));
 }
 
 BOOST_AUTO_TEST_CASE(MismatchedParameterizationLengthsArentExact) {
 	TypeAnalyzer analyzer;
-	PureType a(TYPE_CLASS);
-	PureType b(TYPE_CLASS);
+	PureType<QUALIFIED> a(TYPE_CLASS);
+	PureType<QUALIFIED> b(TYPE_CLASS);
 	a.typedata._class.classname = strdup("hello");
 	b.typedata._class.classname = strdup("hello");
-	a.typedata._class.parameters = new PureTypeArray();
-	b.typedata._class.parameters = new PureTypeArray();
-	addPureTypeToPureTypeArray(new PureType(TYPE_MATCHALL), a.typedata._class.parameters);
-	addPureTypeToPureTypeArray(new PureType(TYPE_MATCHALL), a.typedata._class.parameters);
-	addPureTypeToPureTypeArray(new PureType(TYPE_MATCHALL), b.typedata._class.parameters);
+	a.typedata._class.parameters = new PureTypeArray<QUALIFIED>();
+	b.typedata._class.parameters = new PureTypeArray<QUALIFIED>();
+	a.typedata._class.parameters->addType(new PureType<QUALIFIED>(TYPE_MATCHALL));
+	a.typedata._class.parameters->addType(new PureType<QUALIFIED>(TYPE_MATCHALL));
+	b.typedata._class.parameters->addType(new PureType<QUALIFIED>(TYPE_MATCHALL));
 	BOOST_REQUIRE(!analyzer.isAExactlyB(&a, &b));
 	BOOST_REQUIRE(!analyzer.isAExactlyB(&b, &a));
 }
 
 BOOST_AUTO_TEST_CASE(MismatchedParameterizationsArentExact) {
 	TypeAnalyzer analyzer;
-	PureType a(TYPE_CLASS);
-	PureType b(TYPE_CLASS);
-	PureType* asub = new PureType(TYPE_CLASS);
-	PureType* bsub = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED> a(TYPE_CLASS);
+	PureType<QUALIFIED> b(TYPE_CLASS);
+	PureType<QUALIFIED>* asub = new PureType<QUALIFIED>(TYPE_CLASS);
+	PureType<QUALIFIED>* bsub = new PureType<QUALIFIED>(TYPE_CLASS);
 	a.typedata._class.classname = strdup("hello");
 	b.typedata._class.classname = strdup("hello");
 	asub->typedata._class.classname = strdup("hellosuba");
 	bsub->typedata._class.classname = strdup("hellosubb");
-	a.typedata._class.parameters = new PureTypeArray();
-	b.typedata._class.parameters = new PureTypeArray();
-	addPureTypeToPureTypeArray(asub, a.typedata._class.parameters);
-	addPureTypeToPureTypeArray(bsub, b.typedata._class.parameters);
+	a.typedata._class.parameters = new PureTypeArray<QUALIFIED>();
+	b.typedata._class.parameters = new PureTypeArray<QUALIFIED>();
+	a.typedata._class.parameters->addType(asub);
+	b.typedata._class.parameters->addType(bsub);
 	BOOST_REQUIRE(!analyzer.isAExactlyB(&a, &b));
 	BOOST_REQUIRE(!analyzer.isAExactlyB(&b, &a));
 }
 
 BOOST_AUTO_TEST_CASE(ExactParameterizationsArentExact) {
 	TypeAnalyzer analyzer;
-	PureType a(TYPE_CLASS);
-	PureType b(TYPE_CLASS);
-	PureType* asub = new PureType(TYPE_CLASS);
-	PureType* bsub = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED> a(TYPE_CLASS);
+	PureType<QUALIFIED> b(TYPE_CLASS);
+	PureType<QUALIFIED>* asub = new PureType<QUALIFIED>(TYPE_CLASS);
+	PureType<QUALIFIED>* bsub = new PureType<QUALIFIED>(TYPE_CLASS);
 	a.typedata._class.classname = strdup("hello");
 	b.typedata._class.classname = strdup("hello");
 	asub->typedata._class.classname = strdup("hellosub");
 	bsub->typedata._class.classname = strdup("hellosub");
-	a.typedata._class.parameters = new PureTypeArray();
-	b.typedata._class.parameters = new PureTypeArray();
-	addPureTypeToPureTypeArray(asub, a.typedata._class.parameters);
-	addPureTypeToPureTypeArray(bsub, b.typedata._class.parameters);
+	a.typedata._class.parameters = new PureTypeArray<QUALIFIED>();
+	b.typedata._class.parameters = new PureTypeArray<QUALIFIED>();
+	a.typedata._class.parameters->addType(asub);
+	b.typedata._class.parameters->addType(bsub);
 	BOOST_REQUIRE(analyzer.isAExactlyB(&a, &b));
 	BOOST_REQUIRE(analyzer.isAExactlyB(&b, &a));
 }
 
 BOOST_AUTO_TEST_CASE(ParameterizedTypesAreExactWithExactLabel) {
 	TypeAnalyzer analyzer;
-	PureType a(TYPE_PARAMETERIZED);
-	PureType b(TYPE_PARAMETERIZED);
+	PureType<QUALIFIED> a(TYPE_PARAMETERIZED);
+	PureType<QUALIFIED> b(TYPE_PARAMETERIZED);
 	a.typedata.parameterized.label = strdup("hello");
 	b.typedata.parameterized.label = strdup("hello");
 	BOOST_REQUIRE(analyzer.isAExactlyB(&a, &b));
@@ -302,8 +304,8 @@ BOOST_AUTO_TEST_CASE(ParameterizedTypesAreExactWithExactLabel) {
 
 BOOST_AUTO_TEST_CASE(ParameterizedTypesAreNotExactWithDifferentLabel) {
 	TypeAnalyzer analyzer;
-	PureType a(TYPE_PARAMETERIZED);
-	PureType b(TYPE_PARAMETERIZED);
+	PureType<QUALIFIED> a(TYPE_PARAMETERIZED);
+	PureType<QUALIFIED> b(TYPE_PARAMETERIZED);
 	a.typedata.parameterized.label = strdup("hello");
 	b.typedata.parameterized.label = strdup("nothello");
 	BOOST_REQUIRE(!analyzer.isAExactlyB(&a, &b));
@@ -312,19 +314,19 @@ BOOST_AUTO_TEST_CASE(ParameterizedTypesAreNotExactWithDifferentLabel) {
 
 BOOST_AUTO_TEST_CASE(LambdaTypesAreNotExactWithVoidVsNonVoid) {
 	TypeAnalyzer analyzer;
-	PureType a(TYPE_LAMBDA);
-	PureType b(TYPE_LAMBDA);
-	a.typedata.lambda.returntype = new PureType(TYPE_MATCHALL);
+	PureType<QUALIFIED> a(TYPE_LAMBDA);
+	PureType<QUALIFIED> b(TYPE_LAMBDA);
+	a.typedata.lambda.returntype = new PureType<QUALIFIED>(TYPE_MATCHALL);
 	BOOST_REQUIRE(!analyzer.isAExactlyB(&a, &b));
 	BOOST_REQUIRE(!analyzer.isAExactlyB(&b, &a));
 }
 
 BOOST_AUTO_TEST_CASE(LambdaTypesAreNotExactWithDifferentReturnType) {
 	TypeAnalyzer analyzer;
-	PureType a(TYPE_LAMBDA);
-	PureType b(TYPE_LAMBDA);
-	a.typedata.lambda.returntype = new PureType(TYPE_CLASS);
-	b.typedata.lambda.returntype = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED> a(TYPE_LAMBDA);
+	PureType<QUALIFIED> b(TYPE_LAMBDA);
+	a.typedata.lambda.returntype = new PureType<QUALIFIED>(TYPE_CLASS);
+	b.typedata.lambda.returntype = new PureType<QUALIFIED>(TYPE_CLASS);
 	a.typedata.lambda.returntype->typedata._class.classname = strdup("hello");
 	b.typedata.lambda.returntype->typedata._class.classname = strdup("nothello");
 	BOOST_REQUIRE(!analyzer.isAExactlyB(&a, &b));
@@ -333,36 +335,36 @@ BOOST_AUTO_TEST_CASE(LambdaTypesAreNotExactWithDifferentReturnType) {
 
 BOOST_AUTO_TEST_CASE(LambdaTypesAreNotExactWithDifferentArgumentCounts) {
 	TypeAnalyzer analyzer;
-	PureType a(TYPE_LAMBDA);
-	PureType b(TYPE_LAMBDA);
-	a.typedata.lambda.arguments = new PureTypeArray();
-	b.typedata.lambda.arguments = new PureTypeArray();
-	addPureTypeToPureTypeArray(new PureType(TYPE_MATCHALL), a.typedata.lambda.arguments);
+	PureType<QUALIFIED> a(TYPE_LAMBDA);
+	PureType<QUALIFIED> b(TYPE_LAMBDA);
+	a.typedata.lambda.arguments = new PureTypeArray<QUALIFIED>();
+	b.typedata.lambda.arguments = new PureTypeArray<QUALIFIED>();
+	a.typedata.lambda.arguments->addType(new PureType<QUALIFIED>(TYPE_MATCHALL));
 	BOOST_REQUIRE(!analyzer.isAExactlyB(&a, &b));
 	BOOST_REQUIRE(!analyzer.isAExactlyB(&b, &a));
 }
 
 BOOST_AUTO_TEST_CASE(LambdaTypesAreNotExactWithNullNonNullArguments) {
 	TypeAnalyzer analyzer;
-	PureType a(TYPE_LAMBDA);
-	PureType b(TYPE_LAMBDA);
-	a.typedata.lambda.arguments = new PureTypeArray();
+	PureType<QUALIFIED> a(TYPE_LAMBDA);
+	PureType<QUALIFIED> b(TYPE_LAMBDA);
+	a.typedata.lambda.arguments = new PureTypeArray<QUALIFIED>();
 	BOOST_REQUIRE(!analyzer.isAExactlyB(&a, &b));
 	BOOST_REQUIRE(!analyzer.isAExactlyB(&b, &a));
 }
 
 BOOST_AUTO_TEST_CASE(LambdaTypesAreNotExactWithDifferentArguments) {
 	TypeAnalyzer analyzer;
-	PureType a(TYPE_LAMBDA);
-	PureType b(TYPE_LAMBDA);
-	PureType* aarg = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED> a(TYPE_LAMBDA);
+	PureType<QUALIFIED> b(TYPE_LAMBDA);
+	PureType<QUALIFIED>* aarg = new PureType<QUALIFIED>(TYPE_CLASS);
 	aarg->typedata._class.classname = strdup("holl");
-	PureType* barg = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED>* barg = new PureType<QUALIFIED>(TYPE_CLASS);
 	barg->typedata._class.classname = strdup("holle");
-	a.typedata.lambda.arguments = new PureTypeArray();
-	addPureTypeToPureTypeArray(aarg, a.typedata.lambda.arguments);
-	b.typedata.lambda.arguments = new PureTypeArray();
-	addPureTypeToPureTypeArray(barg, b.typedata.lambda.arguments);
+	a.typedata.lambda.arguments = new PureTypeArray<QUALIFIED>();
+	a.typedata.lambda.arguments->addType(aarg);
+	b.typedata.lambda.arguments = new PureTypeArray<QUALIFIED>();
+	b.typedata.lambda.arguments->addType(barg);
 	BOOST_REQUIRE(!analyzer.isAExactlyB(&a, &b));
 	BOOST_REQUIRE(!analyzer.isAExactlyB(&b, &a));
 }
@@ -376,15 +378,15 @@ BOOST_AUTO_TEST_CASE(LambdaTypesAreNotExactWithDifferentArguments) {
  */
 BOOST_AUTO_TEST_CASE(MatchallTypesCommonAreTheirNeighbor) {
 	TypeAnalyzer analyzer;
-	PureType a(TYPE_MATCHALL);
-	PureType b(TYPE_OPTIONAL);
-	b.typedata.optional.contained = new PureType(TYPE_MATCHALL);
-	PureType c(TYPE_CLASS);
+	PureType<QUALIFIED> a(TYPE_MATCHALL);
+	PureType<QUALIFIED> b(TYPE_OPTIONAL);
+	b.typedata.optional.contained = new PureType<QUALIFIED>(TYPE_MATCHALL);
+	PureType<QUALIFIED> c(TYPE_CLASS);
 	c.typedata._class.classname = strdup("Test");
-	PureType d(TYPE_LAMBDA);
-	PureType e(TYPE_LIST);
-	e.typedata.optional.contained = new PureType(TYPE_MATCHALL);
-	boost::optional<PureType*> ret;
+	PureType<QUALIFIED> d(TYPE_LAMBDA);
+	PureType<QUALIFIED> e(TYPE_LIST);
+	e.typedata.optional.contained = new PureType<QUALIFIED>(TYPE_MATCHALL);
+	boost::optional<PureType<QUALIFIED>*> ret;
 
 	ret = analyzer.getCommonSubtypeOf(&a, &a);
 	BOOST_REQUIRE(ret);
@@ -417,14 +419,14 @@ BOOST_AUTO_TEST_CASE(MatchallTypesCommonAreTheirNeighbor) {
 
 BOOST_AUTO_TEST_CASE(NothingOptionalCommonTypeIsOptionalType) {
 	TypeAnalyzer analyzer;
-	PureType optional(TYPE_OPTIONAL);
-	PureType* contained = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED> optional(TYPE_OPTIONAL);
+	PureType<QUALIFIED>* contained = new PureType<QUALIFIED>(TYPE_CLASS);
 	optional.typedata.optional.contained = contained;
 	contained->typedata._class.classname = strdup("Classname");
-	PureType nothing(TYPE_OPTIONAL);
-	nothing.typedata.optional.contained = new PureType(TYPE_MATCHALL);
+	PureType<QUALIFIED> nothing(TYPE_OPTIONAL);
+	nothing.typedata.optional.contained = new PureType<QUALIFIED>(TYPE_MATCHALL);
 
-	boost::optional<PureType*> ret = analyzer.getCommonSubtypeOf(&optional, &nothing);
+	boost::optional<PureType<QUALIFIED>*> ret = analyzer.getCommonSubtypeOf(&optional, &nothing);
 	BOOST_REQUIRE(ret);
 	BOOST_REQUIRE((*ret)->type == TYPE_OPTIONAL);
 	BOOST_REQUIRE((*ret)->typedata.optional.contained->type == TYPE_CLASS);
@@ -440,9 +442,9 @@ BOOST_AUTO_TEST_CASE(NothingOptionalCommonTypeIsOptionalType) {
 
 BOOST_AUTO_TEST_CASE(NothingNothingCommonTypeIsNothing) {
 	TypeAnalyzer analyzer;
-	PureType nothing(TYPE_OPTIONAL);
-	nothing.typedata.optional.contained = new PureType(TYPE_MATCHALL);
-	boost::optional<PureType*> ret = analyzer.getCommonSubtypeOf(&nothing, &nothing);
+	PureType<QUALIFIED> nothing(TYPE_OPTIONAL);
+	nothing.typedata.optional.contained = new PureType<QUALIFIED>(TYPE_MATCHALL);
+	boost::optional<PureType<QUALIFIED>*> ret = analyzer.getCommonSubtypeOf(&nothing, &nothing);
 	BOOST_REQUIRE(ret);
 	BOOST_REQUIRE((*ret)->type == TYPE_OPTIONAL);
 	BOOST_REQUIRE((*ret)->typedata.optional.contained->type == TYPE_MATCHALL);
@@ -451,11 +453,11 @@ BOOST_AUTO_TEST_CASE(NothingNothingCommonTypeIsNothing) {
 
 BOOST_AUTO_TEST_CASE(MismatchedTypesWithNoCommonType) {
 	TypeAnalyzer analyzer;
-	PureType lambda(TYPE_LAMBDA);
-	PureType clazz(TYPE_CLASS); clazz.typedata._class.classname = strdup("Test");
-	PureType list(TYPE_LIST);
-	list.typedata.list.contained = new PureType(clazz);
-	PureType unusable(TYPE_UNUSABLE);
+	PureType<QUALIFIED> lambda(TYPE_LAMBDA);
+	PureType<QUALIFIED> clazz(TYPE_CLASS); clazz.typedata._class.classname = strdup("Test");
+	PureType<QUALIFIED> list(TYPE_LIST);
+	list.typedata.list.contained = new PureType<QUALIFIED>(clazz);
+	PureType<QUALIFIED> unusable(TYPE_UNUSABLE);
 
 	BOOST_REQUIRE(!analyzer.getCommonSubtypeOf(&lambda, &clazz));
 	BOOST_REQUIRE(!analyzer.getCommonSubtypeOf(&lambda, &list));
@@ -474,12 +476,12 @@ BOOST_AUTO_TEST_CASE(MismatchedTypesWithNoCommonType) {
 
 BOOST_AUTO_TEST_CASE(CommonTypeNothingNotOptionalNotNothingIsOptionalOtherType) {
 	TypeAnalyzer analyzer;
-	PureType clazz(TYPE_CLASS);
+	PureType<QUALIFIED> clazz(TYPE_CLASS);
 	clazz.typedata._class.classname = strdup("Classname");
-	PureType nothing(TYPE_OPTIONAL);
-	nothing.typedata.optional.contained = new PureType(TYPE_MATCHALL);
+	PureType<QUALIFIED> nothing(TYPE_OPTIONAL);
+	nothing.typedata.optional.contained = new PureType<QUALIFIED>(TYPE_MATCHALL);
 
-	boost::optional<PureType*> ret = analyzer.getCommonSubtypeOf(&clazz, &nothing);
+	boost::optional<PureType<QUALIFIED>*> ret = analyzer.getCommonSubtypeOf(&clazz, &nothing);
 	BOOST_REQUIRE(ret);
 	BOOST_REQUIRE((*ret)->type == TYPE_OPTIONAL);
 	BOOST_REQUIRE((*ret)->typedata.optional.contained->type == TYPE_CLASS);
@@ -495,47 +497,47 @@ BOOST_AUTO_TEST_CASE(CommonTypeNothingNotOptionalNotNothingIsOptionalOtherType) 
 
 BOOST_AUTO_TEST_CASE(ListTypesNotExactlyEqualHaveNoCommonType) {
 	TypeAnalyzer analyzer;
-	PureType listOptNums(TYPE_LIST);
-	PureType* optNums = new PureType(TYPE_OPTIONAL);
-	PureType* num = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED> listOptNums(TYPE_LIST);
+	PureType<QUALIFIED>* optNums = new PureType<QUALIFIED>(TYPE_OPTIONAL);
+	PureType<QUALIFIED>* num = new PureType<QUALIFIED>(TYPE_CLASS);
 
 	listOptNums.typedata.list.contained = optNums;
 	optNums->typedata.optional.contained = num;
 	num->typedata._class.classname = strdup("Num");
 
-	PureType listNums(TYPE_LIST);
-	PureType* num2 = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED> listNums(TYPE_LIST);
+	PureType<QUALIFIED>* num2 = new PureType<QUALIFIED>(TYPE_CLASS);
 
 	listNums.typedata.list.contained = num2;
 	num2->typedata._class.classname = strdup("Num");
 
-	PureType listTexts(TYPE_LIST);
-	PureType* text = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED> listTexts(TYPE_LIST);
+	PureType<QUALIFIED>* text = new PureType<QUALIFIED>(TYPE_CLASS);
 
 	listTexts.typedata.list.contained = text;
 	text->typedata._class.classname = strdup("Text");
 
-	PureType listListTexts(TYPE_LIST);
-	PureType* listListTextsInner = new PureType(TYPE_LIST);
-	PureType* text2 = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED> listListTexts(TYPE_LIST);
+	PureType<QUALIFIED>* listListTextsInner = new PureType<QUALIFIED>(TYPE_LIST);
+	PureType<QUALIFIED>* text2 = new PureType<QUALIFIED>(TYPE_CLASS);
 
 	listListTextsInner->typedata.list.contained = text2;
 	listListTexts.typedata.list.contained = listListTextsInner;
 	text2->typedata._class.classname = strdup("Text");
 
-	PureType listListOptNums(TYPE_LIST);
-	PureType* listListOptNumsInner = new PureType(TYPE_LIST);
-	PureType* optNums2 = new PureType(TYPE_OPTIONAL);
-	PureType* num3 = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED> listListOptNums(TYPE_LIST);
+	PureType<QUALIFIED>* listListOptNumsInner = new PureType<QUALIFIED>(TYPE_LIST);
+	PureType<QUALIFIED>* optNums2 = new PureType<QUALIFIED>(TYPE_OPTIONAL);
+	PureType<QUALIFIED>* num3 = new PureType<QUALIFIED>(TYPE_CLASS);
 
 	listListOptNums.typedata.list.contained = listListOptNumsInner;
 	listListOptNumsInner->typedata.list.contained = optNums2;
 	optNums2->typedata.optional.contained = num3;
 	num3->typedata._class.classname = strdup("Num");
 
-	PureType listListNums(TYPE_LIST);
-	PureType* listListNumsInner = new PureType(TYPE_LIST);
-	PureType* num4 = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED> listListNums(TYPE_LIST);
+	PureType<QUALIFIED>* listListNumsInner = new PureType<QUALIFIED>(TYPE_LIST);
+	PureType<QUALIFIED>* num4 = new PureType<QUALIFIED>(TYPE_CLASS);
 
 	listListNums.typedata.list.contained = listListNumsInner;
 	listListNumsInner->typedata.list.contained = num4;
@@ -573,7 +575,7 @@ BOOST_AUTO_TEST_CASE(ListTypesNotExactlyEqualHaveNoCommonType) {
 	BOOST_REQUIRE(!analyzer.getCommonSubtypeOf(&listListNums, &listListTexts));
 	BOOST_REQUIRE(!analyzer.getCommonSubtypeOf(&listListNums, &listListOptNums));
 
-	boost::optional<PureType*> ret;
+	boost::optional<PureType<QUALIFIED>*> ret;
 	ret = analyzer.getCommonSubtypeOf(&listOptNums, &listOptNums);
 	BOOST_REQUIRE(ret);
 	BOOST_REQUIRE(analyzer.isAExactlyB(*ret, &listOptNums));
@@ -602,12 +604,12 @@ BOOST_AUTO_TEST_CASE(ListTypesNotExactlyEqualHaveNoCommonType) {
 
 BOOST_AUTO_TEST_CASE(TestExactClassesAreTheirOwnCommonType) {
 	TypeAnalyzer analyzer;
-	PureType text1(TYPE_CLASS);
+	PureType<QUALIFIED> text1(TYPE_CLASS);
 	text1.typedata._class.classname = strdup("Text");
-	PureType text2(TYPE_CLASS);
+	PureType<QUALIFIED> text2(TYPE_CLASS);
 	text2.typedata._class.classname = strdup("Text");
 
-	boost::optional<PureType*> ret = analyzer.getCommonSubtypeOf(&text1, &text2);
+	boost::optional<PureType<QUALIFIED>*> ret = analyzer.getCommonSubtypeOf(&text1, &text2);
 	BOOST_REQUIRE(*ret);
 	BOOST_REQUIRE((*ret)->type == TYPE_CLASS);
 	BOOST_REQUIRE((*ret)->typedata._class.classname == string("Text"));
@@ -621,14 +623,14 @@ BOOST_AUTO_TEST_CASE(TestExactClassesAreTheirOwnCommonType) {
 
 BOOST_AUTO_TEST_CASE(TestClassesWithMismatchedParameterExistenceHaveNoCommonType) {
 	TypeAnalyzer analyzer;
-	PureType text1(TYPE_CLASS);
+	PureType<QUALIFIED> text1(TYPE_CLASS);
 	text1.typedata._class.classname = strdup("Text");
-	text1.typedata._class.parameters = new PureTypeArray();
-	addPureTypeToPureTypeArray(new PureType(TYPE_MATCHALL), text1.typedata._class.parameters);
-	PureType text2(TYPE_CLASS);
+	text1.typedata._class.parameters = new PureTypeArray<QUALIFIED>();
+	text1.typedata._class.parameters->addType(new PureType<QUALIFIED>(TYPE_MATCHALL));
+	PureType<QUALIFIED> text2(TYPE_CLASS);
 	text2.typedata._class.classname = strdup("Text");
 
-	boost::optional<PureType*> ret;
+	boost::optional<PureType<QUALIFIED>*> ret;
 	BOOST_REQUIRE(!analyzer.getCommonSubtypeOf(&text1, &text2));
 	BOOST_REQUIRE(!analyzer.getCommonSubtypeOf(&text2, &text1));
 }
@@ -637,16 +639,16 @@ BOOST_AUTO_TEST_CASE(TestClassesWithParameterValuesDifferentHaveNoCommonType) {
 	TypeAnalyzer analyzer;
 	ClassSpaceSymbolTable reference;
 	analyzer.reference = &reference;
-	PureType text1(TYPE_CLASS);
+	PureType<QUALIFIED> text1(TYPE_CLASS);
 	text1.typedata._class.classname = strdup("Text");
-	text1.typedata._class.parameters = new PureTypeArray();
-	addPureTypeToPureTypeArray(new PureType(TYPE_MATCHALL), text1.typedata._class.parameters);
-	PureType text2(TYPE_CLASS);
+	text1.typedata._class.parameters = new PureTypeArray<QUALIFIED>();
+	text1.typedata._class.parameters->addType(new PureType<QUALIFIED>(TYPE_MATCHALL));
+	PureType<QUALIFIED> text2(TYPE_CLASS);
 	text2.typedata._class.classname = strdup("Text");
-	text2.typedata._class.parameters = new PureTypeArray();
-	addPureTypeToPureTypeArray(new PureType(TYPE_MATCHALL), text1.typedata._class.parameters);
+	text2.typedata._class.parameters = new PureTypeArray<QUALIFIED>();
+	text1.typedata._class.parameters->addType(new PureType<QUALIFIED>(TYPE_MATCHALL));
 
-	boost::optional<PureType*> ret = analyzer.getCommonSubtypeOf(&text1, &text2);
+	boost::optional<PureType<QUALIFIED>*> ret = analyzer.getCommonSubtypeOf(&text1, &text2);
 	BOOST_REQUIRE(!analyzer.getCommonSubtypeOf(&text1, &text2));
 	BOOST_REQUIRE(!analyzer.getCommonSubtypeOf(&text2, &text1));
 }
@@ -655,16 +657,16 @@ BOOST_AUTO_TEST_CASE(TestClassWithParentIsCommonToParent) {
 	TypeAnalyzer analyzer;
 	ClassSpaceSymbolTable reference;
 	analyzer.reference = &reference;
-	PureType printer(TYPE_CLASS);
+	PureType<QUALIFIED> printer(TYPE_CLASS);
 	printer.typedata._class.classname = strdup("Printer");
-	PureType disabledPrinter(TYPE_CLASS);
+	PureType<QUALIFIED> disabledPrinter(TYPE_CLASS);
 	disabledPrinter.typedata._class.classname = strdup("DisabledPrinter");
 
 	reference.addClass("Printer");
 	reference.addClass("DisabledPrinter");
 	reference.addInheritance("Printer", true);
 
-	boost::optional<PureType*> ret = analyzer.getCommonSubtypeOf(&printer, &disabledPrinter);
+	boost::optional<PureType<QUALIFIED>*> ret = analyzer.getCommonSubtypeOf(&printer, &disabledPrinter);
 	BOOST_REQUIRE(ret);
 	BOOST_REQUIRE((*ret)->type == TYPE_CLASS);
 	BOOST_REQUIRE((*ret)->typedata._class.classname == string("Printer"));
@@ -680,16 +682,16 @@ BOOST_AUTO_TEST_CASE(TestClassesWithRootParentIsRootParent) {
 	TypeAnalyzer analyzer;
 	ClassSpaceSymbolTable reference;
 	analyzer.reference = &reference;
-	PureType stdErrPrinter(TYPE_CLASS);
+	PureType<QUALIFIED> stdErrPrinter(TYPE_CLASS);
 	stdErrPrinter.typedata._class.classname = strdup("StdErrPrinter");
-	PureType disabledPrinter(TYPE_CLASS);
+	PureType<QUALIFIED> disabledPrinter(TYPE_CLASS);
 	disabledPrinter.typedata._class.classname = strdup("DisabledPrinter");
 
 	reference.addClass("Printer");
 	reference.addClass("DisabledPrinter"); reference.addInheritance("Printer", true);
 	reference.addClass("StdErrPrinter"); reference.addInheritance("Printer", true);
 
-	boost::optional<PureType*> ret = analyzer.getCommonSubtypeOf(&stdErrPrinter, &disabledPrinter);
+	boost::optional<PureType<QUALIFIED>*> ret = analyzer.getCommonSubtypeOf(&stdErrPrinter, &disabledPrinter);
 	BOOST_REQUIRE(ret);
 	BOOST_REQUIRE((*ret)->type == TYPE_CLASS);
 	BOOST_REQUIRE((*ret)->typedata._class.classname == string("Printer"));
@@ -705,9 +707,9 @@ BOOST_AUTO_TEST_CASE(TestClassesWithDifferenntLengthPathsToRootParentIsRootParen
 	TypeAnalyzer analyzer;
 	ClassSpaceSymbolTable reference;
 	analyzer.reference = &reference;
-	PureType stdErrPrinter(TYPE_CLASS);
+	PureType<QUALIFIED> stdErrPrinter(TYPE_CLASS);
 	stdErrPrinter.typedata._class.classname = strdup("StdErrPrinter");
-	PureType logger(TYPE_CLASS);
+	PureType<QUALIFIED> logger(TYPE_CLASS);
 	logger.typedata._class.classname = strdup("Logger");
 
 	reference.addClass("OStream");
@@ -715,7 +717,7 @@ BOOST_AUTO_TEST_CASE(TestClassesWithDifferenntLengthPathsToRootParentIsRootParen
 	reference.addClass("StdErrPrinter"); reference.addInheritance("Printer", true);
 	reference.addClass("Logger"); reference.addInheritance("OStream", true);
 
-	boost::optional<PureType*> ret = analyzer.getCommonSubtypeOf(&stdErrPrinter, &logger);
+	boost::optional<PureType<QUALIFIED>*> ret = analyzer.getCommonSubtypeOf(&stdErrPrinter, &logger);
 	BOOST_REQUIRE(ret);
 	BOOST_REQUIRE((*ret)->type == TYPE_CLASS);
 	BOOST_REQUIRE((*ret)->typedata._class.classname == string("OStream"));
@@ -731,9 +733,9 @@ BOOST_AUTO_TEST_CASE(TestClassesWithRootRootParentIsRootRootParent) {
 	TypeAnalyzer analyzer;
 	ClassSpaceSymbolTable reference;
 	analyzer.reference = &reference;
-	PureType stdErrPrinter(TYPE_CLASS);
+	PureType<QUALIFIED> stdErrPrinter(TYPE_CLASS);
 	stdErrPrinter.typedata._class.classname = strdup("StdErrPrinter");
-	PureType disabledLogger(TYPE_CLASS);
+	PureType<QUALIFIED> disabledLogger(TYPE_CLASS);
 	disabledLogger.typedata._class.classname = strdup("DisabledLogger");
 
 	reference.addClass("OStream");
@@ -742,7 +744,7 @@ BOOST_AUTO_TEST_CASE(TestClassesWithRootRootParentIsRootRootParent) {
 	reference.addClass("Logger"); reference.addInheritance("OStream", true);
 	reference.addClass("DisabledLogger"); reference.addInheritance("Logger", true);
 
-	boost::optional<PureType*> ret = analyzer.getCommonSubtypeOf(&stdErrPrinter, &disabledLogger);
+	boost::optional<PureType<QUALIFIED>*> ret = analyzer.getCommonSubtypeOf(&stdErrPrinter, &disabledLogger);
 	BOOST_REQUIRE(ret);
 	BOOST_REQUIRE((*ret)->type == TYPE_CLASS);
 	BOOST_REQUIRE((*ret)->typedata._class.classname == string("OStream"));
@@ -758,9 +760,9 @@ BOOST_AUTO_TEST_CASE(TestTwoEquallyViableParentClassesHasNoCommonType) {
 	TypeAnalyzer analyzer;
 	ClassSpaceSymbolTable reference;
 	analyzer.reference = &reference;
-	PureType printer(TYPE_CLASS);
+	PureType<QUALIFIED> printer(TYPE_CLASS);
 	printer.typedata._class.classname = strdup("Printer");
-	PureType logger(TYPE_CLASS);
+	PureType<QUALIFIED> logger(TYPE_CLASS);
 	logger.typedata._class.classname = strdup("Logger");
 
 	reference.addClass("OStream");
@@ -776,9 +778,9 @@ BOOST_AUTO_TEST_CASE(TestTwoDistantEquallyViableParentClassesHasNoCommonType) {
 	TypeAnalyzer analyzer;
 	ClassSpaceSymbolTable reference;
 	analyzer.reference = &reference;
-	PureType disabledPrinter(TYPE_CLASS);
+	PureType<QUALIFIED> disabledPrinter(TYPE_CLASS);
 	disabledPrinter.typedata._class.classname = strdup("DisabledPrinter");
-	PureType stdErrLogger(TYPE_CLASS);
+	PureType<QUALIFIED> stdErrLogger(TYPE_CLASS);
 	stdErrLogger.typedata._class.classname = strdup("StdErrLogger");
 
 	reference.addClass("OStream");
@@ -796,9 +798,9 @@ BOOST_AUTO_TEST_CASE(TestTwoLopsidedEquallyViableParentClassesHasNoCommonType) {
 	TypeAnalyzer analyzer;
 	ClassSpaceSymbolTable reference;
 	analyzer.reference = &reference;
-	PureType disabledPrinter(TYPE_CLASS);
+	PureType<QUALIFIED> disabledPrinter(TYPE_CLASS);
 	disabledPrinter.typedata._class.classname = strdup("DisabledPrinter");
-	PureType logger(TYPE_CLASS);
+	PureType<QUALIFIED> logger(TYPE_CLASS);
 	logger.typedata._class.classname = strdup("Logger");
 
 	reference.addClass("OStream");
@@ -815,9 +817,9 @@ BOOST_AUTO_TEST_CASE(TestDistantEquallyViableParentClassesBelowValidParentClassI
 	TypeAnalyzer analyzer;
 	ClassSpaceSymbolTable reference;
 	analyzer.reference = &reference;
-	PureType disabledPrinter(TYPE_CLASS);
+	PureType<QUALIFIED> disabledPrinter(TYPE_CLASS);
 	disabledPrinter.typedata._class.classname = strdup("DisabledPrinter");
-	PureType stdErrLogger(TYPE_CLASS);
+	PureType<QUALIFIED> stdErrLogger(TYPE_CLASS);
 	stdErrLogger.typedata._class.classname = strdup("StdErrLogger");
 
 	reference.addClass("OStream");
@@ -828,7 +830,7 @@ BOOST_AUTO_TEST_CASE(TestDistantEquallyViableParentClassesBelowValidParentClassI
 	reference.addClass("DisabledPrinter"); reference.addInheritance("Printer", true); reference.addInheritance("Debuggable", false);
 	reference.addClass("StdErrLogger"); reference.addInheritance("Logger", true); reference.addInheritance("Debuggable", false);
 
-	boost::optional<PureType*> ret = analyzer.getCommonSubtypeOf(&stdErrLogger, &disabledPrinter);
+	boost::optional<PureType<QUALIFIED>*> ret = analyzer.getCommonSubtypeOf(&stdErrLogger, &disabledPrinter);
 	BOOST_REQUIRE(ret);
 	BOOST_REQUIRE((*ret)->type == TYPE_CLASS);
 	BOOST_REQUIRE((*ret)->typedata._class.classname == string("Debuggable"));
@@ -842,31 +844,31 @@ BOOST_AUTO_TEST_CASE(TestDistantEquallyViableParentClassesBelowValidParentClassI
 
 BOOST_AUTO_TEST_CASE(TestGetArrayReferenceLevelForClassIs0) {
 	TypeAnalyzer analyzer;
-	PureType clazz(TYPE_CLASS);
+	PureType<QUALIFIED> clazz(TYPE_CLASS);
 	BOOST_REQUIRE(analyzer.getArrayReferenceLevel(clazz) == 0);
 }
 
 BOOST_AUTO_TEST_CASE(TestGetArrayReferenceLevelForListIs1) {
 	TypeAnalyzer analyzer;
-	PureType list(TYPE_LIST);
-	list.typedata.list.contained = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED> list(TYPE_LIST);
+	list.typedata.list.contained = new PureType<QUALIFIED>(TYPE_CLASS);
 	BOOST_REQUIRE(analyzer.getArrayReferenceLevel(list) == 1);
 }
 
 BOOST_AUTO_TEST_CASE(TestGetArrayReferenceLevelForListListIs2) {
 	TypeAnalyzer analyzer;
-	PureType list(TYPE_LIST);
-	list.typedata.list.contained = new PureType(TYPE_LIST);
-	list.typedata.list.contained->typedata.list.contained = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED> list(TYPE_LIST);
+	list.typedata.list.contained = new PureType<QUALIFIED>(TYPE_LIST);
+	list.typedata.list.contained->typedata.list.contained = new PureType<QUALIFIED>(TYPE_CLASS);
 	BOOST_REQUIRE(analyzer.getArrayReferenceLevel(list) == 2);
 }
 
 BOOST_AUTO_TEST_CASE(TestGetArrayReferenceLevelForListOptionalListIs2) {
 	TypeAnalyzer analyzer;
-	PureType list(TYPE_LIST);
-	list.typedata.list.contained = new PureType(TYPE_OPTIONAL);
-	list.typedata.list.contained->typedata.optional.contained = new PureType(TYPE_LIST);
-	list.typedata.list.contained->typedata.optional.contained->typedata.list.contained = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED> list(TYPE_LIST);
+	list.typedata.list.contained = new PureType<QUALIFIED>(TYPE_OPTIONAL);
+	list.typedata.list.contained->typedata.optional.contained = new PureType<QUALIFIED>(TYPE_LIST);
+	list.typedata.list.contained->typedata.optional.contained->typedata.list.contained = new PureType<QUALIFIED>(TYPE_CLASS);
 	BOOST_REQUIRE(analyzer.getArrayReferenceLevel(list) == 2);
 }
 

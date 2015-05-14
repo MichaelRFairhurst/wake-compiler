@@ -33,11 +33,12 @@ BOOST_AUTO_TEST_SUITE( ParseTreeTraverserTest )
 		Parser p; \
 		ErrorTracker errors; \
 		ClassSpaceSymbolTable table; \
+		table.setModule("lang"); \
 		LibraryLoader loader; \
 		loader.loadStdLibToTable(&table); \
 		ParseTreeTraverser t(&table, errors); \
 		MockSemanticErrorPrinter e; \
-		p.parse( CODE  "\nevery Num is: every Bool is: every Text is: every List{T} is: Num -- getSize() { return 0; } every Exception is: Text[] -- getStackTrace() { var Text[] = []; return Text[]; }"); \
+		p.parse("module lang;\n" CODE  "\nevery Num is: every Bool is: every Text is: every List{T} is: Num -- getSize() { return 0; } every Exception is: Text[] -- getStackTrace() { var Text[] = []; return Text[]; }"); \
 		if(PTT_PRINT_TREE) p.print(); \
 		{ EXPECTATIONS } \
 		t.traverse(p.getParseTree()); \

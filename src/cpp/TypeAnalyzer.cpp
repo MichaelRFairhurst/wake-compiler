@@ -433,6 +433,7 @@ bool TypeAnalyzer::isAutoboxedType(PureType<wake::QUALIFIED>* type, PureType<wak
 	if(type->type == TYPE_LIST) {
 		*boxed = new PureType<wake::QUALIFIED>(TYPE_CLASS);
 		PureType<wake::QUALIFIED>* loweredtype = new PureType<wake::QUALIFIED>(*type->typedata.list.contained);
+		(*boxed)->typedata._class.modulename = strdup("lang");
 		(*boxed)->typedata._class.classname = strdup("List");
 		(*boxed)->typedata._class.parameters = new PureTypeArray<wake::QUALIFIED>();
 
@@ -456,18 +457,21 @@ bool TypeAnalyzer::isAutoboxedType(PureType<wake::QUALIFIED>* type, PureType<wak
 
 	if(isPrimitiveTypeBool(type)) {
 		*boxed = new PureType<wake::QUALIFIED>(TYPE_CLASS);
+		(*boxed)->typedata._class.modulename = strdup("lang");
 		(*boxed)->typedata._class.classname = strdup("Bool");
 		return true;
 	}
 
 	if(isPrimitiveTypeText(type)) {
 		*boxed = new PureType<wake::QUALIFIED>(TYPE_CLASS);
+		(*boxed)->typedata._class.modulename = strdup("lang");
 		(*boxed)->typedata._class.classname = strdup("Text");
 		return true;
 	}
 
 	if(isPrimitiveTypeNum(type)) {
 		*boxed = new PureType<wake::QUALIFIED>(TYPE_CLASS);
+		(*boxed)->typedata._class.modulename = strdup("lang");
 		(*boxed)->typedata._class.classname = strdup("Num");
 		return true;
 	}
@@ -477,6 +481,7 @@ bool TypeAnalyzer::isAutoboxedType(PureType<wake::QUALIFIED>* type, PureType<wak
 
 bool TypeAnalyzer::isException(PureType<wake::QUALIFIED>* type) {
 	PureType<wake::QUALIFIED> exception(TYPE_CLASS);
+	exception.typedata._class.modulename = strdup("lang");
 	exception.typedata._class.classname = strdup("Exception");
 	bool ret = isASubtypeOfB(type, &exception);
 	return ret;

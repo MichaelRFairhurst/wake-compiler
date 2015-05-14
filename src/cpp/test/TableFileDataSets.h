@@ -12,7 +12,7 @@
  *
  **************************************************/
 
-#define TABLE_FILE_VERSION "\005"
+#define TABLE_FILE_VERSION "\006"
 
 extern char SIMPLE_TABLE[23];
 

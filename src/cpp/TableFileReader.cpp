@@ -21,7 +21,7 @@ using namespace wake;
 
 void TableFileReader::read(PropertySymbolTable* table, istream& s) {
 	int version = readUInt8(s);
-	if(version != 5) throw string("Can not read table file, it has an unsupported version");
+	if(version != 6) throw string("Can not read table file, it has an unsupported version");
 	table->setModule(readString(s));
 	table->classname = readString(s);
 	table->abstract = readUInt8(s);

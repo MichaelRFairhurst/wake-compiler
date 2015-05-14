@@ -20,7 +20,7 @@ using namespace wake;
 void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 	char dataptr[1] = {0};
 
-	dataptr[0] = (char) 5; //version
+	dataptr[0] = (char) 6; //version
 	out.write(dataptr, 1);
 
 	dataptr[0] = (char) table->getModule().size();

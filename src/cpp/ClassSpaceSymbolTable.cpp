@@ -51,7 +51,7 @@ boost::optional<SemanticError*> ClassSpaceSymbolTable::importClass(PropertySymbo
 		return boost::optional<SemanticError*>(new SemanticError(MULTIPLE_CLASS_DEFINITION));
 	}
 
-	fullQualifications[fqname] = table->classname;
+	fullQualifications[table->classname] = fqname;
 	classes[fqname] = pair<PropertySymbolTable*, bool>(table, false);
 	return boost::optional<SemanticError*>();
 }
@@ -174,8 +174,8 @@ void ClassSpaceSymbolTable::assertTypeIsValid(PureType<wake::QUALIFIED>* type) {
 	if(type->type == TYPE_PARAMETERIZED) return;
 
 	if(type->type == TYPE_CLASS) {
-		if(classes.count(type->typedata._class.classname)) {
-			std::map<string, pair<PropertySymbolTable*, bool> >::iterator searcher = classes.find(type->typedata._class.classname);
+		if(classes.count(type->getFQClassname())) {
+			std::map<string, pair<PropertySymbolTable*, bool> >::iterator searcher = classes.find(type->getFQClassname());
 			PropertySymbolTable* table = searcher->second.first;
 			vector<PureType<wake::QUALIFIED>*> parameterizations;
 
@@ -251,8 +251,13 @@ string ClassSpaceSymbolTable::getFullyQualifiedClassname(string classname) {
 
 PureType<wake::QUALIFIED>* ClassSpaceSymbolTable::setModulesOnType(PureType<wake::UNQUALIFIED>* type) {
 	if(type->type == TYPE_CLASS) {
-		if(type->typedata._class.modulename != NULL) {
-			type->typedata._class.modulename = strdup(getFullyQualifiedClassname(type->typedata._class.classname).c_str());
+		if(type->typedata._class.modulename == NULL) {
+			try {
+				PropertySymbolTable* fullSpec = findByImportedNameModifiable(type->typedata._class.classname);
+				type->typedata._class.modulename = strdup(fullSpec->getModule().c_str());
+			} catch(SymbolNotFoundException* e) {
+				delete e;
+			}
 		}
 
 		if(type->typedata._class.parameters != NULL) {
@@ -265,10 +270,16 @@ PureType<wake::QUALIFIED>* ClassSpaceSymbolTable::setModulesOnType(PureType<wake
 	} else if(type->type == TYPE_LIST) {
 		setModulesOnType(type->typedata.list.contained);
 	} else if(type->type == TYPE_PARAMETERIZED || type->type == TYPE_PARAMETERIZED_ARG) {
-		setModulesOnType(type->typedata.parameterized.upperbound);
-		setModulesOnType(type->typedata.parameterized.lowerbound);
+		if(type->typedata.parameterized.upperbound != NULL) {
+			setModulesOnType(type->typedata.parameterized.upperbound);
+		}
+		if(type->typedata.parameterized.lowerbound != NULL) {
+			setModulesOnType(type->typedata.parameterized.lowerbound);
+		}
 	} else if(type->type == TYPE_LAMBDA) {
-		setModulesOnType(type->typedata.lambda.returntype);
+		if(type->typedata.lambda.returntype != NULL) {
+			setModulesOnType(type->typedata.lambda.returntype);
+		}
 
 		if(type->typedata.lambda.arguments != NULL) {
 			for (int i = 0; i < type->typedata.lambda.arguments->typecount; i++) {

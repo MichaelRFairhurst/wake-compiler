@@ -16,12 +16,14 @@
 #include "SemanticError.h"
 #include <boost/test/unit_test.hpp>
 
+using namespace wake;
+
 BOOST_AUTO_TEST_SUITE( ScopeSymbolTableTest )
 
 BOOST_AUTO_TEST_CASE( TestSymbolTableAddsAndThenGets ) {
 	ScopeSymbolTable table;
-	VarDecl decl;
-	decl.typedata = PureType(TYPE_CLASS);
+	VarDecl<QUALIFIED> decl;
+	decl.typedata = PureType<QUALIFIED>(TYPE_CLASS);
 	decl.alias = strdup("bilbo");
 	table.add(&decl);
 
@@ -30,7 +32,7 @@ BOOST_AUTO_TEST_CASE( TestSymbolTableAddsAndThenGets ) {
 
 BOOST_AUTO_TEST_CASE( TestSymbolTableAddInLastStackWillGet ) {
 	ScopeSymbolTable table;
-	VarDecl decl;
+	VarDecl<QUALIFIED> decl;
 	decl.alias = strdup("bilbo");
 	table.add(&decl);
 	table.pushScope();
@@ -41,7 +43,7 @@ BOOST_AUTO_TEST_CASE( TestSymbolTableAddInLastStackWillGet ) {
 
 BOOST_AUTO_TEST_CASE( TestSymbolTableNotAddedGetsEmptyOptional) {
 	ScopeSymbolTable table;
-	boost::optional<PureType*> type;
+	boost::optional<PureType<QUALIFIED>*> type;
 
 	type = table.find("bilbo");
 	BOOST_CHECK(!type);
@@ -49,8 +51,8 @@ BOOST_AUTO_TEST_CASE( TestSymbolTableNotAddedGetsEmptyOptional) {
 
 BOOST_AUTO_TEST_CASE( TestSymbolTableAddTwiceThrowsSemanticError ) {
 	ScopeSymbolTable table;
-	VarDecl decl;
-	decl.typedata = PureType(TYPE_CLASS);
+	VarDecl<QUALIFIED> decl;
+	decl.typedata = PureType<QUALIFIED>(TYPE_CLASS);
 	decl.alias = strdup("bilbo");
 
 	table.add(&decl);
@@ -66,8 +68,8 @@ BOOST_AUTO_TEST_CASE( TestSymbolTableAddTwiceThrowsSemanticError ) {
 
 BOOST_AUTO_TEST_CASE( TestSymbolTableAddInNewScopeStillThrowsSemanticError ) {
 	ScopeSymbolTable table;
-	VarDecl decl;
-	decl.typedata = PureType(TYPE_CLASS);
+	VarDecl<QUALIFIED> decl;
+	decl.typedata = PureType<QUALIFIED>(TYPE_CLASS);
 	decl.alias = strdup("bilbo");
 
 	table.add(&decl);
@@ -84,10 +86,10 @@ BOOST_AUTO_TEST_CASE( TestSymbolTableAddInNewScopeStillThrowsSemanticError ) {
 
 BOOST_AUTO_TEST_CASE( TestSymbolTableAddInNewScopeNotSetOncePopped ) {
 	ScopeSymbolTable table;
-	boost::optional<PureType*> optionaltype;
-	VarDecl decl;
+	boost::optional<PureType<QUALIFIED>*> optionaltype;
+	VarDecl<QUALIFIED> decl;
 	decl.alias = strdup("bilbo");
-	decl.typedata = PureType(TYPE_CLASS);
+	decl.typedata = PureType<QUALIFIED>(TYPE_CLASS);
 
 	table.pushScope();
 	table.add(&decl);
@@ -105,15 +107,15 @@ BOOST_AUTO_TEST_CASE( TestPushPopEmptyScopeGoesOK ) {
 
 BOOST_AUTO_TEST_CASE( TestSymbolsAddedByType ) {
 	ScopeSymbolTable table;
-	VarDecl simple;
-	simple.typedata = PureType(TYPE_CLASS);
+	VarDecl<QUALIFIED> simple;
+	simple.typedata = PureType<QUALIFIED>(TYPE_CLASS);
 	simple.shadow = 0;
 	simple.typedata.typedata._class.classname = strdup("MyClass");
-	VarDecl aliased;
-	aliased.typedata = PureType(TYPE_CLASS);
+	VarDecl<QUALIFIED> aliased;
+	aliased.typedata = PureType<QUALIFIED>(TYPE_CLASS);
 	aliased.alias = strdup("myClass");
-	VarDecl shadowed;
-	shadowed.typedata = PureType(TYPE_CLASS);
+	VarDecl<QUALIFIED> shadowed;
+	shadowed.typedata = PureType<QUALIFIED>(TYPE_CLASS);
 	//shadowed.alias = NULL;
 	shadowed.typedata.typedata._class.classname = strdup("MyClass");
 	shadowed.shadow = 3;
@@ -129,8 +131,8 @@ BOOST_AUTO_TEST_CASE( TestSymbolsAddedByType ) {
 
 BOOST_AUTO_TEST_CASE( TestGetSymbolByType ) {
 	ScopeSymbolTable table;
-	PureType simplep(TYPE_CLASS);
-	PureType shadowedp(TYPE_CLASS);
+	PureType<QUALIFIED> simplep(TYPE_CLASS);
+	PureType<QUALIFIED> shadowedp(TYPE_CLASS);
 
 	table.add("MyClass", &simplep);
 	table.add("$$$MyClass", &shadowedp);
@@ -146,21 +148,21 @@ BOOST_AUTO_TEST_SUITE_END()
 
 BOOST_AUTO_TEST_CASE( TestArrayedSymbolsAddedByType ) {
 	ScopeSymbolTable table;
-	PureType onearray(TYPE_LIST);
-	PureType* onecontained = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED> onearray(TYPE_LIST);
+	PureType<QUALIFIED>* onecontained = new PureType<QUALIFIED>(TYPE_CLASS);
 	onecontained->typedata._class.classname = strdup("One");
 	//onecontained->alias = NULL;
 	onearray.type = TYPE_LIST;
 	onearray.typedata.list.contained = onecontained;
-	PureType twoarray(TYPE_LIST);
-	PureType* twoarrayinner = new PureType(TYPE_LIST);
-	PureType* twocontained = new PureType(TYPE_CLASS);
+	PureType<QUALIFIED> twoarray(TYPE_LIST);
+	PureType<QUALIFIED>* twoarrayinner = new PureType<QUALIFIED>(TYPE_LIST);
+	PureType<QUALIFIED>* twocontained = new PureType<QUALIFIED>(TYPE_CLASS);
 	twocontained->typedata._class.classname = strdup("Two");
 	twoarrayinner->typedata.list.contained = twocontained;
 	twoarray.typedata.list.contained = twoarrayinner;
 
-	VarDecl onearraydecl;
-	VarDecl twoarraydecl;
+	VarDecl<QUALIFIED> onearraydecl;
+	VarDecl<QUALIFIED> twoarraydecl;
 	onearraydecl.typedata = onearray;
 	twoarraydecl.typedata = twoarray;
 	table.add(&onearraydecl);
