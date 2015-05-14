@@ -143,7 +143,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 				// @Todo only print exception classes
 				for(map<string, bool>::const_iterator it = parentage.begin(); it != parentage.end(); ++it) {
 					file << "'";
-					header->addClassUsage(file.tellp(), classes->getFullyQualifiedClassname(it->first));
+					header->addClassUsage(file.tellp(), it->first);
 					file << "',";
 				}
 				file << "'";
@@ -534,7 +534,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_PROPERTY:
 			{
 				file << "this.";
-				string propname = tree->node_data.nodes[0]->node_data.nodes[0]->node_data.var_ref->toString();
+				string propname = tree->node_data.nodes[0]->node_data.nodes[0]->node_data.var_decl->createVarRef().toString();
 				header->addPropertyUsage(file.tellp(), propname);
 				file << "=";
 				generate(tree->node_data.nodes[0]->node_data.nodes[1]);

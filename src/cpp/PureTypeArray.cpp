@@ -28,7 +28,7 @@ template<wake::TypeQualification isQualified>
 void PureTypeArray<isQualified>::addType(PureType<isQualified>* type) {
 		// Remember: this template is purely for the typesystem, we can cast without borking mem safety
 	addPureTypeToPureTypeArray(
-		new PureType<wake::UNQUALIFIED>(*(PureType<wake::UNQUALIFIED>*) type),
+		(PureType<wake::UNQUALIFIED>*) type,
 		(PureTypeArray<wake::UNQUALIFIED>*) this
 	);
 }

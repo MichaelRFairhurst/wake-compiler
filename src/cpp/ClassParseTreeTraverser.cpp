@@ -415,10 +415,12 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 									case NT_STRINGLIT:
 										actual.typedata = PureType<QUALIFIED>(TYPE_CLASS);
 										actual.typedata.typedata._class.classname = strdup("Text");
+										actual.typedata.typedata._class.modulename = strdup("lang");
 										break;
 									case NT_NUMBERLIT:
 										actual.typedata = PureType<QUALIFIED>(TYPE_CLASS);
 										actual.typedata.typedata._class.classname = strdup("Num");
+										actual.typedata.typedata._class.modulename = strdup("lang");
 										break;
 
 									case NT_INJECTION_ARG:

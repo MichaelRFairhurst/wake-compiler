@@ -188,6 +188,7 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 						delete ret;
 						ret = new PureType<QUALIFIED>(TYPE_CLASS);
 						ret->typedata._class.classname = strdup("Num");
+						ret->typedata._class.modulename = strdup("lang");
 					}
 
 					EXPECTED	"Num"
@@ -206,6 +207,7 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 					delete ret;
 					ret = new PureType<QUALIFIED>(TYPE_CLASS);
 					ret->typedata._class.classname = strdup("Num");
+					ret->typedata._class.modulename = strdup("lang");
 
 					EXPECTED	"Num"
 					ERRONEOUS	erroneousstring
@@ -222,6 +224,7 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 			{
 				ret = new PureType<QUALIFIED>(TYPE_CLASS);
 				ret->typedata._class.classname = strdup("Bool");
+				ret->typedata._class.modulename = strdup("lang");
 
 				PureType<QUALIFIED> a = *auto_ptr<PureType<QUALIFIED> >(children[0].typeCheck(false));
 				PureType<QUALIFIED> b = *auto_ptr<PureType<QUALIFIED> >(children[1].typeCheck(false));
@@ -249,6 +252,7 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 				PureType<QUALIFIED> b = *auto_ptr<PureType<QUALIFIED> >(children[1].typeCheck(false));
 				ret = new PureType<QUALIFIED>(TYPE_CLASS);
 				ret->typedata._class.classname = strdup("Bool");
+				ret->typedata._class.modulename = strdup("lang");
 
 				if(!analyzer->isASubtypeOfB(&a, &b) && !analyzer->isASubtypeOfB(&b, &a)) {
 					EXPECTED	a.toString()
@@ -274,6 +278,7 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 						delete ret;
 						ret = new PureType<QUALIFIED>(TYPE_CLASS);
 						ret->typedata._class.classname = strdup("Bool");
+						ret->typedata._class.modulename = strdup("lang");
 					}
 
 					EXPECTED	"Bool"
@@ -291,6 +296,7 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 				delete ret;
 				ret = new PureType<QUALIFIED>(TYPE_CLASS);
 				ret->typedata._class.classname = strdup("Bool");
+				ret->typedata._class.modulename = strdup("lang");
 
 				EXPECTED	"Bool"
 				ERRONEOUS	erroneousstring

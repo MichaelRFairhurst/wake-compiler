@@ -30,7 +30,8 @@ ClassSpaceSymbolTable::~ClassSpaceSymbolTable() {
 boost::optional<SemanticError*> ClassSpaceSymbolTable::addClass(string name) {
 	addingclass_name = name;
 
-	if(classes.count(addingclass_name)) {
+	string fqname = (module.size() ? module + "." : "") + addingclass_name;
+	if(classes.count(fqname)) {
 		return boost::optional<SemanticError*>(new SemanticError(MULTIPLE_CLASS_DEFINITION));
 	}
 
@@ -38,7 +39,6 @@ boost::optional<SemanticError*> ClassSpaceSymbolTable::addClass(string name) {
 	addingclass_symbol->classname = name;
 	addingclass_hassubclass = false;
 
-	string fqname = (module.size() ? module + "." : "") + addingclass_name;
 	classes[fqname] = pair<PropertySymbolTable*, bool>(addingclass_symbol, true);
 	fullQualifications[addingclass_name] = fqname;
 
@@ -71,9 +71,7 @@ vector<PropertySymbolTable*> ClassSpaceSymbolTable::getDefinedClasses() {
 }
 
 boost::optional<SemanticError*> ClassSpaceSymbolTable::addInheritance(string childname, bool as_subclass) {
-	if(addingclass_hassubclass && as_subclass) {
-		return boost::optional<SemanticError*>(new SemanticError(MORE_THAN_ONE_SUBCLASS));
-	}
+	string fqname = fullQualifications[addingclass_name];
 
 	if(fullQualifications.count(childname)) {
 		// careful! undefined behavior if we don't check this exists first
@@ -85,11 +83,15 @@ boost::optional<SemanticError*> ClassSpaceSymbolTable::addInheritance(string chi
 		childname = module.size() ? module + "." + childname : childname;
 	}
 
-	if(childname == addingclass_name) {
+	if(addingclass_hassubclass && as_subclass) {
+		return boost::optional<SemanticError*>(new SemanticError(MORE_THAN_ONE_SUBCLASS));
+	}
+
+	if(childname == fqname) {
 		return boost::optional<SemanticError*>(new SemanticError(SELF_INHERITANCE));
 	}
 
-	if(analyzer.isASubtypeOfB(childname, addingclass_name)) {
+	if(analyzer.isASubtypeOfB(childname, fqname)) {
 		return boost::optional<SemanticError*>(new SemanticError(CIRCULAR_INHERITANCE));
 	}
 

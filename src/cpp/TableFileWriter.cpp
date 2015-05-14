@@ -15,6 +15,8 @@
 #include "TableFileWriter.h"
 #include "PureTypeArray.h"
 
+#include <iostream>
+
 using namespace wake;
 
 void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
@@ -52,7 +54,7 @@ void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 	// Its very important that our methods section has our needs listed in order!
 	for(vector<SpecializableVarDecl<QUALIFIED>*>::iterator need = table->getNeeds()->begin(); need != table->getNeeds()->end(); ++need) {
 		for(map<string, ObjectProperty*>::iterator it = table->properties.begin(); it != table->properties.end(); ++it) {
-			if((*need)->decl.createVarRef().toString() != it->second->decl.createVarRef().toString()) continue;
+			if((*need)->decl.createVarRef().toString() != it->first) continue;
 			dataptr[0] = (char) it->second->flags;
 			out.write(dataptr, 1);
 

@@ -22,10 +22,11 @@ bool TypeAnalyzer::isASubtypeOfB(string a, string b) {
 	try {
 		if(a == b) return true;
 
-		ReadOnlyPropertySymbolTable* a_data = reference->findByImportedName(a);
+		ReadOnlyPropertySymbolTable* a_data = reference->findFullyQualified(a);
 
 		for(map<string, bool>::const_iterator it = a_data->getParentage().begin(); it != a_data->getParentage().end(); ++it) {
-			if(isASubtypeOfB(it->first, b)) return true;
+			PropertySymbolTable* a_child_data = reference->findFullyQualifiedModifiable(it->first);
+			if(isASubtypeOfB(a_child_data->getAsPureType()->getFQClassname(), b)) return true;
 		}
 
 	} catch(SymbolNotFoundException* e) {
@@ -89,24 +90,12 @@ bool TypeAnalyzer::isASubtypeOfB(PureType<wake::QUALIFIED>* a, PureType<wake::QU
 				return false;
 		}
 
-		if(string(a->typedata._class.classname) == b->typedata._class.classname) {
+		if(a->getFQClassname() == b->getFQClassname()) {
 			return true;
 		}
 
 		try {
-			string fqname = a->typedata._class.modulename == NULL ? "" : a->typedata._class.modulename;
-
-			if(fqname.size()) {
-				fqname += ".";
-			}
-			fqname += a->typedata._class.classname;
-
-			ReadOnlyPropertySymbolTable* a_data = reference->findFullyQualified(fqname);
-
-			for(map<string, bool>::const_iterator it = a_data->getParentage().begin(); it != a_data->getParentage().end(); ++it) {
-				if(isASubtypeOfB(it->first, b->typedata._class.classname)) return true;
-			}
-
+			if(isASubtypeOfB(a->getFQClassname(), b->getFQClassname())) return true;
 		} catch(SymbolNotFoundException* e) {
 			delete e;
 		}

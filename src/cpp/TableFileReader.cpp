@@ -152,7 +152,6 @@ PureType<QUALIFIED>* TableFileReader::readLambdaType(istream& s) {
 	while(numArgTypes--) {
 		//cout << "reading lambda arg" << endl;
 		type->typedata.lambda.arguments->addType(readType(s));
-		tag = readUInt8(s);
 	}
 
 	return type;
