@@ -18,6 +18,7 @@
 #include "AnnotationTreeTraverser.h"
 #include "Annotation.h"
 #include <memory>
+#include <stdexcept>
 #include <boost/lexical_cast.hpp>
 
 using namespace wake;
