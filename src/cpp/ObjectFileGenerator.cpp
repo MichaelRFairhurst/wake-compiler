@@ -224,7 +224,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 				vector<SpecializableVarDecl<QUALIFIED>*>* needs = classes->findByImportedName(provisionname)->getNeeds();
 				for(vector<SpecializableVarDecl<QUALIFIED>*>::iterator it = needs->begin(); it != needs->end(); ++it) {
 					SpecializablePureType<QUALIFIED> spType;
-					spType.specialty = strdup((*it)->specialty);
+					spType.specialty = (*it)->specialty == NULL ? NULL : strdup((*it)->specialty);
 					spType.typedata = (*it)->decl.typedata;
 					vector<PureType<QUALIFIED>*> no_args;
 					if(it != needs->begin()) file << ",";
@@ -288,11 +288,11 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 					table.pushScope();
 
-					for(int i = 0; i < tree->node_data.nodes[1]->subnodes; i++) {
+					for(int i = 0; i < tree->node_data.nodes[1]->node_data.nodes[0]->subnodes; i++) {
 						if(i != 0) file << ",";
 						// its ok that we have to cast, its been qualified elsewhere
-						table.add((VarDecl<QUALIFIED>*) tree->node_data.nodes[1]->node_data.nodes[i]->node_data.var_decl);
-						VarRef ref = tree->node_data.nodes[1]->node_data.nodes[i]->node_data.var_decl->createVarRef();
+						table.add((VarDecl<QUALIFIED>*) tree->node_data.nodes[1]->node_data.nodes[0]->node_data.nodes[i]->node_data.var_decl);
+						VarRef ref = tree->node_data.nodes[1]->node_data.nodes[0]->node_data.nodes[i]->node_data.var_decl->createVarRef();
 						file << table.getAddress(&ref);
 					}
 
