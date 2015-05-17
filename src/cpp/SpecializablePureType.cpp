@@ -31,7 +31,7 @@ SpecializablePureType<isQualified>::SpecializablePureType(SpecializablePureType<
 template<wake::TypeQualification isQualified>
 SpecializablePureType<isQualified>& SpecializablePureType<isQualified>::operator=(SpecializablePureType<isQualified>& other) {
 	SpecializablePureType<isQualified> temp(other);
-	std::swap(*this, other);
+	std::swap(*this, temp);
 	return *this;
 }
 

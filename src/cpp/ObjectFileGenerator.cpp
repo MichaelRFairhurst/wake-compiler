@@ -23,7 +23,7 @@
 using namespace wake;
 
 void ObjectFileGenerator::generate(Node* tree) {
-	if(forceArrayIdentifier && tree->node_type != NT_TYPEDATA) {
+	if(forceArrayIdentifier && tree->node_type != NT_VAR_REF) {
 		forceArrayIdentifier = false;
 	}
 
@@ -606,6 +606,14 @@ void ObjectFileGenerator::generate(Node* tree) {
 			file << "]";
 			break;
 
+		case NT_VAR_DECL_DATA:
+			{
+				VarDecl<UNQUALIFIED> decl = *tree->node_data.var_decl;
+				VarRef ref = decl.createVarRef();
+				file << table.getAddress(&ref);
+			}
+			break;
+
 		case NT_VAR_REF:
 			{
 				VarRef ref = *tree->node_data.var_ref;
@@ -711,7 +719,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 			{
 				table.pushScope();
 				Node** nodebase = tree->node_type == NT_FOREACHIN ? tree->node_data.nodes + 1: tree->node_data.nodes;
-				bool iterating_expression = nodebase[0]->node_type != NT_ALIAS && nodebase[0]->node_type != NT_TYPEDATA;
+				bool iterating_expression = nodebase[0]->node_type != NT_ALIAS && nodebase[0]->node_type != NT_VAR_REF;
 				std::stringstream valuestorename;
 				auto_ptr<PureType<QUALIFIED> > latch;
 				if(iterating_expression) {

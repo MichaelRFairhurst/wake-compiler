@@ -41,6 +41,9 @@ void ast::Exists::typeCheck() {
 		if(existableRef->alias != NULL) {
 			realDecl.alias = strdup(existableRef->alias);
 			origDecl.alias = strdup(existableRef->alias);
+		} else {
+			realDecl.shadow = existableRef->_class->shadow;
+			origDecl.shadow = existableRef->_class->shadow;
 		}
 
 		scopesymtable->addOverwriting(new VarDecl<QUALIFIED> (realDecl));

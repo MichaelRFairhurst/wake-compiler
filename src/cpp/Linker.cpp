@@ -164,13 +164,26 @@ void Linker::setMain(ostream& file, string classname, string methodname, ClassSp
 
 void Linker::generateRecursiveConstructors(ostream& file, string ctedclass, ClassSpaceSymbolTable& table) {
 	file << "new ";
-	file << "_" << classTable.getAddress(table.getFullyQualifiedClassname(ctedclass));
+	file << "_" << classTable.getAddress(ctedclass);
 	file << "(";
 
+	bool commaOut = false;
 	vector<SpecializableVarDecl<QUALIFIED>*>* needs = table.findFullyQualified(ctedclass)->getNeeds();
 	for(vector<SpecializableVarDecl<QUALIFIED>*>::iterator it = needs->begin(); it != needs->end(); ++it) {
-		if(it != needs->begin()) file << ",";
-		generateRecursiveConstructors(file, (*it)->decl.typedata.typedata._class.classname, table);
+		if((*it)->decl.typedata.type == TYPE_CLASS) {
+			if(!commaOut) {
+				commaOut = true;
+			} else {
+				file << ",";
+			}
+			generateRecursiveConstructors(file, (*it)->decl.typedata.getFQClassname(), table);
+		} else if((*it)->decl.typedata.type == TYPE_LIST) {
+			file << "[]";
+		} else if((*it)->decl.typedata.type == TYPE_OPTIONAL) {
+			file << "null";
+		} else {
+			throw "Recursive CTOR not generatable: " + (*it)->decl.typedata.toString();;
+		}
 	}
 
 	file << ")";

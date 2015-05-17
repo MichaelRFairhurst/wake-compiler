@@ -227,15 +227,8 @@ void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable*
 			}
 			child->properties[it->first] = propagate;
 
-			if(extend && propagate->flags & PROPERTY_NEED) {
-				if(propagate->decl.typedata.type == TYPE_CLASS) {
-					string fqname = (child->getModule().size() ? child->getModule() + "." : "") + child->classname;
-					child->analyzer->assertFQNeedIsNotCircular(fqname, propagate->decl.typedata.getFQClassname());
-				}
-
-				SpecializableVarDecl<wake::QUALIFIED>* spdecl = new SpecializableVarDecl<wake::QUALIFIED>();
-				spdecl->decl = propagate->decl;
-				child->getNeeds()->push_back(spdecl);
+			if(!extend && propagate->flags & PROPERTY_NEED) {
+				propagate->flags = propagate->flags & ~PROPERTY_NEED;
 			}
 
 		} else {
@@ -250,6 +243,17 @@ void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable*
 			) {
 				errors.addError(new SemanticError(INVALID_CHILD_RETURN_TYPE, "method " + searcher->second->address + " on class " + child->classname, NULL, ""));
 			}
+		}
+	}
+
+	if(extend) {
+		for(vector<SpecializableVarDecl<wake::QUALIFIED>*>::iterator it = parent->getNeeds()->begin(); it != parent->getNeeds()->end(); ++it) {
+			if((*it)->decl.typedata.type == TYPE_CLASS) {
+				string fqname = (child->getModule().size() ? child->getModule() + "." : "") + child->classname;
+				child->analyzer->assertFQNeedIsNotCircular(fqname, (*it)->decl.typedata.getFQClassname());
+			}
+
+			child->getNeeds()->push_back(*it);
 		}
 	}
 }

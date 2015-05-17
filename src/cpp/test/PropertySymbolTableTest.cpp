@@ -16,6 +16,7 @@
 
 #include "PropertySymbolTable.h"
 #include "PureTypeArray.h"
+#include "ClassSpaceSymbolTable.h"
 
 using namespace wake;
 
@@ -128,6 +129,78 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesNeedName) {
 	BOOST_REQUIRE(needs->size() == 1);
 	BOOST_REQUIRE(needs->at(0)->decl.typedata.type == TYPE_CLASS);
 	BOOST_REQUIRE(needs->at(0)->decl.typedata.typedata._class.classname == string("AClass"));
+}
+
+BOOST_AUTO_TEST_CASE(TestPropagateInheritanceExtendPreservesNeeds) {
+	TypeAnalyzer analyzer;
+	ClassSpaceSymbolTable classes;
+	analyzer.reference = &classes;
+	classes.addClass("SharedNeed");
+	PropertySymbolTable parent(&analyzer, "");
+	PropertySymbolTable child(&analyzer, "");
+	SpecializableVarDecl<QUALIFIED> needDecl;
+	needDecl.decl.typedata = PureType<QUALIFIED>(TYPE_CLASS);
+	needDecl.decl.typedata.typedata._class.classname = strdup("SharedNeed");
+	needDecl.specialty = strdup("specialty");
+	parent.setParameters(new vector<PureType<QUALIFIED>*>());
+	parent.addNeed(&needDecl, 0, vector<Annotation*>());
+
+	ErrorTracker errors;
+	propagateInheritanceTables(&child, &parent, true, errors);
+	vector<SpecializableVarDecl<QUALIFIED>*>* needs = child.getNeeds();
+
+	BOOST_REQUIRE(needs->size() == 1);
+	BOOST_REQUIRE(needs->at(0)->decl.typedata.type == TYPE_CLASS);
+	BOOST_REQUIRE(needs->at(0)->decl.typedata.typedata._class.classname == string("SharedNeed"));
+	BOOST_REQUIRE(needs->at(0)->specialty == string("specialty"));
+}
+
+BOOST_AUTO_TEST_CASE(TestPropagateInheritanceDropsPrivateNeeds) {
+	TypeAnalyzer analyzer;
+	ClassSpaceSymbolTable classes;
+	analyzer.reference = &classes;
+	classes.addClass("SharedNeed");
+	PropertySymbolTable parent(&analyzer, "");
+	PropertySymbolTable child(&analyzer, "");
+	SpecializableVarDecl<QUALIFIED> needDecl;
+	needDecl.decl.typedata = PureType<QUALIFIED>(TYPE_CLASS);
+	needDecl.decl.typedata.typedata._class.classname = strdup("SharedNeed");
+	needDecl.specialty = strdup("specialty");
+	parent.setParameters(new vector<PureType<QUALIFIED>*>());
+	parent.addNeed(&needDecl, 0, vector<Annotation*>());
+
+	ErrorTracker errors;
+	propagateInheritanceTables(&child, &parent, false, errors);
+	vector<SpecializableVarDecl<QUALIFIED>*>* needs = child.getNeeds();
+
+	BOOST_REQUIRE(needs->size() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(TestPropagateInheritanceKeepsPublicNeedsButNotAsNeed) {
+	TypeAnalyzer analyzer;
+	ClassSpaceSymbolTable classes;
+	analyzer.reference = &classes;
+	classes.addClass("SharedNeed");
+	PropertySymbolTable parent(&analyzer, "");
+	PropertySymbolTable child(&analyzer, "");
+	SpecializableVarDecl<QUALIFIED> needDecl;
+	needDecl.decl.typedata = PureType<QUALIFIED>(TYPE_CLASS);
+	needDecl.decl.typedata.typedata._class.classname = strdup("SharedNeed");
+	needDecl.specialty = strdup("specialty");
+	parent.setParameters(new vector<PureType<QUALIFIED>*>());
+	parent.addNeed(&needDecl, PROPERTY_PUBLIC, vector<Annotation*>());
+
+	ErrorTracker errors;
+	propagateInheritanceTables(&child, &parent, false, errors);
+	vector<SpecializableVarDecl<QUALIFIED>*>* needs = child.getNeeds();
+
+	BOOST_REQUIRE(needs->size() == 0);
+	BOOST_REQUIRE(child.isAbstract());
+	boost::optional<PureType<QUALIFIED>*> method = child.find("SharedNeed");
+	BOOST_REQUIRE(method);
+	BOOST_REQUIRE(*method);
+	BOOST_REQUIRE((*method)->type == TYPE_CLASS);
+	BOOST_REQUIRE((*method)->typedata._class.classname == string("SharedNeed"));
 }
 
 BOOST_AUTO_TEST_SUITE_END();
