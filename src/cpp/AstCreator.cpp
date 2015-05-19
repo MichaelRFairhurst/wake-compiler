@@ -35,6 +35,7 @@
 #include "ast/StatementErrorCatcher.h"
 #include "ast/Lambda.h"
 #include "ast/LambdaReturn.h"
+#include "ast/UnsafeCast.h"
 #include <vector>
 
 wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
@@ -169,6 +170,11 @@ wake::ast::ExpressionNode* wake::AstCreator::generateExpressionAst(Node* node, b
 			provider,
 			classestable->setModulesOnType(node->node_data.nodes[0]->node_data.specializable_pure_type),
 			arguments, node, classestable, classestable->getAnalyzer(), errors);
+	} else if(node->node_type == NT_UNSAFE_CAST) {
+		created = new wake::ast::UnsafeCast(
+			generateExpressionAst(node->node_data.nodes[1], true),
+			classestable->setModulesOnType(node->node_data.nodes[0]->node_data.pure_type),
+			node, classestable, errors);
 	} else if(node->node_type == NT_LAMBDA_INVOCATION) {
 		std::vector<wake::ast::ExpressionNode*> arguments;
 		if(node->subnodes == 2) {

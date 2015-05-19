@@ -163,6 +163,7 @@ extern "C" {
 
 #define NT_PROPERTY 76
 #define NT_CAST 77
+#define NT_UNSAFE_CAST 126
 #define NT_COMPILER_HINT 78
 #define NT_AUTOBOX 86
 

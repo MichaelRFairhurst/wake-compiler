@@ -77,6 +77,7 @@ parent					count(); return PARENT;
 fn						count(); return FN;
 nothing					count(); return NOTHING;
 cast					count(); return CAST;
+unsafe					count(); return UNSAFE;
 exists					count(); return EXISTS;
 var						count(); return VAR;
 foreach					count(); return FOREACH;

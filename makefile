@@ -82,7 +82,8 @@ CPPNAMES= \
 	ast/StatementErrorCatcher.cpp \
 	ast/Lambda.cpp \
 	ast/LambdaReturn.cpp \
-	ast/Retrieval.cpp
+	ast/Retrieval.cpp \
+	ast/UnsafeCast.cpp
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
 

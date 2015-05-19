@@ -101,6 +101,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_CAST:
+		case NT_UNSAFE_CAST:
 			generate(tree->node_data.nodes[1]);
 			break;
 

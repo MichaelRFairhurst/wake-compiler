@@ -51,6 +51,10 @@ void ast::Foreach::typeCheck() {
 VarDecl<QUALIFIED> ast::Foreach::getIterationVarDecl(PureType<QUALIFIED>* iterableType) {
 	VarDecl<QUALIFIED> decl;
 	decl.typedata = *iterableType;
+	if(node->node_data.nodes[0]->node_type == NT_VAR_REF && node->node_data.nodes[0]->node_data.var_ref->_class != NULL) {
+		decl.shadow = node->node_data.nodes[0]->node_data.var_ref->_class->shadow;
+	}
+
 	return decl;
 }
 
