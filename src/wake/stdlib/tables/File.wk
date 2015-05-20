@@ -18,7 +18,7 @@ import lang.Text;
 import lang.Num;
 import lang.Bool;
 
-extern FilePath is:
+extern FilePath:
 
 	needs Text:DoNotUse filename;
 
@@ -45,7 +45,7 @@ extern FilePath is:
 	delete();
 
 
-extern File is:
+extern File:
 
 	needs FilePath;
 

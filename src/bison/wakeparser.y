@@ -159,10 +159,15 @@ annotatedclass:
 	;
 
 class:
-	EVERY class_decl_type parentage IS ':'											{ $$ = makeTwoBranchNode(NT_CLASS, makeNodeFromPureType($2, @$), $3, @$); }
-	| EVERY class_decl_type parentage IS ':' classbody								{ $$ = makeTwoBranchNode(NT_CLASS, makeNodeFromPureType($2, @$), $3, @$); addSubNode($$, $6); }
-	| EXTERN class_decl_type parentage IS ':'										{ $$ = makeTwoBranchNode(NT_CLASS_EXTERN, makeNodeFromPureType($2, @$), $3, @$); }
-	| EXTERN class_decl_type parentage IS ':' classbody								{ $$ = makeTwoBranchNode(NT_CLASS_EXTERN, makeNodeFromPureType($2, @$), $3, @$); addSubNode($$, $6); }
+	EVERY class_decl_type parentage optional_is ':'									{ $$ = makeTwoBranchNode(NT_CLASS, makeNodeFromPureType($2, @$), $3, @$); }
+	| EVERY class_decl_type parentage optional_is ':' classbody						{ $$ = makeTwoBranchNode(NT_CLASS, makeNodeFromPureType($2, @$), $3, @$); addSubNode($$, $6); }
+	| EXTERN class_decl_type parentage optional_is ':'								{ $$ = makeTwoBranchNode(NT_CLASS_EXTERN, makeNodeFromPureType($2, @$), $3, @$); }
+	| EXTERN class_decl_type parentage optional_is ':' classbody					{ $$ = makeTwoBranchNode(NT_CLASS_EXTERN, makeNodeFromPureType($2, @$), $3, @$); addSubNode($$, $6); }
+	;
+
+optional_is:
+	/* empty */
+	| IS
 	;
 
 parentage:
