@@ -14,10 +14,11 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "type.h"
+#include "PureType.h"
+#include "PureTypeArray.h"
 
-void AddTypeToTypeArray(Type* nexttype, TypeArray* container) {
+void addPureTypeToPureTypeArray(PureType* nexttype, PureTypeArray* container) {
 	container->typecount++;
-	container->types = realloc(container->types, container->typecount * sizeof(Type*));
+	container->types = realloc(container->types, container->typecount * sizeof(PureType*));
 	container->types[container->typecount - 1] = nexttype;
 }

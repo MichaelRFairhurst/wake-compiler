@@ -15,14 +15,16 @@
 #include "ast/ForeachInExplicitType.h"
 #include "TypeError.h"
 
-Type wake::ast::ForeachInExplicitType::getIterationType(Type* iterableType) {
-	iterableType->alias = NULL;
+using namespace wake;
 
-	if(!analyzer->isASubtypeOfB(explicitType, iterableType)) {
-		EXPECTED	analyzer->getNameForType(iterableType)
-		ERRONEOUS	analyzer->getNameForType(explicitType)
+VarDecl<QUALIFIED> ast::ForeachInExplicitType::getIterationVarDecl(PureType<QUALIFIED>* iterableType) {
+	if(!analyzer->isASubtypeOfB(&explicitType->typedata, iterableType)) {
+		EXPECTED	iterableType->toString()
+		ERRONEOUS	explicitType->typedata.toString()
 		THROW		("Declaration of item within foreach does not match the item's type");
 	}
 
-	return *explicitType; // preserve shadow and other goodies
+	VarDecl<QUALIFIED> decl;
+	decl.typedata = *iterableType;
+	return decl; // preserve shadow and other goodies
 }

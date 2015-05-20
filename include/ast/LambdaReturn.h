@@ -18,7 +18,6 @@
 #include "ast/StatementNode.h"
 #include "ast/ExpressionNode.h"
 #include "UnifyingType.h"
-#include "type.h"
 #include <memory>
 
 namespace wake {

@@ -28,3 +28,11 @@ every TernaryOperatorTest is:
 	   Asserts.that(false if false else true)Equals(true);
 	   Asserts.that(0 if false else 3)Equals(3);
 	}
+
+	provides Num:test <- 5;
+
+	@Test
+	testMethodOnResultOfTernary(Asserts) {
+		Asserts.that((5 if true else 10).orMinOf(8))Equals(5);
+		Asserts.that((10 if false else 5).orMinOf(8))Equals(5);
+	}

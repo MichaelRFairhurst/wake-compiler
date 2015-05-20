@@ -30,7 +30,7 @@ namespace wake {
 				MethodInvocation(ExpressionNode* subjectExpr, std::vector<MethodSegment*> methodSegments, Node* node, AstCreator* astCreator, ScopeSymbolTable* scopesymtable, ClassSpaceSymbolTable* classestable, ErrorTracker* errors)
 				: subjectExpr(subjectExpr), astCreator(astCreator), scopesymtable(scopesymtable), MethodInvocationBase(methodSegments, node, classestable, errors) {};
 
-				Type* typeCheck(bool forceArrayIdentifier);
+				PureType<wake::QUALIFIED>* typeCheck(bool forceArrayIdentifier);
 
 			private:
 				auto_ptr<ExpressionNode> subjectExpr;

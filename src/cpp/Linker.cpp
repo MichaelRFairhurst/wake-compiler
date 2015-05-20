@@ -23,6 +23,7 @@
 
 using namespace std;
 using namespace boost::filesystem;
+using namespace wake;
 
 extern "C" {
 	#include "objectfile.tab.h"
@@ -44,6 +45,16 @@ void Linker::loadTables(string dirname, ClassSpaceSymbolTable& table) {
 	for(directory_iterator itr(dirname); itr != end_itr; ++itr)
 	if(!is_directory(itr->status())) {
 		string fname = itr->path().string();
+		if(fname.substr(fname.size() - 6) != ".table") continue;
+		file.open(fname.c_str(), fstream::in | fstream::binary);
+		PropertySymbolTable* ptable = table.getEmptyPropertySymbolTable();
+		reader.read(ptable, file);
+		table.importClass(ptable);
+		file.close();
+	}
+	else
+	for(directory_iterator moduleitr(*itr); moduleitr != end_itr; ++moduleitr) {
+		string fname = moduleitr->path().string();
 		if(fname.substr(fname.size() - 6) != ".table") continue;
 		file.open(fname.c_str(), fstream::in | fstream::binary);
 		PropertySymbolTable* ptable = table.getEmptyPropertySymbolTable();
@@ -156,10 +167,23 @@ void Linker::generateRecursiveConstructors(ostream& file, string ctedclass, Clas
 	file << "_" << classTable.getAddress(ctedclass);
 	file << "(";
 
-	vector<Type*>* needs = table.find(ctedclass)->getNeeds();
-	for(vector<Type*>::iterator it = needs->begin(); it != needs->end(); ++it) {
-		if(it != needs->begin()) file << ",";
-		generateRecursiveConstructors(file, (*it)->typedata._class.classname, table);
+	bool commaOut = false;
+	vector<SpecializableVarDecl<QUALIFIED>*>* needs = table.findFullyQualified(ctedclass)->getNeeds();
+	for(vector<SpecializableVarDecl<QUALIFIED>*>::iterator it = needs->begin(); it != needs->end(); ++it) {
+		if((*it)->decl.typedata.type == TYPE_CLASS) {
+			if(!commaOut) {
+				commaOut = true;
+			} else {
+				file << ",";
+			}
+			generateRecursiveConstructors(file, (*it)->decl.typedata.getFQClassname(), table);
+		} else if((*it)->decl.typedata.type == TYPE_LIST) {
+			file << "[]";
+		} else if((*it)->decl.typedata.type == TYPE_OPTIONAL) {
+			file << "null";
+		} else {
+			throw "Recursive CTOR not generatable: " + (*it)->decl.typedata.toString();;
+		}
 	}
 
 	file << ")";

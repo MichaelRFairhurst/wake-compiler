@@ -20,10 +20,7 @@
 #include <utility>
 #include <boost/optional/optional.hpp>
 
-extern "C" {
-	#include "type.h"
-	#include "tree.h"
-}
+#include "tree.h"
 
 #include "ReadOnlyPropertySymbolTable.h"
 #include "PropertySymbolTable.h"
@@ -35,14 +32,13 @@ using namespace std;
 class TempPropertySymbolTable : public ReadOnlyPropertySymbolTable {
 	public:
 		TempPropertySymbolTable(PropertySymbolTable& table) : table(table) {};
-		boost::optional<Type*> find(string name);
+		boost::optional<PureType<wake::QUALIFIED>*> find(string name);
 		boost::optional<ObjectProperty*> findByCasing(string casing);
 		bool isPublic(string name);
 		string getAddress(string name);
 		int getFlags(string name);
-		string getProvisionSymbol(Type* provided, vector<Type*> &arguments);
-		vector<Type*>* getNeeds();
-		string getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments);
+		vector<SpecializableVarDecl<wake::QUALIFIED>*>* getNeeds();
+		string getSymbolNameOf(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments);
 		bool isAbstract();
 		const map<string, bool>& getParentage();
 		~TempPropertySymbolTable() {};

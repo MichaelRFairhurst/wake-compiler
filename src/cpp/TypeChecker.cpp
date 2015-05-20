@@ -21,6 +21,8 @@
 #include <memory>
 #include <boost/ptr_container/ptr_vector.hpp>
 
+using namespace wake;
+
 TypeChecker::TypeChecker(ErrorTracker* errors, ClassSpaceSymbolTable* classestable, ScopeSymbolTable* scopesymtable, MethodSignatureParseTreeTraverser* methodanalyzer) {
 	this->errors = errors;
 	this->classestable = classestable;
@@ -76,14 +78,14 @@ void TypeChecker::flowAnalysis(Node* tree, bool breakable, bool caseable, bool c
 	}
 }
 
-void TypeChecker::setReturnType(Type* returntype) {
+void TypeChecker::setReturnType(PureType<QUALIFIED>* returntype) {
 	this->returntype = returntype;
 }
 
-void TypeChecker::setThisContext(Type* context) {
+void TypeChecker::setThisContext(PureType<QUALIFIED>* context) {
 	thiscontext = context;
 }
 
-void TypeChecker::setParameterizedTypes(const vector<Type*>& types) {
+void TypeChecker::setParameterizedTypes(const vector<PureType<QUALIFIED>*>& types) {
 	parameterizedtypes = types;
 }

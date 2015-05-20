@@ -18,10 +18,7 @@
 #include <string>
 #include <vector>
 
-extern "C" {
-	#include "type.h"
-	#include "tree.h"
-}
+#include "tree.h"
 
 #include "ErrorTracker.h"
 #include "ClassSpaceSymbolTable.h"
@@ -34,10 +31,10 @@ class TypeChecker {
 
 	public:
 		TypeChecker(ErrorTracker* errors, ClassSpaceSymbolTable* objectsymtable, ScopeSymbolTable* scopesymtable, MethodSignatureParseTreeTraverser* methodanalyzer);
-		void setReturnType(Type* returntype);
-		void setThisContext(Type* thiscontext);
+		void setReturnType(PureType<wake::QUALIFIED>* returntype);
+		void setThisContext(PureType<wake::QUALIFIED>* thiscontext);
 		void check(Node* n);
-		void setParameterizedTypes(const vector<Type*>& types);
+		void setParameterizedTypes(const vector<PureType<wake::QUALIFIED>*>& types);
 
 	private:
 		void flowAnalysis(Node* n, bool breakable, bool caseable, bool continuable);
@@ -46,9 +43,9 @@ class TypeChecker {
 		ErrorTracker* errors;
 		ClassSpaceSymbolTable* classestable;
 		ScopeSymbolTable* scopesymtable;
-		Type* returntype;
-		Type* thiscontext;
-		vector<Type*> parameterizedtypes;
+		PureType<wake::QUALIFIED>* returntype;
+		PureType<wake::QUALIFIED>* thiscontext;
+		vector<PureType<wake::QUALIFIED>*> parameterizedtypes;
 
 };
 

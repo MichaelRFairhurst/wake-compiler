@@ -77,6 +77,7 @@ parent					count(); return PARENT;
 fn						count(); return FN;
 nothing					count(); return NOTHING;
 cast					count(); return CAST;
+unsafe					count(); return UNSAFE;
 exists					count(); return EXISTS;
 var						count(); return VAR;
 foreach					count(); return FOREACH;
@@ -85,6 +86,7 @@ throw					count(); return THROW;
 catch					count(); return CATCH;
 try						count(); return TRY;
 from					count(); return FROM;
+module					count(); return MODULE;
 
 \<\(					count(); return SYM_PROVIDE_ARGS_OPEN;
 \+\+					count(); return SYM_INCREMENT;
@@ -146,7 +148,6 @@ from					count(); return FROM;
 
 true					count(); wakelval.number = 1; return BOOL;
 false					count(); wakelval.number = 0; return BOOL;
--?(0[xX][0-9A-Fa-f]+(\.[0-9A-Fa-f]+)?([pP]-?[0-9A-Fa-f]+)?|(([0-9]*(\.[0-9]+)?)|[0-9]+)([eE]-?[0-9]+)?)		count(); wakelval.number = atof(waketext); return NUMBER;
 :[a-zA-Z0-9]+			count(); wakelval.string = strdup(waketext+1); return SPECIALTY;
 @[a-zA-Z0-9]+			count(); wakelval.string = strdup(waketext+1); return ANNOTATION;
 [a-z][a-zA-Z0-9]*		count(); wakelval.string = strdup(waketext); return LIDENTIFIER;
@@ -154,6 +155,9 @@ false					count(); wakelval.number = 0; return BOOL;
 \~\[[^\]]+\]\~			count(); wakelval.string = strdup(waketext); return LIDENTIFIER;
 \"(\\.|[^\\"])*\"		count(); wakelval.string = unEscapeStringLiteral(keepInner(waketext), '"'); return(STRING);
 '(\\.|[^\'])*\'			count(); wakelval.string = unEscapeStringLiteral(keepInner(waketext), '\''); return(STRING);
+
+module\.([a-z0-9]+\.)+[A-Z][a-zA-Z0-9]* count(); wakelval.string = strdup(waketext + 7); return FQIDENTIFIER;
+-?(0[xX][0-9A-Fa-f]+(\.[0-9A-Fa-f]+)?([pP]-?[0-9A-Fa-f]+)?|(([0-9]*(\.[0-9]+)?)|[0-9]+)([eE]-?[0-9]+)?)		count(); wakelval.number = atof(waketext); return NUMBER;
 
 .						count(); return ERRORTOKEN;
 %%

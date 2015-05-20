@@ -1,7 +1,7 @@
 function$ $$A(a, b) {
 	var$ c = a[b];
 	if(typeof$ c === 'undefined') {
-		var$ d = new$ ~UndefinedIndexException~(b);
+		var$ d = new$ ~std.UndefinedIndexException~(b);
 		d.`preThrow()`();
 		throw$ d;
 	}
@@ -15,7 +15,7 @@ function$ $$B(a, b) { return$ a - b * Math.floor(a / b); }
 	var$ b='', fs = require('fs');
 	fs.existsSync = fs.existsSync || require("path").existsSync;
 
-	~Printer~ = function$ ~Printer~(){
+	~io.Printer~ = function$ ~io.Printer~(){
 		this.`print(Text)` =
 		this.`print(Num)` = function(a) {
 			if(typeof$ process != 'undefined'
@@ -36,14 +36,14 @@ function$ $$B(a, b) { return$ a - b * Math.floor(a / b); }
 		};
 	};
 
-	~System~ = function$ ~System~() {
+	~std.System~ = function$ ~std.System~() {
 		this.`exit(Num)` = function(a) {
 			if(typeof$ process!='undefined' && typeof$ process.exit!='undefined')
 				process.exit(a);
 		};
 	};
 
-	~Num~ = function$ ~Num~(a) {
+	~lang.Num~ = function$ ~lang.Num~(a) {
 		this.`squared()` = function() {
 			return$ a * a;
 		};
@@ -104,7 +104,7 @@ function$ $$B(a, b) { return$ a - b * Math.floor(a / b); }
 
 	};
 
-	~Text~ = function$ ~Text~(a) {
+	~lang.Text~ = function$ ~lang.Text~(a) {
 
 		this.`toUpper()` = function() {
 			return$ a.toUpperCase();
@@ -157,7 +157,7 @@ function$ $$B(a, b) { return$ a - b * Math.floor(a / b); }
 
 	};
 
-	~List~ = function$ ~List~(a) {
+	~lang.List~ = function$ ~lang.List~(a) {
 		this.`getSize()` = function() {
 			return$ a.length;
 		};
@@ -217,10 +217,10 @@ function$ $$B(a, b) { return$ a - b * Math.floor(a / b); }
 		}
 	};
 
-	~FileSystem~ = function$ ~FileSystem~() {
+	~io.FileSystem~ = function$ ~io.FileSystem~() {
 
 		this.`getPath(Text)` = function(a) {
-			return$ new$ ~FilePath~(a);
+			return$ new$ ~io.FilePath~(a);
 		};
 
 		this.`listRoots()` = function() {
@@ -237,10 +237,10 @@ function$ $$B(a, b) { return$ a - b * Math.floor(a / b); }
 
 	};
 
-	~FilePath~ = function$ ~FilePath~(a) {
+	~io.FilePath~ = function$ ~io.FilePath~(a) {
 
 		this.`File<-` = function() {
-			return$ new$ ~File~(this);
+			return$ new$ ~io.File~(this);
 		};
 
 		this.`FilePath<-` = function() {
@@ -276,12 +276,11 @@ function$ $$B(a, b) { return$ a - b * Math.floor(a / b); }
 		};
 
 		this.`getChildren()` = function() {
-			return$ fs.readdirSync(a).map(function(b) { return$ new$ ~FilePath~(a + '/' + b); });
+			return$ fs.readdirSync(a).map(function(b) { return$ new$ ~io.FilePath~(a + '/' + b); });
 		};
 
 		this.`getParent()` = function() {
-			var$ b = new$ ~FilePath~(this.`getDirname`);
-			return$ b.`fileExists()`() ? b : null;
+			return$ new$ ~io.FilePath~(this.`getDirname()`());
 		};
 
 		this.`delete()` = function() {
@@ -290,7 +289,7 @@ function$ $$B(a, b) { return$ a - b * Math.floor(a / b); }
 
 	};
 
-	~File~ = function$ ~File~(a) {
+	~io.File~ = function$ ~io.File~(a) {
 		var$ b = 0, c = 1, d = fs.openSync(a.`getPath()`(), 'a+');
 
 		this.`getPath()` = function() {
@@ -352,7 +351,7 @@ function$ $$B(a, b) { return$ a - b * Math.floor(a / b); }
 
 	};
 
-	~Bool~ = function$ ~Bool~(a) {
+	~lang.Bool~ = function$ ~lang.Bool~(a) {
 
 		this.`toString()` = function() {
 			return$ a?"true":"false";
@@ -360,7 +359,7 @@ function$ $$B(a, b) { return$ a - b * Math.floor(a / b); }
 
 	};
 
-	~Exception~ = function$ ~Exception~(e) {
+	~lang.Exception~ = function$ ~lang.Exception~(e) {
 		var$ m;
 
 		this.`getStacktrace()` = function() {
@@ -398,8 +397,17 @@ function$ $$B(a, b) { return$ a - b * Math.floor(a / b); }
 		};
 
 		this.`isExceptionType(Text)` = function(t) {
-			return$ t === "~Exception~";
+			return$ t === "~lang.Exception~";
 		};
 	};
+
+	~std.Argv~ = function$ ~std.Argv~() {
+
+		this.`getArgv()` = function() {
+				return$ process.argv;
+		};
+
+	};
+
 
 })(typeof$ require === 'undefined' ? function() {return {};} : require);

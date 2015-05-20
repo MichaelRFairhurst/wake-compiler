@@ -15,83 +15,63 @@
 #include "ScopeSymbolTable.h"
 #include "SemanticError.h"
 
-void ScopeSymbolTable::add(string name, Type* type) {
+void ScopeSymbolTable::add(string name, PureType<wake::QUALIFIED>* type) {
 	if(table.count(name)) {
 		string temp = "Symbol " + name + " already defined in this scope.";
 		throw new SemanticError(SYMBOL_ALREADY_DEFINED, temp);
 	}
 
-	table[name] = pair<Type*, string>(type, allocator.allocate());
+	table[name] = pair<PureType<wake::QUALIFIED>*, string>(type, allocator.allocate());
 	scopes.back().push_back(name);
 }
 
-void ScopeSymbolTable::add(Type* type) {
-	add(getNameForType(type), type);
+void ScopeSymbolTable::add(VarDecl<wake::QUALIFIED>* type) {
+	VarRef ref(type->createVarRef());
+	add(ref.toString(), &type->typedata);
 }
 
-void ScopeSymbolTable::addOverwriting(string name, Type* type) {
-	table[name] = pair<Type*, string>(type, allocator.allocate());
+void ScopeSymbolTable::addOverwriting(string name, PureType<wake::QUALIFIED>* type) {
+	table[name] = pair<PureType<wake::QUALIFIED>*, string>(type, allocator.allocate());
 	//scopes.back().push_back(name);
 }
 
-void ScopeSymbolTable::addOverwriting(Type* type) {
-	addOverwriting(getNameForType(type), type);
+void ScopeSymbolTable::addOverwriting(VarDecl<wake::QUALIFIED>* type) {
+	VarRef ref(type->createVarRef());
+	addOverwriting(ref.toString(), &type->typedata);
 }
 
-boost::optional<Type*> ScopeSymbolTable::find(string name) {
+boost::optional<PureType<wake::QUALIFIED>*> ScopeSymbolTable::find(string name) {
 	if(!table.count(name)) {
 		string temp = "Symbol " + name + " not defined in this scope.";
 		//throw new SemanticError(SYMBOL_NOT_DEFINED, temp);
-		return boost::optional<Type*>();
+		return boost::optional<PureType<wake::QUALIFIED>*>();
 	}
 
-	map<string, pair<Type*, string> >::iterator it = table.find(name);
-	return boost::optional<Type*>(it->second.first);
+	map<string, pair<PureType<wake::QUALIFIED>*, string> >::iterator it = table.find(name);
+	return boost::optional<PureType<wake::QUALIFIED>*>(it->second.first);
 }
 
-boost::optional<Type*> ScopeSymbolTable::find(Type* type) {
-	string name = getNameForType(type);
+boost::optional<PureType<wake::QUALIFIED>*> ScopeSymbolTable::find(VarRef* type) {
+	string name = type->toString();
 	if(!table.count(name)) {
 		string temp = "Symbol " + name + " not defined in this scope.";
-		return boost::optional<Type*>();
+		return boost::optional<PureType<wake::QUALIFIED>*>();
 		throw new SemanticError(SYMBOL_NOT_DEFINED, temp);
 	}
 
-	map<string, pair<Type*, string> >::iterator it = table.find(name);
-	return boost::optional<Type*>(it->second.first);
+	map<string, pair<PureType<wake::QUALIFIED>*, string> >::iterator it = table.find(name);
+	return boost::optional<PureType<wake::QUALIFIED>*>(it->second.first);
 }
 
-string ScopeSymbolTable::getAddress(Type* type) {
-	string name = getNameForType(type);
-	map<string, pair<Type*, string> >::iterator it = table.find(name);
+string ScopeSymbolTable::getAddress(VarRef* type) {
+	string name = type->toString();
+	map<string, pair<PureType<wake::QUALIFIED>*, string> >::iterator it = table.find(name);
 	return it->second.second;
 }
 
 string ScopeSymbolTable::getAddress(string name) {
-	map<string, pair<Type*, string> >::iterator it = table.find(name);
+	map<string, pair<PureType<wake::QUALIFIED>*, string> >::iterator it = table.find(name);
 	return it->second.second;
-}
-
-string ScopeSymbolTable::getNameForType(Type* type) {
-	if(type->alias != NULL) {
-		return type->alias;
-	} else {
-		if(type->type == TYPE_PARAMETERIZED || type->type == TYPE_PARAMETERIZED_ARG){
-			return string(type->typedata.parameterized.shadow, '$') + type->typedata.parameterized.label;
-		} else if(type->type == TYPE_CLASS) {
-			return string(type->typedata._class.shadow, '$') + type->typedata._class.classname;
-		} else if(type->type == TYPE_LIST) {
-			Type* noList_noOpt = type->typedata.list.contained;
-
-			while(noList_noOpt->type == TYPE_LIST || noList_noOpt->type == TYPE_OPTIONAL) {
-				noList_noOpt = noList_noOpt->type == TYPE_LIST ? noList_noOpt->typedata.list.contained : noList_noOpt->typedata.optional.contained;
-			}
-
-			return getNameForType(noList_noOpt) + "[]";
-		} else if(type->type == TYPE_OPTIONAL) {
-			return getNameForType(type->typedata.optional.contained);
-		}
-	}
 }
 
 void ScopeSymbolTable::pushScope() {

@@ -15,7 +15,7 @@
 #ifndef HEADER_UNIFYING_TYPE
 #define HEADER_UNIFYING_TYPE
 
-#include "type.h"
+#include "PureType.h"
 #include "TypeAnalyzer.h"
 #include <memory>
 
@@ -26,18 +26,18 @@ namespace wake {
 		public:
 			UnifyingType(TypeAnalyzer* analyzer) : analyzer(analyzer) {};
 
-			void unifyWith(Type* unifyWithType);
+			void unifyWith(PureType<wake::QUALIFIED>* unifyWithType);
 
-			Type* getCurrentUnification();
+			PureType<wake::QUALIFIED>* getCurrentUnification();
 
-			Type* getUnificationFailure1();
+			PureType<wake::QUALIFIED>* getUnificationFailure1();
 
-			Type* getUnificationFailure2();
+			PureType<wake::QUALIFIED>* getUnificationFailure2();
 
 		private:
-			std::auto_ptr<Type> currentUnification;
-			std::auto_ptr<Type> failedToUnify1;
-			std::auto_ptr<Type> failedToUnify2;
+			std::auto_ptr<PureType<wake::QUALIFIED> > currentUnification;
+			std::auto_ptr<PureType<wake::QUALIFIED> > failedToUnify1;
+			std::auto_ptr<PureType<wake::QUALIFIED> > failedToUnify2;
 			TypeAnalyzer* analyzer;
 
 	};

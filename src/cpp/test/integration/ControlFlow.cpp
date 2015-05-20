@@ -375,6 +375,18 @@ PTT_TEST_CASE(
 );
 
 PTT_TEST_CASE(
+	TestForeachShadowKeepsShadow,
+	"every MyClass is:					\n\
+		Text -- myMethod($Text[]) {		\n\
+			foreach($Text[]) {			\n\
+				return $Text;			\n\
+			}							\n\
+			return \"Blah\";			\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
 	TestValidTernaries,
 	"every MyClass is:											\n\
 		method() {												\n\

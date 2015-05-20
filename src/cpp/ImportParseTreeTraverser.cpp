@@ -20,25 +20,30 @@ void ImportParseTreeTraverser::traverse(Node* tree, ClassSpaceSymbolTable& class
 
 		case NT_PROGRAM:
 		case NT_IMPORTSET:
-		case NT_IMPORT:
 			for(int i = 0; i < tree->subnodes; i++) {
 				traverse(tree->node_data.nodes[i], classes, l, errors, importpath);
 			}
 			break;
 
-		case NT_IMPORTPATH:
-			// TODO use actual path
-			try {
-				if(!l.loadImport(tree->node_data.string, importpath, classes)) {
-					errors.addError(new SemanticError(BAD_IMPORT, "Could not import class by name " + string(tree->node_data.string), tree));
-				}
-			} catch(string errormsg) {
-				errors.addError(new SemanticError(BAD_IMPORT, "Error importing class by name " + string(tree->node_data.string) + ": " + errormsg, tree));
-			}
-			break;
+		case NT_IMPORT:
+			{
+				std::string moduledirectory = "";
+				std::string importname = tree->node_data.nodes[1]->node_data.string;
 
-		//case NT_IMPORTTARGET:
-			//throw "Not supported yet";
+				if(strlen(tree->node_data.nodes[0]->node_data.string)) {
+					moduledirectory += tree->node_data.nodes[0]->node_data.string + string("/");
+				}
+
+				// TODO use actual path
+				try {
+					if(!l.loadImport(moduledirectory + importname, importpath, classes)) {
+						errors.addError(new SemanticError(BAD_IMPORT, "Could not import class by name " + moduledirectory + importname, tree));
+					}
+				} catch(string errormsg) {
+					errors.addError(new SemanticError(BAD_IMPORT, "Error importing class by name " + moduledirectory + importname + ": " + errormsg, tree));
+				}
+				break;
+			}
 	}
 
 }

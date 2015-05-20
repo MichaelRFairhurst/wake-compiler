@@ -18,7 +18,6 @@
 #include "ast/StatementNode.h"
 #include "ast/ExpressionNode.h"
 #include "TypeAnalyzer.h"
-#include "type.h"
 #include <memory>
 
 namespace wake {
@@ -28,7 +27,7 @@ namespace wake {
 		class Return : public StatementNode {
 
 			public:
-				Return(ExpressionNode* value, Type* returntype, TypeAnalyzer* analyzer)
+				Return(ExpressionNode* value, PureType<wake::QUALIFIED>* returntype, TypeAnalyzer* analyzer)
 					: value(value), returntype(returntype), analyzer(analyzer) {};
 
 				void typeCheck();
@@ -39,7 +38,7 @@ namespace wake {
 
 			private:
 				std::auto_ptr<ExpressionNode> value;
-				Type* returntype;
+				PureType<wake::QUALIFIED>* returntype;
 				TypeAnalyzer* analyzer;
 
 		};

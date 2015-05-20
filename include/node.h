@@ -16,8 +16,23 @@
 #define HEADER_NODE
 
 #include "wakelltype.h"
+#include "PureType.h"
+#include "PureTypeArray.h"
+#include "VarDecl.h"
+#include "SpecializableVarDecl.h"
+#include "SpecializablePureType.h"
 
-typedef struct Node {
+#ifdef __cplusplus
+extern "C" {
+#define TEMPL_UNQUALIFIED <wake::UNQUALIFIED>
+#define STRUCT
+#else
+#define TEMPL_UNQUALIFIED
+#define STRUCT struct
+#endif
+
+typedef
+struct Node {
 	int line;
 	int col;
 	YYLTYPE loc;
@@ -27,9 +42,17 @@ typedef struct Node {
 		char* string;
 		double number;
 		struct Node** nodes;
-		struct Type* type;
-		struct TypeArray* typearray;
+		STRUCT PureType TEMPL_UNQUALIFIED* pure_type;
+		STRUCT PureTypeArray TEMPL_UNQUALIFIED* pure_type_array;
+		struct ClassVarRef* class_var_ref;
+		struct VarRef* var_ref;
+		STRUCT VarDecl TEMPL_UNQUALIFIED* var_decl;
+		STRUCT SpecializableVarDecl TEMPL_UNQUALIFIED* specializable_var_decl;
+		STRUCT SpecializablePureType TEMPL_UNQUALIFIED* specializable_pure_type;
 	} node_data;
 } Node;
 
+#ifdef __cplusplus
+}
+#endif
 #endif

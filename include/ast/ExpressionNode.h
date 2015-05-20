@@ -15,7 +15,7 @@
 #ifndef HEADER_EXPRESSION_NODE
 #define HEADER_EXPRESSION_NODE
 
-#include "type.h"
+#include "PureType.h"
 
 namespace wake {
 
@@ -24,7 +24,7 @@ namespace wake {
 		class ExpressionNode {
 
 			public:
-				virtual Type* typeCheck(bool forceArrayIdentifier)=0;
+				virtual PureType<wake::QUALIFIED>* typeCheck(bool forceArrayIdentifier)=0;
 				virtual ~ExpressionNode(){};
 
 			private:

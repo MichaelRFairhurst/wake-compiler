@@ -30,30 +30,34 @@ ClassSpaceSymbolTable::~ClassSpaceSymbolTable() {
 boost::optional<SemanticError*> ClassSpaceSymbolTable::addClass(string name) {
 	addingclass_name = name;
 
-	if(classes.count(addingclass_name)) {
+	string fqname = (module.size() ? module + "." : "") + addingclass_name;
+	if(classes.count(fqname)) {
 		return boost::optional<SemanticError*>(new SemanticError(MULTIPLE_CLASS_DEFINITION));
 	}
 
-	addingclass_symbol = new PropertySymbolTable(&analyzer);
+	addingclass_symbol = new PropertySymbolTable(&analyzer, module);
 	addingclass_symbol->classname = name;
 	addingclass_hassubclass = false;
 
-	classes[addingclass_name] = pair<PropertySymbolTable*, bool>(addingclass_symbol, true);
+	classes[fqname] = pair<PropertySymbolTable*, bool>(addingclass_symbol, true);
+	fullQualifications[addingclass_name] = fqname;
 
 	return boost::optional<SemanticError*>();
 }
 
 boost::optional<SemanticError*> ClassSpaceSymbolTable::importClass(PropertySymbolTable* table) {
-	if(classes.count(addingclass_name)) {
+	string fqname = (table->getModule().size() ? table->getModule() + "." : "") + table->classname;
+	if(classes.count(fqname) || fullQualifications.count(table->classname)) {
 		return boost::optional<SemanticError*>(new SemanticError(MULTIPLE_CLASS_DEFINITION));
 	}
 
-	classes[table->classname] = pair<PropertySymbolTable*, bool>(table, false);
+	fullQualifications[table->classname] = fqname;
+	classes[fqname] = pair<PropertySymbolTable*, bool>(table, false);
 	return boost::optional<SemanticError*>();
 }
 
 PropertySymbolTable* ClassSpaceSymbolTable::getEmptyPropertySymbolTable() {
-	return new PropertySymbolTable(&analyzer);
+	return new PropertySymbolTable(&analyzer, module);
 }
 
 vector<PropertySymbolTable*> ClassSpaceSymbolTable::getDefinedClasses() {
@@ -67,15 +71,27 @@ vector<PropertySymbolTable*> ClassSpaceSymbolTable::getDefinedClasses() {
 }
 
 boost::optional<SemanticError*> ClassSpaceSymbolTable::addInheritance(string childname, bool as_subclass) {
+	string fqname = fullQualifications[addingclass_name];
+
+	if(fullQualifications.count(childname)) {
+		// careful! undefined behavior if we don't check this exists first
+		childname = fullQualifications[childname];
+	} else {
+		// either they forgot to import it, or they are about to define it
+		// which means its in the current module. Continue as if its just
+		// not defined yet, it will fail later if they don't
+		childname = module.size() ? module + "." + childname : childname;
+	}
+
 	if(addingclass_hassubclass && as_subclass) {
 		return boost::optional<SemanticError*>(new SemanticError(MORE_THAN_ONE_SUBCLASS));
 	}
 
-	if(childname == addingclass_name) {
+	if(childname == fqname) {
 		return boost::optional<SemanticError*>(new SemanticError(SELF_INHERITANCE));
 	}
 
-	if(analyzer.isASubtypeOfB(childname, addingclass_name)) {
+	if(analyzer.isASubtypeOfB(childname, fqname)) {
 		return boost::optional<SemanticError*>(new SemanticError(CIRCULAR_INHERITANCE));
 	}
 
@@ -112,66 +128,58 @@ void ClassSpaceSymbolTable::propagateInheritanceToParent(string childname, Error
 
 	for(map<string, bool>::iterator it = current->first->parentage.begin(); it != current->first->parentage.end(); ++it) {
 		propagateInheritanceToParent(it->first, errors);
-		propagateInheritanceTables(current->first, findModifiable(it->first), it->second, errors);
+		propagateInheritanceTables(current->first, findFullyQualifiedModifiable(it->first), it->second, errors);
 	}
 
 	current->second = true;
 }
 
-ReadOnlyPropertySymbolTable* ClassSpaceSymbolTable::find(Type* type) {
-	PropertySymbolTable* table = findModifiable(type);
-	if(type->typedata._class.parameters == NULL) {
+ReadOnlyPropertySymbolTable* ClassSpaceSymbolTable::findFullyQualified(string fqclassname, vector<PureType<wake::QUALIFIED>*> parameters) {
+	PropertySymbolTable* table = findFullyQualifiedModifiable(fqclassname);
+	if(!parameters.size()) {
 		if(table->getParameters().size()) {
 			SymbolNotFoundException* error = new SymbolNotFoundException();
-			error->errormsg = "Type " + string(type->typedata._class.classname) + " cannot be used without type parameters";;
+			error->errormsg = "Type " + fqclassname + " cannot be used without type parameters";;
 			throw error;
 		}
 		return new TempPropertySymbolTable(*table);
 	} else {
-		if(table->getParameters().size() != type->typedata._class.parameters->typecount) {
+		if(table->getParameters().size() != parameters.size()) {
 			SymbolNotFoundException* error = new SymbolNotFoundException();
-			error->errormsg = "Type " + string(type->typedata._class.classname) + " is used with the wrong number of type parameters";;
+			error->errormsg = "Type " + fqclassname + " is used with the wrong number of type parameters";;
 			throw error;
 		} else {
 			// TODO check lower and upper bounds on type parameters
-			vector<Type*> temp;
-			for(int i = 0; i < type->typedata._class.parameters->typecount; i++) {
-				temp.push_back(type->typedata._class.parameters->types[i]);
-			}
-			return table->resolveParameters(temp);
+			return table->resolveParameters(parameters);
 		}
 	}
 }
 
-ReadOnlyPropertySymbolTable* ClassSpaceSymbolTable::find(string name) {
-	return findModifiable(name);
+ReadOnlyPropertySymbolTable* ClassSpaceSymbolTable::findFullyQualified(string fqclassname) {
+	return new TempPropertySymbolTable(*findFullyQualifiedModifiable(fqclassname));
 }
 
-PropertySymbolTable* ClassSpaceSymbolTable::findModifiable(Type* type) {
-	return findModifiable(type->typedata._class.classname);
-}
-
-PropertySymbolTable* ClassSpaceSymbolTable::findModifiable(string name) {
-	std::map<string, pair<PropertySymbolTable*, bool> >::iterator searcher = classes.find(name);
-	if(!classes.count(name)) {
+PropertySymbolTable* ClassSpaceSymbolTable::findFullyQualifiedModifiable(string fqclassname) {
+	std::map<string, pair<PropertySymbolTable*, bool> >::iterator searcher = classes.find(fqclassname);
+	if(!classes.count(fqclassname)) {
 		SymbolNotFoundException* error = new SymbolNotFoundException();
 		error->errormsg = "Could not find symbol ";
-		error->errormsg += name;
-		error->errormsg += " in object table";
+		error->errormsg += fqclassname;
+		error->errormsg += " in class space";
 		throw error;
 	}
 
 	return searcher->second.first;
 }
 
-void ClassSpaceSymbolTable::assertTypeIsValid(Type* type) {
+void ClassSpaceSymbolTable::assertTypeIsValid(PureType<wake::QUALIFIED>* type) {
 	if(type->type == TYPE_PARAMETERIZED) return;
 
 	if(type->type == TYPE_CLASS) {
-		if(classes.count(type->typedata._class.classname)) {
-			std::map<string, pair<PropertySymbolTable*, bool> >::iterator searcher = classes.find(type->typedata._class.classname);
+		if(classes.count(type->getFQClassname())) {
+			std::map<string, pair<PropertySymbolTable*, bool> >::iterator searcher = classes.find(type->getFQClassname());
 			PropertySymbolTable* table = searcher->second.first;
-			vector<Type*> parameterizations;
+			vector<PureType<wake::QUALIFIED>*> parameterizations;
 
 			if(type->typedata._class.parameters != NULL) {
 				int i;
@@ -218,9 +226,98 @@ TypeAnalyzer* ClassSpaceSymbolTable::getAnalyzer() {
 }
 
 void ClassSpaceSymbolTable::assertNoNeedsAreCircular() {
-	for(map<string, pair<PropertySymbolTable*, bool> >::iterator it = classes.begin(); it != classes.end(); ++it) {
-		for(vector<Type*>::iterator needit = it->second.first->getNeeds()->begin(); needit != it->second.first->getNeeds()->end(); ++needit) {
-			analyzer.assertNeedIsNotCircular(it->first, *needit);
+	for(map<string, pair<PropertySymbolTable*, bool> >::iterator it = classes.begin(); it != classes.end(); ++it)
+	for(vector<SpecializableVarDecl<wake::QUALIFIED>*>::iterator needit = it->second.first->getNeeds()->begin(); needit != it->second.first->getNeeds()->end(); ++needit)
+	if((*needit)->decl.typedata.type == TYPE_CLASS) {
+		analyzer.assertFQNeedIsNotCircular(it->first, (*needit)->decl.typedata.getFQClassname());
+	}
+}
+
+void ClassSpaceSymbolTable::setModule(string module) {
+	this->module = module;
+}
+
+string ClassSpaceSymbolTable::getModule() {
+	return module;
+}
+
+string ClassSpaceSymbolTable::getFullyQualifiedClassname(string classname) {
+	if(fullQualifications.count(classname)) {
+		return fullQualifications[classname];
+	} else {
+		SymbolNotFoundException* error = new SymbolNotFoundException();
+		error->errormsg = "Type " + classname + " was not found in loaded class space";;
+		throw error;
+	}
+}
+
+PureType<wake::QUALIFIED>* ClassSpaceSymbolTable::setModulesOnType(PureType<wake::UNQUALIFIED>* type) {
+	if(type->type == TYPE_CLASS) {
+		if(type->typedata._class.modulename == NULL) {
+			try {
+				PropertySymbolTable* fullSpec = findByImportedNameModifiable(type->typedata._class.classname);
+				type->typedata._class.modulename = strdup(fullSpec->getModule().c_str());
+			} catch(SymbolNotFoundException* e) {
+				delete e;
+			}
+		}
+
+		if(type->typedata._class.parameters != NULL) {
+			for (int i = 0; i < type->typedata._class.parameters->typecount; i++) {
+				setModulesOnType(type->typedata._class.parameters->types[i]);
+			}
+		}
+	} else if(type->type == TYPE_OPTIONAL) {
+		setModulesOnType(type->typedata.optional.contained);
+	} else if(type->type == TYPE_LIST) {
+		setModulesOnType(type->typedata.list.contained);
+	} else if(type->type == TYPE_PARAMETERIZED || type->type == TYPE_PARAMETERIZED_ARG) {
+		if(type->typedata.parameterized.upperbound != NULL) {
+			setModulesOnType(type->typedata.parameterized.upperbound);
+		}
+		if(type->typedata.parameterized.lowerbound != NULL) {
+			setModulesOnType(type->typedata.parameterized.lowerbound);
+		}
+	} else if(type->type == TYPE_LAMBDA) {
+		if(type->typedata.lambda.returntype != NULL) {
+			setModulesOnType(type->typedata.lambda.returntype);
+		}
+
+		if(type->typedata.lambda.arguments != NULL) {
+			for (int i = 0; i < type->typedata.lambda.arguments->typecount; i++) {
+				setModulesOnType(type->typedata.lambda.arguments->types[i]);
+			}
 		}
 	}
+
+	return (PureType<wake::QUALIFIED>*) type;
+}
+
+SpecializablePureType<wake::QUALIFIED>* ClassSpaceSymbolTable::setModulesOnType(SpecializablePureType<wake::UNQUALIFIED>* type) {
+	setModulesOnType(&type->typedata);
+	return (SpecializablePureType<wake::QUALIFIED>*) type;
+}
+
+SpecializableVarDecl<wake::QUALIFIED>* ClassSpaceSymbolTable::setModulesOnType(SpecializableVarDecl<wake::UNQUALIFIED>* type) {
+	setModulesOnType(&type->decl);
+	return (SpecializableVarDecl<wake::QUALIFIED>*) type;
+}
+
+VarDecl<wake::QUALIFIED>* ClassSpaceSymbolTable::setModulesOnType(VarDecl<wake::UNQUALIFIED>* type) {
+	setModulesOnType(&type->typedata);
+	return (VarDecl<wake::QUALIFIED>*) type;
+}
+
+
+PropertySymbolTable* ClassSpaceSymbolTable::findByImportedNameModifiable(string classname) {
+	return findFullyQualifiedModifiable(getFullyQualifiedClassname(classname));
+}
+
+ReadOnlyPropertySymbolTable* ClassSpaceSymbolTable::findByImportedName(string classname) {
+	return findFullyQualified(getFullyQualifiedClassname(classname));
+}
+
+ReadOnlyPropertySymbolTable* ClassSpaceSymbolTable::findByImportedName(string classname, vector<PureType<wake::QUALIFIED>*> args) {
+	return findFullyQualified(getFullyQualifiedClassname(classname), args);
+
 }

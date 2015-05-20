@@ -24,10 +24,10 @@
 #include "TypeChecker.h"
 
 extern "C" {
-	#include "type.h"
 	#include "node.h"
-	#include "tree.h"
 }
+
+#include "tree.h"
 
 using namespace std;
 

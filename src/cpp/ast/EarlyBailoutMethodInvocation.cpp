@@ -16,16 +16,18 @@
 #include "ast/EarlyBailoutMethodInvocation.h"
 #include "TypeError.h"
 
-Type* wake::ast::EarlyBailoutMethodInvocation::typeCheck(bool forceArrayIdentifier) {
-	Type subject = *auto_ptr<Type>(subjectExpr->typeCheck(false));
+using namespace wake;
+
+PureType<QUALIFIED>* ast::EarlyBailoutMethodInvocation::typeCheck(bool forceArrayIdentifier) {
+	PureType<QUALIFIED> subject = *auto_ptr<PureType<QUALIFIED> >(subjectExpr->typeCheck(false));
 	if(subject.type == TYPE_MATCHALL) {
-		return new Type(subject);
+		return new PureType<QUALIFIED>(subject);
 	} else if(subject.type != TYPE_OPTIONAL) {
 		errors->addError(new SemanticError(OPTIONAL_USE_OF_NONOPTIONAL_TYPE, "using .? on a nonoptional", node));
-		return new Type(TYPE_MATCHALL);
+		return new PureType<QUALIFIED>(TYPE_MATCHALL);
 	} else {
-		Type* ret = new Type(TYPE_OPTIONAL);
-		Type* nonoptional = subject.typedata.optional.contained;
+		PureType<QUALIFIED>* ret = new PureType<QUALIFIED>(TYPE_OPTIONAL);
+		PureType<QUALIFIED>* nonoptional = subject.typedata.optional.contained;
 
 		while(nonoptional->type == TYPE_OPTIONAL) {
 			nonoptional = nonoptional->typedata.optional.contained;

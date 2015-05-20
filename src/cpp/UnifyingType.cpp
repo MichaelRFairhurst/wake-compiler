@@ -1,33 +1,49 @@
+/**************************************************
+ * Source Code for the Original Compiler for the
+ * Programming Language Wake
+ *
+ * UnifyingType.cpp
+ *
+ * Licensed under the MIT license
+ * See LICENSE.TXT for details
+ *
+ * Author: Michael Fairhurst
+ * Revised By:
+ *
+ **************************************************/
+
 #include "UnifyingType.h"
 
-void wake::UnifyingType::unifyWith(Type* unifyWithType) {
+using namespace wake;
+
+void UnifyingType::unifyWith(PureType<QUALIFIED>* unifyWithType) {
 	if(failedToUnify1.get()) return;
 
 	if(currentUnification.get() == NULL) {
-		currentUnification.reset(new Type(unifyWithType));
+		currentUnification.reset(new PureType<QUALIFIED>(*unifyWithType));
 	} else if(currentUnification->type == TYPE_UNUSABLE ^ unifyWithType->type == TYPE_UNUSABLE) {
-		failedToUnify1.reset(new Type(currentUnification.get()));
-		failedToUnify2.reset(new Type(unifyWithType));
-		currentUnification.reset(new Type(TYPE_UNUSABLE));
+		failedToUnify1.reset(new PureType<QUALIFIED>(*currentUnification.get()));
+		failedToUnify2.reset(new PureType<QUALIFIED>(*unifyWithType));
+		currentUnification.reset(new PureType<QUALIFIED>(TYPE_UNUSABLE));
 	} else if(currentUnification->type != TYPE_UNUSABLE && unifyWithType->type != TYPE_UNUSABLE) {
-		boost::optional<Type*> newUnification = analyzer->getCommonSubtypeOf(currentUnification.get(), unifyWithType);
+		boost::optional<PureType<QUALIFIED>*> newUnification = analyzer->getCommonSubtypeOf(currentUnification.get(), unifyWithType);
 		if(!newUnification) {
-			failedToUnify1.reset(new Type(currentUnification.get()));
-			failedToUnify2.reset(new Type(unifyWithType));
+			failedToUnify1.reset(new PureType<QUALIFIED>(*currentUnification.get()));
+			failedToUnify2.reset(new PureType<QUALIFIED>(*unifyWithType));
 		} else {
 			currentUnification.reset(*newUnification);
 		}
 	}
 }
 
-Type* wake::UnifyingType::getCurrentUnification() {
+PureType<QUALIFIED>* UnifyingType::getCurrentUnification() {
 	return currentUnification.get();
 }
 
-Type* wake::UnifyingType::getUnificationFailure1() {
+PureType<QUALIFIED>* UnifyingType::getUnificationFailure1() {
 	return failedToUnify1.get();
 }
 
-Type* wake::UnifyingType::getUnificationFailure2() {
+PureType<QUALIFIED>* UnifyingType::getUnificationFailure2() {
 	return failedToUnify2.get();
 }

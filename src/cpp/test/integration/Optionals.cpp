@@ -298,3 +298,14 @@ PTT_TEST_CASE(
 	PTT_EXPECT(TYPE_ERROR)
 );
 
+PTT_TEST_CASE(
+	TestShadowsPreservedInExistsClause,
+	"every MyClass is:						\n\
+		myMethod() {						\n\
+			var $Num? = nothing;			\n\
+			if $Num exists {				\n\
+				$Num = $Num + 2;			\n\
+			}								\n\
+		}",
+	PTT_VALID
+);

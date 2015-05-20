@@ -16,12 +16,9 @@
 #define HEADER_SEMANTIC_ERROR
 
 #include <string>
+#include "node.h"
 using namespace std;
 
-extern "C" {
-	#include "type.h"
-	#include "node.h"
-}
 
 enum SemanticErrorCode {
 	MULTIPLE_CLASS_DEFINITION,			// defining class A twice

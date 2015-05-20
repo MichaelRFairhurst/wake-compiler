@@ -16,11 +16,10 @@
 #define HEADER_PARSER
 
 #include <stdio.h>
+#include "tree.h"
 
 extern "C" {
-	#include "type.h"
 	#include "node.h"
-	#include "tree.h"
 	#include "wake.tab.h"
 	extern int wakeparse();
 	extern void wake_scan_string(const char* string);

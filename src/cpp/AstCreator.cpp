@@ -35,6 +35,7 @@
 #include "ast/StatementErrorCatcher.h"
 #include "ast/Lambda.h"
 #include "ast/LambdaReturn.h"
+#include "ast/UnsafeCast.h"
 #include <vector>
 
 wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
@@ -42,11 +43,17 @@ wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
 
 	switch(node->node_type) {
 		case NT_DECLARATION:
-			created = new wake::ast::Declaration(&node->node_data.nodes[0]->node_data.type, generateExpressionAst(node->node_data.nodes[1], true), node, classestable, scopesymtable, errors, parameterizedtypes);
+			created = new wake::ast::Declaration(
+				classestable->setModulesOnType(node->node_data.nodes[0]->node_data.var_decl),
+				generateExpressionAst(node->node_data.nodes[1], true),
+				node, classestable, scopesymtable, errors, parameterizedtypes);
 			break;
 
 		case NT_CATCH:
-			created = new wake::ast::Catch(node->node_data.nodes[0]->node_data.type, generateStatementAst(node->node_data.nodes[1]), node, classestable, scopesymtable, errors);
+			created = new wake::ast::Catch(
+				classestable->setModulesOnType(node->node_data.nodes[0]->node_data.var_decl),
+				generateStatementAst(node->node_data.nodes[1]),
+				node, classestable, scopesymtable, errors);
 			break;
 
 		case NT_THROW:
@@ -55,11 +62,20 @@ wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
 
 		case NT_IF_ELSE:
 		case NT_WHILE:
-			created = new wake::ast::IfElseWhile(generateExpressionAst(node->node_data.nodes[0], true), generateStatementAst(node->node_data.nodes[1]), node->subnodes == 3 ? generateStatementAst(node->node_data.nodes[2]) : NULL, classestable->getAnalyzer());
+			created = new wake::ast::IfElseWhile(
+				generateExpressionAst(node->node_data.nodes[0], true),
+				generateStatementAst(node->node_data.nodes[1]),
+				node->subnodes == 3 ? generateStatementAst(node->node_data.nodes[2]) : NULL,
+				classestable->getAnalyzer());
 			break;
 
 		case NT_FOR:
-			created = new wake::ast::For(generateStatementAst(node->node_data.nodes[0]), generateExpressionAst(node->node_data.nodes[1], true), generateStatementAst(node->node_data.nodes[2]), generateStatementAst(node->node_data.nodes[3]), scopesymtable, classestable->getAnalyzer());
+			created = new wake::ast::For(
+				generateStatementAst(node->node_data.nodes[0]),
+				generateExpressionAst(node->node_data.nodes[1], true),
+				generateStatementAst(node->node_data.nodes[2]),
+				generateStatementAst(node->node_data.nodes[3]),
+				scopesymtable, classestable->getAnalyzer());
 			break;
 
 		case NT_RETURN:
@@ -79,19 +95,34 @@ wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
 			break;
 
 		case NT_EXISTS:
-			created = new wake::ast::Exists(generateExpressionAst(node->node_data.nodes[0], true), generateStatementAst(node->node_data.nodes[1]), node->subnodes == 3 ? generateStatementAst(node->node_data.nodes[2]) : NULL, node, scopesymtable, errors);
+			created = new wake::ast::Exists(
+				generateExpressionAst(node->node_data.nodes[0], true),
+				generateStatementAst(node->node_data.nodes[1]),
+				node->subnodes == 3 ? generateStatementAst(node->node_data.nodes[2]) : NULL,
+				node, scopesymtable, errors);
 			break;
 
 		case NT_FOREACH:
-			created = new wake::ast::Foreach(generateExpressionAst(node->node_data.nodes[0], true), generateStatementAst(node->node_data.nodes[1]), node, scopesymtable, errors);
+			created = new wake::ast::Foreach(
+				generateExpressionAst(node->node_data.nodes[0], true),
+				generateStatementAst(node->node_data.nodes[1]),
+				node, scopesymtable, errors);
 			break;
 
 		case NT_FOREACHIN:
-			if(node->node_data.nodes[0]->node_type == NT_ALIAS) {
-				created = new wake::ast::ForeachInAliased(generateExpressionAst(node->node_data.nodes[1], true), generateStatementAst(node->node_data.nodes[2]), node->node_data.nodes[0]->node_data.string, node, scopesymtable, errors);
+			if(node->node_data.nodes[0]->node_type == NT_VAR_REF) {
+				created = new wake::ast::ForeachInAliased(
+					generateExpressionAst(node->node_data.nodes[1], true),
+					generateStatementAst(node->node_data.nodes[2]),
+					node->node_data.nodes[0]->node_data.var_ref->alias,
+					node, scopesymtable, errors);
 				break;
 			} else {
-				created = new wake::ast::ForeachInExplicitType(generateExpressionAst(node->node_data.nodes[1], true), generateStatementAst(node->node_data.nodes[2]),  node->node_data.nodes[0]->node_data.type, node, scopesymtable, errors, classestable->getAnalyzer());
+				created = new wake::ast::ForeachInExplicitType(
+					generateExpressionAst(node->node_data.nodes[1], true),
+					generateStatementAst(node->node_data.nodes[2]),
+					classestable->setModulesOnType(node->node_data.nodes[0]->node_data.var_decl),
+					node, scopesymtable, errors, classestable->getAnalyzer());
 				break;
 			}
 
@@ -135,7 +166,15 @@ wake::ast::ExpressionNode* wake::AstCreator::generateExpressionAst(Node* node, b
 			}
 		}
 		wake::ast::ExpressionNode* provider = generateExpressionAst(node->node_data.nodes[2], true);
-		created = new wake::ast::Retrieval(provider, node->node_data.nodes[0]->node_data.type, arguments, node, classestable, classestable->getAnalyzer(), errors);
+		created = new wake::ast::Retrieval(
+			provider,
+			classestable->setModulesOnType(node->node_data.nodes[0]->node_data.specializable_pure_type),
+			arguments, node, classestable, classestable->getAnalyzer(), errors);
+	} else if(node->node_type == NT_UNSAFE_CAST) {
+		created = new wake::ast::UnsafeCast(
+			generateExpressionAst(node->node_data.nodes[1], true),
+			classestable->setModulesOnType(node->node_data.nodes[0]->node_data.pure_type),
+			node, classestable, errors);
 	} else if(node->node_type == NT_LAMBDA_INVOCATION) {
 		std::vector<wake::ast::ExpressionNode*> arguments;
 		if(node->subnodes == 2) {
@@ -196,19 +235,19 @@ wake::ast::ExpressionNode* wake::AstCreator::generateExpressionAst(Node* node, b
 }
 
 wake::ast::Lambda* wake::AstCreator::generateLambda(Node* node) {
-	std::vector<std::pair<boost::optional<std::string>, boost::optional<Type> > > arguments;
+	std::vector<std::pair<boost::optional<std::string>, boost::optional<VarDecl<QUALIFIED> > > > arguments;
 
 	for(int i = 0; i < node->node_data.nodes[0]->subnodes; i++)
 	if(node->node_data.nodes[0]->node_data.nodes[i]->node_type == NT_ALIAS) {
 		boost::optional<std::string> alias(node->node_data.nodes[0]->node_data.nodes[i]->node_data.string);
-		boost::optional<Type> notype;
+		boost::optional<VarDecl<QUALIFIED> > notype;
 
-		arguments.push_back(std::pair<boost::optional<std::string>, boost::optional<Type> >(alias, notype));
+		arguments.push_back(std::pair<boost::optional<std::string>, boost::optional<VarDecl<QUALIFIED> > >(alias, notype));
 	} else {
 		boost::optional<std::string> noalias;
-		boost::optional<Type> type(new Type(node->node_data.nodes[0]->node_data.nodes[i]->node_data.type));
+		boost::optional<VarDecl<QUALIFIED> > type(VarDecl<QUALIFIED>(*classestable->setModulesOnType(node->node_data.nodes[0]->node_data.nodes[i]->node_data.var_decl)));
 
-		arguments.push_back(std::pair<boost::optional<std::string>, boost::optional<Type> >(noalias, type));
+		arguments.push_back(std::pair<boost::optional<std::string>, boost::optional<VarDecl<QUALIFIED> > >(noalias, type));
 	}
 
 	UnifyingType* lastLambdaReturn = lambdaReturnType;

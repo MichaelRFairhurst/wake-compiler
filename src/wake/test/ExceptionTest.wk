@@ -13,7 +13,7 @@
 ##
 
 import Asserts;
-import UndefinedIndexException;
+import std.UndefinedIndexException;
 
 @TestClass
 every ExceptionTest is:

@@ -41,7 +41,7 @@ void LibraryLoader::loadStdLibToTable(ClassSpaceSymbolTable* table) {
 
 		#define LOAD_MEMORY_TABLE_FILE(tname) \
 			stringstream importbin ## tname; \
-			importbin ## tname.write((const char*)bin_waketable_ ## tname ## _table, bin_waketable_ ## tname ## _table_len); \
+			importbin ## tname.write((const char*)bin_waketable_lang_ ## tname ## _table, bin_waketable_lang_ ## tname ## _table_len); \
 			ptable = table->getEmptyPropertySymbolTable(); \
 			reader.read(ptable, importbin ## tname); \
 			table->importClass(ptable);

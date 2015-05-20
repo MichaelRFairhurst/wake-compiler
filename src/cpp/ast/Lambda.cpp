@@ -14,39 +14,42 @@
 
 #include "ast/Lambda.h"
 #include "TypeError.h"
+#include "PureTypeArray.h"
 #include "SemanticError.h"
 #include <boost/ptr_container/ptr_vector.hpp>
 
-Type* wake::ast::Lambda::typeCheck(bool forceArrayIdentifier) {
+using namespace wake;
+
+PureType<QUALIFIED>* ast::Lambda::typeCheck(bool forceArrayIdentifier) {
 	return typeCheckCommon(NULL);
 }
 
-Type* wake::ast::Lambda::typeCheckExpecting(Type* hint) {
+PureType<QUALIFIED>* ast::Lambda::typeCheckExpecting(PureType<QUALIFIED>* hint) {
 	return typeCheckCommon(hint);
 }
 
-Type* wake::ast::Lambda::typeCheckCommon(Type* hint) {
+PureType<QUALIFIED>* ast::Lambda::typeCheckCommon(PureType<QUALIFIED>* hint) {
 	scopesymtable->pushScope();
-	auto_ptr<Type> lambdaType(new Type(TYPE_LAMBDA));
+	auto_ptr<PureType<QUALIFIED> > lambdaType(new PureType<QUALIFIED>(TYPE_LAMBDA));
 	bool unknownSignature = false;
 
 	int i = 0;
-	for(std::vector<std::pair<boost::optional<std::string>, boost::optional<Type> > >::iterator it = arguments.begin(); it != arguments.end(); ++it, i++) {
+	for(std::vector<std::pair<boost::optional<std::string>, boost::optional<VarDecl<QUALIFIED> > > >::iterator it = arguments.begin(); it != arguments.end(); ++it, i++) {
 
 		if(lambdaType->typedata.lambda.arguments == NULL) {
-			lambdaType->typedata.lambda.arguments = MakeTypeArray();
+			lambdaType->typedata.lambda.arguments = new PureTypeArray<QUALIFIED>();
 		}
 
 		if(it->second) {
-			Type* type = &*it->second;
-			AddTypeToTypeArray(new Type(type), lambdaType->typedata.lambda.arguments);
-			scopesymtable->add(lambdaType->typedata.lambda.arguments->types[lambdaType->typedata.lambda.arguments->typecount - 1]);
+			VarDecl<QUALIFIED>* decl = &*it->second;
+			lambdaType->typedata.lambda.arguments->addType(new PureType<QUALIFIED>(decl->typedata));
+			scopesymtable->add(decl);
 		} else {
 			std::string alias = *it->first;
 			// try type inference
 			if(hint == NULL) {
 				unknownSignature = true;
-				AddTypeToTypeArray(new Type(TYPE_MATCHALL), lambdaType->typedata.lambda.arguments);
+				lambdaType->typedata.lambda.arguments->addType(new PureType<QUALIFIED>(TYPE_MATCHALL));
 				errors->addError(new SemanticError(TYPE_INFERENCE_FAILURE,
 					"Cannot infer argument of name '"
 					+ alias
@@ -54,16 +57,18 @@ Type* wake::ast::Lambda::typeCheckCommon(Type* hint) {
 					node));
 			} else if(hint->type != TYPE_LAMBDA || hint->typedata.lambda.arguments == NULL || hint->typedata.lambda.arguments->typecount <= i) {
 				unknownSignature = true;
-				AddTypeToTypeArray(new Type(TYPE_MATCHALL), lambdaType->typedata.lambda.arguments);
+				lambdaType->typedata.lambda.arguments->addType(new PureType<QUALIFIED>(TYPE_MATCHALL));
 				errors->addError(new SemanticError(TYPE_INFERENCE_FAILURE,
 					"Cannot infer argument of name '"
 					+ alias
 					+ "': The type hint is either not a lambda, or the type hinted lambda has fewer arguments",
 					node));
 			} else {
-				AddTypeToTypeArray(new Type(hint->typedata.lambda.arguments->types[i]), lambdaType->typedata.lambda.arguments);
-				lambdaType->typedata.lambda.arguments->types[lambdaType->typedata.lambda.arguments->typecount - 1]->alias = strdup(alias.c_str());
-				scopesymtable->add(lambdaType->typedata.lambda.arguments->types[lambdaType->typedata.lambda.arguments->typecount - 1]);
+				lambdaType->typedata.lambda.arguments->addType(new PureType<QUALIFIED>(*hint->typedata.lambda.arguments->types[i]));
+				VarDecl<QUALIFIED> decl;
+				decl.alias = strdup(alias.c_str());
+				decl.typedata = *lambdaType->typedata.lambda.arguments->types[lambdaType->typedata.lambda.arguments->typecount - 1];
+				scopesymtable->add(new VarDecl<QUALIFIED>(decl));
 			}
 		}
 
@@ -78,15 +83,15 @@ Type* wake::ast::Lambda::typeCheckCommon(Type* hint) {
 	if(returntype->getUnificationFailure1() != NULL) {
 		errors->addError(new SemanticError(TYPE_INFERENCE_FAILURE,
 			"Unification failed for lambda returned types: Partially inferred type "
-			+ analyzer->getNameForType(returntype->getUnificationFailure1())
+			+ returntype->getUnificationFailure1()->toString()
 			+ " and next type "
-			+ analyzer->getNameForType(returntype->getUnificationFailure2()),
+			+ returntype->getUnificationFailure2()->toString(),
 			node));
 
-		lambdaType->typedata.lambda.returntype = new Type(TYPE_MATCHALL);
+		lambdaType->typedata.lambda.returntype = new PureType<QUALIFIED>(TYPE_MATCHALL);
 
 	} else if(returntype->getCurrentUnification() && returntype->getCurrentUnification() != NULL && returntype->getCurrentUnification()->type != TYPE_UNUSABLE) {
-		lambdaType->typedata.lambda.returntype = new Type(returntype->getCurrentUnification());
+		lambdaType->typedata.lambda.returntype = new PureType<QUALIFIED>(*returntype->getCurrentUnification());
 
 		if(!body->exhaustiveReturns()) {
 			errors->addError(new SemanticError(INEXHAUSTIVE_RETURNS, "Lambda declaration has an inferred return type, but not every execution path returns a value", node));
@@ -94,8 +99,8 @@ Type* wake::ast::Lambda::typeCheckCommon(Type* hint) {
 	}
 
 	if(unknownSignature) {
-		return new Type(TYPE_MATCHALL);
+		return new PureType<QUALIFIED>(TYPE_MATCHALL);
 	}
 
-	return new Type(lambdaType.get());
+	return new PureType<QUALIFIED>(*lambdaType.get());
 }

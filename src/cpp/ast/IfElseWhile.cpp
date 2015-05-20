@@ -16,8 +16,10 @@
 #include "TypeError.h"
 #include <memory>
 
-void wake::ast::IfElseWhile::typeCheck() {
-	auto_ptr<Type> conditionType(condition->typeCheck(false));
+using namespace wake;
+
+void ast::IfElseWhile::typeCheck() {
+	auto_ptr<PureType<QUALIFIED> > conditionType(condition->typeCheck(false));
 	block->typeCheck();
 
 	if(otherwise.get() != NULL) {
@@ -26,12 +28,12 @@ void wake::ast::IfElseWhile::typeCheck() {
 
 	if(!analyzer->isPrimitiveTypeNum(conditionType.get()) && !analyzer->isPrimitiveTypeBool(conditionType.get())) {
 		EXPECTED	"Bool"
-		ERRONEOUS	analyzer->getNameForType(conditionType.get())
+		ERRONEOUS	conditionType->toString()
 		THROW		("If/While conditions must be Bool or Num");
 	}
 }
 
-bool wake::ast::IfElseWhile::exhaustiveReturns() {
+bool ast::IfElseWhile::exhaustiveReturns() {
 	if(otherwise.get() == NULL) {
 		return false;
 	}

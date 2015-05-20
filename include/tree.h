@@ -18,8 +18,34 @@
 #include <stdlib.h>
 #include <string.h>
 #include "node.h"
-#include "type.h"
+#include "PureType.h"
+#include "PureTypeArray.h"
+#include "VarRef.h"
+#include "VarDecl.h"
+#include "SpecializableVarDecl.h"
+#include "SpecializablePureType.h"
+
+#ifdef __cplusplus
+extern "C" {
+// SUPER HACK
+#define PureType PureType<wake::UNQUALIFIED>
+#define PureTypeArray PureTypeArray<wake::UNQUALIFIED>
+#define VarDecl VarDecl<wake::UNQUALIFIED>
+#define SpecializableVarDecl SpecializableVarDecl<wake::UNQUALIFIED>
+#define SpecializablePureType SpecializablePureType<wake::UNQUALIFIED>
+#endif
+
 #include "wake.tab.h"
+
+// SUPER HACK
+#ifdef __cplusplus
+#undef PureType
+#undef PureTypeArray
+#undef VarDecl
+#undef SpecializableVarDecl
+#undef SpecializablePureType
+}
+#endif
 
 #define NT_PROGRAM 0
 
@@ -29,6 +55,7 @@
 #define NT_IMPORTSET 3
 #define NT_IMPORTTARGET 4
 #define NT_IMPORTPATH 5
+#define NT_MODULE 120
 
 #define NT_CLASS 6
 #define NT_CLASS_EXTERN 108
@@ -63,6 +90,11 @@
 #define NT_PARENT 29
 #define NT_TYPE_ARRAY 30
 #define NT_TYPEDATA 31
+#define NT_SPECIALIZABLE_TYPEDATA 121
+#define NT_VAR_DECL_DATA 122
+#define NT_VAR_DECLS 125
+#define NT_VAR_REF 123
+#define NT_SPECIALIZABLE_VAR_DECL 124
 #define NT_CLASSNAME 32
 #define NT_CURRIED 33
 #define NT_STRINGLIT 34
@@ -131,6 +163,7 @@
 
 #define NT_PROPERTY 76
 #define NT_CAST 77
+#define NT_UNSAFE_CAST 126
 #define NT_COMPILER_HINT 78
 #define NT_AUTOBOX 86
 
@@ -158,28 +191,46 @@
 #define NT_MODNATIVE 118
 #define NT_MODALT 119
 
-void AddSubNode(Node* parent, Node* child);
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void PrependSubNode(Node* parent, Node* child);
+void addSubNode(Node* parent, Node* child);
 
-Node* MakeEmptyNode(int nodetype, YYLTYPE loc);
+void prependSubNode(Node* parent, Node* child);
 
-Node* MakeNodeFromType(Type* thetype, YYLTYPE loc);
+Node* makeEmptyNode(int nodetype, YYLTYPE loc);
 
-Node* MakeNodeFromTypeArray(TypeArray* thearray, YYLTYPE loc);
+Node* makeNodeFromPureType(PureType TEMPL_UNQUALIFIED* thetype, YYLTYPE loc);
 
-Node* MakeNodeFromString(int nodetype, char* mystring, YYLTYPE loc);
+Node* makeNodeFromVarDecl(VarDecl TEMPL_UNQUALIFIED* decl, YYLTYPE loc);
 
-Node* MakeNodeFromNumber(int nodetype, double number, YYLTYPE loc);
+Node* makeNodeFromClassVarRef(ClassVarRef* ref, YYLTYPE loc);
 
-Node* MakeTwoBranchNode(int nodetype, Node* a, Node* b, YYLTYPE loc);
+Node* makeNodeFromAlias(char* alias, YYLTYPE loc);
 
-Node* MakeOneBranchNode(int nodetype, Node* a, YYLTYPE loc);
+Node* makeNodeFromSpecializableVarDecl(SpecializableVarDecl TEMPL_UNQUALIFIED* decl, YYLTYPE loc);
 
-char* getTypeLabel(Type* thetype);
+Node* makeNodeFromPureTypeArray(PureTypeArray TEMPL_UNQUALIFIED* thearray, YYLTYPE loc);
+
+Node* makeNodeFromSpecializablePureType(SpecializablePureType TEMPL_UNQUALIFIED* thetype, YYLTYPE loc);
+
+Node* makeNodeFromString(int nodetype, char* mystring, YYLTYPE loc);
+
+Node* makeNodeFromNumber(int nodetype, double number, YYLTYPE loc);
+
+Node* makeTwoBranchNode(int nodetype, Node* a, Node* b, YYLTYPE loc);
+
+Node* makeOneBranchNode(int nodetype, Node* a, YYLTYPE loc);
+
+//char* getTypeLabel(Type* thetype);
 
 void printtree (Node *n, int level);
 
 void freeNode (Node *n);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

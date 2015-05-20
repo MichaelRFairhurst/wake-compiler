@@ -15,8 +15,10 @@
 #include "ast/Foreach.h"
 #include "TypeError.h"
 
-void wake::ast::Foreach::typeCheck() {
-	auto_ptr<Type> list(iterable->typeCheck(false));
+using namespace wake;
+
+void ast::Foreach::typeCheck() {
+	auto_ptr<PureType<QUALIFIED> > list(iterable->typeCheck(false));
 
 	if(list->type == TYPE_OPTIONAL) {
 		errors->addError(new SemanticError(DIRECT_USE_OF_OPTIONAL_TYPE, "Iterating over optional type. You must first wrap object in an exists { } clause.", node));
@@ -29,25 +31,34 @@ void wake::ast::Foreach::typeCheck() {
 	if(list->type != TYPE_LIST) {
 		errors->addError(new SemanticError(TYPE_ERROR, "Calling foreach over something that is not a list", node));
 	} else {
-		Type lowered(*list->typedata.list.contained);
+		PureType<QUALIFIED> lowered(*list->typedata.list.contained);
 
-		if(lowered.alias != NULL) free(lowered.alias);
-		Type actualLowered = getIterationType(&lowered);
+		VarDecl<QUALIFIED> actualLowered = getIterationVarDecl(&lowered);
+
+		if(node->node_data.nodes[0]->node_type == NT_VAR_DECL_DATA && node->node_data.nodes[0]->node_data.var_decl->alias == NULL) {
+			actualLowered.shadow = node->node_data.nodes[0]->node_data.var_decl->shadow;
+		}
 
 		scopesymtable->pushScope();
 		scopesymtable->add(&actualLowered);
 		body->typeCheck();
 		scopesymtable->popScope();
 
-		AddSubNode(node, MakeNodeFromString(NT_COMPILER_HINT, strdup(scopesymtable->getNameForType(&actualLowered).c_str()), node->loc));
+		addSubNode(node, makeNodeFromString(NT_COMPILER_HINT, strdup(actualLowered.createVarRef().toString().c_str()), node->loc));
 	}
 }
 
-Type wake::ast::Foreach::getIterationType(Type* iterableType) {
-	iterableType->alias = NULL;
-	return *iterableType;
+VarDecl<QUALIFIED> ast::Foreach::getIterationVarDecl(PureType<QUALIFIED>* iterableType) {
+	VarDecl<QUALIFIED> decl;
+	decl.typedata = *iterableType;
+	if(node->node_data.nodes[0]->node_type == NT_VAR_REF && node->node_data.nodes[0]->node_data.var_ref->_class != NULL) {
+		decl.shadow = node->node_data.nodes[0]->node_data.var_ref->_class->shadow;
+	}
+
+	return decl;
 }
 
-bool wake::ast::Foreach::exhaustiveReturns() {
+bool ast::Foreach::exhaustiveReturns() {
 	return false; // might be 0 items
 }
+

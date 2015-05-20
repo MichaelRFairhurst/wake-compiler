@@ -28,7 +28,7 @@ namespace wake {
 				EarlyBailoutMethodInvocation(ExpressionNode* subjectExpr, vector<MethodSegment*> methodSegments, Node* node, ClassSpaceSymbolTable* classestable, ErrorTracker* errors)
 				: subjectExpr(subjectExpr), MethodInvocationBase(methodSegments, node, classestable, errors) {};
 
-				Type* typeCheck(bool forceArrayIdentifier);
+				PureType<wake::QUALIFIED>* typeCheck(bool forceArrayIdentifier);
 
 			private:
 				auto_ptr<ExpressionNode> subjectExpr;

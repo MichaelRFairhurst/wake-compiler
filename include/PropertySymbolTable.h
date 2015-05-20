@@ -20,10 +20,7 @@
 #include <utility>
 #include <boost/optional/optional.hpp>
 
-extern "C" {
-	#include "type.h"
-	#include "tree.h"
-}
+#include "tree.h"
 
 #include "ReadOnlyPropertySymbolTable.h"
 #include "ObjectProperty.h"
@@ -37,44 +34,46 @@ using namespace std;
 
 class PropertySymbolTable : public ReadOnlyPropertySymbolTable {
 	public:
-		PropertySymbolTable(TypeAnalyzer* tanalyzer);
+		PropertySymbolTable(TypeAnalyzer* tanalyzer, string module) : analyzer(tanalyzer), module(module), abstract(false), declaredtypeparameters(new vector<PureType<wake::QUALIFIED>*>()), needs(new vector<SpecializableVarDecl<wake::QUALIFIED>*>()) {};
 		~PropertySymbolTable();
-		boost::optional<Type*> find(string name);
+		boost::optional<PureType<wake::QUALIFIED>*> find(string name);
 		boost::optional<ObjectProperty*> findByCasing(string casing);
 		bool isPublic(string name);
 		string getAddress(string name);
 		int getFlags(string name);
-		string getProvisionSymbol(Type* provided, vector<Type*> &arguments);
-		boost::optional<SemanticError*> addMethod(Type* returntype, vector<pair<string, TypeArray*> >* segments_arguments, int flags, vector<Annotation*> annotations);
-		boost::optional<SemanticError*> addProperty(Type* property, int flags, vector<Annotation*> annotations);
-		boost::optional<SemanticError*> addProvision(Type* provision, vector<Type*> &arguments, int flags, vector<Annotation*> annotations);
+		boost::optional<SemanticError*> addMethod(PureType<wake::QUALIFIED>* returntype, vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments, int flags, vector<Annotation*> annotations);
+		boost::optional<SemanticError*> addProperty(VarDecl<wake::QUALIFIED>* property, int flags, vector<Annotation*> annotations);
+		boost::optional<SemanticError*> addProvision(SpecializablePureType<wake::QUALIFIED>* provision, vector<PureType<wake::QUALIFIED>*> &arguments, int flags, vector<Annotation*> annotations);
 		bool isBehavioralProvision(string name);
-		void addNeed(Type* returntype, int flags, vector<Annotation*> annotations);
+		void addNeed(SpecializableVarDecl<wake::QUALIFIED>* need, int flags, vector<Annotation*> annotations);
 		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);
-		vector<Type*>* getNeeds();
-		string getSymbolNameOf(vector<pair<string, TypeArray*> >* segments_arguments);
-		string getCasingNameOf(vector<pair<string, TypeArray*> >* segments_arguments);
+		vector<SpecializableVarDecl<wake::QUALIFIED>*>* getNeeds();
+		string getSymbolNameOf(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments);
+		string getCasingNameOf(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments);
 		bool isAbstract();
 		string classname;
 		bool abstract;
 		map<string, ObjectProperty*> properties;
 		const map<string, bool>& getParentage();
 		map<string, bool> parentage;
-		void setParameters(vector<Type*>* parameters);
-		const vector<Type*>& getParameters();
-		Type* getAsType();
+		void setParameters(vector<PureType<wake::QUALIFIED>*>* parameters);
+		const vector<PureType<wake::QUALIFIED>*>& getParameters();
+		PureType<wake::QUALIFIED>* getAsPureType();
 		void setAnnotations(vector<Annotation*> annotations);
 		const boost::ptr_vector<Annotation>& getAnnotations();
+		void setModule(string newmodule);
+		string getModule();
 
-		ReadOnlyPropertySymbolTable* resolveParameters(vector<Type*>& parameters);
+		ReadOnlyPropertySymbolTable* resolveParameters(vector<PureType<wake::QUALIFIED>*>& parameters);
 
 		friend void propagateInheritanceTables(PropertySymbolTable* parent, PropertySymbolTable* child, bool extend, ErrorTracker& errors);
 
 	private:
 		TypeAnalyzer* analyzer;
-		vector<Type*>* needs;
-		vector<Type*>* declaredtypeparameters;
+		vector<SpecializableVarDecl<wake::QUALIFIED>*>* needs;
+		vector<PureType<wake::QUALIFIED>*>* declaredtypeparameters;
 		boost::ptr_vector<Annotation> annotations;
+		string module;
 };
 
 #endif

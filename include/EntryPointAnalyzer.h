@@ -17,10 +17,7 @@
 
 #include <string>
 #include <vector>
-
-extern "C" {
-	#include "type.h"
-}
+#include "SpecializableVarDecl.h"
 
 using namespace std;
 
@@ -29,9 +26,9 @@ class ClassSpaceSymbolTable;
 class EntryPointAnalyzer {
 
 	public:
-		bool checkClassNeedsCanBeMain(vector<Type*>* needs);
-		bool checkMethodCanBeMain(string methodname, Type* method);
-		bool checkMethodCanBeMain(string classname, string methodname, ClassSpaceSymbolTable* table);
+		bool checkClassNeedsCanBeMain(vector<SpecializableVarDecl<wake::QUALIFIED>*>* needs);
+		bool checkFQClassMethodCanBeMain(string methodname, PureType<wake::QUALIFIED>* method);
+		bool checkFQClassMethodCanBeMain(string classname, string methodname, ClassSpaceSymbolTable* table);
 		bool printClass(string classname);
 		bool printMethod(string methodname);
 

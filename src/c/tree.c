@@ -111,7 +111,7 @@ void initTreeTypes() {
 	treeTypesInited = 1;
 }
 
-void AddSubNode(Node* parent, Node* child) {
+void addSubNode(Node* parent, Node* child) {
 	parent->subnodes++;
 	parent->node_data.nodes = realloc(parent->node_data.nodes, sizeof(Node*) * parent->subnodes);
 	parent->node_data.nodes[parent->subnodes - 1] = child;
@@ -135,39 +135,69 @@ Node* NodeFactory(int nodetype, YYLTYPE loc) {
 	return mynode;
 }
 
-Node* MakeEmptyNode(int nodetype, YYLTYPE loc) {
+Node* makeEmptyNode(int nodetype, YYLTYPE loc) {
 	Node* mynode = NodeFactory(nodetype, loc);
 	mynode->node_data.nodes = NULL;
 	return mynode;
 }
 
-Node* MakeNodeFromType(Type* thetype, YYLTYPE loc) {
+Node* makeNodeFromPureType(PureType* thetype, YYLTYPE loc) {
 	Node* mynode = NodeFactory(NT_TYPEDATA, loc);
-	mynode->node_data.type = thetype;
+	mynode->node_data.pure_type = thetype;
 	return mynode;
 }
 
-Node* MakeNodeFromTypeArray(TypeArray* thearray, YYLTYPE loc) {
+Node* makeNodeFromVarDecl(VarDecl* decl, YYLTYPE loc) {
+	Node* mynode = NodeFactory(NT_VAR_DECL_DATA, loc);
+	mynode->node_data.var_decl = decl;
+	return mynode;
+}
+
+Node* makeNodeFromSpecializableVarDecl(SpecializableVarDecl* decl, YYLTYPE loc) {
+	Node* mynode = NodeFactory(NT_SPECIALIZABLE_VAR_DECL, loc);
+	mynode->node_data.specializable_var_decl = decl;
+	return mynode;
+}
+
+Node* makeNodeFromPureTypeArray(PureTypeArray* thearray, YYLTYPE loc) {
 	Node* mynode = NodeFactory(NT_TYPE_ARRAY, loc);
-	mynode->node_data.typearray = thearray;
+	mynode->node_data.pure_type_array = thearray;
 
 	return mynode;
 }
 
-Node* MakeNodeFromString(int nodetype, char* mystring, YYLTYPE loc) {
+Node* makeNodeFromSpecializablePureType(SpecializablePureType* thetype, YYLTYPE loc) {
+	Node* mynode = NodeFactory(NT_SPECIALIZABLE_TYPEDATA, loc);
+	mynode->node_data.specializable_pure_type = thetype;
+	return mynode;
+}
+
+Node* makeNodeFromClassVarRef(ClassVarRef* ref, YYLTYPE loc) {
+	Node* mynode = NodeFactory(NT_VAR_REF, loc);
+	mynode->node_data.var_ref = makeVarRefFromClass(ref);
+	return mynode;
+}
+
+Node* makeNodeFromAlias(char* alias, YYLTYPE loc) {
+	Node* mynode = NodeFactory(NT_VAR_REF, loc);
+	mynode->node_data.var_ref = makeVarRefFromAlias(alias);
+	return mynode;
+}
+
+Node* makeNodeFromString(int nodetype, char* mystring, YYLTYPE loc) {
 	Node* mynode = NodeFactory(nodetype, loc);
 	mynode->node_data.string = mystring;
 	//mynode->node_data.string = strdup(mystring);
 	return mynode;
 }
 
-Node* MakeNodeFromNumber(int nodetype, double number, YYLTYPE loc) {
+Node* makeNodeFromNumber(int nodetype, double number, YYLTYPE loc) {
 	Node* mynode = NodeFactory(nodetype, loc);
 	mynode->node_data.number = number;
 	return mynode;
 }
 
-Node* MakeTwoBranchNode(int nodetype, Node* a, Node* b, YYLTYPE loc) {
+Node* makeTwoBranchNode(int nodetype, Node* a, Node* b, YYLTYPE loc) {
 	Node* mynode = NodeFactory(nodetype, loc);
 	mynode->subnodes = 2;
 	mynode->node_data.nodes = malloc(2 * sizeof(Node*));
@@ -175,7 +205,7 @@ Node* MakeTwoBranchNode(int nodetype, Node* a, Node* b, YYLTYPE loc) {
 	return mynode;
 }
 
-Node* MakeOneBranchNode(int nodetype, Node* a, YYLTYPE loc) {
+Node* makeOneBranchNode(int nodetype, Node* a, YYLTYPE loc) {
 	Node* mynode = NodeFactory(nodetype, loc);
 	mynode->subnodes = 1;
 	mynode->node_data.nodes = malloc(1 * sizeof(Node*));
@@ -191,9 +221,9 @@ void printSubNodes(Node *n, int level, char* name) {
 		printtree (n->node_data.nodes[i], level+1);
 }
 
-void printtype(Type* thetype, int level) {
+void printtype(PureType* thetype, int level) {
 	/*
-	switch(thetype->type) {
+	switch(thetype->pure_type) {
 		case TYPE_LAMBDA:
 			printf("%*c lambda, []^%d, {%s}, @%s\n", level, ' ', thetype->arrayed, thetype->specialty, thetype->alias);
 			if(thetype->typedata.lambda.returntype != NULL) {
@@ -237,14 +267,14 @@ void printtree (Node *n, int level) {
 			printf("%*c %s %s\n", level, ' ', myname, n->node_data.string);
 			break;
 		case NT_TYPEDATA:
-			printtype(n->node_data.type, level);
+			printtype(n->node_data.pure_type, level);
 			break;
 		case NT_TYPE_ARRAY:
 			printf("%*c %s\n", level, ' ', myname);
 			{
 				int i;
-				for(i = 0; i < n->node_data.typearray->typecount; i++)
-					printtype(n->node_data.typearray->types[i], level + 1);
+				for(i = 0; i < n->node_data.pure_type_array->typecount; i++)
+					printtype(n->node_data.pure_type_array->types[i], level + 1);
 			}
 			break;
 		default:
@@ -270,10 +300,10 @@ void freeNode(Node* n) {
 			free(n->node_data.string);
 			break;
 		case NT_TYPEDATA:
-			freeType(n->node_data.type);
+			freePureType(n->node_data.pure_type);
 			break;
 		case NT_TYPE_ARRAY:
-			freeTypeArray(n->node_data.typearray);
+			freePureTypeArray(n->node_data.pure_type_array);
 			break;
 	}
 

@@ -17,17 +17,15 @@
 
 #include <iostream>
 #include "PropertySymbolTable.h"
-extern "C" {
-	#include "type.h"
-}
 
 class TableFileWriter {
 
 	public:
 		void write(ostream& out, PropertySymbolTable* table);
 	private:
-		void writeType(ostream& out, Type* type);
+		void writeType(ostream& out, PureType<wake::QUALIFIED>* type);
 		void writeProperty(ostream& out, ObjectProperty* property);
+		void writeVarDecl(ostream& out, VarDecl<wake::QUALIFIED>& decl);
 		void writeAnnotations(ostream& out, const boost::ptr_vector<Annotation>& annotations);
 };
 

@@ -26,10 +26,20 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	TestCastDownValid,
-	"every ParentClass is:					\n\
-	every MyClass (a ParentClass) is:		\n\
-		method(ParentClass) {				\n\
-			method((cast ParentClass) this);		\n\
+	"every ParentClass is:						\n\
+	every MyClass (a ParentClass) is:			\n\
+		method(ParentClass) {					\n\
+			method((cast ParentClass) this);	\n\
+		}",
+	PTT_VALID
+)
+
+PTT_TEST_CASE(
+	TestUnsafeCastInvalidAccepted,
+	"every UnrelatedClass is:							\n\
+	every MyClass is:									\n\
+		method(UnrelatedClass) {						\n\
+			method((unsafe cast UnrelatedClass) this);	\n\
 		}",
 	PTT_VALID
 )

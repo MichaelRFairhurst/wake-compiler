@@ -16,32 +16,34 @@
 #include "TypeError.h"
 #include <memory>
 
-void wake::ast::Return::typeCheck() {
+using namespace wake;
+
+void ast::Return::typeCheck() {
 	if(returntype == NULL) {
 		if(value.get() == NULL) return;
 
-		auto_ptr<Type> actualReturn(value->typeCheck(false));
+		auto_ptr<PureType<QUALIFIED> > actualReturn(value->typeCheck(false));
 
 		EXPECTED	"VOID"
-		ERRONEOUS	analyzer->getNameForType(actualReturn.get())
+		ERRONEOUS	actualReturn->toString()
 		THROW		("Method is not allowed to return anything");
 	}
 
 	if(value.get() == NULL) {
-		EXPECTED	analyzer->getNameForType(returntype)
+		EXPECTED	returntype->toString()
 		ERRONEOUS	"VOID"
 		THROW		("Method is not allowed to return without a value");
 	}
 
-	auto_ptr<Type> actualReturn(value->typeCheck(false));
+	auto_ptr<PureType<QUALIFIED> > actualReturn(value->typeCheck(false));
 
 	if(!analyzer->isASubtypeOfB(actualReturn.get(), returntype)) {
-		EXPECTED	analyzer->getNameForType(returntype)
-		ERRONEOUS	analyzer->getNameForType(actualReturn.get())
+		EXPECTED	returntype->toString()
+		ERRONEOUS	actualReturn->toString()
 		THROW		("Return type is incompatible with method signature");
 	}
 }
 
-bool wake::ast::Return::exhaustiveReturns() {
+bool ast::Return::exhaustiveReturns() {
 	return true;
 }

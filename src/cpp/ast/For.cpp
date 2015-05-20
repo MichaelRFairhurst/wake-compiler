@@ -16,11 +16,13 @@
 #include "TypeError.h"
 #include <memory>
 
-void wake::ast::For::typeCheck() {
+using namespace wake;
+
+void ast::For::typeCheck() {
 	scopesymtable->pushScope();
 
 	init->typeCheck();
-	std::auto_ptr<Type> conditionType(condition->typeCheck(false));
+	std::auto_ptr<PureType<QUALIFIED> > conditionType(condition->typeCheck(false));
 	incr->typeCheck();
 	block->typeCheck();
 
@@ -28,11 +30,11 @@ void wake::ast::For::typeCheck() {
 
 	if(!analyzer->isPrimitiveTypeBool(conditionType.get())) {
 		EXPECTED	"Bool"
-		ERRONEOUS	analyzer->getNameForType(conditionType.get())
+		ERRONEOUS	conditionType->toString()
 		THROW		("For conditions must be Bool");
 	}
 }
 
-bool wake::ast::For::exhaustiveReturns() {
+bool ast::For::exhaustiveReturns() {
 	return false; // all loops are conditional
 }

@@ -16,16 +16,18 @@
 #include "TypeError.h"
 #include <memory>
 
-void wake::ast::Throw::typeCheck() {
-	auto_ptr<Type> exceptionType(exception->typeCheck(false));
+using namespace wake;
+
+void ast::Throw::typeCheck() {
+	auto_ptr<PureType<QUALIFIED> > exceptionType(exception->typeCheck(false));
 
 	if(!analyzer->isException(exceptionType.get())) {
 		EXPECTED	"Exception"
-		ERRONEOUS	analyzer->getNameForType(exceptionType.get())
+		ERRONEOUS	exceptionType->toString()
 		THROW		("Can only throw subclasses of exception");
 	}
 }
 
-bool wake::ast::Throw::exhaustiveReturns() {
+bool ast::Throw::exhaustiveReturns() {
 	return true;
 }

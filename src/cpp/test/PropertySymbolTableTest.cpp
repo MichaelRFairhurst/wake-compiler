@@ -15,38 +15,42 @@
 #include <boost/test/unit_test.hpp>
 
 #include "PropertySymbolTable.h"
+#include "PureTypeArray.h"
+#include "ClassSpaceSymbolTable.h"
+
+using namespace wake;
 
 BOOST_AUTO_TEST_SUITE(PropertySymbolTableTestSuite);
 
 BOOST_AUTO_TEST_CASE(AddingNeedsAreGotten) {
 	TypeAnalyzer analyzer;
-	PropertySymbolTable table(&analyzer);
-	Type* thefirsttype = MakeType(TYPE_CLASS);
-	Type* thesecondtype = MakeType(TYPE_CLASS);
-	thefirsttype->typedata._class.classname = strdup("");
-	thefirsttype->typedata._class.shadow = 0;
-	thesecondtype->typedata._class.classname = strdup("");
-	thesecondtype->typedata._class.shadow = 0;
-	table.addNeed(thefirsttype, 0, vector<Annotation*>());
-	table.addNeed(thesecondtype, 0, vector<Annotation*>());
-	BOOST_REQUIRE(table.getNeeds()->at(0) == thefirsttype);
-	BOOST_REQUIRE(table.getNeeds()->at(1) == thesecondtype);
+	PropertySymbolTable table(&analyzer, "");
+	SpecializableVarDecl<QUALIFIED> thefirsttype;
+	thefirsttype.decl.typedata = PureType<QUALIFIED>(TYPE_CLASS);
+	SpecializableVarDecl<QUALIFIED> thesecondtype;
+	thesecondtype.decl.typedata = PureType<QUALIFIED>(TYPE_CLASS);
+	thefirsttype.decl.typedata.typedata._class.classname = strdup("");
+	thesecondtype.decl.typedata.typedata._class.classname = strdup("");
+	table.addNeed(&thefirsttype, 0, vector<Annotation*>());
+	table.addNeed(&thesecondtype, 0, vector<Annotation*>());
+	BOOST_REQUIRE(table.getNeeds()->at(0) == &thefirsttype);
+	BOOST_REQUIRE(table.getNeeds()->at(1) == &thesecondtype);
 }
 
 BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesReturnTypes) {
 	TypeAnalyzer analyzer;
-	PropertySymbolTable table(&analyzer);
+	PropertySymbolTable table(&analyzer, "");
 	ObjectProperty* property = new ObjectProperty();
-	vector<Type*>* parameters = new vector<Type*>();
-	vector<Type*> parameterizations;
-	Type* methodtype = MakeType(TYPE_LAMBDA);
-	Type parameter(TYPE_PARAMETERIZED);
-	Type parameterization(TYPE_CLASS);
+	vector<PureType<QUALIFIED>*>* parameters = new vector<PureType<QUALIFIED>*>();
+	vector<PureType<QUALIFIED>*> parameterizations;
+	PureType<QUALIFIED>* methodtype = new PureType<QUALIFIED>(TYPE_LAMBDA);
+	PureType<QUALIFIED> parameter(TYPE_PARAMETERIZED);
+	PureType<QUALIFIED> parameterization(TYPE_CLASS);
 
 	parameterization.typedata._class.classname = strdup("AClass");
 	parameter.typedata.parameterized.label = strdup("E");
-	methodtype->typedata.lambda.returntype = copyType(&parameter);
-	property->type = methodtype;
+	methodtype->typedata.lambda.returntype = new PureType<QUALIFIED>(parameter);
+	property->decl.typedata = *methodtype;
 	property->casing = "myMethod";
 	parameters->push_back(&parameter);
 	parameterizations.push_back(&parameterization);
@@ -56,7 +60,7 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesReturnTypes) {
 
 	auto_ptr<ReadOnlyPropertySymbolTable> derived(table.resolveParameters(parameterizations));
 
-	boost::optional<Type*> method = derived->find("myMethod");
+	boost::optional<PureType<QUALIFIED>*> method = derived->find("myMethod");
 	BOOST_REQUIRE(method);
 	BOOST_REQUIRE(*method);
 	BOOST_REQUIRE((*method)->type == TYPE_LAMBDA);
@@ -68,19 +72,19 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesReturnTypes) {
 
 BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesPropertyName) {
 	TypeAnalyzer analyzer;
-	PropertySymbolTable table(&analyzer);
+	PropertySymbolTable table(&analyzer, "");
 	ObjectProperty* property = new ObjectProperty();
-	vector<Type*>* parameters = new vector<Type*>();
-	vector<Type*> parameterizations;
-	Type* methodtype = MakeType(TYPE_LAMBDA);
-	Type parameter(TYPE_PARAMETERIZED);
-	Type parameterization(TYPE_CLASS);
+	vector<PureType<QUALIFIED>*>* parameters = new vector<PureType<QUALIFIED>*>();
+	vector<PureType<QUALIFIED>*> parameterizations;
+	PureType<QUALIFIED>* methodtype = new PureType<QUALIFIED>(TYPE_LAMBDA);
+	PureType<QUALIFIED> parameter(TYPE_PARAMETERIZED);
+	PureType<QUALIFIED> parameterization(TYPE_CLASS);
 
 	parameterization.typedata._class.classname = strdup("AClass");
 	parameter.typedata.parameterized.label = strdup("E");
-	methodtype->typedata.lambda.arguments = MakeTypeArray();
-	AddTypeToTypeArray(copyType(&parameter), methodtype->typedata.lambda.arguments);
-	property->type = methodtype;
+	methodtype->typedata.lambda.arguments = new PureTypeArray<QUALIFIED>();
+	methodtype->typedata.lambda.arguments->addType(new PureType<QUALIFIED>(parameter));
+	property->decl.typedata = *methodtype;
 	property->casing = "myMethod(#)";
 	parameters->push_back(&parameter);
 	parameterizations.push_back(&parameterization);
@@ -90,7 +94,7 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesPropertyName) {
 
 	auto_ptr<ReadOnlyPropertySymbolTable> derived(table.resolveParameters(parameterizations));
 
-	boost::optional<Type*> method = derived->find("myMethod(AClass)");
+	boost::optional<PureType<QUALIFIED>*> method = derived->find("myMethod(AClass)");
 	BOOST_REQUIRE(method);
 	BOOST_REQUIRE(*method);
 	BOOST_REQUIRE((*method)->type == TYPE_LAMBDA);
@@ -103,26 +107,100 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesPropertyName) {
 
 BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesNeedName) {
 	TypeAnalyzer analyzer;
-	PropertySymbolTable table(&analyzer);
-	vector<Type*>* parameters = new vector<Type*>();
-	vector<Type*> parameterizations;
-	Type* parameter = MakeType(TYPE_PARAMETERIZED);
-	Type parameterization(TYPE_CLASS);
+	PropertySymbolTable table(&analyzer, "");
+	vector<PureType<QUALIFIED>*>* parameters = new vector<PureType<QUALIFIED>*>();
+	vector<PureType<QUALIFIED>*> parameterizations;
+	PureType<QUALIFIED>* parameter = new PureType<QUALIFIED>(TYPE_PARAMETERIZED);
+	PureType<QUALIFIED> parameterization(TYPE_CLASS);
 
 	parameterization.typedata._class.classname = strdup("AClass");
 	parameter->typedata.parameterized.label = strdup("E");
 	parameters->push_back(parameter);
 	parameterizations.push_back(&parameterization);
+	SpecializableVarDecl<QUALIFIED> needDecl;
+	needDecl.decl.typedata = *parameter;
 	table.setParameters(parameters);
-	table.addNeed(parameter, 0, vector<Annotation*>());
+	table.addNeed(&needDecl, 0, vector<Annotation*>());
 
 	auto_ptr<ReadOnlyPropertySymbolTable> derived(table.resolveParameters(parameterizations));
 
-	vector<Type*>* needs = derived->getNeeds();
+	vector<SpecializableVarDecl<QUALIFIED>*>* needs = derived->getNeeds();
 
 	BOOST_REQUIRE(needs->size() == 1);
-	BOOST_REQUIRE(needs->at(0)->type == TYPE_CLASS);
-	BOOST_REQUIRE(needs->at(0)->typedata._class.classname == string("AClass"));
+	BOOST_REQUIRE(needs->at(0)->decl.typedata.type == TYPE_CLASS);
+	BOOST_REQUIRE(needs->at(0)->decl.typedata.typedata._class.classname == string("AClass"));
+}
+
+BOOST_AUTO_TEST_CASE(TestPropagateInheritanceExtendPreservesNeeds) {
+	TypeAnalyzer analyzer;
+	ClassSpaceSymbolTable classes;
+	analyzer.reference = &classes;
+	classes.addClass("SharedNeed");
+	PropertySymbolTable parent(&analyzer, "");
+	PropertySymbolTable child(&analyzer, "");
+	SpecializableVarDecl<QUALIFIED> needDecl;
+	needDecl.decl.typedata = PureType<QUALIFIED>(TYPE_CLASS);
+	needDecl.decl.typedata.typedata._class.classname = strdup("SharedNeed");
+	needDecl.specialty = strdup("specialty");
+	parent.setParameters(new vector<PureType<QUALIFIED>*>());
+	parent.addNeed(&needDecl, 0, vector<Annotation*>());
+
+	ErrorTracker errors;
+	propagateInheritanceTables(&child, &parent, true, errors);
+	vector<SpecializableVarDecl<QUALIFIED>*>* needs = child.getNeeds();
+
+	BOOST_REQUIRE(needs->size() == 1);
+	BOOST_REQUIRE(needs->at(0)->decl.typedata.type == TYPE_CLASS);
+	BOOST_REQUIRE(needs->at(0)->decl.typedata.typedata._class.classname == string("SharedNeed"));
+	BOOST_REQUIRE(needs->at(0)->specialty == string("specialty"));
+}
+
+BOOST_AUTO_TEST_CASE(TestPropagateInheritanceDropsPrivateNeeds) {
+	TypeAnalyzer analyzer;
+	ClassSpaceSymbolTable classes;
+	analyzer.reference = &classes;
+	classes.addClass("SharedNeed");
+	PropertySymbolTable parent(&analyzer, "");
+	PropertySymbolTable child(&analyzer, "");
+	SpecializableVarDecl<QUALIFIED> needDecl;
+	needDecl.decl.typedata = PureType<QUALIFIED>(TYPE_CLASS);
+	needDecl.decl.typedata.typedata._class.classname = strdup("SharedNeed");
+	needDecl.specialty = strdup("specialty");
+	parent.setParameters(new vector<PureType<QUALIFIED>*>());
+	parent.addNeed(&needDecl, 0, vector<Annotation*>());
+
+	ErrorTracker errors;
+	propagateInheritanceTables(&child, &parent, false, errors);
+	vector<SpecializableVarDecl<QUALIFIED>*>* needs = child.getNeeds();
+
+	BOOST_REQUIRE(needs->size() == 0);
+}
+
+BOOST_AUTO_TEST_CASE(TestPropagateInheritanceKeepsPublicNeedsButNotAsNeed) {
+	TypeAnalyzer analyzer;
+	ClassSpaceSymbolTable classes;
+	analyzer.reference = &classes;
+	classes.addClass("SharedNeed");
+	PropertySymbolTable parent(&analyzer, "");
+	PropertySymbolTable child(&analyzer, "");
+	SpecializableVarDecl<QUALIFIED> needDecl;
+	needDecl.decl.typedata = PureType<QUALIFIED>(TYPE_CLASS);
+	needDecl.decl.typedata.typedata._class.classname = strdup("SharedNeed");
+	needDecl.specialty = strdup("specialty");
+	parent.setParameters(new vector<PureType<QUALIFIED>*>());
+	parent.addNeed(&needDecl, PROPERTY_PUBLIC, vector<Annotation*>());
+
+	ErrorTracker errors;
+	propagateInheritanceTables(&child, &parent, false, errors);
+	vector<SpecializableVarDecl<QUALIFIED>*>* needs = child.getNeeds();
+
+	BOOST_REQUIRE(needs->size() == 0);
+	BOOST_REQUIRE(child.isAbstract());
+	boost::optional<PureType<QUALIFIED>*> method = child.find("SharedNeed");
+	BOOST_REQUIRE(method);
+	BOOST_REQUIRE(*method);
+	BOOST_REQUIRE((*method)->type == TYPE_CLASS);
+	BOOST_REQUIRE((*method)->typedata._class.classname == string("SharedNeed"));
 }
 
 BOOST_AUTO_TEST_SUITE_END();
