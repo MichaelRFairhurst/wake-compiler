@@ -181,7 +181,7 @@ bin/waketable/io/FilePath.table: bin/waketable/File.table bin/waketable/lang/Tex
 
 bin/waketable/io/FileSystem.table: bin/waketable/File.table bin/waketable/lang/Text.table bin/waketable/lang/Num.table
 
-bin/waketable/%.table: src/wake/stdlib/tables/%.wk bin/wake-nolib
+bin/waketable/lang/%.table: src/wake/stdlib/tables/%.wk bin/wake-nolib
 	./bin/wake-nolib -d bin/waketable -t $< -d bin/waketable
 
 bin/waketable/io/Printer.table: bin/waketable/lang/Num.table bin/waketable/lang/Text.table bin/wake-nolib src/wake/stdlib/tables/Printer.wk

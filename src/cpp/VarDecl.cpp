@@ -72,3 +72,5 @@ VarDecl<wake::UNQUALIFIED>* copyVarDecl(VarDecl<wake::UNQUALIFIED>* toBeCopied) 
 
 template struct VarDecl<wake::QUALIFIED>;
 template struct VarDecl<wake::UNQUALIFIED>;
+template void std::swap(VarDecl<wake::QUALIFIED>& lhs, VarDecl<wake::QUALIFIED>& rhs);
+template void std::swap(VarDecl<wake::UNQUALIFIED>& lhs, VarDecl<wake::UNQUALIFIED>& rhs);
