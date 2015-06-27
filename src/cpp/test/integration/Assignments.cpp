@@ -81,8 +81,8 @@ PTT_TEST_CASE(
 		inEquivalence() { (Num = 5) == 5; }							\n\
 		inLT() { (Num = 5) <= 5; }									\n\
 		inGT() { (Num = 5) >= 5; }									\n\
-		inIfStmt() { if(Bool = true) {} }							\n\
-		inWhileStmt() { while(Bool = true) {} }						\n\
+		inIfStmt() { if Bool = true {} }							\n\
+		inWhileStmt() { while Bool = true {} }						\n\
 		inMethodArg($Num) { inMethodArg(Num = 5); }					\n\
 	",
 	PTT_EXPECT(USE_OF_ASSIGNMENT_VALUE)
@@ -117,8 +117,8 @@ PTT_TEST_CASE(
 		inEquivalence() { (Num := 5) == 5; }									\n\
 		inLT() { (Num := 5) <= 5; }												\n\
 		inGT() { (Num := 5) >= 5; }												\n\
-		inIfStmt() { if(Bool := true) {} }										\n\
-		inWhileStmt() { while(Bool := true) {} }								\n\
+		inIfStmt() { if Bool := true {} }										\n\
+		inWhileStmt() { while Bool := true {} }								\n\
 	",
 	PTT_VALID
 );

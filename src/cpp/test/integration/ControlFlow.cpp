@@ -15,12 +15,12 @@
 PTT_TEST_CASE(
 	CatchesTypeErrorsWithinIfElseAndInvertWorks,
 	"every MyClass is:													\n\
-		failInIf() { if(true) 5 + 'illegal'; }							\n\
-		failInElse() { if(true) 5; else 5 + 'illegal'; }				\n\
-		failInIfInverted() { if(!true) 5 + 'illegal'; }					\n\
-		failInElseInverted() { if(!true) 5; else 5 + 'illegal'; }		\n\
-		failInWhile() { while(!true) 5 + 'illegal'; }					\n\
-		failInWhileInverted() { while(!true) 5 + 'illegal'; }			\n\
+		failInIf() { if true then 5 + 'illegal'; }							\n\
+		failInElse() { if true then 5; else 5 + 'illegal'; }				\n\
+		failInIfInverted() { if !true then 5 + 'illegal'; }					\n\
+		failInElseInverted() { if !true then 5; else 5 + 'illegal'; }		\n\
+		failInWhile() { while !true do 5 + 'illegal'; }					\n\
+		failInWhileInverted() { while !true do 5 + 'illegal'; }			\n\
 		failInFor() { for(5; !true; 5) 5 + 'illegal'; }					\n\
 		failInForInverted() { for(5; !true; 5) 5 + 'illegal'; }			\n\
 		failInForInit() { for(5 + 'illegal'; !true; 5) 5; }				\n\
@@ -45,18 +45,18 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ValidIfConditions,
 	"every MyClass is:											\n\
-		truthLiterals() { if(true) 5; if(false) 5; }			\n\
-		truthNumLiteral() { if(1) 5; }			\n\
-		truthVariable(Bool) { if(Bool) 5; }					\n\
-		numVariable(Num) { if(Num) 5; }					\n\
-		truthAlias(Bool b) { if(b) 5; }						\n\
-		numAlias(Num n) { if(n) 5; }						\n\
-		truthLiteralsWhile() { while(true) 5; while(false) 5; }	\n\
-		truthVariableWhile(Bool) { while(Bool) 5; }			\n\
-		truthAliasWhile(Bool b) { while(b) 5; }				\n\
-		numLiteralWhile() { while(5) 5; }	\n\
-		numVariableWhile(Num) { while(Num) 5; }			\n\
-		numAliasWhile(Num n) { while(n) 5; }				\n\
+		truthLiterals() { if true then 5; if false then 5; }			\n\
+		truthNumLiteral() { if 1 then 5; }			\n\
+		truthVariable(Bool) { if Bool then 5; }					\n\
+		numVariable(Num) { if Num then 5; }					\n\
+		truthAlias(Bool b) { if b then 5; }						\n\
+		numAlias(Num n) { if n then 5; }						\n\
+		truthLiteralsWhile() { while true do 5; while false do 5; }	\n\
+		truthVariableWhile(Bool) { while Bool do 5; }			\n\
+		truthAliasWhile(Bool b) { while b do 5; }				\n\
+		numLiteralWhile() { while 5 do 5; }	\n\
+		numVariableWhile(Num) { while Num do 5; }			\n\
+		numAliasWhile(Num n) { while n do 5; }				\n\
 	",
 	PTT_VALID
 )
@@ -106,31 +106,31 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	BreakAndContinueWithinForOrWhileIsOK,
-	"every MyClass is: afn() { while(true) { while(true) { break; continue; } for(5; true; 5) { break; continue; }; break; continue; } }",
+	"every MyClass is: afn() { while true { while true { break; continue; } for(5; true; 5) { break; continue; }; break; continue; } }",
 	PTT_VALID
 )
 
 PTT_TEST_CASE(
 	InexhaustiveReturnFromIfsWithoutElses,
-	"every MyClass is: Bool -- afn() { if(true) return true; if(true) return true; if(true) return true; }",
+	"every MyClass is: Bool -- afn() { if true then return true; if true then return true; if true then return true; }",
 	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
 )
 
 PTT_TEST_CASE(
 	InexhaustiveReturnFromIfsWithoutReturns,
-	"every MyClass is: Bool -- afn() { if(true) 5; else return true; if(true) 5; else return true; }",
+	"every MyClass is: Bool -- afn() { if true then 5; else return true; if true then 5; else return true; }",
 	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
 )
 
 PTT_TEST_CASE(
 	InexhaustiveReturnFromElsesWithoutReturns,
-	"every MyClass is: Bool -- afn() { if(true) return true; else 5; if(true) return true; else 5; }",
+	"every MyClass is: Bool -- afn() { if true then return true; else 5; if true then return true; else 5; }",
 	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
 )
 
 PTT_TEST_CASE(
 	InexhaustiveReturnFromReturningWithinLoopsOnly,
-	"every MyClass is: Bool -- afn() { while(true) return true; for(1; true; 1) return true; }",
+	"every MyClass is: Bool -- afn() { while true do return true; for(1; true; 1) return true; }",
 	PTT_EXPECT(INEXHAUSTIVE_RETURNS)
 )
 
@@ -144,8 +144,8 @@ PTT_TEST_CASE(
 	InexhaustiveReturnComplicated,
 	"every MyClass is:				\n\
 		Bool -- afn() {			\n\
-			if(true) {				\n\
-				if(true) {			\n\
+			if true {				\n\
+				if true {			\n\
 					5 + 5;			\n\
 					6 + 6;			\n\
 					return true;	\n\
@@ -153,7 +153,7 @@ PTT_TEST_CASE(
 			} else {				\n\
 				5 + 6;				\n\
 				7 == 10;			\n\
-				while(true) {		\n\
+				while true {		\n\
 					return true;	\n\
 				}					\n\
 			}						\n\
@@ -166,8 +166,8 @@ PTT_TEST_CASE(
 	ExhaustiveReturnComplicated,
 	"every MyClass is:				\n\
 		Bool -- afn() {			\n\
-			if(true) {				\n\
-				if(true) {			\n\
+			if true {				\n\
+				if true {			\n\
 					5 + 5;			\n\
 					6 + 6;			\n\
 					return true;	\n\
@@ -256,11 +256,11 @@ PTT_TEST_CASE(
 	"every MyClass is:						\n\
 		method() {							\n\
 			var Num[] = [];					\n\
-			foreach(Num[]) {				\n\
+			foreach Num[] {				\n\
 				Num += Num[0];				\n\
 			}								\n\
 			var Text[] = [];				\n\
-			foreach(Text[]) {				\n\
+			foreach Text[] {				\n\
 				Text += Text[0];			\n\
 			}								\n\
 		}",
@@ -272,12 +272,12 @@ PTT_TEST_CASE(
 	"every MyClass is:						\n\
 		lowerArrayArray() {					\n\
 			var Num[][] = [];				\n\
-			foreach(Num[][]) { }			\n\
+			foreach Num[][] { }			\n\
 		}									\n\
 		overwriteVar() {					\n\
 			var Num[] = [];					\n\
 			var Num = 3;					\n\
-			foreach(Num[]) { }				\n\
+			foreach Num[] { }				\n\
 		}",
 	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)
 	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)
@@ -286,9 +286,9 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	TestForeachOnNonArray,
 	"every MyClass is:						\n\
-		onThis() { foreach(this) { } }		\n\
-		on(Num) { foreach(Num) { } }		\n\
-		on(Text) { foreach(Text) { } }		\n\
+		onThis() { foreach this { } }		\n\
+		on(Num) { foreach Num { } }		\n\
+		on(Text) { foreach Text { } }		\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -300,7 +300,7 @@ PTT_TEST_CASE(
 	"every MyClass is:						\n\
 		myMethod() {						\n\
 			var aliased Num[] = [];			\n\
-			foreach(aliased) { Num + 5; }	\n\
+			foreach aliased { Num + 5; }	\n\
 		}",
 );
 
@@ -310,7 +310,7 @@ PTT_TEST_CASE(
 		myMethod() {						\n\
 			var aliased Num[] = [];			\n\
 			var Num = 5;					\n\
-			foreach(aliased) { }			\n\
+			foreach aliased { }			\n\
 		}",
 	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)
 );
@@ -326,7 +326,7 @@ PTT_TEST_CASE(
 	TestForeachInValid,
 	"every MyClass is:					\n\
 		myMethod(Text[]) {				\n\
-			foreach(text in Text[]) {	\n\
+			foreach text in Text[] {	\n\
 				text + 'another text';	\n\
 			}							\n\
 		}",
@@ -337,7 +337,7 @@ PTT_TEST_CASE(
 	TestTypeErrorsWithinForeachAreCaught,
 	"every MyClass is:					\n\
 		myMethod(Text[]) {				\n\
-			foreach(text in Text[]) {	\n\
+			foreach text in Text[] {	\n\
 				5 + 'another text';		\n\
 			}							\n\
 		}",
@@ -348,7 +348,7 @@ PTT_TEST_CASE(
 	TestNonSubtypeinForeachIsTypeError,
 	"every MyClass is:					\n\
 		myMethod(Text[]) {				\n\
-			foreach(Num in Text[]) {	\n\
+			foreach Num in Text[] {	\n\
 			}							\n\
 		}",
 	PTT_EXPECT(TYPE_ERROR)
@@ -358,7 +358,7 @@ PTT_TEST_CASE(
 	TestRedefinitionOfAliasInForeachInIsCaught,
 	"every MyClass is:					\n\
 		myMethod(Text[], Text text) {	\n\
-			foreach(text in Text[]) {	\n\
+			foreach text in Text[] {	\n\
 			}							\n\
 		}",
 	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)
@@ -368,7 +368,7 @@ PTT_TEST_CASE(
 	TestRedefinitionOfTypeInForeachInIsCaught,
 	"every MyClass is:					\n\
 		myMethod(Text[], Text) {		\n\
-			foreach(Text in Text[]) {	\n\
+			foreach Text in Text[] {	\n\
 			}							\n\
 		}",
 	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)
@@ -378,7 +378,7 @@ PTT_TEST_CASE(
 	TestForeachShadowKeepsShadow,
 	"every MyClass is:					\n\
 		Text -- myMethod($Text[]) {		\n\
-			foreach($Text[]) {			\n\
+			foreach $Text[] {			\n\
 				return $Text;			\n\
 			}							\n\
 			return \"Blah\";			\n\

@@ -42,10 +42,10 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	CannotIfCondOrInvertWithAnythingButBools,
 	"every MyClass is:											\n\
-		ifConditionWith( MyClass ) { if(MyClass) 5; }			\n\
-		ifConditionWithText() { if('test') 5; }					\n\
-		whileConditionWith( MyClass ) { while(MyClass) 5; }		\n\
-		whileConditionWithText() { while('test') 5; }			\n\
+		ifConditionWith( MyClass ) { if MyClass then 5; }		\n\
+		ifConditionWithText() { if 'test' then 5; }					\n\
+		whileConditionWith( MyClass ) { while MyClass do 5; }		\n\
+		whileConditionWithText() { while 'test' do 5; }			\n\
 		forConditionWithNum() { for(5; 5; 5) 5; }				\n\
 		forConditionWith( MyClass ) { for(5; MyClass; 5) 5; }	\n\
 		forConditionWithText() { for(5; 'test'; 5) 5; }			\n\

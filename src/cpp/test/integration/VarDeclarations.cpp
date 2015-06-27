@@ -32,7 +32,7 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	TestDeclareAnNumIsScoped,
-	"every MyClass is: Num -- myfn() { if(true) { var Num = 5; } return Num; }",
+	"every MyClass is: Num -- myfn() { if true { var Num = 5; } return Num; }",
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 )
 

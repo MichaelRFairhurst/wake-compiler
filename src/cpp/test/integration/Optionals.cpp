@@ -280,7 +280,7 @@ PTT_TEST_CASE(
 	TestEndOfExistsScopeDoesntRemoveVariableFromTable,
 	"every MyClass is: method() {			\n\
 		var Num? = nothing;					\n\
-		if(true) {							\n\
+		if true {							\n\
 			if Num exists { }				\n\
 		}									\n\
 		Num = nothing;						\n\

@@ -190,7 +190,7 @@ PTT_TEST_CASE(
 			var RightClass -- fn() right = { -> return RightClass; };	\n\
 			var fn() void = { -> return; };								\n\
 			var LowestClass -- fn() lowest = { ->						\n\
-				if(true) {												\n\
+				if true {												\n\
 					return LeftClass;									\n\
 				} else {												\n\
 					return RightClass;									\n\
@@ -214,7 +214,7 @@ PTT_TEST_CASE(
 			var LeftClass -- fn() left = { -> return LowestClass; };	\n\
 			var RightClass -- fn() right = { -> return LowestClass; };	\n\
 			var LowestClass -- fn() lowest = { ->						\n\
-				if(true) {												\n\
+				if true {												\n\
 					return;												\n\
 				} else {												\n\
 					return RightClass;									\n\
@@ -240,14 +240,14 @@ PTT_TEST_CASE(
 			{ -> return; };			\n\
 			{ -> return 4; };		\n\
 			{ ->					\n\
-				if(true) {			\n\
+				if true {			\n\
 					return 4;		\n\
 				} else {			\n\
 					return 2;		\n\
 				}					\n\
 			};						\n\
 			{ ->					\n\
-				if(true) {			\n\
+				if true {			\n\
 					return;			\n\
 				}					\n\
 			};						\n\
@@ -260,7 +260,7 @@ PTT_TEST_CASE(
 	"every MyClass is:				\n\
 		myMethod() {				\n\
 			{ ->					\n\
-				if(true) {			\n\
+				if true {			\n\
 					return 4;		\n\
 				}					\n\
 			};						\n\

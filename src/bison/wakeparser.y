@@ -95,8 +95,8 @@ int wakewrap()
 %type <string> alias modulename
 %start file
 
-/* 3 are from @annotations before class definitions, 1 from if/else, 1 from try/catch, 1 from exists/else */
-%expect 6
+/* 3 are from @annotations before class definitions, 3 from if/else, 1 from try/catch, 1 from exists/else */
+%expect 8
 
 %expect-rr 0
 %%
@@ -482,16 +482,21 @@ existsstatement:
 	;
 
 selectionstatement:
-	IF '(' expression ')' statement_or_block										{ $$ = makeTwoBranchNode(NT_IF_ELSE, $3, $5, @$); }
-	| IF '(' expression ')' statement_or_block ELSE statement_or_block				{ $$ = makeTwoBranchNode(NT_IF_ELSE, $3, $5, @$); addSubNode($$, $7); }
+	IF expression_noretrieval block													{ $$ = makeTwoBranchNode(NT_IF_ELSE, $2, $3, @$); }
+	| IF expression_noretrieval THEN statement										{ $$ = makeTwoBranchNode(NT_IF_ELSE, $2, $4, @$); }
+	| IF expression_noretrieval block ELSE statement_or_block						{ $$ = makeTwoBranchNode(NT_IF_ELSE, $2, $3, @$); addSubNode($$, $5); }
+	| IF expression_noretrieval THEN statement ELSE statement_or_block				{ $$ = makeTwoBranchNode(NT_IF_ELSE, $2, $4, @$); addSubNode($$, $6); }
 	| SWITCH '(' expression ')' block												{ $$ = makeTwoBranchNode(NT_SWITCH, $3, $5, @$); }
 	;
 
 iterationstatement:
-	WHILE '(' expression ')' statement_or_block										{ $$ = makeTwoBranchNode(NT_WHILE, $3, $5, @$); }
+	WHILE expression block															{ $$ = makeTwoBranchNode(NT_WHILE, $2, $3, @$); }
+	| WHILE expression DO statement													{ $$ = makeTwoBranchNode(NT_WHILE, $2, $4, @$); }
 	| FOR '(' forinit forcondition forincrement ')' statement_or_block				{ $$ = makeTwoBranchNode(NT_FOR, $3, $4, @$); addSubNode($$, $5); addSubNode($$, $7); }
-	| FOREACH '(' expression ')' statement_or_block									{ $$ = makeTwoBranchNode(NT_FOREACH, $3, $5, @$); }
-	| FOREACH '(' member IN expression ')' statement_or_block						{ $$ = makeTwoBranchNode(NT_FOREACHIN, $3, $5, @$); addSubNode($$, $7); }
+	| FOREACH expression DO statement												{ $$ = makeTwoBranchNode(NT_FOREACH, $2, $4, @$); }
+	| FOREACH member IN expression DO statement										{ $$ = makeTwoBranchNode(NT_FOREACHIN, $2, $4, @$); addSubNode($$, $6); }
+	| FOREACH expression block														{ $$ = makeTwoBranchNode(NT_FOREACH, $2, $3, @$); }
+	| FOREACH member IN expression block											{ $$ = makeTwoBranchNode(NT_FOREACHIN, $2, $4, @$); addSubNode($$, $5); }
 	;
 
 member:
