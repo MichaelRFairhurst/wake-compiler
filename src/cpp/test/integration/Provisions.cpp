@@ -563,3 +563,19 @@ PTT_TEST_CASE(
 	PTT_VALID
 );
 
+PTT_TEST_CASE(
+	TestRetrievalWithinRetrieval,
+	"every ClassA is:												\n\
+	every ClassB is:												\n\
+		needs ClassA;												\n\
+	every MyClass is:												\n\
+		needs ClassA;												\n\
+		provides MyClass <- (?ClassB),								\n\
+			ClassB <- (?ClassA);									\n\
+		method() {													\n\
+			MyClass(ClassB(ClassA from this) from this) from this;	\n\
+		}															\n\
+	",
+	PTT_VALID
+);
+

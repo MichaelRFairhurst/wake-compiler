@@ -50,7 +50,7 @@ int wakewrap()
 %}
 
 /* keywords */
-%token EVERY EXTERN CAPABLE KEYWORD_A AN IS RETURN WITH PUBLIC IF ELSE WHILE IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST UNSAFE PRIVATE EXISTS VAR FOREACH IN THROW TRY CATCH FROM MODULE
+%token EVERY EXTERN CAPABLE KEYWORD_A AN IS RETURN WITH PUBLIC IF ELSE WHILE IMPORT PROVIDES NEEDS THEN NOTHING SWITCH CASE DEFAULT BREAK FOR DO CONTINUE THIS PARENT FN CAST UNSAFE PRIVATE EXISTS VAR FOREACH IN THROW TRY CATCH FROM MODULE AS
 /* symbols */
 %token SYM_CURRIER SYM_LE SYM_PROVIDE SYM_RETURN_DECREMENT SYM_AND SYM_OR SYM_EQ SYM_NE SYM_GE SYM_INCREMENT SYM_PLUSEQ SYM_VALEQ SYM_MULTEQ SYM_SUBEQ SYM_DIVEQ SYM_PROVIDE_ARGS_OPEN SYM_EARLYBAILOUT_DOT SYM_TYPESAFE_INDEX SYM_LAMBDA SYM_LAMBDA_AUTORETURN SYM_BITSHIFTLEFT SYM_BITSHIFTRIGHT SYM_MODNATIVE SYM_MODALT;
 /* this too */
@@ -493,10 +493,10 @@ iterationstatement:
 	WHILE expression block															{ $$ = makeTwoBranchNode(NT_WHILE, $2, $3, @$); }
 	| WHILE expression DO statement													{ $$ = makeTwoBranchNode(NT_WHILE, $2, $4, @$); }
 	| FOR '(' forinit forcondition forincrement ')' statement_or_block				{ $$ = makeTwoBranchNode(NT_FOR, $3, $4, @$); addSubNode($$, $5); addSubNode($$, $7); }
-	| FOREACH expression DO statement												{ $$ = makeTwoBranchNode(NT_FOREACH, $2, $4, @$); }
-	| FOREACH member IN expression DO statement										{ $$ = makeTwoBranchNode(NT_FOREACHIN, $2, $4, @$); addSubNode($$, $6); }
-	| FOREACH expression block														{ $$ = makeTwoBranchNode(NT_FOREACH, $2, $3, @$); }
-	| FOREACH member IN expression block											{ $$ = makeTwoBranchNode(NT_FOREACHIN, $2, $4, @$); addSubNode($$, $5); }
+	| FOREACH expression_noretrieval DO statement									{ $$ = makeTwoBranchNode(NT_FOREACH, $2, $4, @$); }
+	| FOREACH expression_noretrieval AS member DO statement							{ $$ = makeTwoBranchNode(NT_FOREACHIN, $4, $2, @$); addSubNode($$, $6); }
+	| FOREACH expression_noretrieval block											{ $$ = makeTwoBranchNode(NT_FOREACH, $2, $3, @$); }
+	| FOREACH expression_noretrieval AS member block								{ $$ = makeTwoBranchNode(NT_FOREACHIN, $4, $2, @$); addSubNode($$, $5); }
 	;
 
 member:
@@ -637,7 +637,7 @@ expression_conditional:
 
 expression_retrieval:
 	expression_conditional															{ $$ = $1; }
-	| specializable_pure_type retrievalargs expression_conditional					{ $$ = makeTwoBranchNode(NT_RETRIEVAL, makeNodeFromSpecializablePureType($1, @$), $2, @$); addSubNode($$, $3); }
+	| specializable_pure_type retrievalargs expression_retrieval					{ $$ = makeTwoBranchNode(NT_RETRIEVAL, makeNodeFromSpecializablePureType($1, @$), $2, @$); addSubNode($$, $3); }
 	;
 
 assignment:

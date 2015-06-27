@@ -51,6 +51,7 @@ extern					count(); return EXTERN;
 capable					count(); return CAPABLE;
 a						count(); return KEYWORD_A;
 an						count(); return AN;
+as						count(); return AS;
 is						count(); return IS;
 return					count(); return RETURN;
 foreach					count(); return FOREACH;
