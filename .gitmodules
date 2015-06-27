@@ -1,0 +1,6 @@
+[submodule "src/wake/stdlib"]
+	path = src/wake/stdlib
+	url = git@github.com:MichaelRFairhurst/wake-stdlib.git
+[submodule "src/wake/tests"]
+	path = src/wake/test
+	url = git@github.com:MichaelRFairhurst/wake-tests.git

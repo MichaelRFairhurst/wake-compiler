@@ -87,10 +87,12 @@ CPPNAMES= \
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
 
-WAKETABLENAMES=Printer.wk List.wk Text.wk Num.wk Bool.wk File.wk FilePath.wk FileSystem.wk Argv.wk Exception.wk System.wk
 WAKETABLENAMES=List.wk Text.wk Num.wk Bool.wk Exception.wk
 WAKETABLEOBJS=$(addprefix bin/waketable/lang/, $(WAKETABLENAMES:.wk=.table))
 WAKETABLEINCLUDES=$(addprefix gen/, $(WAKETABLENAMES:.wk=.table.h))
+
+STDWAKETABLENAMES=io/Printer.wk lang/List.wk lang/Text.wk lang/Num.wk lang/Bool.wk io/File.wk io/FilePath.wk io/FileSystem.wk std/Argv.wk lang/Exception.wk std/System.wk std/Map.wk std/UndefinedIndexException.wk
+STDWAKETABLEOBJS=$(addprefix bin/waketable/, $(STDWAKETABLENAMES:.wk=.table))
 
 CNAMES=tree.c type.c parseUtil.c error.c
 COBJS=$(addprefix bin/c/, $(CNAMES:.c=.o))
@@ -118,9 +120,13 @@ endif
 
 TESTOBJS=$(addprefix bin/tests/, $(TESTNAMES:.cpp=.o))
 
-include wmake.mk
-
 prefix=/usr/local
+
+default: default-notests
+	cd src/wake/stdlib && make WAKE=../../../bin/wake
+	cd src/wake/test && make WAKE=../../../bin/wake
+
+default-notests: bin/wake $(STDWAKETABLEOBJS)
 
 install: bin/wake
 	mkdir -p $(prefix)/bin
@@ -164,34 +170,25 @@ bin/wake: $(CPPOBJS) $(GENOBJS) $(COBJS) bin/cpp/wake.o bin/cpp/LibraryLoader-wi
 	@echo -- CHEERIO
 	@echo
 
-bin/wakeobj/std.o: src/wake/stdlib/myobj/std.o js_to_wakeobj.sh
-	cat $< | ./js_to_wakeobj.sh > $@
+bin/wakeobj/std.o: src/wake/stdlib/src/extern/internals/std.js src/wake/stdlib/js_to_wakeobj.sh
+	cd src/wake/stdlib && make bin/wakeobj/std.o
+	cd ../../../
+	cp src/wake/stdlib/bin/wakeobj/std.o bin/wakeobj
 
 $(OBJECTFILES) : bin/wake
 $(TABLEFILES) : bin/wake
 
-bin/waketable/std/UndefinedIndexException.table: src/wake/stdlib/external/UndefinedIndexException.table
-	cp $< $@
+bin/wakeobj/%.o: bin/wake
+	cd src/wake/stdlib && make WAKE=../../../bin/wake $@
+	cp src/wake/stdlib/$@ $@
 
-bin/wakeobj/std/UndefinedIndexException.o: src/wake/stdlib/external/UndefinedIndexException.o
-	cp $< $@
+bin/waketable/%.table: bin/wake
+	cd src/wake/stdlib && make WAKE=../../../bin/wake $@
+	cp src/wake/stdlib/$@ $@
 
-bin/waketable/io/FilePath.table: bin/waketable/File.table bin/waketable/lang/Text.table bin/waketable/lang/Num.table bin/waketable/lang/Bool.table
-	echo this overrides the wildcard that doesnt work
-
-bin/waketable/io/FileSystem.table: bin/waketable/File.table bin/waketable/lang/Text.table bin/waketable/lang/Num.table
-
-bin/waketable/lang/%.table: src/wake/stdlib/tables/%.wk bin/wake-nolib
-	./bin/wake-nolib -d bin/waketable -t $< -d bin/waketable
-
-bin/waketable/io/Printer.table: bin/waketable/lang/Num.table bin/waketable/lang/Text.table bin/wake-nolib src/wake/stdlib/tables/Printer.wk
-bin/waketable/io/File.table: src/wake/stdlib/tables/File.wk bin/waketable/lang/Text.table bin/waketable/lang/Num.table bin/waketable/lang/Bool.table
-bin/waketable/lang/List.table: src/wake/stdlib/tables/List.wk bin/waketable/lang/Num.table bin/waketable/lang/Bool.table
-bin/waketable/std/Argv.table: bin/waketable/lang/Text.table
-bin/waketable/lang/Exception.table: bin/waketable/lang/Text.table src/wake/stdlib/tables/Exception.wk
-
-bin/waketable/lang/Text.table bin/waketable/lang/Num.table bin/waketable/lang/Bool.table: src/wake/stdlib/tables/Primitives.wk bin/wake-nolib
-	./bin/wake-nolib -d bin/waketable -t $< -d bin/waketable
+bin/waketable/lang/%.table: bin/wake-nolib
+	cd src/wake/stdlib && make WAKE=../../../bin/wake-nolib $@
+	cp src/wake/stdlib/$@ $@
 
 bin/gen/%.o: gen/%.c gen/wake.tab.c
 	$(CC) $(OPT) -c $< -o $@
@@ -223,7 +220,7 @@ gen/lex.%.c: src/flex/%lexer.l gen/wake.tab.c gen/objectfile.tab.c
 loc:
 	find src -type f -print0 | xargs -0 wc -l makefile include/* include/ast/* js_to_wakeobj.sh
 
-loo: clean
+loo:
 	@echo
 	@echo -- IN THE LOO
 	@echo
@@ -237,8 +234,8 @@ loo: clean
 	rm bin/wakeobj/* || :
 	rm bin/waketable/* || :
 	rm bin/finaltest.js || :
-	rm callwmake || :
-	make -f wmake.mk clean
+	cd src/wake/stdlib && make clean
+	cd src/wake/test && make clean
 	@echo
 	@echo -- CLEANED MY ARSE
 	@echo
