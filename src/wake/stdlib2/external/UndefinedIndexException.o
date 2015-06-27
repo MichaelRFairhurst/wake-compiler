@@ -1,2 +1,0 @@
-%-CLASSES-%9 %UndefinedIndexException% 21 %Exception% 92 %Num% 147 %Exception% 150 %UndefinedIndexException% %-PROPERTIES-%18 %index% 38 %getMessage()% 98 %index% 100 %toString()% 125 %isExceptionType(Text)% %-END-%
-function (a){this.=a;.call(this);this.=function(){return (("Accessing undefined index "+new (this.).())+" of a list");};this.=function(a){return ['',''].indexOf(a)!==-1;};};
