@@ -15,7 +15,7 @@
 #ifndef HEADER_CLASS_VAR_REF
 #define HEADER_CLASS_VAR_REF
 
-typedef struct ClassVarRef {
+struct ClassVarRef {
 	char* classname;
 	int shadow;
 	int arrayed;
@@ -27,7 +27,7 @@ typedef struct ClassVarRef {
 		~ClassVarRef();
 	#endif
 
-} ClassVarRef;
+};
 
 #ifdef __cplusplus
 extern "C" {
