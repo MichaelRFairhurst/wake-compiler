@@ -80,8 +80,6 @@ cast					count(); return CAST;
 unsafe					count(); return UNSAFE;
 exists					count(); return EXISTS;
 var						count(); return VAR;
-foreach					count(); return FOREACH;
-in						count(); return IN;
 throw					count(); return THROW;
 catch					count(); return CATCH;
 try						count(); return TRY;
