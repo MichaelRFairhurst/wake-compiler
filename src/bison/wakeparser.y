@@ -84,7 +84,7 @@ int wakewrap()
 %token <number> BOOL
 %token <number> SYM_SHADOW
 %token <void> SYM_ARRAYED
-%type <node> imports import classes annotatedclass class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value value_invokable method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments methodcallsegments curryableexpressions expression expressions decls_and_stmts decl_or_stmt decl statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_bitshift expression_relational expression_bitand expression_bitxor expression_bitor expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval expressions_noretrieval provision_args annotatedmethod annotation annotations annotationvals annotationval lambda statement_or_block expression_nolambda module inferenceable_decl_types annotated_specializable_decl_type decl_types
+%type <node> imports import classes annotatedclass class parentage inheritances inheritance classbody classprop providable injection injection_subinjections provision provisions injection_subinjection ctor ctorargs value value_invokable method block methodreturn lmethodnamesegments lumethodnamesegments methodbody methodaccess lumethodcallsegments methodcallsegments curryableexpressions expression expressions decls_and_stmts decl_or_stmt decl statement labelstatement existsstatement selectionstatement iterationstatement jumpstatement forinit forcondition forincrement expressionstatements expression_unary expression_logicalunary expression_multiply expression_add expression_bitshift expression_relational expression_bitand expression_bitxor expression_bitor expression_conditionaland expression_conditionalor expression_equality expression_conditional member property property_value retrievalargs objectable expression_cast assignment ctorarg expression_retrieval throwstatement trystatement catchstatement expression_noretrieval provision_args annotatedmethod annotation annotations annotationvals annotationval lambda statement_or_block expression_nolambda module inferenceable_decl_types annotated_specializable_decl_type decl_types
 %type <pure_type> pure_type function_type class_decl_type unboundtypespecification parameterized_inheritance_type pure_class_type pure_optional_type pure_optional_parameterized_type
 %type <class_var_ref> usable_as_variable_type base_class_type
 %type <pure_type_array> pure_types unboundtypespecifications
@@ -437,7 +437,7 @@ decl:
 
 retrievalargs:
 	FROM																			{ $$ = makeEmptyNode(NT_EMPTY, @$); }
-	| '(' expressions_noretrieval ')' FROM											{ $$ = $2; }
+	| '(' expressions ')' FROM														{ $$ = $2; }
 	;
 
 statement:
@@ -494,13 +494,13 @@ iterationstatement:
 	| WHILE expression DO statement													{ $$ = makeTwoBranchNode(NT_WHILE, $2, $4, @$); }
 	| FOR '(' forinit forcondition forincrement ')' statement_or_block				{ $$ = makeTwoBranchNode(NT_FOR, $3, $4, @$); addSubNode($$, $5); addSubNode($$, $7); }
 	| FOREACH expression_noretrieval DO statement									{ $$ = makeTwoBranchNode(NT_FOREACH, $2, $4, @$); }
-	| FOREACH expression_noretrieval AS member DO statement							{ $$ = makeTwoBranchNode(NT_FOREACHIN, $4, $2, @$); addSubNode($$, $6); }
+	| FOREACH member IN expression_noretrieval DO statement							{ $$ = makeTwoBranchNode(NT_FOREACHIN, $2, $4, @$); addSubNode($$, $6); }
 	| FOREACH expression_noretrieval block											{ $$ = makeTwoBranchNode(NT_FOREACH, $2, $3, @$); }
-	| FOREACH expression_noretrieval AS member block								{ $$ = makeTwoBranchNode(NT_FOREACHIN, $4, $2, @$); addSubNode($$, $5); }
+	| FOREACH member IN expression_noretrieval block								{ $$ = makeTwoBranchNode(NT_FOREACHIN, $2, $4, @$); addSubNode($$, $5); }
 	;
 
 member:
-	decl_type																		{ $$ = makeNodeFromVarDecl($1, @$); }
+	usable_as_variable_type															{ $$ = makeNodeFromClassVarRef($1, @$); }
 	| alias																			{ $$ = makeNodeFromAlias($1, @$); }
 	;
 
@@ -678,11 +678,6 @@ expression_nolambda:
 expressions:
 	expression																		{ $$ = makeOneBranchNode(NT_EXPRESSIONS, $1, @$); }
 	| expressions ',' expression													{ $$ = $1; addSubNode($$, $3); }
-	;
-
-expressions_noretrieval:
-	expression_noretrieval															{ $$ = makeOneBranchNode(NT_EXPRESSIONS, $1, @$); }
-	| expressions_noretrieval ',' expression_noretrieval							{ $$ = $1; addSubNode($$, $3); }
 	;
 
 identifier:

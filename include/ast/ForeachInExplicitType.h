@@ -25,7 +25,7 @@ namespace wake {
 		class ForeachInExplicitType : public Foreach {
 
 			public:
-				ForeachInExplicitType(ExpressionNode* iterable, StatementNode* body, VarDecl<wake::QUALIFIED>* explicitType, Node* node, ScopeSymbolTable* scopesymtable, ErrorTracker* errors, TypeAnalyzer* analyzer)
+				ForeachInExplicitType(ExpressionNode* iterable, StatementNode* body, ClassVarRef* explicitType, Node* node, ScopeSymbolTable* scopesymtable, ErrorTracker* errors, TypeAnalyzer* analyzer)
 					: Foreach(iterable, body, node, scopesymtable, errors), analyzer(analyzer), explicitType(explicitType) {};
 
 				VarDecl<wake::QUALIFIED> getIterationVarDecl(PureType<wake::QUALIFIED>* iterableType);
@@ -33,7 +33,7 @@ namespace wake {
 				~ForeachInExplicitType(){};
 
 			private:
-				VarDecl<wake::QUALIFIED>* explicitType;
+				ClassVarRef* explicitType;
 				TypeAnalyzer* analyzer;
 
 		};

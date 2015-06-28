@@ -37,6 +37,46 @@ ClassVarRef* makeClassVarRef(char* classname, int shadow, int arrayed) {
 	return new ClassVarRef(classname, shadow, arrayed);
 }
 
+std::string ClassVarRef::toString() {
+	std::string ret = "";
+	for(int i = 0; i < shadow; ++i) {
+		ret += "$";
+	}
+
+	ret += classname;
+
+	for(int i = 0; i < arrayed; ++i) {
+		ret += "[]";
+	}
+
+	return ret;
+}
+
+bool ClassVarRef::canRepresentType(PureType<wake::QUALIFIED>& type) {
+	switch(type.type) {
+		case TYPE_LIST:
+			{
+				if(!arrayed) {
+					return false;
+				}
+
+				ClassVarRef lowered = *this;
+				lowered.arrayed--;
+
+				return lowered.canRepresentType(*type.typedata.list.contained);
+			}
+
+		case TYPE_LAMBDA:
+			return false;
+
+		case TYPE_OPTIONAL:
+			return canRepresentType(*type.typedata.optional.contained);
+
+		case TYPE_CLASS:
+			return std::string(classname) == type.typedata._class.classname;
+	}
+}
+
 void freeClassVarRef(ClassVarRef* ref) {
 	delete ref;
 }

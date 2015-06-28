@@ -326,7 +326,7 @@ PTT_TEST_CASE(
 	TestForeachInValid,
 	"every MyClass is:					\n\
 		myMethod(Text[]) {				\n\
-			foreach Text[] as text {	\n\
+			foreach text in Text[] {	\n\
 				text + 'another text';	\n\
 			}							\n\
 		}",
@@ -337,7 +337,7 @@ PTT_TEST_CASE(
 	TestTypeErrorsWithinForeachAreCaught,
 	"every MyClass is:					\n\
 		myMethod(Text[]) {				\n\
-			foreach Text[] as text {	\n\
+			foreach text in Text[] {	\n\
 				5 + 'another text';		\n\
 			}							\n\
 		}",
@@ -348,8 +348,7 @@ PTT_TEST_CASE(
 	TestNonSubtypeinForeachIsTypeError,
 	"every MyClass is:					\n\
 		myMethod(Text[]) {				\n\
-			foreach Text[] as Num {		\n\
-				aaaa;					\n\
+			foreach Num in Text[] {		\n\
 			}							\n\
 		}",
 	PTT_EXPECT(TYPE_ERROR)
@@ -359,7 +358,7 @@ PTT_TEST_CASE(
 	TestRedefinitionOfAliasInForeachInIsCaught,
 	"every MyClass is:					\n\
 		myMethod(Text[], Text text) {	\n\
-			foreach Text[] as text {	\n\
+			foreach text in Text[] {	\n\
 			}							\n\
 		}",
 	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)
@@ -369,7 +368,7 @@ PTT_TEST_CASE(
 	TestRedefinitionOfTypeInForeachInIsCaught,
 	"every MyClass is:					\n\
 		myMethod(Text[], Text) {		\n\
-			foreach Text[] as Text {	\n\
+			foreach Text in Text[] {	\n\
 			}							\n\
 		}",
 	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)

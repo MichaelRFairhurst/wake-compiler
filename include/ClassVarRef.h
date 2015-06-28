@@ -15,6 +15,12 @@
 #ifndef HEADER_CLASS_VAR_REF
 #define HEADER_CLASS_VAR_REF
 
+#include "PureType.h"
+
+#ifdef __cplusplus
+#include <string>
+#endif
+
 struct ClassVarRef {
 	char* classname;
 	int shadow;
@@ -25,6 +31,9 @@ struct ClassVarRef {
 		ClassVarRef(const ClassVarRef& other);
 		ClassVarRef& operator=(ClassVarRef& other);
 		~ClassVarRef();
+
+		std::string toString();
+		bool canRepresentType(PureType<wake::QUALIFIED>& type);
 	#endif
 
 };

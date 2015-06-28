@@ -110,7 +110,7 @@ wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
 			break;
 
 		case NT_FOREACHIN:
-			if(node->node_data.nodes[0]->node_type == NT_VAR_REF) {
+			if(node->node_data.nodes[0]->node_data.var_ref->alias != NULL) {
 				created = new wake::ast::ForeachInAliased(
 					generateExpressionAst(node->node_data.nodes[1], true),
 					generateStatementAst(node->node_data.nodes[2]),
@@ -121,7 +121,8 @@ wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
 				created = new wake::ast::ForeachInExplicitType(
 					generateExpressionAst(node->node_data.nodes[1], true),
 					generateStatementAst(node->node_data.nodes[2]),
-					classestable->setModulesOnType(node->node_data.nodes[0]->node_data.var_decl),
+					//classestable->setModulesOnType(node->node_data.nodes[0]->node_data.var_decl),
+					node->node_data.nodes[0]->node_data.var_ref->_class,
 					node, scopesymtable, errors, classestable->getAnalyzer());
 				break;
 			}

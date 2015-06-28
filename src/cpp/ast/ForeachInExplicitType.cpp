@@ -18,13 +18,14 @@
 using namespace wake;
 
 VarDecl<QUALIFIED> ast::ForeachInExplicitType::getIterationVarDecl(PureType<QUALIFIED>* iterableType) {
-	if(!analyzer->isASubtypeOfB(&explicitType->typedata, iterableType)) {
+	if(!explicitType->canRepresentType(*iterableType)) {
 		EXPECTED	iterableType->toString()
-		ERRONEOUS	explicitType->typedata.toString()
+		ERRONEOUS	explicitType->toString()
 		THROW		("Declaration of item within foreach does not match the item's type");
 	}
 
 	VarDecl<QUALIFIED> decl;
 	decl.typedata = *iterableType;
+	decl.shadow = explicitType->shadow;
 	return decl; // preserve shadow and other goodies
 }
