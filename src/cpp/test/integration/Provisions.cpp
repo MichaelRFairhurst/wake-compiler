@@ -21,7 +21,7 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	RetrieveFromErrorWorks,
 	"every ClassA is: myMethod() { Num from Oastnhunsh; }",
-	PTT_EXPECT(SYMBOL_NOT_FOUND)
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 )
 
 PTT_TEST_CASE(
