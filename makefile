@@ -179,6 +179,7 @@ $(OBJECTFILES) : bin/wake
 $(TABLEFILES) : bin/wake
 
 bin/waketable/lang/%.table: bin/wake-nolib
+	mkdir bin/waketable/lang || :
 	cd src/wake/stdlib && make WAKE=../../../bin/wake-nolib $@
 	cp src/wake/stdlib/$@ $@
 
