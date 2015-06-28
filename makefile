@@ -178,16 +178,16 @@ bin/wakeobj/std.o: src/wake/stdlib/src/extern/internals/std.js src/wake/stdlib/j
 $(OBJECTFILES) : bin/wake
 $(TABLEFILES) : bin/wake
 
+bin/waketable/lang/%.table: bin/wake-nolib
+	cd src/wake/stdlib && make WAKE=../../../bin/wake-nolib $@
+	cp src/wake/stdlib/$@ $@
+
 bin/wakeobj/%.o: bin/wake
 	cd src/wake/stdlib && make WAKE=../../../bin/wake $@
 	cp src/wake/stdlib/$@ $@
 
 bin/waketable/%.table: bin/wake
 	cd src/wake/stdlib && make WAKE=../../../bin/wake $@
-	cp src/wake/stdlib/$@ $@
-
-bin/waketable/lang/%.table: bin/wake-nolib
-	cd src/wake/stdlib && make WAKE=../../../bin/wake-nolib $@
 	cp src/wake/stdlib/$@ $@
 
 bin/gen/%.o: gen/%.c gen/wake.tab.c
