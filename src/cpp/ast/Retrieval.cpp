@@ -25,6 +25,11 @@ PureType<QUALIFIED>* wake::ast::Retrieval::typeCheck(bool forceArrayIdentifier) 
 	try {
 		PureType<QUALIFIED> provider = *auto_ptr<PureType<QUALIFIED> >(providerExp->typeCheck(false));
 		classestable->assertTypeIsValid(&retrievalType->typedata);
+
+		if(provider.type == TYPE_MATCHALL) {
+			return new PureType<QUALIFIED>(retrievalType->typedata);
+		}
+
 		vector<PureType<QUALIFIED>*> arguments;
 		boost::ptr_vector<PureType<QUALIFIED> > arguments_latch;
 

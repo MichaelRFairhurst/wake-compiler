@@ -19,6 +19,12 @@ PTT_TEST_CASE(
 )
 
 PTT_TEST_CASE(
+	RetrieveFromErrorWorks,
+	"every ClassA is: myMethod() { Num from Oastnhunsh; }",
+	PTT_EXPECT(SYMBOL_NOT_FOUND)
+)
+
+PTT_TEST_CASE(
 	ProvideBindToClassNotExists,
 	"every ClassA is: provides ClassA <- NonExistClass;",
 	PTT_EXPECT(CLASSNAME_NOT_FOUND)
