@@ -184,10 +184,12 @@ bin/waketable/lang/%.table: bin/wake-nolib
 	cp src/wake/stdlib/$@ $@
 
 bin/wakeobj/%.o: bin/wake
+	make `dirname $@` || :
 	cd src/wake/stdlib && make WAKE=../../../bin/wake $@
 	cp src/wake/stdlib/$@ $@
 
 bin/waketable/%.table: bin/wake
+	make `dirname $@` || :
 	cd src/wake/stdlib && make WAKE=../../../bin/wake $@
 	cp src/wake/stdlib/$@ $@
 
