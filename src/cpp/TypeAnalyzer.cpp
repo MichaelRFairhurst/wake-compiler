@@ -158,12 +158,7 @@ void TypeAnalyzer::assertFQNeedIsNotCircular(string classname, string otherclass
 	for(vector<SpecializableVarDecl<wake::QUALIFIED>*>::iterator it = recurse->begin(); it != recurse->end(); ++it)
 	try {
 		if((*it)->decl.typedata.type == TYPE_CLASS) {
-			string fqname = (*it)->decl.typedata.typedata._class.modulename;
-			if(fqname.size()) {
-				fqname += ".";
-			}
-
-			fqname += (*it)->decl.typedata.typedata._class.classname;
+			string fqname = (*it)->decl.typedata.getFQClassname();
 			assertFQNeedIsNotCircular(classname, fqname);
 		}
 	} catch(SemanticError* e) {
