@@ -717,10 +717,35 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 		case NT_FOREACH:
 		case NT_FOREACHIN:
+		case NT_FOREACHAT:
+		case NT_FOREACHINAT:
 			{
 				table.pushScope();
-				Node** nodebase = tree->node_type == NT_FOREACHIN ? tree->node_data.nodes + 1: tree->node_data.nodes;
-				bool iterating_expression = nodebase[0]->node_type != NT_ALIAS && nodebase[0]->node_type != NT_VAR_REF;
+				Node* iterationValue;
+				Node* iterationVar;
+				Node* iterationIndexVar = NULL;
+				Node* iterationBody;
+				if(tree->node_type == NT_FOREACHIN) {
+					iterationValue = tree->node_data.nodes[1];
+					iterationBody = tree->node_data.nodes[2];
+					iterationVar = tree->node_data.nodes[3];
+				} else if(tree->node_type == NT_FOREACHINAT) {
+					iterationValue = tree->node_data.nodes[1];
+					iterationBody = tree->node_data.nodes[3];
+					iterationVar = tree->node_data.nodes[4];
+					iterationIndexVar = tree->node_data.nodes[5];
+				} else if(tree->node_type == NT_FOREACHAT) {
+					iterationValue = tree->node_data.nodes[0];
+					iterationBody = tree->node_data.nodes[2];
+					iterationVar = tree->node_data.nodes[3];
+					iterationIndexVar = tree->node_data.nodes[4];
+				} else {
+					iterationValue = tree->node_data.nodes[0];
+					iterationBody = tree->node_data.nodes[1];
+					iterationVar = tree->node_data.nodes[2];
+				}
+
+				bool iterating_expression = iterationValue->node_type != NT_ALIAS && iterationValue->node_type != NT_VAR_REF;
 				std::stringstream valuestorename;
 				auto_ptr<PureType<QUALIFIED> > latch;
 				if(iterating_expression) {
@@ -728,26 +753,30 @@ void ObjectFileGenerator::generate(Node* tree) {
 					valuestorename << latch.get();
 					table.add(valuestorename.str(), latch.get());
 					file << "var " << table.getAddress(valuestorename.str()) << "=";
-					generate(nodebase[0]);
+					generate(iterationValue);
 					file << ";";
 				}
 
 				auto_ptr<PureType<QUALIFIED> > indexer(new PureType<QUALIFIED>(TYPE_MATCHALL));
 				auto_ptr<PureType<QUALIFIED> > lowered(new PureType<QUALIFIED>(TYPE_MATCHALL));
 				std::stringstream indexername;
-				indexername << indexer.get();
+				if(iterationIndexVar == NULL) {
+					indexername << indexer.get();
+				} else {
+					indexername << iterationIndexVar->node_data.string;
+				}
 				table.add(indexername.str(), indexer.get());
-				table.add(nodebase[2]->node_data.string, lowered.get());
+				table.add(iterationVar->node_data.string, lowered.get());
 				file << "for(var " << table.getAddress(indexername.str()) << "=0;";
 				file << table.getAddress(indexername.str()) << " < ";
 				if(iterating_expression) file << table.getAddress(valuestorename.str());
-				else generate(nodebase[0]);
+				else generate(iterationValue);
 				file << ".length; " << table.getAddress(indexername.str()) << "++){";
-				file << "var " << table.getAddress(nodebase[2]->node_data.string) << "=";
+				file << "var " << table.getAddress(iterationVar->node_data.string) << "=";
 				if(iterating_expression) file << table.getAddress(valuestorename.str());
-				else generate(nodebase[0]);
+				else generate(iterationValue);
 				file << "[" << table.getAddress(indexername.str()) << "];";
-				generate(nodebase[1]);
+				generate(iterationBody);
 				file << "}";
 				table.popScope();
 			}

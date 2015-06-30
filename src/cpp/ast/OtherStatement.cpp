@@ -48,9 +48,9 @@ void wake::ast::OtherStatement::typeCheck() {
 					it->typeCheck();
 				}
 				if(tree->node_type == NT_BLOCK || tree->node_type == NT_TRY) scopesymtable->popScope();
-			} catch(SemanticError *e) {
+			} catch(...) {
 				if(tree->node_type == NT_BLOCK || tree->node_type == NT_TRY) scopesymtable->popScope();
-				throw e;
+				throw;
 			}
 	}
 }

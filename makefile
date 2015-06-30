@@ -67,6 +67,7 @@ CPPNAMES= \
 	ast/Foreach.cpp \
 	ast/ForeachInAliased.cpp \
 	ast/ForeachInExplicitType.cpp \
+	ast/ForeachAt.cpp \
 	ast/IfElseWhile.cpp \
 	ast/OtherExpression.cpp \
 	ast/OtherStatement.cpp \

@@ -40,8 +40,12 @@ void ast::Foreach::typeCheck() {
 		}
 
 		scopesymtable->pushScope();
-		scopesymtable->add(&actualLowered);
-		body->typeCheck();
+		try {
+			scopesymtable->add(&actualLowered);
+			body->typeCheck();
+		} catch (SemanticError* e) {
+			errors->addError(e);
+		}
 		scopesymtable->popScope();
 
 		addSubNode(node, makeNodeFromString(NT_COMPILER_HINT, strdup(actualLowered.createVarRef().toString().c_str()), node->loc));

@@ -28,6 +28,7 @@
 #include "ast/Exists.h"
 #include "ast/ForeachInAliased.h"
 #include "ast/ForeachInExplicitType.h"
+#include "ast/ForeachAt.h"
 #include "ast/Retrieval.h"
 #include "ast/Invocation.h"
 #include "ast/MethodInvocation.h"
@@ -121,11 +122,51 @@ wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
 				created = new wake::ast::ForeachInExplicitType(
 					generateExpressionAst(node->node_data.nodes[1], true),
 					generateStatementAst(node->node_data.nodes[2]),
-					//classestable->setModulesOnType(node->node_data.nodes[0]->node_data.var_decl),
 					node->node_data.nodes[0]->node_data.var_ref->_class,
 					node, scopesymtable, errors, classestable->getAnalyzer());
 				break;
 			}
+
+		case NT_FOREACHAT:
+			{
+				wake::ast::Foreach* foreach = new wake::ast::Foreach(
+					generateExpressionAst(node->node_data.nodes[0], true),
+					generateStatementAst(node->node_data.nodes[2]),
+					node, scopesymtable, errors);
+
+				created = new wake::ast::ForeachAt(
+					foreach,
+					*node->node_data.nodes[1]->node_data.var_ref,
+					node, scopesymtable, errors);
+			}
+
+			break;
+
+		case NT_FOREACHINAT:
+			{
+				wake::ast::Foreach* foreach;
+				if(node->node_data.nodes[0]->node_data.var_ref->alias != NULL) {
+					foreach = new wake::ast::ForeachInAliased(
+						generateExpressionAst(node->node_data.nodes[1], true),
+						generateStatementAst(node->node_data.nodes[3]),
+						node->node_data.nodes[0]->node_data.var_ref->alias,
+						node, scopesymtable, errors);
+				} else {
+					foreach = new wake::ast::ForeachInExplicitType(
+						generateExpressionAst(node->node_data.nodes[1], true),
+						generateStatementAst(node->node_data.nodes[3]),
+						node->node_data.nodes[0]->node_data.var_ref->_class,
+						node, scopesymtable, errors, classestable->getAnalyzer());
+				}
+
+				created = new wake::ast::ForeachAt(
+					foreach,
+					*node->node_data.nodes[2]->node_data.var_ref,
+					node, scopesymtable, errors);
+			}
+
+			break;
+
 
 		case NT_SWITCH:
 		case NT_VALUES:

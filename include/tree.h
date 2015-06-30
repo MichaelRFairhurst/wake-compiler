@@ -134,6 +134,8 @@ extern "C" {
 #define NT_FOR 52
 #define NT_FOREACH 87
 #define NT_FOREACHIN 88
+#define NT_FOREACHAT 108
+#define NT_FOREACHINAT 109
 #define NT_BREAK 53
 #define NT_THROW 89
 #define NT_TRY 90

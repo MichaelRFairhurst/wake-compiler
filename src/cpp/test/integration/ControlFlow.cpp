@@ -413,3 +413,89 @@ PTT_TEST_CASE(
 	PTT_EXPECT(TYPE_ERROR)
 );
 
+PTT_TEST_CASE(
+	TestForeachAtValid,
+	"every MyClass is:												\n\
+		method() {													\n\
+			foreach ['a', 'b', 'c'] at Num do Num + 5;				\n\
+			foreach Text in ['a', 'b', 'c'] at Num do Num + 5;		\n\
+			foreach ['a', 'b', 'c'] at num do num + 5;				\n\
+			foreach Text in ['a', 'b', 'c'] at num do num + 5;		\n\
+			foreach ['a', 'b', 'c'] at $Num do $Num + 5;			\n\
+			foreach Text in ['a', 'b', 'c'] at $Num do $Num + 5;	\n\
+		}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestForeachAtInvalid,
+	"every MyClass is:											\n\
+		method() {												\n\
+			foreach ['a', 'b', 'c'] at Text {}					\n\
+			foreach Text in ['a', 'b', 'c'] at Text {}			\n\
+			foreach ['a', 'b', 'c'] at Num[] {}					\n\
+			foreach Text in ['a', 'b', 'c'] at Num[] {}			\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	TestForeachAtTypechecksInterior,
+	"every MyClass is:												\n\
+		method() {													\n\
+			foreach ['a', 'b', 'c'] at Text { 5 + 'aoo'; }			\n\
+			foreach Text in ['a', 'b', 'c'] at Text { 5 + 'aoo'; }	\n\
+		}",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	TestForeachAtVariableIsOutOfScopeByEnd,
+	"every MyClass is:												\n\
+		method() {													\n\
+			foreach Text in ['a', 'b', 'c'] at Num { }				\n\
+			Num + 5;												\n\
+		}",
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
+);
+
+PTT_TEST_CASE(
+	TestForeachAtVariableIsOutOfScopeByEndInPresenceOfTypeError,
+	"every MyClass is:												\n\
+		method() {													\n\
+			foreach Text in ['a', 'b', 'c'] at Num { 5 + 'aoeu'; }	\n\
+			Num + 5;												\n\
+		}",
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	TestForeachAtClashingVariableDeclarationsAreCaptured,
+	"every MyClass is:												\n\
+		method() {													\n\
+			var Num = 4;											\n\
+			foreach Text in ['a', 'b', 'c'] at Num { }				\n\
+			Num + 5;												\n\
+		}",
+	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)
+);
+
+PTT_TEST_CASE(
+	TestForeachInAtClashingVariableDeclarationsAreCaptured,
+	"every MyClass is:											\n\
+		method() {												\n\
+			if true {											\n\
+				var Num = 4;									\n\
+				foreach Num in [1, 2, 3] { }					\n\
+			}													\n\
+			if true {											\n\
+				var Num = 4;									\n\
+			}													\n\
+		}",
+	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)
+);
