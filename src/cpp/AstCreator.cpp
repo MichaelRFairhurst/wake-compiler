@@ -16,6 +16,7 @@
 #include "ast/OtherStatement.h"
 #include "ast/OtherExpression.h"
 #include "ast/Declaration.h"
+#include "ast/TypeInferDeclaration.h"
 #include "ast/ExpressionStatement.h"
 #include "ast/EmptyStatement.h"
 #include "ast/Catch.h"
@@ -48,6 +49,13 @@ wake::ast::StatementNode* wake::AstCreator::generateStatementAst(Node* node) {
 				classestable->setModulesOnType(node->node_data.nodes[0]->node_data.var_decl),
 				generateExpressionAst(node->node_data.nodes[1], true),
 				node, classestable, scopesymtable, errors, parameterizedtypes);
+			break;
+
+		case NT_TYPEINFER_DECLARATION:
+			created = new wake::ast::TypeInferDeclaration(
+				node->node_data.nodes[0]->node_data.string,
+				generateExpressionAst(node->node_data.nodes[1], true),
+				node, scopesymtable, errors);
 			break;
 
 		case NT_CATCH:

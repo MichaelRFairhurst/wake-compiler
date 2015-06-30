@@ -429,6 +429,7 @@ decl_or_stmt:
 
 decl:
 	VAR decl_type '=' expression ';'												{ $$ = makeTwoBranchNode(NT_DECLARATION, makeNodeFromVarDecl($2, @2), $4, @$); }
+	| VAR alias '=' expression ';'													{ $$ = makeTwoBranchNode(NT_TYPEINFER_DECLARATION, makeNodeFromString(NT_ALIAS, $2, @2), $4, @$); }
 	| VAR specializable_decl_type retrievalargs expression ';'						{	SpecializablePureType* spPureType = makeSpecializablePureType(&$2->decl.typedata); spPureType->specialty = $2->specialty;
 																						Node* retrieval = makeTwoBranchNode(NT_RETRIEVAL, makeNodeFromSpecializablePureType(spPureType, @2), $3, @$);
 																						addSubNode(retrieval, $4);

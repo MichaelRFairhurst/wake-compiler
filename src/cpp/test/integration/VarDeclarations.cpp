@@ -67,3 +67,30 @@ PTT_TEST_CASE(
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 );
+
+PTT_TEST_CASE(
+	TestDeclareVarWithTypeInferenceValid,
+	"every MyClass is: method() {		\n\
+		var num = 4;					\n\
+		num += 1;						\n\
+	}",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	TestDeclareVarWithTypeInferenceInvalid,
+	"every MyClass is: method() {		\n\
+		var num = 4;					\n\
+		num += 'hey';					\n\
+	}",
+	PTT_EXPECT(TYPE_ERROR)
+);
+
+PTT_TEST_CASE(
+	TestDeclareVarWithTypeInferenceTwice,
+	"every MyClass is: method() {		\n\
+		var num = 4;					\n\
+		var num = 4;					\n\
+	}",
+	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)
+);

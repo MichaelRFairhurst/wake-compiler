@@ -543,6 +543,20 @@ void ObjectFileGenerator::generate(Node* tree) {
 			}
 			break;
 
+		case NT_TYPEINFER_DECLARATION:
+			{
+				VarDecl<QUALIFIED> decl;
+				decl.typedata = PureType<QUALIFIED>(TYPE_MATCHALL);
+				decl.alias = strdup(tree->node_data.nodes[0]->node_data.string);
+				table.add(new VarDecl<QUALIFIED>(decl));
+
+				file << "var ";
+				generate(tree->node_data.nodes[0]);
+				file << "=";
+				generate(tree->node_data.nodes[1]);
+				break;
+			}
+
 		case NT_DECLARATION:
 			// its ok that we have to cast, its been qualified elsewhere
 			table.add((VarDecl<QUALIFIED>*) tree->node_data.nodes[0]->node_data.var_decl);

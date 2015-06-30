@@ -62,6 +62,7 @@ CPPNAMES= \
 	ast/Catch.cpp \
 	ast/MethodSegment.cpp \
 	ast/Declaration.cpp \
+	ast/TypeInferDeclaration.cpp \
 	ast/Exists.cpp \
 	ast/For.cpp \
 	ast/Foreach.cpp \
