@@ -77,6 +77,7 @@ CPPNAMES= \
 	ast/ExpressionStatement.cpp \
 	ast/Throw.cpp \
 	ast/ExpressionErrorCatcher.cpp \
+	ast/Char.cpp \
 	ast/Invocation.cpp \
 	ast/MethodInvocationBase.cpp \
 	ast/MethodInvocation.cpp \

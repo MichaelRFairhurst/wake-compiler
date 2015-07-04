@@ -98,6 +98,7 @@ extern "C" {
 #define NT_CLASSNAME 32
 #define NT_CURRIED 33
 #define NT_STRINGLIT 34
+#define NT_CHARLIT 130
 #define NT_NUMBERLIT 35
 #define NT_BOOLLIT 36
 #define NT_ALIAS 37

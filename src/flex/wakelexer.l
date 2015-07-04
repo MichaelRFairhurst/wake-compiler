@@ -147,13 +147,16 @@ module					count(); return MODULE;
 
 true					count(); wakelval.number = 1; return BOOL;
 false					count(); wakelval.number = 0; return BOOL;
+\\([a-zA-Z]|[0-9]{1,3})	count(); int unused; wakelval.string = malloc(2); wakelval.string[0] = unEscapeCharLiteral(waketext + 1, &unused); wakelval.string[1] = '\0'; return CHAR;
 :[a-zA-Z0-9]+			count(); wakelval.string = strdup(waketext+1); return SPECIALTY;
 @[a-zA-Z0-9]+			count(); wakelval.string = strdup(waketext+1); return ANNOTATION;
 [a-z][a-zA-Z0-9]*		count(); wakelval.string = strdup(waketext); return LIDENTIFIER;
 [A-Z][a-zA-Z0-9]*		count(); wakelval.string = strdup(waketext); return UIDENTIFIER;
 \~\[[^\]]+\]\~			count(); wakelval.string = strdup(waketext); return LIDENTIFIER;
-\"(\\.|[^\\"])*\"		count(); wakelval.string = unEscapeStringLiteral(keepInner(waketext), '"'); return(STRING);
-'(\\.|[^\'])*\'			count(); wakelval.string = unEscapeStringLiteral(keepInner(waketext), '\''); return(STRING);
+\"(\\.|[^\\"])*\"		count(); wakelval.string = unEscapeStringLiteral(keepInner(waketext), '"'); return strlen(wakelval.string) == 1 ? CHAR : STRING;
+'(\\.|[^\'])*\'			count(); wakelval.string = unEscapeStringLiteral(keepInner(waketext), '\''); return strlen(wakelval.string) == 1 ? CHAR : STRING;
+\"(\\.|[^\\"])*\"s		count(); waketext[strlen(waketext)] = 0; wakelval.string = unEscapeStringLiteral(keepInner(waketext), '"'); return STRING;
+'(\\.|[^\'])*\'s		count(); waketext[strlen(waketext)] = 0; wakelval.string = unEscapeStringLiteral(keepInner(waketext), '\''); return STRING;
 
 module\.([a-z0-9]+\.)+[A-Z][a-zA-Z0-9]* count(); wakelval.string = strdup(waketext + 7); return FQIDENTIFIER;
 -?(0[xX][0-9A-Fa-f]+(\.[0-9A-Fa-f]+)?([pP]-?[0-9A-Fa-f]+)?|(([0-9]*(\.[0-9]+)?)|[0-9]+)([eE]-?[0-9]+)?)		count(); wakelval.number = atof(waketext); return NUMBER;

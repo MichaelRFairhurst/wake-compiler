@@ -15,6 +15,7 @@
 #include "parseUtil.h"
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 char* keepInner(char* in) {
 	char* out = malloc(sizeof(char)*strlen(in) - 1);
@@ -29,33 +30,15 @@ char* unEscapeStringLiteral(char* in, char terminator) {
 	char* out = malloc(sizeof(char) * strlen(in) + 1);
 
 	for(i = 0; i < strlen(in); i++)
-	if(in[i] == '\\')
-	switch(in[i + 1]) {
-		case '\\':
-			out[c] = '\\';
-			c++; i++; break;
-		case 'n':
-			out[c] = '\n';
-			c++; i++; break;
-		case 't':
-			out[c] = '\t';
-			c++; i++; break;
-		case 'r':
-			out[c] = '\r';
-			c++; i++; break;
-		case 'b':
-			out[c] = '\b';
-			c++; i++; break;
-		case 'f':
-			out[c] = '\f';
-			c++; i++; break;
-		case 'v':
-			out[c] = '\v';
-			c++; i++; break;
-		default:
-			if(in[i + 1] == terminator) continue;
-			out[c] = '\\';
-			c++;
+	if(in[i] == '\\') {
+		int increment;
+		out[c] = unEscapeCharLiteral(in + i + 1, &increment);
+		if(increment != -1) {
+			i += increment; // one more will be added by the for loop
+		} else {
+			free(out); free(in);
+			return NULL;
+		}
 	}
 	else {
 		out[c] = in[i];
@@ -67,5 +50,55 @@ char* unEscapeStringLiteral(char* in, char terminator) {
 	// free some memory
 	out = realloc(out, sizeof(char) * c + 1);
 	free(in);
+	return out;
+}
+
+char unEscapeCharLiteral(char* in, int* count) {
+	if(isdigit(in[0])) {
+		int i = 1;
+		char c = in[0] - '0';
+		while(i < 3 && isdigit(in[i])) {
+			char increment = in[i] - '0';
+
+			// overflow condition
+			if(c * 10 + increment > 255) {
+				*count = -1;
+				return '\0';
+			}
+
+			c = c * 10 + (in[i] - '0');
+		}
+
+		*count = i;
+		return c;
+	}
+
+	char out;
+	switch(in[0]) {
+		case '\\':
+			out = '\\'; break;
+		case 'n':
+			out = '\n'; break;
+		case 't':
+			out = '\t'; break;
+		case 'r':
+			out = '\r'; break;
+		case 'b':
+			out = '\b'; break;
+		case 'f':
+			out = '\f'; break;
+		case 'v':
+			out = '\v'; break;
+		case 'a':
+			out = '\a'; break;
+		case '\'':
+		case '"':
+			out = in[0]; break;
+		default:
+			*count = -1;
+			return '\0';
+	}
+
+	*count = 1;
 	return out;
 }

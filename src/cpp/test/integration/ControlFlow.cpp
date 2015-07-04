@@ -418,11 +418,11 @@ PTT_TEST_CASE(
 	"every MyClass is:												\n\
 		method() {													\n\
 			foreach ['a', 'b', 'c'] at Num do Num + 5;				\n\
-			foreach Text in ['a', 'b', 'c'] at Num do Num + 5;		\n\
+			foreach Char in ['a', 'b', 'c'] at Num do Num + 5;		\n\
 			foreach ['a', 'b', 'c'] at num do num + 5;				\n\
-			foreach Text in ['a', 'b', 'c'] at num do num + 5;		\n\
+			foreach Char in ['a', 'b', 'c'] at num do num + 5;		\n\
 			foreach ['a', 'b', 'c'] at $Num do $Num + 5;			\n\
-			foreach Text in ['a', 'b', 'c'] at $Num do $Num + 5;	\n\
+			foreach Char in ['a', 'b', 'c'] at $Num do $Num + 5;	\n\
 		}",
 	PTT_VALID
 );
@@ -432,9 +432,9 @@ PTT_TEST_CASE(
 	"every MyClass is:											\n\
 		method() {												\n\
 			foreach ['a', 'b', 'c'] at Text {}					\n\
-			foreach Text in ['a', 'b', 'c'] at Text {}			\n\
+			foreach Char in ['a', 'b', 'c'] at Text {}			\n\
 			foreach ['a', 'b', 'c'] at Num[] {}					\n\
-			foreach Text in ['a', 'b', 'c'] at Num[] {}			\n\
+			foreach Char in ['a', 'b', 'c'] at Num[] {}			\n\
 		}",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -447,7 +447,7 @@ PTT_TEST_CASE(
 	"every MyClass is:												\n\
 		method() {													\n\
 			foreach ['a', 'b', 'c'] at Text { 5 + 'aoo'; }			\n\
-			foreach Text in ['a', 'b', 'c'] at Text { 5 + 'aoo'; }	\n\
+			foreach Char in ['a', 'b', 'c'] at Text { 5 + 'aoo'; }	\n\
 		}",
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -457,7 +457,7 @@ PTT_TEST_CASE(
 	TestForeachAtVariableIsOutOfScopeByEnd,
 	"every MyClass is:												\n\
 		method() {													\n\
-			foreach Text in ['a', 'b', 'c'] at Num { }				\n\
+			foreach Char in ['a', 'b', 'c'] at Num { }				\n\
 			Num + 5;												\n\
 		}",
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
@@ -467,7 +467,7 @@ PTT_TEST_CASE(
 	TestForeachAtVariableIsOutOfScopeByEndInPresenceOfTypeError,
 	"every MyClass is:												\n\
 		method() {													\n\
-			foreach Text in ['a', 'b', 'c'] at Num { 5 + 'aoeu'; }	\n\
+			foreach Char in ['a', 'b', 'c'] at Num { 5 + 'aoeu'; }	\n\
 			Num + 5;												\n\
 		}",
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
@@ -479,7 +479,7 @@ PTT_TEST_CASE(
 	"every MyClass is:												\n\
 		method() {													\n\
 			var Num = 4;											\n\
-			foreach Text in ['a', 'b', 'c'] at Num { }				\n\
+			foreach Char in ['a', 'b', 'c'] at Num { }				\n\
 			Num + 5;												\n\
 		}",
 	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)

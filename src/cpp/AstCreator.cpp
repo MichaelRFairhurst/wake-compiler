@@ -31,6 +31,7 @@
 #include "ast/ForeachInExplicitType.h"
 #include "ast/ForeachAt.h"
 #include "ast/Retrieval.h"
+#include "ast/Char.h"
 #include "ast/Invocation.h"
 #include "ast/MethodInvocation.h"
 #include "ast/EarlyBailoutMethodInvocation.h"
@@ -220,6 +221,10 @@ wake::ast::ExpressionNode* wake::AstCreator::generateExpressionAst(Node* node, b
 			provider,
 			classestable->setModulesOnType(node->node_data.nodes[0]->node_data.specializable_pure_type),
 			arguments, node, classestable, classestable->getAnalyzer(), errors);
+	} else if(node->node_type == NT_CHARLIT) {
+		created = new wake::ast::Char(
+			node->node_data.string,
+			node, errors);
 	} else if(node->node_type == NT_UNSAFE_CAST) {
 		created = new wake::ast::UnsafeCast(
 			generateExpressionAst(node->node_data.nodes[1], true),

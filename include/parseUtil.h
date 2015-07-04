@@ -18,6 +18,7 @@
 #include <string.h>
 
 char* unEscapeStringLiteral(char* in, char terminator);
+char unEscapeCharLiteral(char* in, int* count);
 char* keepInner(char* in);
 
 #endif

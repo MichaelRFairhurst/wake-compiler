@@ -118,8 +118,38 @@ PTT_TEST_CASE(
 		inLT() { (Num := 5) <= 5; }												\n\
 		inGT() { (Num := 5) >= 5; }												\n\
 		inIfStmt() { if Bool := true {} }										\n\
-		inWhileStmt() { while Bool := true {} }								\n\
+		inWhileStmt() { while Bool := true {} }									\n\
 	",
 	PTT_VALID
 );
 
+PTT_TEST_CASE(
+	UsingValidCharLiteralsAndSpecialStringLiterals,
+	"every MyClass is:														\n\
+		with Char = 'a';													\n\
+		with $Char = \"a\";													\n\
+		with $$Char = \\n;													\n\
+		with $$$Char = \\3;													\n\
+		with Text = 'a's;													\n\
+		with $Text = \"a\"s;												\n\
+	",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
+	UsingInvalidCharLiteralsAndSpecialStringLiterals,
+	"every MyClass is:														\n\
+		with Text = 'a';													\n\
+		with $Text = \"a\";													\n\
+		with $$Text = \\n;													\n\
+		with $$$Text = \\3;													\n\
+		with Char = 'a's;													\n\
+		with $Char = \"a\"s;												\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
+);

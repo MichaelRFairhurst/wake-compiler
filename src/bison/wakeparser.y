@@ -79,6 +79,7 @@ int wakewrap()
 %token <string> SPECIALTY
 %token <string> ANNOTATION
 %token <string> STRING
+%token <string> CHAR
 %type <string> identifier
 %token <number> NUMBER
 %token <number> BOOL
@@ -148,6 +149,7 @@ annotationvals:
 
 annotationval:
 	STRING																			{ $$ = makeNodeFromString(NT_STRINGLIT, $1, @$); }
+	| CHAR																			{ $$ = makeNodeFromString(NT_CHARLIT, $1, @$); }
 	| NUMBER																		{ $$ = makeNodeFromNumber(NT_NUMBERLIT, $1, @$); }
 	| BOOL																			{ $$ = makeNodeFromNumber(NT_BOOLLIT, $1, @$); }
 	| NOTHING																		{ $$ = makeEmptyNode(NT_NOTHING, @$); }
@@ -229,6 +231,7 @@ providable:
 	| injection																		{ $$ = $1; }
 	| provision_args block															{ $$ = $1; addSubNode($$, $2); }
 	| STRING																		{ $$ = makeNodeFromString(NT_STRINGLIT, $1, @$); }
+	| CHAR																			{ $$ = makeNodeFromString(NT_CHARLIT, $1, @$); }
 	| NUMBER																		{ $$ = makeNodeFromNumber(NT_NUMBERLIT, $1, @$); }
 	| BOOL																			{ $$ = makeNodeFromNumber(NT_BOOLLIT, $1, @$); }
 	;
@@ -250,6 +253,7 @@ injection_subinjections:
 injection_subinjection:
 	specializable_pure_type															{ $$ = makeNodeFromSpecializablePureType($1, @$); }
 	| STRING																		{ $$ = makeNodeFromString(NT_STRINGLIT, $1, @$); }
+	| CHAR																			{ $$ = makeNodeFromString(NT_CHARLIT, $1, @$); }
 	| NUMBER																		{ $$ = makeNodeFromNumber(NT_NUMBERLIT, $1, @$); }
 	| BOOL																			{ $$ = makeNodeFromNumber(NT_BOOLLIT, $1, @$); }
 	| '?' pure_type																	{ $$ = makeOneBranchNode(NT_INJECTION_ARG, makeNodeFromPureType($2, @$), @$); }
@@ -336,6 +340,7 @@ value:
 	| value_invokable																{ $$ = $1; }
 	| THIS																			{ $$ = makeEmptyNode(NT_THIS, @$); }
 	| STRING																		{ $$ = makeNodeFromString(NT_STRINGLIT, $1, @$); }
+	| CHAR																			{ $$ = makeNodeFromString(NT_CHARLIT, $1, @$); }
 	| NUMBER																		{ $$ = makeNodeFromNumber(NT_NUMBERLIT, $1, @$); }
 	| BOOL																			{ $$ = makeNodeFromNumber(NT_BOOLLIT, $1, @$); }
 	| '[' expressions ']'															{ $$ = $2; $$->loc = @$; $$->node_type = NT_ARRAY_DECLARATION; }
