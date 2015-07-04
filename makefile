@@ -125,8 +125,9 @@ TESTOBJS=$(addprefix bin/tests/, $(TESTNAMES:.cpp=.o))
 
 prefix=/usr/local
 
-default: default-notests
+default: default-notests bin/wakeobj/std.o
 	cd src/wake/stdlib && make WAKE=../../../bin/wake
+	cp bin/wakeobj/std.o src/wake/test/lib/std/obj/std.o
 	cd src/wake/test && make WAKE=../../../bin/wake
 
 default-notests: bin/wake $(STDWAKETABLEOBJS)

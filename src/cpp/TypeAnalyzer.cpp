@@ -394,17 +394,22 @@ boost::optional<pair<int, string> > TypeAnalyzer::getCommonFQClassnamesWithDepth
 
 bool TypeAnalyzer::isPrimitiveTypeNum(PureType<wake::QUALIFIED>* type) {
 	if(type->type == TYPE_MATCHALL) return true;
-	return type->type == TYPE_CLASS && type->typedata._class.classname == string("Num");
+	return type->type == TYPE_CLASS && type->typedata._class.classname == string("Num") && type->typedata._class.modulename == string("lang");
 }
 
 bool TypeAnalyzer::isPrimitiveTypeText(PureType<wake::QUALIFIED>* type) {
 	if(type->type == TYPE_MATCHALL) return true;
-	return type->type == TYPE_CLASS && type->typedata._class.classname == string("Text");
+	return type->type == TYPE_CLASS && type->typedata._class.classname == string("Text") && type->typedata._class.modulename == string("lang");
 }
 
 bool TypeAnalyzer::isPrimitiveTypeBool(PureType<wake::QUALIFIED>* type) {
 	if(type->type == TYPE_MATCHALL) return true;
-	return type->type == TYPE_CLASS && type->typedata._class.classname == string("Bool");
+	return type->type == TYPE_CLASS && type->typedata._class.classname == string("Bool") && type->typedata._class.modulename == string("lang");
+}
+
+bool TypeAnalyzer::isPrimitiveTypeChar(PureType<wake::QUALIFIED>* type) {
+	if(type->type == TYPE_MATCHALL) return true;
+	return type->type == TYPE_CLASS && type->typedata._class.classname == string("Char") && type->typedata._class.modulename == string("lang");
 }
 
 bool TypeAnalyzer::isAutoboxedType(PureType<wake::QUALIFIED>* type, PureType<wake::QUALIFIED>** boxed) {
@@ -457,6 +462,13 @@ bool TypeAnalyzer::isAutoboxedType(PureType<wake::QUALIFIED>* type, PureType<wak
 		*boxed = new PureType<wake::QUALIFIED>(TYPE_CLASS);
 		(*boxed)->typedata._class.modulename = strdup("lang");
 		(*boxed)->typedata._class.classname = strdup("Num");
+		return true;
+	}
+
+	if(isPrimitiveTypeChar(type)) {
+		*boxed = new PureType<wake::QUALIFIED>(TYPE_CLASS);
+		(*boxed)->typedata._class.modulename = strdup("lang");
+		(*boxed)->typedata._class.classname = strdup("Char");
 		return true;
 	}
 

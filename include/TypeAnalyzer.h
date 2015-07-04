@@ -41,6 +41,7 @@ class TypeAnalyzer {
 		bool isPrimitiveTypeNum(PureType<wake::QUALIFIED>* theint);
 		bool isPrimitiveTypeText(PureType<wake::QUALIFIED>* theint);
 		bool isPrimitiveTypeBool(PureType<wake::QUALIFIED>* theint);
+		bool isPrimitiveTypeChar(PureType<wake::QUALIFIED>* theint);
 		bool isAutoboxedType(PureType<wake::QUALIFIED>* type, PureType<wake::QUALIFIED>** boxedtype);
 		bool isException(PureType<wake::QUALIFIED>* type);
 		bool hasArgParameterization(PureType<wake::QUALIFIED>* type);
