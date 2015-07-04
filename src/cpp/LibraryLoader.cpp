@@ -38,6 +38,7 @@ void LibraryLoader::loadStdLibToTable(ClassSpaceSymbolTable* table) {
 		#include "Bool.table.h"
 		#include "List.table.h"
 		#include "Exception.table.h"
+		#include "Char.table.h"
 
 		#define LOAD_MEMORY_TABLE_FILE(tname) \
 			stringstream importbin ## tname; \
@@ -54,6 +55,7 @@ void LibraryLoader::loadStdLibToTable(ClassSpaceSymbolTable* table) {
 		LOAD_MEMORY_TABLE_FILE(Bool);
 		LOAD_MEMORY_TABLE_FILE(List);
 		LOAD_MEMORY_TABLE_FILE(Exception);
+		LOAD_MEMORY_TABLE_FILE(Char);
 
 	#endif
 }

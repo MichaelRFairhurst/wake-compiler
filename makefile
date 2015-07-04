@@ -90,11 +90,11 @@ CPPNAMES= \
 
 CPPOBJS=$(addprefix bin/cpp/, $(CPPNAMES:.cpp=.o))
 
-WAKETABLENAMES=List.wk Text.wk Num.wk Bool.wk Exception.wk
+WAKETABLENAMES=List.wk Text.wk Num.wk Char.wk Bool.wk Exception.wk
 WAKETABLEOBJS=$(addprefix bin/waketable/lang/, $(WAKETABLENAMES:.wk=.table))
 WAKETABLEINCLUDES=$(addprefix gen/, $(WAKETABLENAMES:.wk=.table.h))
 
-STDWAKETABLENAMES=io/Printer.wk lang/List.wk lang/Text.wk lang/Num.wk lang/Bool.wk io/File.wk io/FilePath.wk io/FileSystem.wk std/Argv.wk lang/Exception.wk std/System.wk std/Map.wk std/UndefinedIndexException.wk
+STDWAKETABLENAMES=io/Printer.wk lang/List.wk lang/Text.wk lang/Char.wk lang/Num.wk lang/Bool.wk io/File.wk io/FilePath.wk io/FileSystem.wk std/Argv.wk lang/Exception.wk std/System.wk std/Map.wk std/UndefinedIndexException.wk
 STDWAKETABLEOBJS=$(addprefix bin/waketable/, $(STDWAKETABLENAMES:.wk=.table))
 
 CNAMES=tree.c type.c parseUtil.c error.c
