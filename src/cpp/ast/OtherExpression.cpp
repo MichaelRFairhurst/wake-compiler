@@ -136,19 +136,23 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 						THROW		("Addition with a non-numeral");
 					}
 
-				} else if(analyzer->isPrimitiveTypeText(ret)) {
-					if(!analyzer->isPrimitiveTypeText(&additive) && ret->type != TYPE_MATCHALL) {
-						EXPECTED	"Text"
+				} else if(analyzer->isPrimitiveTypeText(ret) || analyzer->isPrimitiveTypeChar(ret)) {
+					if(!analyzer->isPrimitiveTypeText(&additive) && !analyzer->isPrimitiveTypeChar(&additive) && ret->type != TYPE_MATCHALL) {
+						EXPECTED	"Text' or 'Char"
 						ERRONEOUS	additive.toString()
 						THROW		("Concatenation with non-Text");
 					}
 
+					if(analyzer->isPrimitiveTypeChar(ret)) {
+						free(ret->typedata._class.classname);
+						ret->typedata._class.classname = strdup("Text");
+					}
 				} else {
 					string erroneousstring = ret->toString();
 					delete ret;
 					ret = new PureType<QUALIFIED>(TYPE_ERROR);
 
-					EXPECTED	"Num' or 'Text"
+					EXPECTED	"Num' or 'Text' or 'Char"
 					ERRONEOUS	erroneousstring
 					THROW		("Only numerics or Texts can be added/concatenated");
 				}

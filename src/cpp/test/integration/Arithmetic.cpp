@@ -59,7 +59,7 @@ PTT_TEST_CASE(
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 )
-	
+
 PTT_TEST_CASE(
 	ModNativeNumsAndAnythingElseIsTypeError,
 	"every MyClass is:											\n\
@@ -90,8 +90,8 @@ PTT_TEST_CASE(
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
-)	
-	
+)
+
 PTT_TEST_CASE(
 	AddNumsAndAnythingElseIsTypeError,
 	"every MyClass is:											\n\
@@ -189,3 +189,12 @@ PTT_TEST_CASE(
 	PTT_EXPECT(TYPE_ERROR)
 )
 
+PTT_TEST_CASE(
+	TestValidCharArithmetic,
+	"every MyClass is:								\n\
+		addChars() { var Text = \\n + \\n; }		\n\
+		addStringChar() { var Text = 'ab' + \\n; }	\n\
+		addCharString() { var Text = \\n + 'ab'; }	\n\
+	",
+	PTT_VALID
+);
