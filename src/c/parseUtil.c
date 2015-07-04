@@ -33,6 +33,7 @@ char* unEscapeStringLiteral(char* in, char terminator) {
 	if(in[i] == '\\') {
 		int increment;
 		out[c] = unEscapeCharLiteral(in + i + 1, &increment);
+		c++;
 		if(increment != -1) {
 			i += increment; // one more will be added by the for loop
 		} else {
