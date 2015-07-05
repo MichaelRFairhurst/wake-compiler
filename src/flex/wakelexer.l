@@ -155,8 +155,8 @@ false					count(); wakelval.number = 0; return BOOL;
 \~\[[^\]]+\]\~			count(); wakelval.string = strdup(waketext); return LIDENTIFIER;
 \"(\\.|[^\\"])*\"		count(); wakelval.string = unEscapeStringLiteral(keepInner(waketext), '"'); return strlen(wakelval.string) == 1 ? CHAR : STRING;
 '(\\.|[^\'])*\'			count(); wakelval.string = unEscapeStringLiteral(keepInner(waketext), '\''); return strlen(wakelval.string) == 1 ? CHAR : STRING;
-\"(\\.|[^\\"])*\"s		count(); waketext[strlen(waketext)] = 0; wakelval.string = unEscapeStringLiteral(keepInner(waketext), '"'); return STRING;
-'(\\.|[^\'])*\'s		count(); waketext[strlen(waketext)] = 0; wakelval.string = unEscapeStringLiteral(keepInner(waketext), '\''); return STRING;
+\"(\\.|[^\\"])*\"s		count(); waketext[strlen(waketext) - 1] = 0; wakelval.string = unEscapeStringLiteral(keepInner(waketext), '"'); return STRING;
+'(\\.|[^\'])*\'s		count(); waketext[strlen(waketext) - 1] = 0; wakelval.string = unEscapeStringLiteral(keepInner(waketext), '\''); return STRING;
 
 module\.([a-z0-9]+\.)+[A-Z][a-zA-Z0-9]* count(); wakelval.string = strdup(waketext + 7); return FQIDENTIFIER;
 -?(0[xX][0-9A-Fa-f]+(\.[0-9A-Fa-f]+)?([pP]-?[0-9A-Fa-f]+)?|(([0-9]*(\.[0-9]+)?)|[0-9]+)([eE]-?[0-9]+)?)		count(); wakelval.number = atof(waketext); return NUMBER;
