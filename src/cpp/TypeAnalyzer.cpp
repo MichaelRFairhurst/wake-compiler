@@ -100,6 +100,11 @@ bool TypeAnalyzer::isASubtypeOfB(PureType<wake::QUALIFIED>* a, PureType<wake::QU
 			delete e;
 		}
 
+		// special case...
+		if(isPrimitiveTypeInt(a) && isPrimitiveTypeNum(b)) {
+			return true;
+		}
+
 		return false;
 	} else if(a->type == TYPE_PARAMETERIZED || a->type == TYPE_PARAMETERIZED_ARG) {
 		if(a->typedata.parameterized.label == string(b->typedata.parameterized.label)) return true;
@@ -392,6 +397,11 @@ boost::optional<pair<int, string> > TypeAnalyzer::getCommonFQClassnamesWithDepth
 	return boost::optional<pair<int, string> >();
 }
 
+bool TypeAnalyzer::isPrimitiveTypeInt(PureType<wake::QUALIFIED>* type) {
+	if(type->type == TYPE_MATCHALL) return true;
+	return type->type == TYPE_CLASS && type->typedata._class.classname == string("Int") && type->typedata._class.modulename == string("lang");
+}
+
 bool TypeAnalyzer::isPrimitiveTypeNum(PureType<wake::QUALIFIED>* type) {
 	if(type->type == TYPE_MATCHALL) return true;
 	return type->type == TYPE_CLASS && type->typedata._class.classname == string("Num") && type->typedata._class.modulename == string("lang");
@@ -462,6 +472,13 @@ bool TypeAnalyzer::isAutoboxedType(PureType<wake::QUALIFIED>* type, PureType<wak
 		*boxed = new PureType<wake::QUALIFIED>(TYPE_CLASS);
 		(*boxed)->typedata._class.modulename = strdup("lang");
 		(*boxed)->typedata._class.classname = strdup("Num");
+		return true;
+	}
+
+	if(isPrimitiveTypeInt(type)) {
+		*boxed = new PureType<wake::QUALIFIED>(TYPE_CLASS);
+		(*boxed)->typedata._class.modulename = strdup("lang");
+		(*boxed)->typedata._class.classname = strdup("Int");
 		return true;
 	}
 

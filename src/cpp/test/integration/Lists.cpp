@@ -24,6 +24,7 @@ PTT_TEST_CASE(
 		arrayAccessOnClass(MyClass my) { my[1]; }				\n\
 		arrayAccessWithClass(MyClass, Num[]) { Num[MyClass]; }	\n\
 		arrayAccessWithString(Num[]) { Num['test']; }			\n\
+		arrayAccessWithNum(Num[]) { Num[5.4]; }			\n\
 		safeListAccessOnNum() { 9[?1]; }							\n\
 		safeListAccessOnString() { 'abcd'[?1]; }					\n\
 		safeListAccessOnBool() { true[?1]; }						\n\
@@ -33,7 +34,10 @@ PTT_TEST_CASE(
 		safeListAccessOnClass(MyClass my) { my[?1]; }				\n\
 		safeListAccessWithClass(MyClass, Num[]) { Num[?MyClass]; }	\n\
 		safeListAccessWithString(Num[]) { Num[?'test']; }			\n\
+		safeListAccessWithNum(Num[]) { Num[?5.5]; }			\n\
 	",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -59,9 +63,11 @@ PTT_TEST_CASE(
 	"every MyClass is:									\n\
 		arrayAccessOnClass(Text) { Text[1]; }			\n\
 		arrayAccessOnClass(Num) { Num[1]; }				\n\
+		arrayAccessOnClass(Int) { Int[1]; }				\n\
 		arrayAccessOnClass(Bool) { Bool[1]; }			\n\
 		arrayAccessOnClass(MyClass) { MyClass[1]; }		\n\
 	",
+	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
@@ -71,10 +77,10 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	ValidListIndexAccessAndReturningValidTypes,
 	"every MyClass is:														\n\
-		intListBecomesNum(Num[]) { Num[0] + 3; }							\n\
+		numListBecomesNum(Num[]) { Num[0] + 3; }							\n\
 		stringListBecomesString(Text[]) { Text[1] + 'test'; }				\n\
 		stringListListBecomesString(Text[][]) { Text[1][1] + 'test'; }	\n\
-		intListListBecomesNum(Num[][]) { Num[1][1] + 5; }					\n\
+		numListListBecomesNum(Num[][]) { Num[1][1] + 5; }					\n\
 	",
 	PTT_VALID
 )
@@ -85,7 +91,7 @@ PTT_TEST_CASE(
 		assignMeToList() {				\n\
 			var MyClass[] = this;		\n\
 		}								\n\
-		assignNumberToClassList() {	\n\
+		assignNumberToClassList() {		\n\
 			var MyClass[] = 4;			\n\
 		}								\n\
 		assignTextToClassList() {		\n\
@@ -200,10 +206,10 @@ PTT_TEST_CASE(
 			var Text[] = ['hey'];								\n\
 			var $Text[] = ['hey', 'man'];						\n\
 			var $$Text[] = [];									\n\
-			var Num[] = [];										\n\
-			var $$Num[] = [1];									\n\
-			var $$$Num[] = [1, 2];								\n\
-			var $$$$Num[][] = [[1]];							\n\
+			var Int[] = [];										\n\
+			var $Int[] = [1];									\n\
+			var $$Int[] = [1, 2];								\n\
+			var $$$Int[][] = [[1]];								\n\
 			var $$$Text[][] = [['hey']];						\n\
 		}",
 	PTT_VALID
@@ -213,13 +219,13 @@ PTT_TEST_CASE(
 	TestInvalidListLiterals,
 	"every MyClass is:											\n\
 		method() {												\n\
-			var Num[] = ['hey'];								\n\
+			var Int[] = ['hey'];								\n\
 			var Text[] = ['hey', 3];							\n\
 			var $Text[] = [true];								\n\
-			var $Num[] = [nothing];								\n\
-			var $$Num[] = [this];								\n\
-			var $$$Num[] = [1, [2]];							\n\
-			var $$$$Num[][] = [['hey']];						\n\
+			var $Int[] = [nothing];								\n\
+			var $$Int[] = [this];								\n\
+			var $$$Int[] = [1, [2]];							\n\
+			var $$$$Int[][] = [['hey']];						\n\
 			var $$Text[][] = [[['hey']]];						\n\
 		}",
 	PTT_EXPECT(TYPE_ERROR)
@@ -235,8 +241,8 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	TestStrangeValidUsagesOfEmptyList,
 	"every MyClass is:											\n\
-		with Num[][][] = [];									\n\
-		with Num len = [].getSize();							\n\
+		with Int[][][] = [];									\n\
+		with Int len = [].getSize();							\n\
 		MyClass[] -- myMethod() {								\n\
 			var Text[][] = [[], [], []];						\n\
 			var Text = [[], [], []][0][0];						\n\
@@ -249,8 +255,8 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	TestStrangeInvalidUsagesOfEmptyList,
 	"every MyClass is:											\n\
-		with Num[][][] = [[[[]]]];								\n\
-		with Num len = [];										\n\
+		with Int[][][] = [[[[]]]];								\n\
+		with Int len = [];										\n\
 		MyClass -- myMethod() {									\n\
 			var Text[][] = [[3], [], []];						\n\
 			return [];											\n\
@@ -277,19 +283,19 @@ PTT_TEST_CASE(
 	TestSetOptionalOptionalToValues,
 	"every MyClass is:											\n\
 		myMethod() {											\n\
-			var Num? = nothing;									\n\
-			Num = [1, 1][0];									\n\
-			Num = [1, nothing][0];								\n\
-			Num = [nothing][0];									\n\
-			var $Num?? = Num;									\n\
-			$Num = nothing;										\n\
-			$Num = 1;											\n\
-			$Num = [1, 1][0];									\n\
-			$Num = [1, nothing][0];								\n\
-			$Num = [1, Num][0];									\n\
-			$Num = [nothing, Num][0];							\n\
-			$Num = [nothing][0];								\n\
-			$Num = [Num][0];									\n\
+			var Int? = nothing;									\n\
+			Int = [1, 1][0];									\n\
+			Int = [1, nothing][0];								\n\
+			Int = [nothing][0];									\n\
+			var $Int?? = Int;									\n\
+			$Int = nothing;										\n\
+			$Int = 1;											\n\
+			$Int = [1, 1][0];									\n\
+			$Int = [1, nothing][0];								\n\
+			$Int = [1, Int][0];									\n\
+			$Int = [nothing, Int][0];							\n\
+			$Int = [nothing][0];								\n\
+			$Int = [Int][0];									\n\
 		}",
 	PTT_VALID
 );

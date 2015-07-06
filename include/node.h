@@ -41,6 +41,7 @@ struct Node {
 	union {
 		char* string;
 		double number;
+		int integer;
 		struct Node** nodes;
 		STRUCT PureType TEMPL_UNQUALIFIED* pure_type;
 		STRUCT PureTypeArray TEMPL_UNQUALIFIED* pure_type_array;

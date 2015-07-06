@@ -26,10 +26,10 @@ void ast::IfElseWhile::typeCheck() {
 		otherwise->typeCheck();
 	}
 
-	if(!analyzer->isPrimitiveTypeNum(conditionType.get()) && !analyzer->isPrimitiveTypeBool(conditionType.get())) {
-		EXPECTED	"Bool"
+	if(!analyzer->isPrimitiveTypeNum(conditionType.get()) && !analyzer->isPrimitiveTypeBool(conditionType.get()) && !analyzer->isPrimitiveTypeInt(conditionType.get())) {
+		EXPECTED	"Bool' or 'Num' or 'Int"
 		ERRONEOUS	conditionType->toString()
-		THROW		("If/While conditions must be Bool or Num");
+		THROW		("If/While conditions must be Bool or Num or Int");
 	}
 }
 

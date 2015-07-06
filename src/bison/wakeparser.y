@@ -61,6 +61,7 @@ int wakewrap()
 %union
 {
 	double number;
+	int integer;
 	char* string;
 	Node* node;
 	PureType* pure_type;
@@ -82,6 +83,7 @@ int wakewrap()
 %token <string> CHAR
 %type <string> identifier
 %token <number> NUMBER
+%token <integer> INTEGER
 %token <number> BOOL
 %token <number> SYM_SHADOW
 %token <void> SYM_ARRAYED
@@ -151,6 +153,7 @@ annotationval:
 	STRING																			{ $$ = makeNodeFromString(NT_STRINGLIT, $1, @$); }
 	| CHAR																			{ $$ = makeNodeFromString(NT_CHARLIT, $1, @$); }
 	| NUMBER																		{ $$ = makeNodeFromNumber(NT_NUMBERLIT, $1, @$); }
+	| INTEGER																		{ $$ = makeNodeFromNumber(NT_INTEGERLIT, $1, @$); }
 	| BOOL																			{ $$ = makeNodeFromNumber(NT_BOOLLIT, $1, @$); }
 	| NOTHING																		{ $$ = makeEmptyNode(NT_NOTHING, @$); }
 	;
@@ -233,6 +236,7 @@ providable:
 	| STRING																		{ $$ = makeNodeFromString(NT_STRINGLIT, $1, @$); }
 	| CHAR																			{ $$ = makeNodeFromString(NT_CHARLIT, $1, @$); }
 	| NUMBER																		{ $$ = makeNodeFromNumber(NT_NUMBERLIT, $1, @$); }
+	| INTEGER																		{ $$ = makeNodeFromNumber(NT_INTEGERLIT, $1, @$); }
 	| BOOL																			{ $$ = makeNodeFromNumber(NT_BOOLLIT, $1, @$); }
 	;
 
@@ -255,6 +259,7 @@ injection_subinjection:
 	| STRING																		{ $$ = makeNodeFromString(NT_STRINGLIT, $1, @$); }
 	| CHAR																			{ $$ = makeNodeFromString(NT_CHARLIT, $1, @$); }
 	| NUMBER																		{ $$ = makeNodeFromNumber(NT_NUMBERLIT, $1, @$); }
+	| INTEGER																		{ $$ = makeNodeFromNumber(NT_INTEGERLIT, $1, @$); }
 	| BOOL																			{ $$ = makeNodeFromNumber(NT_BOOLLIT, $1, @$); }
 	| '?' pure_type																	{ $$ = makeOneBranchNode(NT_INJECTION_ARG, makeNodeFromPureType($2, @$), @$); }
 	;
@@ -342,6 +347,7 @@ value:
 	| STRING																		{ $$ = makeNodeFromString(NT_STRINGLIT, $1, @$); }
 	| CHAR																			{ $$ = makeNodeFromString(NT_CHARLIT, $1, @$); }
 	| NUMBER																		{ $$ = makeNodeFromNumber(NT_NUMBERLIT, $1, @$); }
+	| INTEGER																		{ $$ = makeNodeFromInteger(NT_INTEGERLIT, $1, @$); }
 	| BOOL																			{ $$ = makeNodeFromNumber(NT_BOOLLIT, $1, @$); }
 	| '[' expressions ']'															{ $$ = $2; $$->loc = @$; $$->node_type = NT_ARRAY_DECLARATION; }
 	| SYM_ARRAYED																	{ $$ = makeEmptyNode(NT_ARRAY_DECLARATION, @$); }
@@ -559,7 +565,7 @@ expression_unary:
 	SYM_INCREMENT expression_unary													{ $$ = makeOneBranchNode(NT_INCREMENT, $2, @$); }
 	| SYM_RETURN_DECREMENT expression_unary											{ $$ = makeOneBranchNode(NT_DECREMENT, $2, @$); }
 	| '~' expression_unary															{ $$ = makeOneBranchNode(NT_BITNOT, $2, @$); }
-	| '-' expression_unary															{ $$ = makeTwoBranchNode(NT_SUBTRACT, makeNodeFromNumber(NT_NUMBERLIT, 0, @2), $2, @$); }
+	| '-' expression_unary															{ $$ = makeTwoBranchNode(NT_SUBTRACT, makeNodeFromInteger(NT_INTEGERLIT, 0, @2), $2, @$); }
 	| expression_logicalunary														{ $$ = $1; }
 	;
 
@@ -593,6 +599,14 @@ expression_add:
 																							YYERROR;
 																						} else {
 																							$$ = makeTwoBranchNode(NT_ADD, $1, makeNodeFromNumber(NT_NUMBERLIT,$2,@2), @$);
+																						}
+																					}
+	| expression_add INTEGER														{
+																						if ($2 > 0) {
+																							wakeerror("Number follows expression without an operator.");
+																							YYERROR;
+																						} else {
+																							$$ = makeTwoBranchNode(NT_ADD, $1, makeNodeFromInteger(NT_INTEGERLIT,$2,@2), @$);
 																						}
 																					}
 	;

@@ -67,9 +67,9 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	TestEarlyBailoutAccessReturnsOptionalWrappedMemberType,
 	"every MyClass is:											\n\
-		with public Num = 1;									\n\
+		with public Num = 1.0;									\n\
 		with public Text = 'hey';								\n\
-		with public Num[] = [1];								\n\
+		with public Num[] = [1.0];								\n\
 		with public Text[] = ['hey'];							\n\
 		myMethod(MyClass?, $MyClass?? ) {						\n\
 			var Num? = MyClass.?Num; 							\n\
@@ -87,9 +87,9 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	TestEarlyBailoutReturnsOptionalWrappedReturnType,
 	"every MyClass is:											\n\
-		Num -- getNum() { return 1; }							\n\
+		Num -- getNum() { return 1.0; }							\n\
 		Text -- getText() { return 'hey'; }						\n\
-		Num[] -- getNumList() { return [1]; }					\n\
+		Num[] -- getNumList() { return [1.0]; }					\n\
 		Text[] -- getTextList() { return ['hey']; }				\n\
 		myMethod(MyClass?, $MyClass?? ) {						\n\
 			var Num? = MyClass.?getNum(); 						\n\

@@ -21,19 +21,19 @@ using namespace wake::ast;
 void ForeachAt::typeCheck() {
 	VarDecl<QUALIFIED> atTypeDecl;
 	atTypeDecl.typedata = PureType<QUALIFIED>(TYPE_CLASS);
-	atTypeDecl.typedata.typedata._class.classname = strdup("Num");
+	atTypeDecl.typedata.typedata._class.classname = strdup("Int");
 	atTypeDecl.typedata.typedata._class.modulename = strdup("lang");
 
 	if(var_ref.alias != NULL) {
 		atTypeDecl.alias = strdup(var_ref.alias);
 	} else {
-		if(var_ref._class->classname != std::string("Num")) {
-			errors->addError(new SemanticError(TYPE_ERROR, "The 'at' variable of this foreach loop must be of type Num", node));
+		if(var_ref._class->classname != std::string("Int")) {
+			errors->addError(new SemanticError(TYPE_ERROR, "The 'at' variable of this foreach loop must be of type Int", node));
 			return;
 		}
 
 		if(var_ref._class->arrayed) {
-			errors->addError(new SemanticError(TYPE_ERROR, "The 'at' variable of this foreach loop must be of type Num", node));
+			errors->addError(new SemanticError(TYPE_ERROR, "The 'at' variable of this foreach loop must be of type Int", node));
 			return;
 		}
 

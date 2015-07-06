@@ -44,19 +44,23 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	ValidIfConditions,
-	"every MyClass is:											\n\
-		truthLiterals() { if true then 5; if false then 5; }			\n\
-		truthNumLiteral() { if 1 then 5; }			\n\
-		truthVariable(Bool) { if Bool then 5; }					\n\
-		numVariable(Num) { if Num then 5; }					\n\
-		truthAlias(Bool b) { if b then 5; }						\n\
-		numAlias(Num n) { if n then 5; }						\n\
+	"every MyClass is:												\n\
+		truthLiterals() { if true then 5; if false then 5; }		\n\
+		truthNumLiteral() { if 1 then 5; }							\n\
+		truthVariable(Bool) { if Bool then 5; }						\n\
+		numVariable(Num) { if Num then 5; }							\n\
+		truthAlias(Bool b) { if b then 5; }							\n\
+		numAlias(Num n) { if n then 5; }							\n\
 		truthLiteralsWhile() { while true do 5; while false do 5; }	\n\
-		truthVariableWhile(Bool) { while Bool do 5; }			\n\
-		truthAliasWhile(Bool b) { while b do 5; }				\n\
-		numLiteralWhile() { while 5 do 5; }	\n\
-		numVariableWhile(Num) { while Num do 5; }			\n\
-		numAliasWhile(Num n) { while n do 5; }				\n\
+		truthVariableWhile(Bool) { while Bool do 5; }				\n\
+		truthAliasWhile(Bool b) { while b do 5; }					\n\
+		numLiteralWhile() { while 5 do 5; }							\n\
+		numVariableWhile(Num) { while Num do 5; }					\n\
+		numAliasWhile(Num n) { while n do 5; }						\n\
+		intVariableWhile(Int) { while Int do 5; }					\n\
+		intAliasWhile(Int i) { while i do 5; }						\n\
+		intVariable(Int) { if Int then 5; }							\n\
+		intAlias(Int i) { if i then 5; }							\n\
 	",
 	PTT_VALID
 )
@@ -417,12 +421,12 @@ PTT_TEST_CASE(
 	TestForeachAtValid,
 	"every MyClass is:												\n\
 		method() {													\n\
-			foreach ['a', 'b', 'c'] at Num do Num + 5;				\n\
-			foreach Char in ['a', 'b', 'c'] at Num do Num + 5;		\n\
-			foreach ['a', 'b', 'c'] at num do num + 5;				\n\
-			foreach Char in ['a', 'b', 'c'] at num do num + 5;		\n\
-			foreach ['a', 'b', 'c'] at $Num do $Num + 5;			\n\
-			foreach Char in ['a', 'b', 'c'] at $Num do $Num + 5;	\n\
+			foreach ['a', 'b', 'c'] at Int do Int + 5;				\n\
+			foreach Char in ['a', 'b', 'c'] at Int do Int + 5;		\n\
+			foreach ['a', 'b', 'c'] at int do int + 5;				\n\
+			foreach Char in ['a', 'b', 'c'] at int do int + 5;		\n\
+			foreach ['a', 'b', 'c'] at $Int do $Int + 5;			\n\
+			foreach Char in ['a', 'b', 'c'] at $Int do $Int + 5;	\n\
 		}",
 	PTT_VALID
 );
@@ -431,11 +435,15 @@ PTT_TEST_CASE(
 	TestForeachAtInvalid,
 	"every MyClass is:											\n\
 		method() {												\n\
+			foreach ['a', 'b', 'c'] at Num {}					\n\
+			foreach Char in ['a', 'b', 'c'] at Num {}			\n\
 			foreach ['a', 'b', 'c'] at Text {}					\n\
 			foreach Char in ['a', 'b', 'c'] at Text {}			\n\
 			foreach ['a', 'b', 'c'] at Num[] {}					\n\
 			foreach Char in ['a', 'b', 'c'] at Num[] {}			\n\
 		}",
+	PTT_EXPECT(TYPE_ERROR)
+	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
 	PTT_EXPECT(TYPE_ERROR)
@@ -457,8 +465,8 @@ PTT_TEST_CASE(
 	TestForeachAtVariableIsOutOfScopeByEnd,
 	"every MyClass is:												\n\
 		method() {													\n\
-			foreach Char in ['a', 'b', 'c'] at Num { }				\n\
-			Num + 5;												\n\
+			foreach Char in ['a', 'b', 'c'] at Int { }				\n\
+			Int + 5;												\n\
 		}",
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 );
@@ -467,8 +475,8 @@ PTT_TEST_CASE(
 	TestForeachAtVariableIsOutOfScopeByEndInPresenceOfTypeError,
 	"every MyClass is:												\n\
 		method() {													\n\
-			foreach Char in ['a', 'b', 'c'] at Num { 5 + 'aoeu'; }	\n\
-			Num + 5;												\n\
+			foreach Char in ['a', 'b', 'c'] at Int { 5 + 'aoeu'; }	\n\
+			Int + 5;												\n\
 		}",
 	PTT_EXPECT(SYMBOL_NOT_DEFINED)
 	PTT_EXPECT(TYPE_ERROR)
@@ -478,9 +486,9 @@ PTT_TEST_CASE(
 	TestForeachAtClashingVariableDeclarationsAreCaptured,
 	"every MyClass is:												\n\
 		method() {													\n\
-			var Num = 4;											\n\
-			foreach Char in ['a', 'b', 'c'] at Num { }				\n\
-			Num + 5;												\n\
+			var Int = 4;											\n\
+			foreach Char in ['a', 'b', 'c'] at Int { }				\n\
+			Int + 5;												\n\
 		}",
 	PTT_EXPECT(SYMBOL_ALREADY_DEFINED)
 );
@@ -491,7 +499,7 @@ PTT_TEST_CASE(
 		method() {												\n\
 			if true {											\n\
 				var Num = 4;									\n\
-				foreach Num in [1, 2, 3] { }					\n\
+				foreach Num in [1.0, 2.0, 3.0] { } 				\n\
 			}													\n\
 			if true {											\n\
 				var Num = 4;									\n\

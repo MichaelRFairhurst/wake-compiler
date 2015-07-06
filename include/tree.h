@@ -100,6 +100,7 @@ extern "C" {
 #define NT_STRINGLIT 34
 #define NT_CHARLIT 130
 #define NT_NUMBERLIT 35
+#define NT_INTEGERLIT 131
 #define NT_BOOLLIT 36
 #define NT_ALIAS 37
 
@@ -222,6 +223,8 @@ Node* makeNodeFromSpecializablePureType(SpecializablePureType TEMPL_UNQUALIFIED*
 Node* makeNodeFromString(int nodetype, char* mystring, YYLTYPE loc);
 
 Node* makeNodeFromNumber(int nodetype, double number, YYLTYPE loc);
+
+Node* makeNodeFromInteger(int nodetype, int integer, YYLTYPE loc);
 
 Node* makeTwoBranchNode(int nodetype, Node* a, Node* b, YYLTYPE loc);
 

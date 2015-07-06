@@ -45,6 +45,12 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 			ret->typedata._class.modulename = strdup("lang");
 			break;
 
+		case NT_INTEGERLIT:
+			ret = new PureType<QUALIFIED>(TYPE_CLASS);
+			ret->typedata._class.classname = strdup("Int");
+			ret->typedata._class.modulename = strdup("lang");
+			break;
+
 		case NT_BOOLLIT:
 			ret = new PureType<QUALIFIED>(TYPE_CLASS);
 			ret->typedata._class.classname = strdup("Bool");
@@ -120,18 +126,25 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 				ret = children[0].typeCheck(false);
 				PureType<QUALIFIED> additive = *auto_ptr<PureType<QUALIFIED> >(children[1].typeCheck(false));
 
+				if(node->node_type == NT_ADD_ASSIGNMENT && analyzer->isPrimitiveTypeInt(ret) && analyzer->isPrimitiveTypeNum(&additive)) {
+					EXPECTED	"Int"
+					ERRONEOUS	additive.toString()
+					THROW		("An Int cannot use += with a Num, as an Int doesn't have enough precision to store all possible results.");
+				}
+
 				// Ensure the left operand is never a matchall when the right is
 				// this way, when ret is matchall, so we can run all typechecks by the
 				// lefthand side
-				if(ret->type == TYPE_MATCHALL) {
+				// Do the same for Int vs Num so the left side represents the highest precision
+				if(ret->type == TYPE_MATCHALL || analyzer->isPrimitiveTypeNum(&additive)) {
 					auto_ptr<PureType<QUALIFIED> > temp(ret);
 					ret = new PureType<QUALIFIED>(additive);
 					additive = *temp;
 				}
 
-				if(analyzer->isPrimitiveTypeNum(ret) || ret->type == TYPE_MATCHALL) {
-					if(!analyzer->isPrimitiveTypeNum(&additive) && ret->type != TYPE_MATCHALL) {
-						EXPECTED	"Num"
+				if(analyzer->isPrimitiveTypeNum(ret) || analyzer->isPrimitiveTypeInt(ret) || ret->type == TYPE_MATCHALL) {
+					if(!analyzer->isPrimitiveTypeNum(&additive) && !analyzer->isPrimitiveTypeInt(&additive) && ret->type != TYPE_MATCHALL) {
+						EXPECTED	"Num' or 'Int"
 						ERRONEOUS	additive.toString()
 						THROW		("Addition with a non-numeral");
 					}
@@ -156,11 +169,11 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 					ERRONEOUS	erroneousstring
 					THROW		("Only numerics or Texts can be added/concatenated");
 				}
+
 			}
 			break;
 
 		case NT_MULT_ASSIGNMENT:
-		case NT_DIV_ASSIGNMENT:
 		case NT_SUB_ASSIGNMENT:
 			if(!isValidLValue(node->node_data.nodes[0])) {
 				errors->addError(new SemanticError(INVALID_ASSIGNMENT, "", node));
@@ -168,7 +181,6 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 			}
 			// FALLTHROUGH
 		case NT_MULTIPLY:
-		case NT_DIVIDE:
 		case NT_MOD:
 		case NT_MODNATIVE:
 		case NT_MODALT:
@@ -182,22 +194,91 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 				ret = children[0].typeCheck(false);
 				PureType<QUALIFIED> factor = *auto_ptr<PureType<QUALIFIED> >(children[1].typeCheck(false));
 
-				if(!analyzer->isPrimitiveTypeNum(ret) || !analyzer->isPrimitiveTypeNum(&factor)) {
-					string erroneousstring;
+				if(node->node_type == NT_MULT_ASSIGNMENT
+					|| node->node_type == NT_SUB_ASSIGNMENT
+					&& analyzer->isPrimitiveTypeInt(ret)
+					&& analyzer->isPrimitiveTypeNum(&factor)
+				) {
+					EXPECTED	"Int"
+					ERRONEOUS	factor.toString()
+					THROW		("An Int cannot use -= or *= with a Num, as an Int doesn't have enough precision to store all possible results.");
+				}
 
-					if(analyzer->isPrimitiveTypeNum(ret)) {
-						erroneousstring = factor.toString();
-					} else {
-						erroneousstring = ret->toString();
-						delete ret;
-						ret = new PureType<QUALIFIED>(TYPE_CLASS);
-						ret->typedata._class.classname = strdup("Num");
-						ret->typedata._class.modulename = strdup("lang");
-					}
+				// If a num is on the right side, move it to the left. That way 'ret' is our
+				// highest precision
+				if(analyzer->isPrimitiveTypeNum(&factor)) {
+					auto_ptr<PureType<QUALIFIED> > temp(ret);
+					ret = new PureType<QUALIFIED>(factor);
+					factor = *temp;
+				}
 
+				string erroneousstring;
+				bool broken = false;
+
+				if(!analyzer->isPrimitiveTypeNum(&factor) && !analyzer->isPrimitiveTypeInt(&factor)) {
+					erroneousstring = factor.toString();
+					broken = true;
+				} else if(!analyzer->isPrimitiveTypeNum(ret) && !analyzer->isPrimitiveTypeInt(ret)) {
+					broken = true;
+					erroneousstring = ret->toString();
+					delete ret;
+					ret = new PureType<QUALIFIED>(TYPE_CLASS);
+					ret->typedata._class.classname = strdup("Num");
+					ret->typedata._class.modulename = strdup("lang");
+				}
+
+				if(broken) {
 					EXPECTED	"Num"
 					ERRONEOUS	erroneousstring
 					THROW		("Mathematical operation performed on non-numerals");
+				}
+			}
+			break;
+		case NT_DIV_ASSIGNMENT:
+			if(!isValidLValue(node->node_data.nodes[0])) {
+				errors->addError(new SemanticError(INVALID_ASSIGNMENT, "", node));
+					break;
+			}
+			// FALLTHROUGH
+		case NT_DIVIDE:
+			{
+				ret = children[0].typeCheck(false);
+				PureType<QUALIFIED> factor = *auto_ptr<PureType<QUALIFIED> >(children[1].typeCheck(false));
+
+				if(node->node_type == NT_DIV_ASSIGNMENT
+					&& analyzer->isPrimitiveTypeInt(ret)
+				) {
+					EXPECTED	"Num"
+					ERRONEOUS	ret->toString()
+					THROW		("Cannot use /= with an Int, as it requires using integer division. Use \\= instead.");
+				}
+
+				string erroneousstring;
+				bool broken = false;
+
+				if(!analyzer->isPrimitiveTypeNum(&factor) && !analyzer->isPrimitiveTypeInt(&factor)) {
+					erroneousstring = factor.toString();
+					broken = true;
+				} else if(!analyzer->isPrimitiveTypeNum(ret) && !analyzer->isPrimitiveTypeInt(ret)) {
+					broken = true;
+					erroneousstring = ret->toString();
+					delete ret;
+					ret = new PureType<QUALIFIED>(TYPE_CLASS);
+					ret->typedata._class.classname = strdup("Num");
+					ret->typedata._class.modulename = strdup("lang");
+				}
+
+				if(broken) {
+					EXPECTED	"Num"
+					ERRONEOUS	erroneousstring
+					THROW		("Mathematical operation performed on non-numerals");
+				}
+
+				if(!analyzer->isPrimitiveTypeNum(ret)) {
+					delete ret;
+					ret = new PureType<QUALIFIED>(TYPE_CLASS);
+					ret->typedata._class.classname = strdup("Num");
+					ret->typedata._class.modulename = strdup("lang");
 				}
 			}
 			break;
@@ -206,7 +287,7 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 			{
 				ret = children[0].typeCheck(false);
 
-				if(!analyzer->isPrimitiveTypeNum(ret)) {
+				if(!analyzer->isPrimitiveTypeNum(ret) && !analyzer->isPrimitiveTypeInt(ret)) {
 					string erroneousstring = ret->toString();
 					delete ret;
 					ret = new PureType<QUALIFIED>(TYPE_CLASS);
@@ -233,7 +314,7 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 				PureType<QUALIFIED> a = *auto_ptr<PureType<QUALIFIED> >(children[0].typeCheck(false));
 				PureType<QUALIFIED> b = *auto_ptr<PureType<QUALIFIED> >(children[1].typeCheck(false));
 
-				if(!analyzer->isPrimitiveTypeNum(&a) || !analyzer->isPrimitiveTypeNum(&b)) {
+				if(!(analyzer->isPrimitiveTypeNum(&a) || analyzer->isPrimitiveTypeInt(&a)) || !(analyzer->isPrimitiveTypeNum(&b) || analyzer->isPrimitiveTypeInt(&b))) {
 					string erroneousstring;
 
 					if(analyzer->isPrimitiveTypeNum(&a)) {
@@ -323,10 +404,10 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 					ret->typedata.optional.contained = new PureType<QUALIFIED>(temp);
 				}
 
-				if(!analyzer->isPrimitiveTypeNum(&index) && index.type != TYPE_MATCHALL) {
-					EXPECTED	"Num"
+				if(!analyzer->isPrimitiveTypeInt(&index) && index.type != TYPE_MATCHALL) {
+					EXPECTED	"Int"
 					ERRONEOUS	index.toString()
-					THROW		("Array indices must be numeric");
+					THROW		("Array indices must be integers");
 				}
 			}
 			break;
@@ -346,10 +427,10 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 					ret = new PureType<QUALIFIED>(temp);
 				}
 
-				if(!analyzer->isPrimitiveTypeNum(&index) && index.type != TYPE_MATCHALL) {
-					EXPECTED	"Num"
+				if(!analyzer->isPrimitiveTypeInt(&index) && index.type != TYPE_MATCHALL) {
+					EXPECTED	"Int"
 					ERRONEOUS	index.toString()
-					THROW		("Array indices must be numeric");
+					THROW		("Array indices must be integers");
 				}
 			}
 			break;
@@ -481,10 +562,10 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 
 				ret = *common;
 
-				if(!analyzer->isPrimitiveTypeBool(condition.get()) && !analyzer->isPrimitiveTypeNum(condition.get())) {
-					EXPECTED	"Bool or Num"
+				if(!analyzer->isPrimitiveTypeBool(condition.get()) && !analyzer->isPrimitiveTypeNum(condition.get()) && !analyzer->isPrimitiveTypeInt(condition.get())) {
+					EXPECTED	"Bool' or 'Int' or 'Num"
 					ERRONEOUS	condition->toString()
-					THROW		("Only booleans and nums can go inside a ternary operator condition");
+					THROW		("Only Bools, Ints, and Nums can go inside a ternary operator condition");
 				}
 			}
 			break;

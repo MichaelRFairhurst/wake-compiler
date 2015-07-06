@@ -125,7 +125,7 @@ void PrependSubNode(Node* parent, Node* child) {
 	parent->node_data.nodes[0] = child;
 }
 
-Node* NodeFactory(int nodetype, YYLTYPE loc) {
+Node* nodeFactory(int nodetype, YYLTYPE loc) {
 	Node* mynode = malloc(sizeof(Node));
 	mynode->line = line;
 	mynode->col = column;
@@ -136,69 +136,75 @@ Node* NodeFactory(int nodetype, YYLTYPE loc) {
 }
 
 Node* makeEmptyNode(int nodetype, YYLTYPE loc) {
-	Node* mynode = NodeFactory(nodetype, loc);
+	Node* mynode = nodeFactory(nodetype, loc);
 	mynode->node_data.nodes = NULL;
 	return mynode;
 }
 
 Node* makeNodeFromPureType(PureType* thetype, YYLTYPE loc) {
-	Node* mynode = NodeFactory(NT_TYPEDATA, loc);
+	Node* mynode = nodeFactory(NT_TYPEDATA, loc);
 	mynode->node_data.pure_type = thetype;
 	return mynode;
 }
 
 Node* makeNodeFromVarDecl(VarDecl* decl, YYLTYPE loc) {
-	Node* mynode = NodeFactory(NT_VAR_DECL_DATA, loc);
+	Node* mynode = nodeFactory(NT_VAR_DECL_DATA, loc);
 	mynode->node_data.var_decl = decl;
 	return mynode;
 }
 
 Node* makeNodeFromSpecializableVarDecl(SpecializableVarDecl* decl, YYLTYPE loc) {
-	Node* mynode = NodeFactory(NT_SPECIALIZABLE_VAR_DECL, loc);
+	Node* mynode = nodeFactory(NT_SPECIALIZABLE_VAR_DECL, loc);
 	mynode->node_data.specializable_var_decl = decl;
 	return mynode;
 }
 
 Node* makeNodeFromPureTypeArray(PureTypeArray* thearray, YYLTYPE loc) {
-	Node* mynode = NodeFactory(NT_TYPE_ARRAY, loc);
+	Node* mynode = nodeFactory(NT_TYPE_ARRAY, loc);
 	mynode->node_data.pure_type_array = thearray;
 
 	return mynode;
 }
 
 Node* makeNodeFromSpecializablePureType(SpecializablePureType* thetype, YYLTYPE loc) {
-	Node* mynode = NodeFactory(NT_SPECIALIZABLE_TYPEDATA, loc);
+	Node* mynode = nodeFactory(NT_SPECIALIZABLE_TYPEDATA, loc);
 	mynode->node_data.specializable_pure_type = thetype;
 	return mynode;
 }
 
 Node* makeNodeFromClassVarRef(ClassVarRef* ref, YYLTYPE loc) {
-	Node* mynode = NodeFactory(NT_VAR_REF, loc);
+	Node* mynode = nodeFactory(NT_VAR_REF, loc);
 	mynode->node_data.var_ref = makeVarRefFromClass(ref);
 	return mynode;
 }
 
 Node* makeNodeFromAlias(char* alias, YYLTYPE loc) {
-	Node* mynode = NodeFactory(NT_VAR_REF, loc);
+	Node* mynode = nodeFactory(NT_VAR_REF, loc);
 	mynode->node_data.var_ref = makeVarRefFromAlias(alias);
 	return mynode;
 }
 
 Node* makeNodeFromString(int nodetype, char* mystring, YYLTYPE loc) {
-	Node* mynode = NodeFactory(nodetype, loc);
+	Node* mynode = nodeFactory(nodetype, loc);
 	mynode->node_data.string = mystring;
 	//mynode->node_data.string = strdup(mystring);
 	return mynode;
 }
 
 Node* makeNodeFromNumber(int nodetype, double number, YYLTYPE loc) {
-	Node* mynode = NodeFactory(nodetype, loc);
+	Node* mynode = nodeFactory(nodetype, loc);
 	mynode->node_data.number = number;
 	return mynode;
 }
 
+Node* makeNodeFromInteger(int nodetype, int integer, YYLTYPE loc) {
+	Node* mynode = nodeFactory(nodetype, loc);
+	mynode->node_data.integer = integer;
+	return mynode;
+}
+
 Node* makeTwoBranchNode(int nodetype, Node* a, Node* b, YYLTYPE loc) {
-	Node* mynode = NodeFactory(nodetype, loc);
+	Node* mynode = nodeFactory(nodetype, loc);
 	mynode->subnodes = 2;
 	mynode->node_data.nodes = malloc(2 * sizeof(Node*));
 	mynode->node_data.nodes[0] = a; mynode->node_data.nodes[1] = b;
@@ -206,7 +212,7 @@ Node* makeTwoBranchNode(int nodetype, Node* a, Node* b, YYLTYPE loc) {
 }
 
 Node* makeOneBranchNode(int nodetype, Node* a, YYLTYPE loc) {
-	Node* mynode = NodeFactory(nodetype, loc);
+	Node* mynode = nodeFactory(nodetype, loc);
 	mynode->subnodes = 1;
 	mynode->node_data.nodes = malloc(1 * sizeof(Node*));
 	mynode->node_data.nodes[0] = a;

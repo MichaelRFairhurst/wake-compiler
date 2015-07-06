@@ -38,10 +38,11 @@ class TypeAnalyzer {
 		void assertFQClassCanBeProvided(string fullyqualifiedclassname);
 		void assertFQNeedIsNotCircular(string classname, string otherclassname);
 		boost::optional<PureType<wake::QUALIFIED>*> getCommonSubtypeOf(PureType<wake::QUALIFIED>* a, PureType<wake::QUALIFIED>* b);
-		bool isPrimitiveTypeNum(PureType<wake::QUALIFIED>* theint);
-		bool isPrimitiveTypeText(PureType<wake::QUALIFIED>* theint);
-		bool isPrimitiveTypeBool(PureType<wake::QUALIFIED>* theint);
-		bool isPrimitiveTypeChar(PureType<wake::QUALIFIED>* theint);
+		bool isPrimitiveTypeNum(PureType<wake::QUALIFIED>* thenum);
+		bool isPrimitiveTypeInt(PureType<wake::QUALIFIED>* theint);
+		bool isPrimitiveTypeText(PureType<wake::QUALIFIED>* thetext);
+		bool isPrimitiveTypeBool(PureType<wake::QUALIFIED>* thebool);
+		bool isPrimitiveTypeChar(PureType<wake::QUALIFIED>* thechar);
 		bool isAutoboxedType(PureType<wake::QUALIFIED>* type, PureType<wake::QUALIFIED>** boxedtype);
 		bool isException(PureType<wake::QUALIFIED>* type);
 		bool hasArgParameterization(PureType<wake::QUALIFIED>* type);
