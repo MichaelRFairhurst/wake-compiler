@@ -184,11 +184,6 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 		case NT_MOD:
 		case NT_MODNATIVE:
 		case NT_MODALT:
-		case NT_BITSHIFTLEFT:
-		case NT_BITSHIFTRIGHT:
-		case NT_BITAND:
-		case NT_BITXOR:
-		case NT_BITOR:
 		case NT_SUBTRACT:
 			{
 				ret = children[0].typeCheck(false);
@@ -234,6 +229,7 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 				}
 			}
 			break;
+
 		case NT_DIV_ASSIGNMENT:
 			if(!isValidLValue(node->node_data.nodes[0])) {
 				errors->addError(new SemanticError(INVALID_ASSIGNMENT, "", node));
@@ -279,6 +275,46 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 					ret = new PureType<QUALIFIED>(TYPE_CLASS);
 					ret->typedata._class.classname = strdup("Num");
 					ret->typedata._class.modulename = strdup("lang");
+				}
+			}
+			break;
+
+		case NT_BITSHIFTLEFT:
+		case NT_BITSHIFTRIGHT:
+			{
+				ret = children[0].typeCheck(false);
+				PureType<QUALIFIED> factor = *auto_ptr<PureType<QUALIFIED> >(children[1].typeCheck(false));
+
+				if(!analyzer->isPrimitiveTypeInt(ret) && !analyzer->isPrimitiveTypeNum(ret)) {
+					EXPECTED	"Num' or 'Int"
+					ERRONEOUS	ret->toString()
+					THROW		("Left side of a bitshift expression must be a Num or an Int");
+				}
+
+				if(!analyzer->isPrimitiveTypeInt(&factor)) {
+					EXPECTED	"Int"
+					ERRONEOUS	ret->toString()
+					THROW		("Right side of a bitshift expression must be an Int");
+				}
+
+			}
+			break;
+
+		case NT_BITAND:
+		case NT_BITXOR:
+		case NT_BITOR:
+			{
+				ret = children[0].typeCheck(false);
+				PureType<QUALIFIED> factor = *auto_ptr<PureType<QUALIFIED> >(children[1].typeCheck(false));
+
+				if((analyzer->isPrimitiveTypeInt(ret) && (analyzer->isPrimitiveTypeInt(&factor))
+					|| (analyzer->isPrimitiveTypeNum(ret)) && analyzer->isPrimitiveTypeNum(&factor))
+				) {
+					// nothing to do, we're good
+				} else {
+					EXPECTED	"Num' and 'Num' or 'Int' and 'Int"
+					ERRONEOUS	ret->toString() + " and " + factor.toString()
+					THROW		("Both sides of a binary comparison operator must be of the same type");
 				}
 			}
 			break;
