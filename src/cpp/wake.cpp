@@ -131,14 +131,14 @@ void compileFile(Options* options) {
 
 int main(int argc, char** argv) {
 	OptionsParser optionsparser;
-	Options* options = optionsparser.parse(argc, argv);
-	if(options->showVersion) {
+	Options options = optionsparser.parse(argc, argv);
+	if(options.showVersion) {
 		printf("[ Wake    ---- std compiler ]\n");
 		printf("[ v0.2.1  Michael Fairhurst ]\n");
 		exit(0);
 	}
 
-	if(options->showHelp) {
+	if(options.showHelp) {
 		printf("usage: wake flags filename\n");
 		printf("flags: -o|--out file             - compile to this file\n");
 		printf("       -c|--mainclass class      - begin execution with this file\n");
@@ -152,7 +152,7 @@ int main(int argc, char** argv) {
 		exit(0);
 	}
 
-	if(!options->link) compileFile(options);
+	if(!options.link) compileFile(&options);
 	else {
 		try {
 			AddressAllocator classAllocator;
@@ -161,13 +161,13 @@ int main(int argc, char** argv) {
 			SimpleAddressTable classTable(classAllocator);
 			SimpleAddressTable propTable(propAllocator);
 			Linker linker(classTable, propTable);
-			for(std::vector<std::string>::iterator it = options->linkFilenames.begin(); it != options->linkFilenames.end(); ++it) {
+			for(std::vector<std::string>::iterator it = options.linkFilenames.begin(); it != options.linkFilenames.end(); ++it) {
 				linker.loadObject(*it);
 			}
 
 			LibraryLoader loader;
 			loader.loadStdLibToTable(&table);
-			linker.loadTables(options->tabledir, table);
+			linker.loadTables(options.tabledir, table);
 
 			try {
 				table.assertNoNeedsAreCircular();
@@ -180,23 +180,23 @@ int main(int argc, char** argv) {
 			}
 
 			fstream file;
-			file.open(options->outFilename.c_str(), ios::out);
+			file.open(options.outFilename.c_str(), ios::out);
 
 			linker.write(file);
 			linker.writeDebugSymbols(file); // @todo make this optional
 
 			EntryPointAnalyzer entrypointanalyzer;
-			if(options->listMains) {
+			if(options.listMains) {
 				table.printEntryPoints(&entrypointanalyzer);
 				exit(0);
 			} else {
-				if(!entrypointanalyzer.checkFQClassMethodCanBeMain(options->mainclass, options->mainmethod, &table)) {
-					printf("Entry point %s.%s in not valid, cannot continue.\nTry wake yourfile --listmains to get entry points\n", options->mainclass.c_str(), options->mainmethod.c_str());
+				if(!entrypointanalyzer.checkFQClassMethodCanBeMain(options.mainclass, options.mainmethod, &table)) {
+					printf("Entry point %s.%s in not valid, cannot continue.\nTry wake yourfile --listmains to get entry points\n", options.mainclass.c_str(), options.mainmethod.c_str());
 					exit(5);
 				}
 			}
 
-			linker.setMain(file, options->mainclass, options->mainmethod, table);
+			linker.setMain(file, options.mainclass, options.mainmethod, table);
 		} catch(SymbolNotFoundException* e) {
 			cout << "Missing symbol in object files at link time: " << e->errormsg << endl;
 			delete e;

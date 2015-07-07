@@ -20,7 +20,7 @@
 class OptionsParser {
 
 	public:
-		Options* parse(int argc, char** argv);
+		Options parse(int argc, char** argv);
 
 };
 

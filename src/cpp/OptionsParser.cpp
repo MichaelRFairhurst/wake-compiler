@@ -18,20 +18,20 @@
 
 using namespace std;
 
-Options* OptionsParser::parse(int argc, char** argv) {
+Options OptionsParser::parse(int argc, char** argv) {
 	int i = 1;
 
-	Options* options = new Options;
-	options->hasErrors = false;
-	options->link = false;
-	options->showHelp = false;
-	options->listMains = false;
-	options->showVersion = false;
-	options->table = false;
-	options->outFilename = "a.out";
-	options->tabledir = ".";
-	options->mainclass = "Main";
-	options->mainmethod = "main()";
+	Options options;
+	options.hasErrors = false;
+	options.link = false;
+	options.showHelp = false;
+	options.listMains = false;
+	options.showVersion = false;
+	options.table = false;
+	options.outFilename = "a.out";
+	options.tabledir = ".";
+	options.mainclass = "Main";
+	options.mainmethod = "main()";
 
 	while(i < argc) {
 		string arg = argv[i]; i++;
@@ -41,48 +41,48 @@ Options* OptionsParser::parse(int argc, char** argv) {
 		if(arg.at(0) != '-') {
 			//if(arg == "wake") continue;
 
-			if(options->link) options->linkFilenames.push_back(arg);
-			else options->compileFilename = arg;
+			if(options.link) options.linkFilenames.push_back(arg);
+			else options.compileFilename = arg;
 		}
 
 		else if(arg == "-v" || arg == "--version") {
-			options->showVersion = true;
+			options.showVersion = true;
 		}
 
 		else if(arg == "-h" || arg == "--help") {
-			options->showHelp = true;
+			options.showHelp = true;
 		}
 
 		else if(arg == "-i" || arg == "--listmains") {
-			options->listMains = true;
+			options.listMains = true;
 		}
 
 		else if(arg == "-o" || arg == "--out") {
-			options->outFilename = nextarg; i++;
+			options.outFilename = nextarg; i++;
 		}
 
 		else if(arg == "-c" || arg == "--mainclass") {
-			options->mainclass = nextarg; i++;
+			options.mainclass = nextarg; i++;
 		}
 
 		else if(arg == "-m" || arg == "--mainmethod") {
-			options->mainmethod = nextarg; i++;
+			options.mainmethod = nextarg; i++;
 		}
 
 		else if(arg == "-l" || arg == "--link") {
-			options->link = true;
+			options.link = true;
 		}
 
 		else if(arg == "-t" || arg == "--table") {
-			options->table = true;
+			options.table = true;
 		}
 
 		else if(arg == "-d" || arg == "--tabledir") {
-			options->tabledir = nextarg; i++;
+			options.tabledir = nextarg; i++;
 		}
 
 		else {
-			options->hasErrors = true;
+			options.hasErrors = true;
 		}
 	}
 
