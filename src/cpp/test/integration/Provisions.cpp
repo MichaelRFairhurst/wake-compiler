@@ -50,8 +50,32 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	TestProvideNumOnNonNumIsBadNewsBears,
+	"every MyClass is:				\n\
+		provides MyClass <- 4.0;	\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+)
+
+PTT_TEST_CASE(
+	TestProvideIntOnNonIntIsBadNewsBears,
 	"every MyClass is:			\n\
 		provides MyClass <- 4;	\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+)
+
+PTT_TEST_CASE(
+	TestProvideBoolOnNonBoolIsBadNewsBears,
+	"every MyClass is:				\n\
+		provides MyClass <- \\n;	\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+)
+
+PTT_TEST_CASE(
+	TestProvideCharOnNonCharIsBadNewsBears,
+	"every MyClass is:				\n\
+		provides MyClass <- true;	\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 )
@@ -78,7 +102,10 @@ PTT_TEST_CASE(
 	"every ParentClass is:					\n\
 	every MyClass (a ParentClass) is:		\n\
 		provides							\n\
-			Num <- 4,						\n\
+			Num <- 4.0,						\n\
+			Int <- 4,						\n\
+			Char <- \\n,					\n\
+			Bool <- true,					\n\
 			Text <- 'Test',					\n\
 			ParentClass <- MyClass,			\n\
 			MyClass <- MyClass;				\n\
@@ -153,7 +180,37 @@ PTT_TEST_CASE(
 	"every ClassA is:					\n\
 	every ClassB is:					\n\
 		needs ClassA;					\n\
+		provides ClassB <- ClassB(6.0);	\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+)
+
+PTT_TEST_CASE(
+	InjectCtorWithIntNotNeeded,
+	"every ClassA is:					\n\
+	every ClassB is:					\n\
+		needs ClassA;					\n\
 		provides ClassB <- ClassB(6);	\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+)
+
+PTT_TEST_CASE(
+	InjectCtorWithCharNotNeeded,
+	"every ClassA is:					\n\
+	every ClassB is:					\n\
+		needs ClassA;					\n\
+		provides ClassB <- ClassB(\\n);	\n\
+	",
+	PTT_EXPECT(TYPE_ERROR)
+)
+
+PTT_TEST_CASE(
+	InjectCtorWithBoolNotNeeded,
+	"every ClassA is:						\n\
+	every ClassB is:						\n\
+		needs ClassA;						\n\
+		provides ClassB <- ClassB(true);	\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
 )
@@ -169,11 +226,11 @@ PTT_TEST_CASE(
 )
 
 PTT_TEST_CASE(
-	InjectCtorWithTextAndNumOK,
-	"every ClassA is:							\n\
-	every ClassB is:							\n\
-		needs Num, Text;						\n\
-		provides ClassB <- ClassB(5, 'test');	\n\
+	InjectCtorWithTextAndNumAndIntAndCharAndBoolOK,
+	"every ClassA is:											\n\
+	every ClassB is:											\n\
+		needs Num, Text, Int, Char, Bool;						\n\
+		provides ClassB <- ClassB(5.0, 'test', 5, \\n, true);	\n\
 	",
 	PTT_VALID
 )
@@ -216,7 +273,7 @@ PTT_TEST_CASE(
 
 PTT_TEST_CASE(
 	BindToCtorNonexistProviding,
-	"every MyClass is: needs Num, Text; provides Num <- 5, MyClass <- MyClass(Num, Text);",
+	"every MyClass is: needs Int, Text; provides Int <- 5, MyClass <- MyClass(Int, Text);",
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
 )
 
@@ -224,12 +281,12 @@ PTT_TEST_CASE(
 	RetrieveFromClassCtordSpecialtiedValid,
 	"every MyDB is:										\n\
 														\n\
-		needs Num:Port, Text:Username;				\n\
+		needs Int:Port, Text:Username;				\n\
 														\n\
 		provides										\n\
-			Num:Port <- 55,							\n\
+			Int:Port <- 55,							\n\
 			Text:Username <- 'Bilbo',					\n\
-			MyDB <- MyDB(Num:Port, Text:Username);	\n\
+			MyDB <- MyDB(Int:Port, Text:Username);	\n\
 														\n\
 		MyDB -- cloneMe() {								\n\
 			return MyDB from this;						\n\
@@ -241,16 +298,16 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	InjectionsAndProvisionsRequireTransitiveProvidability,
 	"every ClassA is:							\n\
-		needs Num:Port;						\n\
+		needs Int:Port;						\n\
 	every ClassB is:							\n\
 		needs ClassA, Text:Stuff;				\n\
 	every ClassC is:							\n\
-		needs ClassB, Num:ID;					\n\
+		needs ClassB, Int:ID;					\n\
 	every Provider is:							\n\
 		provides								\n\
 			ClassB,								\n\
 			ClassC,								\n\
-			Num:ID,							\n\
+			Int:ID,							\n\
 			Text:Stuff;						\n\
 	",
 	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
@@ -260,20 +317,20 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	InjectionsAndProvisionsRequireTransitiveProvidabilityOK,
 	"every ClassA is:					\n\
-		needs Num:Port;				\n\
+		needs Int:Port;				\n\
 										\n\
 	every ClassB is:					\n\
 		needs ClassA, Text:Stuff;		\n\
 										\n\
 	every ClassC is:					\n\
-		needs ClassB, Num:ID;			\n\
+		needs ClassB, Int:ID;			\n\
 										\n\
 	every Provider is:					\n\
 		provides						\n\
 			ClassC,						\n\
-			Num:ID,					\n\
+			Int:ID,					\n\
 			Text:Stuff,				\n\
-			Num:Port,					\n\
+			Int:Port,					\n\
 			ClassB,						\n\
 			ClassA;						\n\
 	",
@@ -332,14 +389,14 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	TestBehavioralProvisions,
 	"every MyClass is:					\n\
-		provides Num:Test <- { return 5; };",
+		provides Int:Test <- { return 5; };",
 	PTT_VALID
 );
 
 PTT_TEST_CASE(
 	TestInvalidBehavioralProvision,
 	"every MyClass is:							\n\
-		provides Num:Test <- { return 'not int'; };",
+		provides Int:Test <- { return 'not int'; };",
 	PTT_EXPECT(TYPE_ERROR)
 );
 
@@ -361,7 +418,7 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	TestProvisionArgumentNotSubtypeOfNeed,
 	"every MyClass is:						\n\
-		needs Num;							\n\
+		needs Int;							\n\
 		provides MyClass <- MyClass(?Text);	\n\
 	",
 	PTT_EXPECT(TYPE_ERROR)
@@ -370,8 +427,8 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	TestProvisionArgumentSubtypeOfNeed,
 	"every MyClass is:						\n\
-		needs Num;							\n\
-		provides MyClass <- MyClass(?Num);	\n\
+		needs Int;							\n\
+		provides MyClass <- MyClass(?Int);	\n\
 	",
 	PTT_VALID
 );
@@ -425,7 +482,7 @@ PTT_TEST_CASE(
 PTT_TEST_CASE(
 	TestProvisionArgumentNonexistClass,
 	"every MyClass is:							\n\
-		needs Num;								\n\
+		needs Int;								\n\
 		provides MyClass <- MyClass(?Nurmm);	\n\
 	",
 	PTT_EXPECT(CLASSNAME_NOT_FOUND)
