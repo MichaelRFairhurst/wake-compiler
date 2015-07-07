@@ -618,6 +618,24 @@ PTT_TEST_CASE(
 );
 
 PTT_TEST_CASE(
+	TestValidArithmeticAssignments,
+	"every MyClass is:							\n\
+		addIntIntOk(Int) { Int += 5; }			\n\
+		subIntIntOk(Int) { Int -= 5; }			\n\
+		mulIntIntOk(Int) { Int *= 5; }			\n\
+		addNumIntOk(Num) { Num += 5; }			\n\
+		subNumIntOk(Num) { Num -= 5; }			\n\
+		mulNumIntOk(Num) { Num *= 5; }			\n\
+		divNumIntOk(Num) { Num /= 5; }			\n\
+		addNumNumOk(Num) { Num += 5.0; }			\n\
+		subNumNumOk(Num) { Num -= 5.0; }			\n\
+		mulNumNumOk(Num) { Num *= 5.0; }			\n\
+		divNumNumOk(Num) { Num /= 5.0; }			\n\
+		",
+	PTT_VALID
+);
+
+PTT_TEST_CASE(
 	TestIntCantDivEqual,
 	"every MyClass is:						\n\
 		divNotOk(Int) { Int /= 5; }			\n\

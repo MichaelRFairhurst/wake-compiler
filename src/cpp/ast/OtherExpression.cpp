@@ -194,8 +194,8 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 				ret = children[0].typeCheck(false);
 				PureType<QUALIFIED> factor = *auto_ptr<PureType<QUALIFIED> >(children[1].typeCheck(false));
 
-				if(node->node_type == NT_MULT_ASSIGNMENT
-					|| node->node_type == NT_SUB_ASSIGNMENT
+				if((node->node_type == NT_MULT_ASSIGNMENT
+					|| node->node_type == NT_SUB_ASSIGNMENT)
 					&& analyzer->isPrimitiveTypeInt(ret)
 					&& analyzer->isPrimitiveTypeNum(&factor)
 				) {
