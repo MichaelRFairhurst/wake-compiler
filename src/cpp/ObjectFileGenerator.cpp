@@ -281,7 +281,12 @@ void ObjectFileGenerator::generate(Node* tree) {
 						}
 					file << ");";
 					table.popScope();
-				} else if(tree->node_data.nodes[1]->node_type == NT_STRINGLIT || tree->node_data.nodes[1]->node_type == NT_NUMBERLIT || tree->node_data.nodes[1]->node_type == NT_BOOLLIT) {
+				} else if(tree->node_data.nodes[1]->node_type == NT_STRINGLIT
+					|| tree->node_data.nodes[1]->node_type == NT_NUMBERLIT
+					|| tree->node_data.nodes[1]->node_type == NT_BOOLLIT
+					|| tree->node_data.nodes[1]->node_type == NT_INTEGERLIT
+					|| tree->node_data.nodes[1]->node_type == NT_CHARLIT
+				) {
 					file << "function(){return ";
 					generate(tree->node_data.nodes[1]);
 				} else if(tree->node_data.nodes[1]->node_type == NT_PROVISION_BEHAVIOR) {

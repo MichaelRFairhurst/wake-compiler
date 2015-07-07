@@ -377,6 +377,14 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 						if(!classestable->getAnalyzer()->isPrimitiveTypeNum(&provision->typedata))
 							errors->addError(new SemanticError(TYPE_ERROR, "Bound an Num value to something that is not an Num", tree));
 						break;
+					case NT_INTEGERLIT:
+						if(!classestable->getAnalyzer()->isPrimitiveTypeInt(&provision->typedata))
+							errors->addError(new SemanticError(TYPE_ERROR, "Bound an Int value to something that is not an Int", tree));
+						break;
+					case NT_CHARLIT:
+						if(!classestable->getAnalyzer()->isPrimitiveTypeChar(&provision->typedata))
+							errors->addError(new SemanticError(TYPE_ERROR, "Bound an Char value to something that is not an Char", tree));
+						break;
 					case NT_SPECIALIZABLE_TYPEDATA:
 						try {
 							PureType<QUALIFIED>* servedType = classestable->setModulesOnType(&served->node_data.specializable_pure_type->typedata);
@@ -421,6 +429,16 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 									case NT_NUMBERLIT:
 										actual.typedata = PureType<QUALIFIED>(TYPE_CLASS);
 										actual.typedata.typedata._class.classname = strdup("Num");
+										actual.typedata.typedata._class.modulename = strdup("lang");
+										break;
+									case NT_INTEGERLIT:
+										actual.typedata = PureType<QUALIFIED>(TYPE_CLASS);
+										actual.typedata.typedata._class.classname = strdup("Int");
+										actual.typedata.typedata._class.modulename = strdup("lang");
+										break;
+									case NT_CHARLIT:
+										actual.typedata = PureType<QUALIFIED>(TYPE_CLASS);
+										actual.typedata.typedata._class.classname = strdup("Char");
 										actual.typedata.typedata._class.modulename = strdup("lang");
 										break;
 
