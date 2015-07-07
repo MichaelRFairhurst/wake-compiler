@@ -385,6 +385,10 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 						if(!classestable->getAnalyzer()->isPrimitiveTypeChar(&provision->typedata))
 							errors->addError(new SemanticError(TYPE_ERROR, "Bound an Char value to something that is not an Char", tree));
 						break;
+					case NT_BOOLLIT:
+						if(!classestable->getAnalyzer()->isPrimitiveTypeBool(&provision->typedata))
+							errors->addError(new SemanticError(TYPE_ERROR, "Bound an Bool value to something that is not an Bool", tree));
+						break;
 					case NT_SPECIALIZABLE_TYPEDATA:
 						try {
 							PureType<QUALIFIED>* servedType = classestable->setModulesOnType(&served->node_data.specializable_pure_type->typedata);
@@ -439,6 +443,11 @@ void ClassParseTreeTraverser::typeCheckMethods(Node* tree) {
 									case NT_CHARLIT:
 										actual.typedata = PureType<QUALIFIED>(TYPE_CLASS);
 										actual.typedata.typedata._class.classname = strdup("Char");
+										actual.typedata.typedata._class.modulename = strdup("lang");
+										break;
+									case NT_BOOLLIT:
+										actual.typedata = PureType<QUALIFIED>(TYPE_CLASS);
+										actual.typedata.typedata._class.classname = strdup("Bool");
 										actual.typedata.typedata._class.modulename = strdup("lang");
 										break;
 
