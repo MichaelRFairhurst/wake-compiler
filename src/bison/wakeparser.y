@@ -116,7 +116,7 @@ module:
 
 modulename:
 	LIDENTIFIER																		{ $$ = $1; }
-	| modulename '.' LIDENTIFIER													{ $$ = strcat($1, "."); $$ = strcat($$, $3); }
+	| modulename '.' LIDENTIFIER													{ $$ = malloc(strlen($1) + strlen($3) + 2); strcpy($$, $1); strcat($$, "."); strcat($$, $3); }
 	;
 
 imports:
