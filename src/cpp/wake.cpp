@@ -243,6 +243,8 @@ void printDependencies(Options* options) {
 	for(vector<pair<string, string> >::iterator it = singleFileImports.begin(); it != singleFileImports.end(); ++it)
 	if(it->first == module) {
 		gatherDependencyInfo(options, it->first, it->second, depInfoMap, allDeps);
+	} else {
+		allDeps.insert(*it);
 	}
 
 	if(depInfoMap.count(pair<string, string>(module, classname))) {
