@@ -33,9 +33,9 @@ BOOST_AUTO_TEST_CASE(TestDefaults) {
 	BOOST_CHECK(options.link == false);
 	BOOST_CHECK(options.table == false);
 	BOOST_CHECK(options.tabledir == ".");
-	BOOST_CHECK(options.linkFilenames.size() == 0);
-	BOOST_CHECK(options.compileFilename == "");
-	BOOST_CHECK(options.outFilename == "a.out");
+	BOOST_CHECK(options.inFilenames.size() == 0);
+	BOOST_CHECK(options.outFilenames.size() == 1);
+	BOOST_CHECK(options.outFilenames[0] == "a.out");
 	BOOST_CHECK(options.mainclass == "Main");
 	BOOST_CHECK(options.mainmethod == "main()");
 }
@@ -115,7 +115,8 @@ BOOST_AUTO_TEST_CASE(TestOutfileLong) {
 
 	Options options = p.parse(3, args);
 
-	BOOST_CHECK(options.outFilename == "myexec");
+	BOOST_CHECK(options.outFilenames.size() == 1);
+	BOOST_CHECK(options.outFilenames[0] == "myexec");
 }
 
 BOOST_AUTO_TEST_CASE(TestOutfileShort) {
@@ -127,7 +128,8 @@ BOOST_AUTO_TEST_CASE(TestOutfileShort) {
 
 	Options options = p.parse(3, args);
 
-	BOOST_CHECK(options.outFilename == "myexec");
+	BOOST_CHECK(options.outFilenames.size() == 1);
+	BOOST_CHECK(options.outFilenames[0] == "myexec");
 }
 
 BOOST_AUTO_TEST_CASE(TestInfileSimple) {
@@ -138,21 +140,8 @@ BOOST_AUTO_TEST_CASE(TestInfileSimple) {
 
 	Options options = p.parse(2, args);
 
-	BOOST_CHECK(options.compileFilename == "myfile.wk");
-}
-
-BOOST_AUTO_TEST_CASE(TestInfileComplex) {
-	OptionsParser p;
-	char wake[5] = "wake";
-	char list[3] = "-i";
-	char out[3] = "-o";
-	char outfile[7] = "myexec";
-	char file[10] = "myfile.wk";
-	char* args[5] = {wake, list, out, outfile, file};
-
-	Options options = p.parse(5, args);
-
-	BOOST_CHECK(options.compileFilename == "myfile.wk");
+	BOOST_CHECK(options.inFilenames.size() == 1);
+	BOOST_CHECK(options.inFilenames[0] == "myfile.wk");
 }
 
 BOOST_AUTO_TEST_CASE(TestLinkOneFile) {
@@ -165,9 +154,8 @@ BOOST_AUTO_TEST_CASE(TestLinkOneFile) {
 	Options options = p.parse(3, args);
 
 	BOOST_CHECK(options.link == true);
-	BOOST_CHECK(options.linkFilenames.size() == 1);
-	BOOST_CHECK(options.compileFilename == "");
-	BOOST_CHECK(options.linkFilenames[0] == "myfile.o");
+	BOOST_CHECK(options.inFilenames.size() == 1);
+	BOOST_CHECK(options.inFilenames[0] == "myfile.o");
 }
 
 BOOST_AUTO_TEST_CASE(TestLinkTwoFiles) {
@@ -181,10 +169,9 @@ BOOST_AUTO_TEST_CASE(TestLinkTwoFiles) {
 	Options options = p.parse(4, args);
 
 	BOOST_CHECK(options.link == true);
-	BOOST_CHECK(options.linkFilenames.size() == 2);
-	BOOST_CHECK(options.compileFilename == "");
-	BOOST_CHECK(options.linkFilenames[0] == "myfile.o");
-	BOOST_CHECK(options.linkFilenames[1] == "file2.o");
+	BOOST_CHECK(options.inFilenames.size() == 2);
+	BOOST_CHECK(options.inFilenames[0] == "myfile.o");
+	BOOST_CHECK(options.inFilenames[1] == "file2.o");
 }
 
 BOOST_AUTO_TEST_CASE(TestTableFileLong) {
@@ -198,9 +185,10 @@ BOOST_AUTO_TEST_CASE(TestTableFileLong) {
 
 	BOOST_CHECK(options.link == false);
 	BOOST_CHECK(options.table == true);
-	BOOST_CHECK(options.linkFilenames.size() == 0);
-	BOOST_CHECK(options.compileFilename == "myfile.wk");
-	BOOST_CHECK(options.outFilename == "a.out");
+	BOOST_CHECK(options.inFilenames.size() == 1);
+	BOOST_CHECK(options.inFilenames[0] == "myfile.wk");
+	BOOST_CHECK(options.outFilenames.size() == 1);
+	BOOST_CHECK(options.outFilenames[0] == "a.out");
 }
 
 BOOST_AUTO_TEST_CASE(TestTableFileShort) {
@@ -214,9 +202,10 @@ BOOST_AUTO_TEST_CASE(TestTableFileShort) {
 
 	BOOST_CHECK(options.link == false);
 	BOOST_CHECK(options.table == true);
-	BOOST_CHECK(options.linkFilenames.size() == 0);
-	BOOST_CHECK(options.compileFilename == "myfile.wk");
-	BOOST_CHECK(options.outFilename == "a.out");
+	BOOST_CHECK(options.inFilenames.size() == 1);
+	BOOST_CHECK(options.inFilenames[0] == "myfile.wk");
+	BOOST_CHECK(options.outFilenames.size() == 1);
+	BOOST_CHECK(options.outFilenames[0] == "a.out");
 }
 
 BOOST_AUTO_TEST_CASE(TestTableDir) {
@@ -231,9 +220,9 @@ BOOST_AUTO_TEST_CASE(TestTableDir) {
 	BOOST_CHECK(options.link == false);
 	BOOST_CHECK(options.table == false);
 	BOOST_CHECK(options.tabledir == "tabledir");
-	BOOST_CHECK(options.linkFilenames.size() == 0);
-	BOOST_CHECK(options.compileFilename == "");
-	BOOST_CHECK(options.outFilename == "a.out");
+	BOOST_CHECK(options.inFilenames.size() == 0);
+	BOOST_CHECK(options.outFilenames.size() == 1);
+	BOOST_CHECK(options.outFilenames[0] == "a.out");
 }
 
 BOOST_AUTO_TEST_CASE(TestTableDirShort) {
@@ -248,9 +237,9 @@ BOOST_AUTO_TEST_CASE(TestTableDirShort) {
 	BOOST_CHECK(options.link == false);
 	BOOST_CHECK(options.table == false);
 	BOOST_CHECK(options.tabledir == "tabledir");
-	BOOST_CHECK(options.linkFilenames.size() == 0);
-	BOOST_CHECK(options.compileFilename == "");
-	BOOST_CHECK(options.outFilename == "a.out");
+	BOOST_CHECK(options.inFilenames.size() == 0);
+	BOOST_CHECK(options.outFilenames.size() == 1);
+	BOOST_CHECK(options.outFilenames[0] == "a.out");
 }
 
 BOOST_AUTO_TEST_CASE(TestGenerateDependenciesShort) {
@@ -264,8 +253,10 @@ BOOST_AUTO_TEST_CASE(TestGenerateDependenciesShort) {
 
 	BOOST_CHECK(options.link == false);
 	BOOST_CHECK(options.listDeps == true);
-	BOOST_CHECK(options.compileFilename == "MyFile.wk");
-	BOOST_CHECK(options.outFilename == "a.out");
+	BOOST_CHECK(options.inFilenames.size() == 1);
+	BOOST_CHECK(options.inFilenames[0] == "MyFile.wk");
+	BOOST_CHECK(options.outFilenames.size() == 1);
+	BOOST_CHECK(options.outFilenames[0] == "a.out");
 }
 
 BOOST_AUTO_TEST_CASE(TestGenerateDependenciesLong) {
@@ -279,8 +270,32 @@ BOOST_AUTO_TEST_CASE(TestGenerateDependenciesLong) {
 
 	BOOST_CHECK(options.link == false);
 	BOOST_CHECK(options.listDeps == true);
-	BOOST_CHECK(options.compileFilename == "MyFile.wk");
-	BOOST_CHECK(options.outFilename == "a.out");
+	BOOST_CHECK(options.inFilenames.size() == 1);
+	BOOST_CHECK(options.inFilenames[0] == "MyFile.wk");
+	BOOST_CHECK(options.outFilenames.size() == 1);
+	BOOST_CHECK(options.outFilenames[0] == "a.out");
+}
+
+BOOST_AUTO_TEST_CASE(TestMultipleInOutFiles) {
+	OptionsParser p;
+	char wake[5] = "wake";
+	char file1[9] = "FileA.wk";
+	char file2[9] = "FileB.wk";
+	char dashO[3] = "-o";
+	char outfile1[8] = "FileA.o";
+	char outfile2[8] = "FileB.o";
+	char* args[6] = {wake, file1, file2, dashO, outfile1, outfile2};
+
+	Options options = p.parse(6, args);
+
+	BOOST_CHECK(options.link == false);
+	BOOST_CHECK(options.listDeps == false);
+	BOOST_CHECK(options.inFilenames.size() == 2);
+	BOOST_CHECK(options.inFilenames[0] == "FileA.wk");
+	BOOST_CHECK(options.inFilenames[1] == "FileB.wk");
+	BOOST_CHECK(options.outFilenames.size() == 2);
+	BOOST_CHECK(options.outFilenames[0] == "FileA.o");
+	BOOST_CHECK(options.outFilenames[1] == "FileB.o");
 }
 
 BOOST_AUTO_TEST_SUITE_END()

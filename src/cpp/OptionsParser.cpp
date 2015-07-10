@@ -29,10 +29,12 @@ Options OptionsParser::parse(int argc, char** argv) {
 	options.listDeps = false;
 	options.showVersion = false;
 	options.table = false;
-	options.outFilename = "a.out";
+	//options.outFilename = "a.out";
 	options.tabledir = ".";
 	options.mainclass = "Main";
 	options.mainmethod = "main()";
+
+	bool pastDashO = false;
 
 	while(i < argc) {
 		string arg = argv[i]; i++;
@@ -42,8 +44,8 @@ Options OptionsParser::parse(int argc, char** argv) {
 		if(arg.at(0) != '-') {
 			//if(arg == "wake") continue;
 
-			if(options.link) options.linkFilenames.push_back(arg);
-			else options.compileFilename = arg;
+			if(pastDashO) options.outFilenames.push_back(arg);
+			else options.inFilenames.push_back(arg);
 		}
 
 		else if(arg == "-v" || arg == "--version") {
@@ -59,7 +61,7 @@ Options OptionsParser::parse(int argc, char** argv) {
 		}
 
 		else if(arg == "-o" || arg == "--out") {
-			options.outFilename = nextarg; i++;
+			pastDashO = true;
 		}
 
 		else if(arg == "-c" || arg == "--mainclass") {
@@ -89,6 +91,10 @@ Options OptionsParser::parse(int argc, char** argv) {
 		else {
 			options.hasErrors = true;
 		}
+	}
+
+	if(options.outFilenames.size() == 0) {
+		options.outFilenames.push_back("a.out");
 	}
 
 	return options;

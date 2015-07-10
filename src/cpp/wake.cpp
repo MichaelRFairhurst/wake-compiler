@@ -68,12 +68,12 @@ void writeTableFiles(std::string dirname, ClassSpaceSymbolTable& table) {
 
 void compileFile(Options* options) {
 
-	if(options->compileFilename == "") {
+	if(options->inFilenames.size() == 0) {
 		printf("[ no file provided ]\n"); exit(1);
 	}
 
-	FILE *myfile = fopen(options->compileFilename.c_str(), "r");
-	error_open_file(options->compileFilename.c_str());
+	FILE *myfile = fopen(options->inFilenames[0].c_str(), "r");
+	error_open_file(options->inFilenames[0].c_str());
 
 	if (!myfile) {
 		printf("[ couldn't open file ]\n");
@@ -123,7 +123,7 @@ void compileFile(Options* options) {
 	fstream file;
 	ObjectFileHeaderRenderer renderer;
 
-	file.open(options->outFilename.c_str(), ios::out);
+	file.open(options->outFilenames[0].c_str(), ios::out);
 	renderer.writeOut(file, &header);
 	file << object.str();
 	file.close();
@@ -146,7 +146,7 @@ void findRecursiveDeps(string module, string classname, map<pair<string, string>
 }
 
 void gatherDependencyInfo(Options* options, string module, string classname, map<pair<string, string>, vector<pair<string, string> > >& depInfoMap, unordered_set<pair<string, string> >& allDeps) {
-	boost::filesystem::path p(options->compileFilename);
+	boost::filesystem::path p(options->inFilenames[0]);
 	boost::filesystem::path dir = p.parent_path();
 	dir /=  classname + ".wk"; // sweet operator overloading!
 	string filename = dir.string();
@@ -202,11 +202,11 @@ void printDependencies(Options* options) {
 	string module;
 	string classname;
 
-	if(options->compileFilename == "") {
+	if(options->inFilenames.size() == 0) {
 		printf("[ no file provided ]\n"); exit(1);
 	}
 
-	FILE *myfile = fopen(options->compileFilename.c_str(), "r");
+	FILE *myfile = fopen(options->inFilenames[0].c_str(), "r");
 
 	if (!myfile) {
 		printf("[ couldn't open file ]\n");
@@ -295,7 +295,7 @@ int main(int argc, char** argv) {
 			SimpleAddressTable classTable(classAllocator);
 			SimpleAddressTable propTable(propAllocator);
 			Linker linker(classTable, propTable);
-			for(std::vector<std::string>::iterator it = options.linkFilenames.begin(); it != options.linkFilenames.end(); ++it) {
+			for(std::vector<std::string>::iterator it = options.inFilenames.begin(); it != options.inFilenames.end(); ++it) {
 				linker.loadObject(*it);
 			}
 
@@ -314,7 +314,7 @@ int main(int argc, char** argv) {
 			}
 
 			fstream file;
-			file.open(options.outFilename.c_str(), ios::out);
+			file.open(options.outFilenames[0].c_str(), ios::out);
 
 			linker.write(file);
 			linker.writeDebugSymbols(file); // @todo make this optional

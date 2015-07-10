@@ -28,13 +28,12 @@ struct Options {
 	bool link;
 	bool table;
 
-	std::vector<std::string> linkFilenames;
+	std::vector<std::string> inFilenames;
 	std::string mainclass;
 	std::string mainmethod;
 	std::string tabledir;
 
-	std::string compileFilename;
-	std::string outFilename;
+	std::vector<std::string> outFilenames;
 };
 
 #endif
