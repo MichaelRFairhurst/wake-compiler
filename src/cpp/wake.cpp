@@ -44,6 +44,8 @@ extern "C" {
 #include "ImportParseTreeTraverser.h"
 #include "ErrorTracker.h"
 #include <boost/filesystem.hpp>
+#include <boost/unordered_set.hpp>
+using namespace boost;
 
 void writeTableFiles(std::string dirname, ClassSpaceSymbolTable& table) {
 	vector<PropertySymbolTable*> tables = table.getDefinedClasses();
@@ -129,6 +131,134 @@ void compileFile(Options* options) {
 	writeTableFiles(options->tabledir.c_str(), table);
 }
 
+void findRecursiveDeps(string module, string classname, map<pair<string, string>, vector<pair<string, string> > >& depInfoMap, unordered_set<pair<string, string> >& recursiveDeps) {
+	if(recursiveDeps.find(pair<string, string>(module, classname)) != recursiveDeps.end()) {
+		return;
+	}
+
+	recursiveDeps.insert(pair<string, string>(module, classname));
+
+	vector<pair<string, string> > importingClasses = depInfoMap[pair<string, string>(module, classname)];
+
+	for(vector<pair<string, string> >::iterator it = importingClasses.begin(); it != importingClasses.end(); ++it) {
+		findRecursiveDeps(it->first, it->second, depInfoMap, recursiveDeps);
+	}
+}
+
+void gatherDependencyInfo(Options* options, string module, string classname, map<pair<string, string>, vector<pair<string, string> > >& depInfoMap, unordered_set<pair<string, string> >& allDeps) {
+	boost::filesystem::path p(options->compileFilename);
+	boost::filesystem::path dir = p.parent_path();
+	dir /=  classname + ".wk"; // sweet operator overloading!
+	string filename = dir.string();
+
+	if(allDeps.count(pair<string, string>(module, classname))) {
+		return;
+	}
+
+	allDeps.insert(pair<string, string>(module, classname));
+
+	vector<pair<string, string> > singleFileImports;
+
+	FILE *myfile = fopen(filename.c_str(), "r");
+
+	if (!myfile) {
+		cerr << "Warning: couldn't find dependency " << filename << endl;
+		cerr << "It won't be searched for cyclical dependencies." << endl;
+		cerr << "Is it in a different source directory, or misnamed?" << endl;
+		return;
+	}
+
+	{
+		Parser parser;
+		if(parser.parse(myfile)) return;
+
+		ImportParseTreeTraverser importer;
+		singleFileImports = importer.gatherImports(parser.getParseTree());
+		fclose(myfile);
+	}
+
+	for(vector<pair<string, string> >::iterator it = singleFileImports.begin(); it != singleFileImports.end(); ++it) {
+		if(depInfoMap.find(*it) == depInfoMap.end()) {
+			vector<pair<string, string> > vec;
+			vec.push_back(pair<string, string>(module, classname));
+			depInfoMap[*it] = vec;
+		} else {
+			depInfoMap.find(*it)->second.push_back(pair<string, string>(module, classname));
+		}
+
+		if(it->first == module) {
+			gatherDependencyInfo(options, it->first, it->second, depInfoMap, allDeps);
+		} else {
+			allDeps.insert(*it);
+		}
+	}
+}
+
+void printDependencies(Options* options) {
+	vector<pair<string, string> > singleFileImports;
+	unordered_set<pair<string, string> > allDeps;
+	unordered_set<pair<string, string> > recursiveDeps;
+	map<pair<string, string>, vector<pair<string, string> > > depInfoMap;
+	string module;
+	string classname;
+
+	if(options->compileFilename == "") {
+		printf("[ no file provided ]\n"); exit(1);
+	}
+
+	FILE *myfile = fopen(options->compileFilename.c_str(), "r");
+
+	if (!myfile) {
+		printf("[ couldn't open file ]\n");
+		exit(2);
+	}
+
+	{
+		Parser parser;
+		if(parser.parse(myfile)) return;
+
+		Node* tree = parser.getParseTree();
+		module = tree->node_data.nodes[0]->node_data.string;
+
+		tree = tree->node_data.nodes[tree->subnodes - 1];
+		while(tree->node_type != NT_TYPEDATA) {
+			tree = tree->node_data.nodes[0];
+		}
+
+		classname = tree->node_data.pure_type->typedata._class.classname;
+
+		ImportParseTreeTraverser importer;
+		singleFileImports = importer.gatherImports(parser.getParseTree());
+		fclose(myfile);
+	}
+
+	for(vector<pair<string, string> >::iterator it = singleFileImports.begin(); it != singleFileImports.end(); ++it) {
+		vector<pair<string, string> > vec;
+		vec.push_back(pair<string, string>(module, classname));
+		depInfoMap[*it] = vec;
+	}
+
+	allDeps.insert(pair<string, string>(module, classname));
+
+	for(vector<pair<string, string> >::iterator it = singleFileImports.begin(); it != singleFileImports.end(); ++it)
+	if(it->first == module) {
+		gatherDependencyInfo(options, it->first, it->second, depInfoMap, allDeps);
+	}
+
+	if(depInfoMap.count(pair<string, string>(module, classname))) {
+		findRecursiveDeps(module, classname, depInfoMap, recursiveDeps);
+	}
+
+	for(unordered_set<pair<string, string> >::iterator it = allDeps.begin(); it != allDeps.end(); ++it)
+	if(it->first != module || it->second != classname) {
+		if(recursiveDeps.count(*it)) {
+			cout << it->first << "," << it->second << ",TRUE" << endl;
+		} else {
+			cout << it->first << "," << it->second << ",FALSE" << endl;
+		}
+	}
+}
+
 int main(int argc, char** argv) {
 	OptionsParser optionsparser;
 	Options options = optionsparser.parse(argc, argv);
@@ -149,11 +279,13 @@ int main(int argc, char** argv) {
 		printf("       -l|--link                 - link compiled files into an executable\n");
 		printf("       -t|--table                - only generate table files\n");
 		printf("       -d|--tabledir             - dir for finding and creating .table files\n");
+		printf("       -e|--dependencies         - print out dependency information instead of compiling\n");
 		exit(0);
 	}
 
-	if(!options.link) compileFile(&options);
-	else {
+	if(!options.link) {
+		options.listDeps ? printDependencies(&options) : compileFile(&options);
+	} else {
 		try {
 			AddressAllocator classAllocator;
 			AddressAllocator propAllocator;
