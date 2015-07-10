@@ -18,6 +18,8 @@
 #include "LibraryLoader.h"
 #include "ClassSpaceSymbolTable.h"
 #include <string>
+#include <vector>
+#include <utility>
 #include "ErrorTracker.h"
 
 extern "C" {
@@ -28,6 +30,7 @@ class ImportParseTreeTraverser {
 
 	public:
 		void traverse(Node* tree, ClassSpaceSymbolTable& o, LibraryLoader& l, ErrorTracker& errors, std::string dirname);
+		std::vector<std::pair<std::string, std::string> > gatherImports(Node* tree);
 
 };
 

@@ -26,6 +26,7 @@ Options OptionsParser::parse(int argc, char** argv) {
 	options.link = false;
 	options.showHelp = false;
 	options.listMains = false;
+	options.listDeps = false;
 	options.showVersion = false;
 	options.table = false;
 	options.outFilename = "a.out";
@@ -79,6 +80,10 @@ Options OptionsParser::parse(int argc, char** argv) {
 
 		else if(arg == "-d" || arg == "--tabledir") {
 			options.tabledir = nextarg; i++;
+		}
+
+		else if(arg == "-e" || arg == "--dependencies") {
+			options.listDeps = true;
 		}
 
 		else {

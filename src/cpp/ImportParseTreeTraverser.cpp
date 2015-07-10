@@ -47,3 +47,39 @@ void ImportParseTreeTraverser::traverse(Node* tree, ClassSpaceSymbolTable& class
 	}
 
 }
+
+std::vector<std::pair<std::string, std::string> > ImportParseTreeTraverser::gatherImports(Node* tree) {
+	switch(tree->node_type) {
+
+		case NT_PROGRAM:
+		case NT_IMPORTSET:
+			{
+				std::vector<std::pair<std::string, std::string> > res;
+				for(int i = 0; i < tree->subnodes; i++) {
+					std::vector<std::pair<std::string, std::string> > res2 = gatherImports(tree->node_data.nodes[i]);
+					for(std::vector<std::pair<std::string, std::string> >::iterator it = res2.begin(); it != res2.end(); ++it) {
+						res.push_back(*it);
+					}
+				}
+
+				return res;
+			}
+
+		case NT_IMPORT:
+			{
+				std::vector<std::pair<std::string, std::string> > res;
+				std::string module = "";
+				std::string importname = tree->node_data.nodes[1]->node_data.string;
+
+				if(strlen(tree->node_data.nodes[0]->node_data.string)) {
+					module = tree->node_data.nodes[0]->node_data.string;
+				}
+
+				res.push_back(std::pair<std::string, std::string>(module, importname));
+				return res;
+			}
+		default:
+			return std::vector<std::pair<std::string, std::string> >();
+	}
+
+}

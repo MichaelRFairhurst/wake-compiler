@@ -29,6 +29,7 @@ BOOST_AUTO_TEST_CASE(TestDefaults) {
 	BOOST_CHECK(options.showVersion == false);
 	BOOST_CHECK(options.hasErrors == false);
 	BOOST_CHECK(options.listMains == false);
+	BOOST_CHECK(options.listDeps == false);
 	BOOST_CHECK(options.link == false);
 	BOOST_CHECK(options.table == false);
 	BOOST_CHECK(options.tabledir == ".");
@@ -249,6 +250,36 @@ BOOST_AUTO_TEST_CASE(TestTableDirShort) {
 	BOOST_CHECK(options.tabledir == "tabledir");
 	BOOST_CHECK(options.linkFilenames.size() == 0);
 	BOOST_CHECK(options.compileFilename == "");
+	BOOST_CHECK(options.outFilename == "a.out");
+}
+
+BOOST_AUTO_TEST_CASE(TestGenerateDependenciesShort) {
+	OptionsParser p;
+	char wake[5] = "wake";
+	char deps[3] = "-e";
+	char file[10] = "MyFile.wk";
+	char* args[3] = {wake, deps, file};
+
+	Options options = p.parse(3, args);
+
+	BOOST_CHECK(options.link == false);
+	BOOST_CHECK(options.listDeps == true);
+	BOOST_CHECK(options.compileFilename == "MyFile.wk");
+	BOOST_CHECK(options.outFilename == "a.out");
+}
+
+BOOST_AUTO_TEST_CASE(TestGenerateDependenciesLong) {
+	OptionsParser p;
+	char wake[5] = "wake";
+	char deps[15] = "--dependencies";
+	char file[10] = "MyFile.wk";
+	char* args[3] = {wake, deps, file};
+
+	Options options = p.parse(3, args);
+
+	BOOST_CHECK(options.link == false);
+	BOOST_CHECK(options.listDeps == true);
+	BOOST_CHECK(options.compileFilename == "MyFile.wk");
 	BOOST_CHECK(options.outFilename == "a.out");
 }
 

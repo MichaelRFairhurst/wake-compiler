@@ -22,6 +22,7 @@ struct Options {
 	bool hasErrors;
 	bool showHelp;
 	bool listMains;
+	bool listDeps;
 	bool showVersion;
 
 	bool link;
