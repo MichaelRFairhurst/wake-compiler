@@ -40,8 +40,10 @@ BOOST_AUTO_TEST_SUITE( ParseTreeTraverserTest )
 		MockSemanticErrorPrinter e; \
 		p.parse("module lang;\n" CODE  "\nevery Num is: every Int is: every Bool is: every Char is: every Text is: every List{T} is: Int -- getSize() { return 0; } every Exception is: Text[] -- getStackTrace() { var Text[] = []; return Text[]; }"); \
 		if(PTT_PRINT_TREE) p.print(); \
+		t.classGatheringPass(p.getParseTree()); \
+		t.methodGatheringPass(p.getParseTree()); \
+		t.finalPass(p.getParseTree()); \
 		{ EXPECTATIONS } \
-		t.traverse(p.getParseTree()); \
 		t.printErrors(e); \
 		BOOST_REQUIRE(e.passed()); \
 	}

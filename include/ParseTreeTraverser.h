@@ -35,13 +35,13 @@ class ParseTreeTraverser {
 
 	public:
 		ParseTreeTraverser(ClassSpaceSymbolTable* table, ErrorTracker& errors) : errors(errors), methodanalyzer(table), typechecker(&errors, table, &scopesymtable, &methodanalyzer) { objectsymtable = table; }
-		void traverse(Node* tree);
+		void classGatheringPass(Node* tree);
+		void methodGatheringPass(Node* tree);
+		void finalPass(Node* tree);
 		void printErrors(SemanticErrorPrinter& p);
 		bool passesForCompilation();
 
 	private:
-		void secondPass(Node* tree);
-		void thirdPass(Node* tree);
 		ErrorTracker& errors;
 
 		ScopeSymbolTable scopesymtable;

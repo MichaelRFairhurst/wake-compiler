@@ -100,7 +100,9 @@ void compileFile(Options* options) {
 	}
 	// Now do all the semantic analysis
 	ParseTreeTraverser traverser(&table, errors);
-	traverser.traverse(parser.getParseTree());
+	traverser.classGatheringPass(parser.getParseTree());
+	traverser.methodGatheringPass(parser.getParseTree());
+	traverser.finalPass(parser.getParseTree());
 
 	SemanticErrorPrinter printer;
 

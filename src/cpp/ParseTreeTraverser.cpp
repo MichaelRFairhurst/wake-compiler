@@ -18,30 +18,12 @@
 #include "AnnotationTreeTraverser.h"
 #include <string.h>
 
-void ParseTreeTraverser::traverse(Node* tree) {
+void ParseTreeTraverser::classGatheringPass(Node* tree) {
 	switch(tree->node_type) {
 		case NT_PROGRAM:
-			traverse(tree->node_data.nodes[0]);
-			if(tree->subnodes > 1) traverse(tree->node_data.nodes[1]);
-			if(tree->subnodes > 2) traverse(tree->node_data.nodes[2]);
-
-			if(!passesForCompilation()) return;
-			secondPass(tree->node_data.nodes[0]);
-			if(tree->subnodes > 1) secondPass(tree->node_data.nodes[1]);
-			if(tree->subnodes > 2) secondPass(tree->node_data.nodes[2]);
-
-			if(!passesForCompilation()) return;
-			try {
-				objectsymtable->propagateInheritance(errors);
-			} catch(SemanticError* e) {
-				e->token = tree;
-				errors.addError(e);
-				return;
-			}
-
-			thirdPass(tree->node_data.nodes[0]);
-			if(tree->subnodes > 1) thirdPass(tree->node_data.nodes[1]);
-			if(tree->subnodes > 2) thirdPass(tree->node_data.nodes[2]);
+			classGatheringPass(tree->node_data.nodes[0]);
+			if(tree->subnodes > 1) classGatheringPass(tree->node_data.nodes[1]);
+			if(tree->subnodes > 2) classGatheringPass(tree->node_data.nodes[2]);
 			break;
 
 		case NT_INHERITANCESET:
@@ -49,14 +31,14 @@ void ParseTreeTraverser::traverse(Node* tree) {
 			{
 				int i = 0;
 				while(i < tree->subnodes) {
-					traverse(tree->node_data.nodes[i]);
+					classGatheringPass(tree->node_data.nodes[i]);
 					i++;
 				}
 			}
 			break;
 
 		case NT_ANNOTATED_CLASS:
-			traverse(tree->node_data.nodes[0]);
+			classGatheringPass(tree->node_data.nodes[0]);
 			break;
 
 		case NT_CLASS_EXTERN:
@@ -87,7 +69,7 @@ void ParseTreeTraverser::traverse(Node* tree) {
 
 				proptable->setParameters(parameters);
 
-				traverse(tree->node_data.nodes[1]);
+				classGatheringPass(tree->node_data.nodes[1]);
 			}
 			break;
 
@@ -103,14 +85,30 @@ void ParseTreeTraverser::traverse(Node* tree) {
 	}
 }
 
-void ParseTreeTraverser::secondPass(Node* tree) {
+void ParseTreeTraverser::methodGatheringPass(Node* tree) {
 	switch(tree->node_type) {
+		case NT_PROGRAM:
+			if(!passesForCompilation()) return;
+			methodGatheringPass(tree->node_data.nodes[0]);
+			if(tree->subnodes > 1) methodGatheringPass(tree->node_data.nodes[1]);
+			if(tree->subnodes > 2) methodGatheringPass(tree->node_data.nodes[2]);
+
+			if(!passesForCompilation()) return;
+			try {
+				objectsymtable->propagateInheritance(errors);
+			} catch(SemanticError* e) {
+				e->token = tree;
+				errors.addError(e);
+				return;
+			}
+			break;
+
 		case NT_INHERITANCESET:
 		case NT_CLASSSET:
 			{
 				int i = 0;
 				while(i < tree->subnodes) {
-					secondPass(tree->node_data.nodes[i]);
+					methodGatheringPass(tree->node_data.nodes[i]);
 					i++;
 				}
 			}
@@ -136,7 +134,7 @@ void ParseTreeTraverser::secondPass(Node* tree) {
 
 				ClassParseTreeTraverser classtraverser(&errors, objectsymtable, &scopesymtable, objectsymtable->findByImportedNameModifiable(classname)->getAsPureType()->getFQClassname(), &typechecker, &methodanalyzer, proptable, tree->node_type == NT_CLASS_EXTERN);
 
-				secondPass(tree->node_data.nodes[1]);
+				methodGatheringPass(tree->node_data.nodes[1]);
 				if(tree->subnodes > 2) classtraverser.firstPass(tree->node_data.nodes[2]);
 
 				errors.popContext();
@@ -156,20 +154,27 @@ void ParseTreeTraverser::secondPass(Node* tree) {
 	}
 }
 
-void ParseTreeTraverser::thirdPass(Node* tree) {
+void ParseTreeTraverser::finalPass(Node* tree) {
 	switch(tree->node_type) {
+		case NT_PROGRAM:
+			if(!passesForCompilation()) return;
+			finalPass(tree->node_data.nodes[0]);
+			if(tree->subnodes > 1) finalPass(tree->node_data.nodes[1]);
+			if(tree->subnodes > 2) finalPass(tree->node_data.nodes[2]);
+			break;
+
 		case NT_CLASSSET:
 			{
 				int i = 0;
 				while(i < tree->subnodes) {
-					thirdPass(tree->node_data.nodes[i]);
+					finalPass(tree->node_data.nodes[i]);
 					i++;
 				}
 			}
 			break;
 
 		case NT_ANNOTATED_CLASS:
-			thirdPass(tree->node_data.nodes[0]);
+			finalPass(tree->node_data.nodes[0]);
 			break;
 
 		case NT_CLASS:
@@ -181,7 +186,7 @@ void ParseTreeTraverser::thirdPass(Node* tree) {
 
 				ClassParseTreeTraverser classtraverser(&errors, objectsymtable, &scopesymtable, objectsymtable->findByImportedNameModifiable(classname)->getAsPureType()->getFQClassname(), &typechecker, &methodanalyzer, objectsymtable->findByImportedNameModifiable(classname), tree->node_type == NT_CLASS_EXTERN);
 
-				thirdPass(tree->node_data.nodes[1]);
+				finalPass(tree->node_data.nodes[1]);
 				if(tree->subnodes > 2) classtraverser.secondPass(tree->node_data.nodes[2]);
 
 				errors.popContext();
