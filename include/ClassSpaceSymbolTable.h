@@ -39,6 +39,7 @@ class ClassSpaceSymbolTable {
 		boost::optional<SemanticError*> addInheritance(string child, bool issubclass);
 
 		PropertySymbolTable* getEmptyPropertySymbolTable();
+		void prepImport(string modulename, string classname);
 		boost::optional<SemanticError*> importClass(PropertySymbolTable* table);
 		vector<PropertySymbolTable*> getDefinedClasses();
 

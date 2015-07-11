@@ -22,7 +22,8 @@ class LibraryLoader {
 
 	public:
 		bool loadImport(string importname, string importpath, ClassSpaceSymbolTable& objtable);
-		void loadStdLibToTable(ClassSpaceSymbolTable* table);
+		void loadLangModule(ClassSpaceSymbolTable* table);
+		void prepLangModule(ClassSpaceSymbolTable* table);
 
 };
 

@@ -42,10 +42,29 @@ void ImportParseTreeTraverser::traverse(Node* tree, ClassSpaceSymbolTable& class
 				} catch(string errormsg) {
 					errors.addError(new SemanticError(BAD_IMPORT, "Error importing class by name " + moduledirectory + importname + ": " + errormsg, tree));
 				}
-				break;
 			}
+			break;
 	}
 
+}
+
+void ImportParseTreeTraverser::prepImports(Node* tree, ClassSpaceSymbolTable& classes) {
+	switch(tree->node_type) {
+		case NT_PROGRAM:
+		case NT_IMPORTSET:
+			for(int i = 0; i < tree->subnodes; i++) {
+				prepImports(tree->node_data.nodes[i], classes);
+			}
+			break;
+
+		case NT_IMPORT:
+			{
+				std::string modulename = tree->node_data.nodes[0]->node_data.string;
+				std::string classname = tree->node_data.nodes[1]->node_data.string;
+				classes.prepImport(modulename, classname);
+			}
+			break;
+	}
 }
 
 std::vector<std::pair<std::string, std::string> > ImportParseTreeTraverser::gatherImports(Node* tree) {

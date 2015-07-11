@@ -103,16 +103,15 @@ void compileFile(Options* options) {
 		if(parser.parse(myfile)) exit(3);
 		//parser.print();exit(0);
 
-		LibraryLoader loader;
-		loader.loadStdLibToTable(&table);
-		ImportParseTreeTraverser importer;
-		errorTracker.pushContext("Import header");
-		importer.traverse(parser.getParseTree(), table, loader, errorTracker, options->tabledir);
-		errorTracker.popContext();
-
 		if(parser.getParseTree()->node_data.nodes[0]->node_type == NT_MODULE) {
 			table.setModule(parser.getParseTree()->node_data.nodes[0]->node_data.string);
 		}
+
+		ImportParseTreeTraverser importer;
+		importer.prepImports(parser.getParseTree(), table);
+		LibraryLoader loader;
+		loader.prepLangModule(&table);
+
 		// Now do all the semantic analysis
 		parseTreeTraversers.push_back(new ParseTreeTraverser(&table, errorTracker));
 		ParseTreeTraverser& traverser = parseTreeTraversers.back();
@@ -120,6 +119,13 @@ void compileFile(Options* options) {
 	}
 
 	for(int i = 0; i < options->inFilenames.size(); ++i) {
+		LibraryLoader loader;
+		loader.loadLangModule(&classTables[i]);
+		ImportParseTreeTraverser importer;
+		errorTrackers[i].pushContext("Import header");
+		importer.traverse(parsers[i].getParseTree(), classTables[i], loader, errorTrackers[i], options->tabledir);
+		errorTrackers[i].popContext();
+
 		parseTreeTraversers[i].methodGatheringPass(parsers[i].getParseTree());
 	}
 
@@ -339,7 +345,7 @@ int main(int argc, char** argv) {
 			}
 
 			LibraryLoader loader;
-			loader.loadStdLibToTable(&table);
+			loader.loadLangModule(&table);
 			linker.loadTables(options.tabledir, table);
 
 			try {

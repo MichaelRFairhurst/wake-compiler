@@ -29,6 +29,7 @@ extern "C" {
 class ImportParseTreeTraverser {
 
 	public:
+		void prepImports(Node* tree, ClassSpaceSymbolTable& o);
 		void traverse(Node* tree, ClassSpaceSymbolTable& o, LibraryLoader& l, ErrorTracker& errors, std::string dirname);
 		std::vector<std::pair<std::string, std::string> > gatherImports(Node* tree);
 

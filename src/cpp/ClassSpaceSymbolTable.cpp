@@ -45,9 +45,17 @@ boost::optional<SemanticError*> ClassSpaceSymbolTable::addClass(string name) {
 	return boost::optional<SemanticError*>();
 }
 
+void ClassSpaceSymbolTable::prepImport(string modulename, string classname) {
+	if(modulename == "") {
+		fullQualifications[classname] = classname;
+	} else {
+		fullQualifications[classname] = modulename + "." + classname;
+	}
+}
+
 boost::optional<SemanticError*> ClassSpaceSymbolTable::importClass(PropertySymbolTable* table) {
 	string fqname = (table->getModule().size() ? table->getModule() + "." : "") + table->classname;
-	if(classes.count(fqname) || fullQualifications.count(table->classname)) {
+	if(classes.count(fqname) /* || fullQualifications.count(table->classname) this is redundant? And prevents preloading the qualifications */) {
 		return boost::optional<SemanticError*>(new SemanticError(MULTIPLE_CLASS_DEFINITION));
 	}
 
