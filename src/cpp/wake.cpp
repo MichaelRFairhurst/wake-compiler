@@ -130,9 +130,10 @@ void compileFile(Options* options) {
 	SemanticErrorPrinter printer;
 
 	bool quit = false;
-	for(ptr_vector<ParseTreeTraverser>::iterator it = parseTreeTraversers.begin(); it != parseTreeTraversers.end(); ++it)
-	if(!it->passesForCompilation()) {
-		it->printErrors(printer);
+	for(int i = 0; i < parseTreeTraversers.size(); ++i)
+	if(!parseTreeTraversers[i].passesForCompilation()) {
+		error_open_file(options->inFilenames[i].c_str());
+		parseTreeTraversers[i].printErrors(printer);
 		quit = true;
 	}
 
