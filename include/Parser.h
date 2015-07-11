@@ -34,6 +34,9 @@ class Parser {
 		 void print();
 		 Node* getParseTree();
 		 ~Parser();
+
+	private:
+		Node* cxxParseTree;
 };
 
 #endif

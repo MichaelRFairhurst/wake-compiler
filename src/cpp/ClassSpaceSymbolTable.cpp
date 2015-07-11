@@ -113,10 +113,6 @@ void ClassSpaceSymbolTable::propagateInheritance(ErrorTracker& errors) {
 	for(map<string, pair<PropertySymbolTable*, bool> >::iterator it = inheritances_gathered.begin(); it != inheritances_gathered.end(); ++it) {
 		propagateInheritanceToParent(it->first, errors);
 	}
-
-	//for(map<string, pair<PropertySymbolTable*, bool> >::iterator it = inheritances_gathered.begin(); it != inheritances_gathered.end(); ++it) {
-		//delete it->second;
-	//}
 }
 
 void ClassSpaceSymbolTable::propagateInheritanceToParent(string childname, ErrorTracker& errors) {

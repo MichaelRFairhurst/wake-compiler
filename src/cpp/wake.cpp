@@ -72,65 +72,97 @@ void compileFile(Options* options) {
 		printf("[ no file provided ]\n"); exit(1);
 	}
 
-	FILE *myfile = fopen(options->inFilenames[0].c_str(), "r");
-	error_open_file(options->inFilenames[0].c_str());
-
-	if (!myfile) {
-		printf("[ couldn't open file ]\n");
-		exit(2);
+	if(options->inFilenames.size() != options->outFilenames.size() && !options->table) {
+		printf("[ mismatched counts of input files and output files ]\n"); exit(1);
 	}
 
-	Parser parser;
+	ptr_vector<Parser> parsers;
+	ptr_vector<ClassSpaceSymbolTable> classTables;
+	ptr_vector<ParseTreeTraverser> parseTreeTraversers;
+	ptr_vector<ErrorTracker> errorTrackers;
 
-	// Parse the shit out of this
-	if(parser.parse(myfile)) exit(3);
-	//parser.print();exit(0);
+	for(int i = 0; i < options->inFilenames.size(); ++i) {
+		FILE *myfile = fopen(options->inFilenames[i].c_str(), "r");
+		error_open_file(options->inFilenames[i].c_str());
 
-	ClassSpaceSymbolTable table;
-	ErrorTracker errors;
-	LibraryLoader loader;
-	loader.loadStdLibToTable(&table);
-	ImportParseTreeTraverser importer;
-	errors.pushContext("Import header");
-	importer.traverse(parser.getParseTree(), table, loader, errors, options->tabledir);
-	errors.popContext();
+		if (!myfile) {
+			printf("[ couldn't open file ]\n");
+			exit(2);
+		}
 
-	if(parser.getParseTree()->node_data.nodes[0]->node_type == NT_MODULE) {
-		table.setModule(parser.getParseTree()->node_data.nodes[0]->node_data.string);
+		parsers.push_back(new Parser());
+		Parser& parser = parsers.back();
+
+		classTables.push_back(new ClassSpaceSymbolTable());
+		ClassSpaceSymbolTable& table = classTables.back();
+
+		errorTrackers.push_back(new ErrorTracker());
+		ErrorTracker& errorTracker = errorTrackers.back();
+
+		// Parse the shit out of this
+		if(parser.parse(myfile)) exit(3);
+		//parser.print();exit(0);
+
+		LibraryLoader loader;
+		loader.loadStdLibToTable(&table);
+		ImportParseTreeTraverser importer;
+		errorTracker.pushContext("Import header");
+		importer.traverse(parser.getParseTree(), table, loader, errorTracker, options->tabledir);
+		errorTracker.popContext();
+
+		if(parser.getParseTree()->node_data.nodes[0]->node_type == NT_MODULE) {
+			table.setModule(parser.getParseTree()->node_data.nodes[0]->node_data.string);
+		}
+		// Now do all the semantic analysis
+		parseTreeTraversers.push_back(new ParseTreeTraverser(&table, errorTracker));
+		ParseTreeTraverser& traverser = parseTreeTraversers.back();
+		traverser.classGatheringPass(parser.getParseTree());
 	}
-	// Now do all the semantic analysis
-	ParseTreeTraverser traverser(&table, errors);
-	traverser.classGatheringPass(parser.getParseTree());
-	traverser.methodGatheringPass(parser.getParseTree());
-	traverser.finalPass(parser.getParseTree());
+
+	for(int i = 0; i < options->inFilenames.size(); ++i) {
+		parseTreeTraversers[i].methodGatheringPass(parsers[i].getParseTree());
+	}
+
+	for(int i = 0; i < options->inFilenames.size(); ++i) {
+		parseTreeTraversers[i].finalPass(parsers[i].getParseTree());
+	}
 
 	SemanticErrorPrinter printer;
 
-	if(!traverser.passesForCompilation()) {
-		traverser.printErrors(printer);
-		exit(4);
+	bool quit = false;
+	for(ptr_vector<ParseTreeTraverser>::iterator it = parseTreeTraversers.begin(); it != parseTreeTraversers.end(); ++it)
+	if(!it->passesForCompilation()) {
+		it->printErrors(printer);
+		quit = true;
 	}
 
+	if(quit) exit(4);
+
 	if(options->table) {
-		writeTableFiles(options->tabledir, table);
+		for(ptr_vector<ClassSpaceSymbolTable>::iterator it = classTables.begin(); it != classTables.end(); ++it) {
+			writeTableFiles(options->tabledir, *it);
+		}
+
 		return;
 	}
 
-	basic_ostringstream<char> object;
-	ObjectFileHeaderData header;
+	for(int i = 0; i < options->inFilenames.size(); ++i) {
+		basic_ostringstream<char> object;
+		ObjectFileHeaderData header;
 
-	ObjectFileGenerator gen(object, &table, &header);
-	gen.generate(parser.getParseTree());
+		ObjectFileGenerator gen(object, &classTables[i], &header);
+		gen.generate(parsers[i].getParseTree());
 
-	fstream file;
-	ObjectFileHeaderRenderer renderer;
+		fstream file;
+		ObjectFileHeaderRenderer renderer;
 
-	file.open(options->outFilenames[0].c_str(), ios::out);
-	renderer.writeOut(file, &header);
-	file << object.str();
-	file.close();
+		file.open(options->outFilenames[i].c_str(), ios::out);
+		renderer.writeOut(file, &header);
+		file << object.str();
+		file.close();
 
-	writeTableFiles(options->tabledir.c_str(), table);
+		writeTableFiles(options->tabledir, classTables[i]);
+	}
 }
 
 void findRecursiveDeps(string module, string classname, map<pair<string, string>, vector<pair<string, string> > >& depInfoMap, unordered_set<pair<string, string> >& recursiveDeps) {
@@ -206,6 +238,10 @@ void printDependencies(Options* options) {
 
 	if(options->inFilenames.size() == 0) {
 		printf("[ no file provided ]\n"); exit(1);
+	}
+
+	if(options->inFilenames.size() > 1) {
+		printf("[ too many files provided ]\n"); exit(1);
 	}
 
 	FILE *myfile = fopen(options->inFilenames[0].c_str(), "r");

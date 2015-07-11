@@ -26,25 +26,29 @@ bool Parser::parse(const char* input) {
 	error_set_buffer(input);
 	wake_scan_string(input);
 	line = 1; column = 1;
-	return wakeparse();
+	bool res = wakeparse();
+	cxxParseTree = parsetree;
+	return res;
 }
 
 bool Parser::parse(FILE* input) {
 	parsetree = NULL;
 	wakein = input;
 	line = 1; column = 1;
-	return wakeparse();
+	bool res = wakeparse();
+	cxxParseTree = parsetree;
+	return res;
 }
 
 Node* Parser::getParseTree() {
-	return parsetree;
+	return cxxParseTree;
 }
 
 void Parser::print() {
-	printtree(parsetree, 0);
+	printtree(cxxParseTree, 0);
 }
 
 Parser::~Parser() {
 	wakelex_destroy();
-	if(parsetree != NULL) freeNode(parsetree);
+	if(cxxParseTree != NULL) freeNode(cxxParseTree);
 }
