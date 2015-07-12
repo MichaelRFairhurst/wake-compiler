@@ -57,7 +57,7 @@ void writeTableFiles(std::string dirname, ClassSpaceSymbolTable& table) {
 			filename += "/" + table.getModule();
 			boost::filesystem::create_directory(filename);
 		}
-		filename += "/" + (*it)->classname + ".table";
+		filename += "/" + (*it)->getClassname() + ".table";
 
 		file.open((filename).c_str(), ios::out | ios::binary);
 		TableFileWriter writer;
@@ -78,6 +78,7 @@ void compileFile(Options* options) {
 
 	ptr_vector<Parser> parsers;
 	ptr_vector<ClassSpaceSymbolTable> classTables;
+	vector<ClassSpaceSymbolTable*> vectorClassTables;
 	ptr_vector<ParseTreeTraverser> parseTreeTraversers;
 	ptr_vector<ErrorTracker> errorTrackers;
 
@@ -95,6 +96,7 @@ void compileFile(Options* options) {
 
 		classTables.push_back(new ClassSpaceSymbolTable());
 		ClassSpaceSymbolTable& table = classTables.back();
+		vectorClassTables.push_back(&table);
 
 		errorTrackers.push_back(new ErrorTracker());
 		ErrorTracker& errorTracker = errorTrackers.back();
@@ -123,7 +125,7 @@ void compileFile(Options* options) {
 		loader.loadLangModule(&classTables[i]);
 		ImportParseTreeTraverser importer;
 		errorTrackers[i].pushContext("Import header");
-		importer.traverse(parsers[i].getParseTree(), classTables[i], loader, errorTrackers[i], options->tabledir);
+		importer.traverse(parsers[i].getParseTree(), classTables[i], loader, errorTrackers[i], options->tabledir, vectorClassTables);
 		errorTrackers[i].popContext();
 
 		parseTreeTraversers[i].methodGatheringPass(parsers[i].getParseTree());

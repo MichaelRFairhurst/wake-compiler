@@ -23,8 +23,8 @@ void TableFileReader::read(PropertySymbolTable* table, istream& s) {
 	int version = readUInt8(s);
 	if(version != 6) throw string("Can not read table file, it has an unsupported version");
 	table->setModule(readString(s));
-	table->classname = readString(s);
-	table->abstract = readUInt8(s);
+	table->setClassname(readString(s));
+	table->setIsAbstract(readUInt8(s));
 
 	int numProperties = readUInt8(s);
 	while(numProperties--) {
@@ -193,7 +193,7 @@ void TableFileReader::readMethod(PropertySymbolTable* table, istream& s) {
 	vector<Annotation*> annotations = readAnnotations(s);
 	for(vector<Annotation*>::iterator ann = annotations.begin(); ann != annotations.end(); ++ann)
 		prop->annotations.push_back(*ann);
-	table->properties[name] = prop;
+	table->getProperties()[name] = prop;
 	//if(prop->flags & PROPERTY_NEED) table->getNeeds()->push_back(prop->type);
 }
 
@@ -214,7 +214,7 @@ SpecializableVarDecl<QUALIFIED>* TableFileReader::readSpecializableVarDecl(istre
 
 void TableFileReader::readInheritance(PropertySymbolTable* table, istream& s) {
 	string classname = readString(s);
-	table->parentage[classname] = readUInt8(s);;
+	table->getParentageModifiable()[classname] = readUInt8(s);;
 }
 
 vector<Annotation*> TableFileReader::readAnnotations(istream& s) {

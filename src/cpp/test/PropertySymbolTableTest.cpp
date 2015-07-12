@@ -14,7 +14,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include "PropertySymbolTable.h"
+#include "ConcretePropertySymbolTable.h"
 #include "PureTypeArray.h"
 #include "ClassSpaceSymbolTable.h"
 
@@ -24,7 +24,7 @@ BOOST_AUTO_TEST_SUITE(PropertySymbolTableTestSuite);
 
 BOOST_AUTO_TEST_CASE(AddingNeedsAreGotten) {
 	TypeAnalyzer analyzer;
-	PropertySymbolTable table(&analyzer, "");
+	ConcretePropertySymbolTable table(&analyzer, "");
 	SpecializableVarDecl<QUALIFIED> thefirsttype;
 	thefirsttype.decl.typedata = PureType<QUALIFIED>(TYPE_CLASS);
 	SpecializableVarDecl<QUALIFIED> thesecondtype;
@@ -39,7 +39,7 @@ BOOST_AUTO_TEST_CASE(AddingNeedsAreGotten) {
 
 BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesReturnTypes) {
 	TypeAnalyzer analyzer;
-	PropertySymbolTable table(&analyzer, "");
+	ConcretePropertySymbolTable table(&analyzer, "");
 	ObjectProperty* property = new ObjectProperty();
 	vector<PureType<QUALIFIED>*>* parameters = new vector<PureType<QUALIFIED>*>();
 	vector<PureType<QUALIFIED>*> parameterizations;
@@ -56,7 +56,7 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesReturnTypes) {
 	parameterizations.push_back(&parameterization);
 	table.setParameters(parameters);
 
-	table.properties["myMethod"] = property;
+	table.getProperties()["myMethod"] = property;
 
 	auto_ptr<ReadOnlyPropertySymbolTable> derived(table.resolveParameters(parameterizations));
 
@@ -72,7 +72,7 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesReturnTypes) {
 
 BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesPropertyName) {
 	TypeAnalyzer analyzer;
-	PropertySymbolTable table(&analyzer, "");
+	ConcretePropertySymbolTable table(&analyzer, "");
 	ObjectProperty* property = new ObjectProperty();
 	vector<PureType<QUALIFIED>*>* parameters = new vector<PureType<QUALIFIED>*>();
 	vector<PureType<QUALIFIED>*> parameterizations;
@@ -90,7 +90,7 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesPropertyName) {
 	parameterizations.push_back(&parameterization);
 	table.setParameters(parameters);
 
-	table.properties["myMethod(E)"] = property;
+	table.getProperties()["myMethod(E)"] = property;
 
 	auto_ptr<ReadOnlyPropertySymbolTable> derived(table.resolveParameters(parameterizations));
 
@@ -107,7 +107,7 @@ BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesPropertyName) {
 
 BOOST_AUTO_TEST_CASE(DerivedSymbolTableChangesNeedName) {
 	TypeAnalyzer analyzer;
-	PropertySymbolTable table(&analyzer, "");
+	ConcretePropertySymbolTable table(&analyzer, "");
 	vector<PureType<QUALIFIED>*>* parameters = new vector<PureType<QUALIFIED>*>();
 	vector<PureType<QUALIFIED>*> parameterizations;
 	PureType<QUALIFIED>* parameter = new PureType<QUALIFIED>(TYPE_PARAMETERIZED);
@@ -136,8 +136,8 @@ BOOST_AUTO_TEST_CASE(TestPropagateInheritanceExtendPreservesNeeds) {
 	ClassSpaceSymbolTable classes;
 	analyzer.reference = &classes;
 	classes.addClass("SharedNeed");
-	PropertySymbolTable parent(&analyzer, "");
-	PropertySymbolTable child(&analyzer, "");
+	ConcretePropertySymbolTable parent(&analyzer, "");
+	ConcretePropertySymbolTable child(&analyzer, "");
 	SpecializableVarDecl<QUALIFIED> needDecl;
 	needDecl.decl.typedata = PureType<QUALIFIED>(TYPE_CLASS);
 	needDecl.decl.typedata.typedata._class.classname = strdup("SharedNeed");
@@ -160,8 +160,8 @@ BOOST_AUTO_TEST_CASE(TestPropagateInheritanceDropsPrivateNeeds) {
 	ClassSpaceSymbolTable classes;
 	analyzer.reference = &classes;
 	classes.addClass("SharedNeed");
-	PropertySymbolTable parent(&analyzer, "");
-	PropertySymbolTable child(&analyzer, "");
+	ConcretePropertySymbolTable parent(&analyzer, "");
+	ConcretePropertySymbolTable child(&analyzer, "");
 	SpecializableVarDecl<QUALIFIED> needDecl;
 	needDecl.decl.typedata = PureType<QUALIFIED>(TYPE_CLASS);
 	needDecl.decl.typedata.typedata._class.classname = strdup("SharedNeed");
@@ -181,8 +181,8 @@ BOOST_AUTO_TEST_CASE(TestPropagateInheritanceKeepsPublicNeedsButNotAsNeed) {
 	ClassSpaceSymbolTable classes;
 	analyzer.reference = &classes;
 	classes.addClass("SharedNeed");
-	PropertySymbolTable parent(&analyzer, "");
-	PropertySymbolTable child(&analyzer, "");
+	ConcretePropertySymbolTable parent(&analyzer, "");
+	ConcretePropertySymbolTable child(&analyzer, "");
 	SpecializableVarDecl<QUALIFIED> needDecl;
 	needDecl.decl.typedata = PureType<QUALIFIED>(TYPE_CLASS);
 	needDecl.decl.typedata.typedata._class.classname = strdup("SharedNeed");

@@ -32,7 +32,7 @@ CPPNAMES= \
 	ClassSpaceSymbolTable.cpp \
 	ParseTreeTraverser.cpp \
 	SemanticError.cpp \
-	PropertySymbolTable.cpp \
+	ConcretePropertySymbolTable.cpp \
 	Parser.cpp \
 	SemanticErrorPrinter.cpp \
 	MockSemanticErrorPrinter.cpp \

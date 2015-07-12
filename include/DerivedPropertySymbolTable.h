@@ -30,10 +30,8 @@ using namespace std;
 
 class DerivedPropertySymbolTable : public ReadOnlyPropertySymbolTable {
 	public:
-		DerivedPropertySymbolTable(TypeAnalyzer& analyzer, vector<SpecializableVarDecl<wake::QUALIFIED>*>* needs, map<string, ObjectProperty*>* properties, const map<string, bool>& parentage) : analyzer(analyzer), parentage(parentage) {
-			this->needs = needs;
-			this->properties = properties;
-		};
+		DerivedPropertySymbolTable(TypeAnalyzer& analyzer, vector<SpecializableVarDecl<wake::QUALIFIED>*>* needs, map<string, ObjectProperty*>* properties, const map<string, bool>& parentage, string classname, string module)
+			: analyzer(analyzer), parentage(parentage), needs(needs), properties(properties), classname(classname), module(module) {};
 		boost::optional<PureType<wake::QUALIFIED>*> find(string name);
 		boost::optional<ObjectProperty*> findByCasing(string casing);
 		bool isPublic(string name);
@@ -42,6 +40,8 @@ class DerivedPropertySymbolTable : public ReadOnlyPropertySymbolTable {
 		vector<SpecializableVarDecl<wake::QUALIFIED>*>* getNeeds();
 		string getSymbolNameOf(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments);
 		bool isAbstract();
+		string getModule();
+		string getClassname();
 		const map<string, bool>& getParentage();
 		~DerivedPropertySymbolTable();
 
@@ -50,6 +50,8 @@ class DerivedPropertySymbolTable : public ReadOnlyPropertySymbolTable {
 		vector<SpecializableVarDecl<wake::QUALIFIED>*>* needs;
 		map<string, ObjectProperty*>* properties;
 		const map<string, bool>& parentage;
+		string module;
+		string classname;
 
 
 };

@@ -2,7 +2,7 @@
  * Source Code for the Original Compiler for the
  * Programming Language Wake
  *
- * PropertySymbolTable.cpp
+ * ConcretePropertySymbolTable.cpp
  *
  * Licensed under the MIT license
  * See LICENSE.TXT for details
@@ -12,7 +12,7 @@
  *
  **************************************************/
 
-#include "PropertySymbolTable.h"
+#include "ConcretePropertySymbolTable.h"
 #include "SemanticError.h"
 #include "DerivedPropertySymbolTable.h"
 #include "TypeParameterizer.h"
@@ -23,11 +23,19 @@
 
 #include <iostream>
 
-const map<string, bool>& PropertySymbolTable::getParentage() {
+const map<string, bool>& ConcretePropertySymbolTable::getParentage() {
 	return parentage;
 }
 
-boost::optional<SemanticError*> PropertySymbolTable::addMethod(PureType<wake::QUALIFIED>* returntype, vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments, int flags, vector<Annotation*> annotations) {
+map<string, bool>& ConcretePropertySymbolTable::getParentageModifiable() {
+	return parentage;
+}
+
+void ConcretePropertySymbolTable::setParentage(map<string, bool> newparentage) {
+	parentage = newparentage;
+}
+
+boost::optional<SemanticError*> ConcretePropertySymbolTable::addMethod(PureType<wake::QUALIFIED>* returntype, vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments, int flags, vector<Annotation*> annotations) {
 	string name = getSymbolNameOf(segments_arguments);
 
 	if(properties.count(name)) {
@@ -68,7 +76,7 @@ boost::optional<SemanticError*> PropertySymbolTable::addMethod(PureType<wake::QU
 	return boost::optional<SemanticError*>();
 }
 
-boost::optional<SemanticError*> PropertySymbolTable::addProperty(VarDecl<wake::QUALIFIED>* property, int flags, vector<Annotation*> annotations) {
+boost::optional<SemanticError*> ConcretePropertySymbolTable::addProperty(VarDecl<wake::QUALIFIED>* property, int flags, vector<Annotation*> annotations) {
 	VarRef refOfDecl = property->createVarRef();
 	string name = refOfDecl.toString();
 
@@ -89,7 +97,7 @@ boost::optional<SemanticError*> PropertySymbolTable::addProperty(VarDecl<wake::Q
 	return boost::optional<SemanticError*>();
 }
 
-boost::optional<SemanticError*> PropertySymbolTable::addProvision(SpecializablePureType<wake::QUALIFIED>* provided, vector<PureType<wake::QUALIFIED>*> &arguments, int flags, vector<Annotation*> annotations) {
+boost::optional<SemanticError*> ConcretePropertySymbolTable::addProvision(SpecializablePureType<wake::QUALIFIED>* provided, vector<PureType<wake::QUALIFIED>*> &arguments, int flags, vector<Annotation*> annotations) {
 	string name = provided->toProvisionSymbol(arguments);
 
 	if(properties.count(name)) {
@@ -114,7 +122,7 @@ boost::optional<SemanticError*> PropertySymbolTable::addProvision(SpecializableP
 	return boost::optional<SemanticError*>();
 }
 
-boost::optional<PureType<wake::QUALIFIED>*> PropertySymbolTable::find(string name) {
+boost::optional<PureType<wake::QUALIFIED>*> ConcretePropertySymbolTable::find(string name) {
 	if(!properties.count(name))
 		//throw new SemanticError(PROPERTY_OR_METHOD_NOT_FOUND, "Cannot find method with signature " + name);
 		return boost::optional<PureType<wake::QUALIFIED>*>();
@@ -122,7 +130,7 @@ boost::optional<PureType<wake::QUALIFIED>*> PropertySymbolTable::find(string nam
 	return boost::optional<PureType<wake::QUALIFIED>*>(&properties.find(name)->second->decl.typedata);
 }
 
-boost::optional<ObjectProperty*> PropertySymbolTable::findByCasing(string casing) {
+boost::optional<ObjectProperty*> ConcretePropertySymbolTable::findByCasing(string casing) {
 	ObjectProperty* found = NULL;
 
 	for(std::map<string, ObjectProperty*>::iterator it = properties.begin(); it != properties.end(); ++it)
@@ -140,15 +148,15 @@ boost::optional<ObjectProperty*> PropertySymbolTable::findByCasing(string casing
 	}
 }
 
-string PropertySymbolTable::getAddress(string name) {
+string ConcretePropertySymbolTable::getAddress(string name) {
 	return properties.find(name)->second->address;
 }
 
-int PropertySymbolTable::getFlags(string name) {
+int ConcretePropertySymbolTable::getFlags(string name) {
 	return properties.find(name)->second->flags;
 }
 
-string PropertySymbolTable::getCasingNameOf(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments) {
+string ConcretePropertySymbolTable::getCasingNameOf(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments) {
 	string name;
 	for(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
 		name += it->first;
@@ -164,7 +172,7 @@ string PropertySymbolTable::getCasingNameOf(vector<pair<string, PureTypeArray<wa
 	return name;
 }
 
-string PropertySymbolTable::getSymbolNameOf(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments) {
+string ConcretePropertySymbolTable::getSymbolNameOf(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments) {
 	string name;
 	for(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >::iterator it = segments_arguments->begin(); it != segments_arguments->end(); ++it) {
 		name += it->first;
@@ -180,27 +188,27 @@ string PropertySymbolTable::getSymbolNameOf(vector<pair<string, PureTypeArray<wa
 	return name;
 }
 
-void PropertySymbolTable::printEntryPoints(EntryPointAnalyzer* entryanalyzer) {
+void ConcretePropertySymbolTable::printEntryPoints(EntryPointAnalyzer* entryanalyzer) {
 	for(map<string, ObjectProperty*>::iterator it = properties.begin(); it != properties.end(); ++it) {
 		if(entryanalyzer->checkFQClassMethodCanBeMain(module.size() ? module + "." + classname : classname, &it->second->decl.typedata))
 			entryanalyzer->printMethod(it->first);
 	}
 }
 
-void PropertySymbolTable::addNeed(SpecializableVarDecl<wake::QUALIFIED>* needed, int flags, vector<Annotation*> annotations) {
+void ConcretePropertySymbolTable::addNeed(SpecializableVarDecl<wake::QUALIFIED>* needed, int flags, vector<Annotation*> annotations) {
 	needs->push_back(needed);
 	addProperty(&needed->decl, flags | PROPERTY_NEED, annotations);
 }
 
-vector<SpecializableVarDecl<wake::QUALIFIED>*>* PropertySymbolTable::getNeeds() {
+vector<SpecializableVarDecl<wake::QUALIFIED>*>* ConcretePropertySymbolTable::getNeeds() {
 	return needs;
 }
 
-bool PropertySymbolTable::isAbstract() {
+bool ConcretePropertySymbolTable::isAbstract() {
 	return abstract;
 }
 
-PropertySymbolTable::~PropertySymbolTable() {
+ConcretePropertySymbolTable::~ConcretePropertySymbolTable() {
 	for(map<string, ObjectProperty*>::iterator it = properties.begin(); it != properties.end(); ++it) {
 		delete it->second;
 	}
@@ -210,10 +218,10 @@ PropertySymbolTable::~PropertySymbolTable() {
 }
 
 void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable* parent, bool extend, ErrorTracker& errors) {
-	for(map<string, ObjectProperty*>::iterator it = parent->properties.begin(); it != parent->properties.end(); ++it) {
+	for(map<string, ObjectProperty*>::iterator it = parent->getProperties().begin(); it != parent->getProperties().end(); ++it) {
 		if(!extend && !(it->second->flags & PROPERTY_PUBLIC)) continue;
-		map<string, ObjectProperty*>::iterator searcher = child->properties.find(it->first);
-		if(searcher == child->properties.end()) {
+		map<string, ObjectProperty*>::iterator searcher = child->getProperties().find(it->first);
+		if(searcher == child->getProperties().end()) {
 			ObjectProperty* propagate = new ObjectProperty;
 			propagate->decl = it->second->decl;
 			propagate->flags = it->second->flags;
@@ -221,11 +229,11 @@ void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable*
 			propagate->address = it->second->address;
 			if(!extend) {
 				propagate->flags |= PROPERTY_ABSTRACT;
-				child->abstract = true;
+				child->setIsAbstract(true);
 			} else if(propagate->flags & PROPERTY_ABSTRACT) {
-				child->abstract = true;
+				child->setIsAbstract(true);
 			}
-			child->properties[it->first] = propagate;
+			child->getProperties()[it->first] = propagate;
 
 			if(!extend && propagate->flags & PROPERTY_NEED) {
 				propagate->flags = propagate->flags & ~PROPERTY_NEED;
@@ -236,12 +244,12 @@ void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable*
 			if(searcher->second->decl.typedata.type == TYPE_LAMBDA)
 			if(it->second->decl.typedata.typedata.lambda.returntype != NULL)
 			if(searcher->second->decl.typedata.typedata.lambda.returntype == NULL
-				|| !child->analyzer->isASubtypeOfB(
+				|| !child->getAnalyzer()->isASubtypeOfB(
 					searcher->second->decl.typedata.typedata.lambda.returntype,	// this is contravariance
 					it->second->decl.typedata.typedata.lambda.returntype 		// Check parent return is a subtype of child return
 				)
 			) {
-				errors.addError(new SemanticError(INVALID_CHILD_RETURN_TYPE, "method " + searcher->second->address + " on class " + child->classname, NULL, ""));
+				errors.addError(new SemanticError(INVALID_CHILD_RETURN_TYPE, "method " + searcher->second->address + " on class " + child->getClassname(), NULL, ""));
 			}
 		}
 	}
@@ -249,8 +257,8 @@ void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable*
 	if(extend) {
 		for(vector<SpecializableVarDecl<wake::QUALIFIED>*>::iterator it = parent->getNeeds()->begin(); it != parent->getNeeds()->end(); ++it) {
 			if((*it)->decl.typedata.type == TYPE_CLASS) {
-				string fqname = (child->getModule().size() ? child->getModule() + "." : "") + child->classname;
-				child->analyzer->assertFQNeedIsNotCircular(fqname, (*it)->decl.typedata.getFQClassname());
+				string fqname = (child->getModule().size() ? child->getModule() + "." : "") + child->getClassname();
+				child->getAnalyzer()->assertFQNeedIsNotCircular(fqname, (*it)->decl.typedata.getFQClassname());
 			}
 
 			child->getNeeds()->push_back(*it);
@@ -258,20 +266,20 @@ void propagateInheritanceTables(PropertySymbolTable* child, PropertySymbolTable*
 	}
 }
 
-bool PropertySymbolTable::isPublic(string name) {
+bool ConcretePropertySymbolTable::isPublic(string name) {
 	return properties.find(name)->second->flags & PROPERTY_PUBLIC;
 }
 
-void PropertySymbolTable::setParameters(vector<PureType<wake::QUALIFIED>*>* parameters) {
+void ConcretePropertySymbolTable::setParameters(vector<PureType<wake::QUALIFIED>*>* parameters) {
 	delete declaredtypeparameters;
 	declaredtypeparameters = parameters;
 }
 
-const vector<PureType<wake::QUALIFIED>*>& PropertySymbolTable::getParameters() {
+const vector<PureType<wake::QUALIFIED>*>& ConcretePropertySymbolTable::getParameters() {
 	return *declaredtypeparameters;
 }
 
-ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<PureType<wake::QUALIFIED>*>& parameters) {
+ReadOnlyPropertySymbolTable* ConcretePropertySymbolTable::resolveParameters(vector<PureType<wake::QUALIFIED>*>& parameters) {
 	TypeParameterizer parameterizer;
 	map<string, ObjectProperty*>* newprops = new map<string, ObjectProperty*>();
 	for(map<string, ObjectProperty*>::iterator it = properties.begin(); it != properties.end(); ++it) {
@@ -307,10 +315,10 @@ ReadOnlyPropertySymbolTable* PropertySymbolTable::resolveParameters(vector<PureT
 		newneeds->push_back(newneed);
 	}
 
-	return new DerivedPropertySymbolTable(*analyzer, newneeds, newprops, parentage);
+	return new DerivedPropertySymbolTable(*analyzer, newneeds, newprops, parentage, classname, module);
 }
 
-PureType<wake::QUALIFIED>* PropertySymbolTable::getAsPureType() {
+PureType<wake::QUALIFIED>* ConcretePropertySymbolTable::getAsPureType() {
 	PureType<wake::QUALIFIED>* ret = new PureType<wake::QUALIFIED>(TYPE_CLASS);
 	ret->typedata._class.classname = strdup(classname.c_str());
 	ret->typedata._class.modulename = strdup(module.c_str());
@@ -328,23 +336,43 @@ PureType<wake::QUALIFIED>* PropertySymbolTable::getAsPureType() {
 	return ret;
 }
 
-bool PropertySymbolTable::isBehavioralProvision(string name) {
+bool ConcretePropertySymbolTable::isBehavioralProvision(string name) {
 	return properties.find(name)->second->flags & PROPERTY_BLOCKPROVISION;
 }
 
-void PropertySymbolTable::setAnnotations(vector<Annotation*> annotations) {
+void ConcretePropertySymbolTable::setAnnotations(vector<Annotation*> annotations) {
 	for(vector<Annotation*>::iterator annit = annotations.begin(); annit != annotations.end(); ++annit)
 		this->annotations.push_back(*annit);
 }
 
-const boost::ptr_vector<Annotation>& PropertySymbolTable::getAnnotations() {
+const boost::ptr_vector<Annotation>& ConcretePropertySymbolTable::getAnnotations() {
 	return annotations;
 }
 
-void PropertySymbolTable::setModule(string module) {
+void ConcretePropertySymbolTable::setModule(string module) {
 	this->module = module;
 }
 
-string PropertySymbolTable::getModule() {
+void ConcretePropertySymbolTable::setClassname(string classname) {
+	this->classname = classname;
+}
+
+string ConcretePropertySymbolTable::getModule() {
 	return module;
+}
+
+string ConcretePropertySymbolTable::getClassname() {
+	return classname;
+}
+
+map<string, ObjectProperty*>& ConcretePropertySymbolTable::getProperties() {
+	return properties;
+}
+
+void ConcretePropertySymbolTable::setIsAbstract(bool newvalue) {
+	abstract = newvalue;
+}
+
+TypeAnalyzer* ConcretePropertySymbolTable::getAnalyzer() {
+	return analyzer;
 }

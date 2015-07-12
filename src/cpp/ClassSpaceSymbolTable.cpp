@@ -13,6 +13,7 @@
  **************************************************/
 
 #include "ClassSpaceSymbolTable.h"
+#include "ConcretePropertySymbolTable.h"
 #include <algorithm>
 #include "CompilationExceptions.h"
 #include "TempPropertySymbolTable.h"
@@ -35,8 +36,8 @@ boost::optional<SemanticError*> ClassSpaceSymbolTable::addClass(string name) {
 		return boost::optional<SemanticError*>(new SemanticError(MULTIPLE_CLASS_DEFINITION));
 	}
 
-	addingclass_symbol = new PropertySymbolTable(&analyzer, module);
-	addingclass_symbol->classname = name;
+	addingclass_symbol = new ConcretePropertySymbolTable(&analyzer, module);
+	addingclass_symbol->setClassname(name);
 	addingclass_hassubclass = false;
 
 	classes[fqname] = pair<PropertySymbolTable*, bool>(addingclass_symbol, true);
@@ -54,18 +55,18 @@ void ClassSpaceSymbolTable::prepImport(string modulename, string classname) {
 }
 
 boost::optional<SemanticError*> ClassSpaceSymbolTable::importClass(PropertySymbolTable* table) {
-	string fqname = (table->getModule().size() ? table->getModule() + "." : "") + table->classname;
+	string fqname = (table->getModule().size() ? table->getModule() + "." : "") + table->getClassname();
 	if(classes.count(fqname) /* || fullQualifications.count(table->classname) this is redundant? And prevents preloading the qualifications */) {
 		return boost::optional<SemanticError*>(new SemanticError(MULTIPLE_CLASS_DEFINITION));
 	}
 
-	fullQualifications[table->classname] = fqname;
+	fullQualifications[table->getClassname()] = fqname;
 	classes[fqname] = pair<PropertySymbolTable*, bool>(table, false);
 	return boost::optional<SemanticError*>();
 }
 
 PropertySymbolTable* ClassSpaceSymbolTable::getEmptyPropertySymbolTable() {
-	return new PropertySymbolTable(&analyzer, module);
+	return new ConcretePropertySymbolTable(&analyzer, module);
 }
 
 vector<PropertySymbolTable*> ClassSpaceSymbolTable::getDefinedClasses() {
@@ -103,11 +104,11 @@ boost::optional<SemanticError*> ClassSpaceSymbolTable::addInheritance(string chi
 		return boost::optional<SemanticError*>(new SemanticError(CIRCULAR_INHERITANCE));
 	}
 
-	if(addingclass_symbol->parentage.count(childname)) {
+	if(addingclass_symbol->getParentage().count(childname)) {
 		return boost::optional<SemanticError*>(new SemanticError(MULTIPLE_INHERITANCE));
 	}
 
-	addingclass_hassubclass = addingclass_symbol->parentage[childname] = as_subclass;
+	addingclass_hassubclass = addingclass_symbol->getParentageModifiable()[childname] = as_subclass;
 
 	return boost::optional<SemanticError*>();
 }
@@ -130,7 +131,7 @@ void ClassSpaceSymbolTable::propagateInheritanceToParent(string childname, Error
 	pair<PropertySymbolTable*, bool>* current = &inheritances_gathered.find(childname)->second;
 	if(current->second) return; // Already propagated
 
-	for(map<string, bool>::iterator it = current->first->parentage.begin(); it != current->first->parentage.end(); ++it) {
+	for(map<string, bool>::const_iterator it = current->first->getParentage().begin(); it != current->first->getParentage().end(); ++it) {
 		propagateInheritanceToParent(it->first, errors);
 		propagateInheritanceTables(current->first, findFullyQualifiedModifiable(it->first), it->second, errors);
 	}
@@ -311,7 +312,6 @@ VarDecl<wake::QUALIFIED>* ClassSpaceSymbolTable::setModulesOnType(VarDecl<wake::
 	setModulesOnType(&type->typedata);
 	return (VarDecl<wake::QUALIFIED>*) type;
 }
-
 
 PropertySymbolTable* ClassSpaceSymbolTable::findByImportedNameModifiable(string classname) {
 	return findFullyQualifiedModifiable(getFullyQualifiedClassname(classname));

@@ -29,17 +29,17 @@ void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 	out.write(dataptr, 1);
 	out.write(table->getModule().c_str(), table->getModule().size());
 
-	dataptr[0] = (char) table->classname.size();
+	dataptr[0] = (char) table->getClassname().size();
 	out.write(dataptr, 1);
-	out.write(table->classname.c_str(), table->classname.size());
+	out.write(table->getClassname().c_str(), table->getClassname().size());
 
 	dataptr[0] = (char) table->isAbstract();
 	out.write(dataptr, 1);
 
-	dataptr[0] = table->properties.size() - table->getNeeds()->size();
+	dataptr[0] = table->getProperties().size() - table->getNeeds()->size();
 	out.write(dataptr, 1);
 
-	for(map<string, ObjectProperty*>::iterator it = table->properties.begin(); it != table->properties.end(); ++it) {
+	for(map<string, ObjectProperty*>::iterator it = table->getProperties().begin(); it != table->getProperties().end(); ++it) {
 		if(it->second->flags & PROPERTY_NEED) continue;
 		dataptr[0] = (char) it->first.size();
 		out.write(dataptr, 1);
@@ -53,7 +53,7 @@ void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 
 	// Its very important that our methods section has our needs listed in order!
 	for(vector<SpecializableVarDecl<QUALIFIED>*>::iterator need = table->getNeeds()->begin(); need != table->getNeeds()->end(); ++need) {
-		for(map<string, ObjectProperty*>::iterator it = table->properties.begin(); it != table->properties.end(); ++it) {
+		for(map<string, ObjectProperty*>::iterator it = table->getProperties().begin(); it != table->getProperties().end(); ++it) {
 			if((*need)->decl.createVarRef().toString() != it->first) continue;
 			dataptr[0] = (char) it->second->flags;
 			out.write(dataptr, 1);
@@ -73,10 +73,10 @@ void TableFileWriter::write(ostream& out, PropertySymbolTable* table) {
 		}
 	}
 
-	dataptr[0] = (char) table->parentage.size();
+	dataptr[0] = (char) table->getParentage().size();
 	out.write(dataptr, 1);
 
-	for(map<string, bool>::iterator it = table->parentage.begin(); it != table->parentage.end(); ++it) {
+	for(map<string, bool>::const_iterator it = table->getParentage().begin(); it != table->getParentage().end(); ++it) {
 		dataptr[0] = (char) it->first.size();
 		out.write(dataptr, 1);
 		out.write(it->first.c_str(), it->first.size());

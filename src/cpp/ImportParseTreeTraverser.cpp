@@ -13,25 +13,39 @@
  **************************************************/
 
 #include "ImportParseTreeTraverser.h"
+#include "CompilationExceptions.h"
 #include "SemanticError.h"
+#include "TempPropertySymbolTable.h"
 
-void ImportParseTreeTraverser::traverse(Node* tree, ClassSpaceSymbolTable& classes, LibraryLoader& l, ErrorTracker& errors, std::string importpath) {
+void ImportParseTreeTraverser::traverse(Node* tree, ClassSpaceSymbolTable& classes, LibraryLoader& l, ErrorTracker& errors, std::string importpath, vector<ClassSpaceSymbolTable*> otherSources) {
 	switch(tree->node_type) {
 
 		case NT_PROGRAM:
 		case NT_IMPORTSET:
 			for(int i = 0; i < tree->subnodes; i++) {
-				traverse(tree->node_data.nodes[i], classes, l, errors, importpath);
+				traverse(tree->node_data.nodes[i], classes, l, errors, importpath, otherSources);
 			}
 			break;
 
 		case NT_IMPORT:
 			{
-				std::string moduledirectory = "";
+				std::string modulename = tree->node_data.nodes[0]->node_data.string;
 				std::string importname = tree->node_data.nodes[1]->node_data.string;
 
-				if(strlen(tree->node_data.nodes[0]->node_data.string)) {
-					moduledirectory += tree->node_data.nodes[0]->node_data.string + string("/");
+				for(vector<ClassSpaceSymbolTable*>::iterator it = otherSources.begin(); it != otherSources.end(); ++it) {
+					try {
+						PropertySymbolTable* table = (*it)->findFullyQualifiedModifiable(modulename == "" ? importname : modulename + "." + importname);
+
+						classes.importClass(new TempPropertySymbolTable(*table));
+						return;
+					} catch(SymbolNotFoundException* e) {
+						delete e;
+					}
+				}
+
+				std::string moduledirectory = "";
+				if(modulename != "") {
+					moduledirectory = modulename + string("/");
 				}
 
 				// TODO use actual path

@@ -28,7 +28,7 @@ BOOST_AUTO_TEST_CASE(TestGetProperty)
 	prop->decl.typedata = PureType<QUALIFIED>(TYPE_LAMBDA);
 	(*properties)["hello"] = prop;
 	map<string, bool> parentage;
-	DerivedPropertySymbolTable table(analyzer, needs, properties, parentage);
+	DerivedPropertySymbolTable table(analyzer, needs, properties, parentage, "testclass", "testmodule");
 
 	boost::optional<PureType<QUALIFIED>*> method = table.find("hello");
 	BOOST_REQUIRE(method);
@@ -47,7 +47,7 @@ BOOST_AUTO_TEST_CASE(TestGetIsPublic)
 	pubprop->flags = PROPERTY_PUBLIC;
 	(*properties)["public"] = pubprop;
 	map<string, bool> parentage;
-	DerivedPropertySymbolTable table(analyzer, needs, properties, parentage);
+	DerivedPropertySymbolTable table(analyzer, needs, properties, parentage, "testclass", "testmodule");
 
 	BOOST_REQUIRE(table.isPublic(string("public")));
 	BOOST_REQUIRE(!table.isPublic(string("private")));
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(TestGetIsAbstract)
 	prop->flags = PROPERTY_ABSTRACT;
 	(*properties)["prop"] = prop;
 	map<string, bool> parentage;
-	DerivedPropertySymbolTable table(analyzer, needs, properties, parentage);
+	DerivedPropertySymbolTable table(analyzer, needs, properties, parentage, "testclass", "testmodule");
 
 	BOOST_REQUIRE(table.isAbstract());
 }
@@ -76,7 +76,7 @@ BOOST_AUTO_TEST_CASE(TestGetIsNotAbstract)
 	prop->flags = 0;
 	(*properties)["prop"] = prop;
 	map<string, bool> parentage;
-	DerivedPropertySymbolTable table(analyzer, needs, properties, parentage);
+	DerivedPropertySymbolTable table(analyzer, needs, properties, parentage, "testclass", "testmodule");
 
 	BOOST_REQUIRE(!table.isAbstract());
 }
@@ -87,7 +87,7 @@ BOOST_AUTO_TEST_CASE(TestGetParentage)
 	vector<SpecializableVarDecl<QUALIFIED>*>* needs = new vector<SpecializableVarDecl<QUALIFIED>*>();
 	map<string, ObjectProperty*>* properties = new map<string, ObjectProperty*>();
 	map<string, bool> parentage;
-	DerivedPropertySymbolTable table(analyzer, needs, properties, parentage);
+	DerivedPropertySymbolTable table(analyzer, needs, properties, parentage, "testclass", "testmodule");
 
 	BOOST_REQUIRE(&parentage == &table.getParentage());
 }
@@ -98,7 +98,7 @@ BOOST_AUTO_TEST_CASE(TestGetNeeds)
 	vector<SpecializableVarDecl<QUALIFIED>*>* needs = new vector<SpecializableVarDecl<QUALIFIED>*>();
 	map<string, ObjectProperty*>* properties = new map<string, ObjectProperty*>();
 	map<string, bool> parentage;
-	DerivedPropertySymbolTable table(analyzer, needs, properties, parentage);
+	DerivedPropertySymbolTable table(analyzer, needs, properties, parentage, "testclass", "testmodule");
 
 	BOOST_REQUIRE(needs == table.getNeeds());
 }

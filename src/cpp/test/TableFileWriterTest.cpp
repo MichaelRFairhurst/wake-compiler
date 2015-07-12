@@ -18,6 +18,7 @@
 #include <string>
 #include <boost/lexical_cast.hpp>
 #include "TableFileDataSets.h"
+#include "ConcretePropertySymbolTable.h"
 
 using namespace wake;
 
@@ -52,8 +53,8 @@ BOOST_AUTO_TEST_CASE(TestWritesSimple)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer, "test");
-	table.classname = "classname";
+	ConcretePropertySymbolTable table(&tanalyzer, "test");
+	table.setClassname("classname");
 	writer.write(out, &table);
 
 	ASSERT_TABLE(SIMPLE_TABLE);
@@ -64,8 +65,8 @@ BOOST_AUTO_TEST_CASE(TestWritesNoModuleName)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer, "");
-	table.classname = "classname";
+	ConcretePropertySymbolTable table(&tanalyzer, "");
+	table.setClassname("classname");
 	writer.write(out, &table);
 
 	ASSERT_TABLE(SIMPLE_TABLE_WITH_MODULE);
@@ -76,7 +77,7 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer, "test");
+	ConcretePropertySymbolTable table(&tanalyzer, "test");
 
 	vector<pair<string, PureTypeArray<QUALIFIED>*> > segments_arguments;
 	PureTypeArray<QUALIFIED>* arguments = new PureTypeArray<QUALIFIED>();
@@ -86,7 +87,7 @@ BOOST_AUTO_TEST_CASE(TestWritesPublicMethod)
 	arguments->addType(text);
 	segments_arguments.push_back(pair<string, PureTypeArray<QUALIFIED>*>("print", arguments));
 	table.addMethod(NULL, &segments_arguments, PROPERTY_PUBLIC, vector<Annotation*>());
-	table.classname = "classname";
+	table.setClassname("classname");
 	//freeTypeArray(arguments);
 
 	writer.write(out, &table);
@@ -99,7 +100,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer, "test");
+	ConcretePropertySymbolTable table(&tanalyzer, "test");
 
 	PureType<QUALIFIED>* text = new PureType<QUALIFIED>(TYPE_CLASS);
 	text->typedata._class.classname = strdup("Text");
@@ -109,7 +110,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeed)
 	textNeedDecl.specialty = strdup("special");
 
 	table.addNeed(&textNeedDecl, PROPERTY_PUBLIC, vector<Annotation*>());
-	table.classname = "classname";
+	table.setClassname("classname");
 
 	writer.write(out, &table);
 
@@ -121,7 +122,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer, "test");
+	ConcretePropertySymbolTable table(&tanalyzer, "test");
 
 	PureType<QUALIFIED>* text = new PureType<QUALIFIED>(TYPE_CLASS);
 	text->typedata._class.classname = strdup("Text");
@@ -137,7 +138,7 @@ BOOST_AUTO_TEST_CASE(TestWritesNeeds)
 	printerNeedDecl.specialty = strdup("disabled");
 	table.addNeed(&textNeedDecl, PROPERTY_PUBLIC, vector<Annotation*>());
 	table.addNeed(&printerNeedDecl, PROPERTY_PUBLIC, vector<Annotation*>());
-	table.classname = "classname";
+	table.setClassname("classname");
 
 	writer.write(out, &table);
 
@@ -149,10 +150,10 @@ BOOST_AUTO_TEST_CASE(TestWritesInheritance)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer, "test");
-	table.classname = "classname";
-	table.parentage["myinterface"] = false;
-	table.parentage["myparent"] = true;
+	ConcretePropertySymbolTable table(&tanalyzer, "test");
+	table.setClassname("classname");
+	table.getParentageModifiable()["myinterface"] = false;
+	table.getParentageModifiable()["myparent"] = true;
 	writer.write(out, &table);
 
 	ASSERT_TABLE(TABLE_WITH_INHERITANCE);
@@ -163,8 +164,8 @@ BOOST_AUTO_TEST_CASE(TestWritesParameters)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer, "test");
-	table.classname = "classname";
+	ConcretePropertySymbolTable table(&tanalyzer, "test");
+	table.setClassname("classname");
 	vector<PureType<QUALIFIED>*>* parameters = new vector<PureType<QUALIFIED>*>();
 	PureType<QUALIFIED> t(TYPE_PARAMETERIZED); t.typedata.parameterized.label = strdup("T");
 	PureType<QUALIFIED> b(TYPE_PARAMETERIZED); b.typedata.parameterized.label = strdup("B");
@@ -189,7 +190,7 @@ BOOST_AUTO_TEST_CASE(TestWritesList)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer, "test");
+	ConcretePropertySymbolTable table(&tanalyzer, "test");
 	table.classname = "classname";
 	vector<PureType*> parameters;
 	PureType* list = new PureType(TYPE_LIST);
@@ -234,7 +235,7 @@ BOOST_AUTO_TEST_CASE(TestWritesOptional)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer, "test");
+	ConcretePropertySymbolTable table(&tanalyzer, "test");
 	table.classname = "classname";
 	vector<PureType*> parameters;
 	PureType* optional = new PureType(TYPE_OPTIONAL);
@@ -279,8 +280,8 @@ BOOST_AUTO_TEST_CASE(TestWritesClassAnnotations)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer, "test");
-	table.classname = "classname";
+	ConcretePropertySymbolTable table(&tanalyzer, "test");
+	table.setClassname("classname");
 	vector<PureType<QUALIFIED>*> parameters;
 	vector<Annotation*> annotations;
 	annotations.push_back(new Annotation());
@@ -314,8 +315,8 @@ BOOST_AUTO_TEST_CASE(TestWritesMethodAnnotations)
 	std::stringstream out;
 	TableFileWriter writer;
 	TypeAnalyzer tanalyzer;
-	PropertySymbolTable table(&tanalyzer, "test");
-	table.classname = "classname";
+	ConcretePropertySymbolTable table(&tanalyzer, "test");
+	table.setClassname("classname");
 	vector<PureType<QUALIFIED>*> parameters;
 	vector<Annotation*> annotations;
 	annotations.push_back(new Annotation());

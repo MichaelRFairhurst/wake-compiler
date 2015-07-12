@@ -12,8 +12,8 @@
  *
  **************************************************/
 
-#ifndef HEADER_PROPERTY_SYMBOL
-#define HEADER_PROPERTY_SYMBOL
+#ifndef HEADER_BASE_PROPERTY_SYMBOL
+#define HEADER_BASE_PROPERTY_SYMBOL
 #include <map>
 #include <string>
 #include <vector>
@@ -34,46 +34,42 @@ using namespace std;
 
 class PropertySymbolTable : public ReadOnlyPropertySymbolTable {
 	public:
-		PropertySymbolTable(TypeAnalyzer* tanalyzer, string module) : analyzer(tanalyzer), module(module), abstract(false), declaredtypeparameters(new vector<PureType<wake::QUALIFIED>*>()), needs(new vector<SpecializableVarDecl<wake::QUALIFIED>*>()) {};
-		~PropertySymbolTable();
-		boost::optional<PureType<wake::QUALIFIED>*> find(string name);
-		boost::optional<ObjectProperty*> findByCasing(string casing);
-		bool isPublic(string name);
-		string getAddress(string name);
-		int getFlags(string name);
-		boost::optional<SemanticError*> addMethod(PureType<wake::QUALIFIED>* returntype, vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments, int flags, vector<Annotation*> annotations);
-		boost::optional<SemanticError*> addProperty(VarDecl<wake::QUALIFIED>* property, int flags, vector<Annotation*> annotations);
-		boost::optional<SemanticError*> addProvision(SpecializablePureType<wake::QUALIFIED>* provision, vector<PureType<wake::QUALIFIED>*> &arguments, int flags, vector<Annotation*> annotations);
-		bool isBehavioralProvision(string name);
-		void addNeed(SpecializableVarDecl<wake::QUALIFIED>* need, int flags, vector<Annotation*> annotations);
-		void printEntryPoints(EntryPointAnalyzer* entryanalyzer);
-		vector<SpecializableVarDecl<wake::QUALIFIED>*>* getNeeds();
-		string getSymbolNameOf(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments);
-		string getCasingNameOf(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments);
-		bool isAbstract();
-		string classname;
-		bool abstract;
-		map<string, ObjectProperty*> properties;
-		const map<string, bool>& getParentage();
-		map<string, bool> parentage;
-		void setParameters(vector<PureType<wake::QUALIFIED>*>* parameters);
-		const vector<PureType<wake::QUALIFIED>*>& getParameters();
-		PureType<wake::QUALIFIED>* getAsPureType();
-		void setAnnotations(vector<Annotation*> annotations);
-		const boost::ptr_vector<Annotation>& getAnnotations();
-		void setModule(string newmodule);
-		string getModule();
+		virtual ~PropertySymbolTable(){};
+		virtual boost::optional<PureType<wake::QUALIFIED>*> find(string name)=0;
+		virtual boost::optional<ObjectProperty*> findByCasing(string casing)=0;
+		virtual bool isPublic(string name)=0;
+		virtual string getAddress(string name)=0;
+		virtual int getFlags(string name)=0;
+		virtual boost::optional<SemanticError*> addMethod(PureType<wake::QUALIFIED>* returntype, vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments, int flags, vector<Annotation*> annotations)=0;
+		virtual boost::optional<SemanticError*> addProperty(VarDecl<wake::QUALIFIED>* property, int flags, vector<Annotation*> annotations)=0;
+		virtual boost::optional<SemanticError*> addProvision(SpecializablePureType<wake::QUALIFIED>* provision, vector<PureType<wake::QUALIFIED>*> &arguments, int flags, vector<Annotation*> annotations)=0;
+		virtual bool isBehavioralProvision(string name)=0;
+		virtual void addNeed(SpecializableVarDecl<wake::QUALIFIED>* need, int flags, vector<Annotation*> annotations)=0;
+		virtual void printEntryPoints(EntryPointAnalyzer* entryanalyzer)=0;
+		virtual vector<SpecializableVarDecl<wake::QUALIFIED>*>* getNeeds()=0;
+		virtual string getSymbolNameOf(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments)=0;
+		virtual string getCasingNameOf(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments_arguments)=0;
+		virtual bool isAbstract()=0;
+		virtual void setIsAbstract(bool newvalue)=0;
+		virtual const map<string, bool>& getParentage()=0;
+		virtual map<string, bool>& getParentageModifiable()=0;
+		virtual void setParentage(map<string, bool> newparentage)=0;
+		virtual void setParameters(vector<PureType<wake::QUALIFIED>*>* parameters)=0;
+		virtual const vector<PureType<wake::QUALIFIED>*>& getParameters()=0;
+		virtual PureType<wake::QUALIFIED>* getAsPureType()=0;
+		virtual void setAnnotations(vector<Annotation*> annotations)=0;
+		virtual const boost::ptr_vector<Annotation>& getAnnotations()=0;
+		virtual void setModule(string newmodule)=0;
+		virtual string getModule()=0;
+		virtual string getClassname()=0;
+		virtual void setClassname(string classname)=0;
+		virtual TypeAnalyzer* getAnalyzer()=0;
 
-		ReadOnlyPropertySymbolTable* resolveParameters(vector<PureType<wake::QUALIFIED>*>& parameters);
+		virtual ReadOnlyPropertySymbolTable* resolveParameters(vector<PureType<wake::QUALIFIED>*>& parameters)=0;
+
+		virtual map<string, ObjectProperty*>& getProperties()=0;
 
 		friend void propagateInheritanceTables(PropertySymbolTable* parent, PropertySymbolTable* child, bool extend, ErrorTracker& errors);
-
-	private:
-		TypeAnalyzer* analyzer;
-		vector<SpecializableVarDecl<wake::QUALIFIED>*>* needs;
-		vector<PureType<wake::QUALIFIED>*>* declaredtypeparameters;
-		boost::ptr_vector<Annotation> annotations;
-		string module;
 };
 
 #endif

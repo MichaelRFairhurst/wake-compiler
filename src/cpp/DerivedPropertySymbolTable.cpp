@@ -86,6 +86,14 @@ bool DerivedPropertySymbolTable::isAbstract() {
 	return false;
 }
 
+string DerivedPropertySymbolTable::getModule() {
+	return module;
+}
+
+string DerivedPropertySymbolTable::getClassname() {
+	return classname;
+}
+
 const map<string, bool>& DerivedPropertySymbolTable::getParentage() {
 	return parentage;
 }

@@ -45,6 +45,8 @@ class ReadOnlyPropertySymbolTable {
 		virtual bool isAbstract()=0;
 		virtual ~ReadOnlyPropertySymbolTable() {};
 		virtual const map<string, bool>& getParentage()=0;
+		virtual string getModule()=0;
+		virtual string getClassname()=0;
 };
 
 #endif
