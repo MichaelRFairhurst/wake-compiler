@@ -177,7 +177,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 				file << "if(!" << table.getAddress(&ref) << ".";
 				header->addPropertyUsage(file.tellp(), "isExceptionType(Text)");
 				file << ")" << table.getAddress(&ref) << "=new ";
-				header->addClassUsage(file.tellp(), "std.Exception");
+				header->addClassUsage(file.tellp(), "lang.Exception");
 				file << "(" << table.getAddress(&ref) << ");";
 
 				// check its pure_type
