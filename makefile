@@ -206,10 +206,10 @@ bin/tests/%.o: src/cpp/test/%.cpp
 bin/cpp/%.o: src/cpp/%.cpp gen/wake.tab.c gen/objectfile.tab.c
 	$(CPP) $(OPT) -c $< -o $@
 
-bin/cpp/LibraryLoader-withlib.o: src/cpp/LibraryLoader.cpp $(WAKETABLEINCLUDES)
+bin/cpp/LibraryLoader-withlib.o: src/cpp/LibraryLoader.cpp $(WAKETABLEINCLUDES) $(GENOBJS)
 	$(CPP) $(OPT) -c $< -o $@ -DCOMPILE_IN_PRIMITIVE_TYPES
 
-bin/cpp/LibraryLoader-nolib.o: src/cpp/LibraryLoader.cpp
+bin/cpp/LibraryLoader-nolib.o: src/cpp/LibraryLoader.cpp $(GENOBJS)
 	$(CPP) $(OPT) -c $< -o $@
 
 bin/c/%.o: src/c/%.c gen/wake.tab.c gen/objectfile.tab.c
