@@ -103,9 +103,7 @@ COBJS=$(addprefix bin/c/, $(CNAMES:.c=.o))
 GENNAMES=lex.wake.c wake.tab.c objectfile.tab.c lex.objectfile.c
 GENOBJS=$(addprefix bin/gen/, $(GENNAMES:.c=.o))
 
-ifeq ( false , $(TEST) )
-TESTNAMES=
-else
+ifeq ( true , $(TEST) )
 TESTNAMES=CompilerTests.cpp \
 	ClassSpaceSymbolTableTest.cpp \
 	Integration.cpp \
@@ -119,6 +117,8 @@ TESTNAMES=CompilerTests.cpp \
 	TableFileDataSets.cpp \
 	TableFileReaderTest.cpp \
 	DerivedPropertySymbolTableTest.cpp
+else
+TESTNAMES=
 endif
 
 TESTOBJS=$(addprefix bin/tests/, $(TESTNAMES:.cpp=.o))
