@@ -3,7 +3,7 @@ require "formula"
 class Wake < Formula
   url "https://github.com/MichaelRFairhurst/wake-compiler/archive/v0.2.1.tar.gz"
   homepage "http://www.wakelang.com"
-  sha1 "5488504a699937adc181c023e193ef14170cb0dc"
+  sha1 "04920699e52f87e73f34f1a435f49bc3cbed9166"
 
   depends_on "boost" => 'c++11'
   depends_on "flex"
