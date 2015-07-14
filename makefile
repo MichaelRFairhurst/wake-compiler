@@ -103,7 +103,7 @@ COBJS=$(addprefix bin/c/, $(CNAMES:.c=.o))
 GENNAMES=lex.wake.c wake.tab.c objectfile.tab.c lex.objectfile.c
 GENOBJS=$(addprefix bin/gen/, $(GENNAMES:.c=.o))
 
-ifeq ( true , $(TEST) )
+ifeq (true,$(TEST))
 TESTNAMES=CompilerTests.cpp \
 	ClassSpaceSymbolTableTest.cpp \
 	Integration.cpp \
