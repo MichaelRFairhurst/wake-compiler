@@ -43,6 +43,7 @@ CPPNAMES= \
 	ClassParseTreeTraverser.cpp \
 	MethodSignatureParseTreeTraverser.cpp \
 	ObjectFileGenerator.cpp \
+	JavaObjectFileGenerator.cpp \
 	ObjectFileHeaderData.cpp \
 	ObjectFileHeaderRenderer.cpp \
 	AddressAllocator.cpp \
