@@ -136,7 +136,7 @@ void PrecedenceEnforcer::enforce(Node* tree) {
 
 		case NT_RETRIEVAL:
 			{
-				enforce(tree->node_data.nodes[2]);
+				enforceExact(tree, 2, config.getPrec(NT_METHOD_INVOCATION));
 				for(int i = 0; i < tree->node_data.nodes[1]->subnodes; i++) {
 					enforce(tree->node_data.nodes[1]->node_data.nodes[i]);
 				}
