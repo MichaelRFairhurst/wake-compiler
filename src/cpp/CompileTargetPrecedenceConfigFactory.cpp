@@ -28,6 +28,7 @@ CompileTargetPrecedenceConfig CompileTargetPrecedenceConfigFactory::java() {
 	config[NT_EARLYBAILOUT_METHOD_INVOCATION] = 0;
 	config[NT_RETRIEVAL] = 0;
 	config[NT_LAMBDA_INVOCATION] = 0;
+	config[NT_RETRIEVAL] = 0;
 	// ++ config[NT_INVOCATION] = 0;
 	// -- config[NT_INVOCATION] = 0;
 
