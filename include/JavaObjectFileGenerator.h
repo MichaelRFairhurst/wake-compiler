@@ -30,6 +30,7 @@ class JavaObjectFileGenerator {
 	public:
 		JavaObjectFileGenerator(ostream& file, ClassSpaceSymbolTable* classes) : file(file) {this->classes = classes; forceArrayIdentifier = false; }
 		void generate(Node* tree);
+		void generateInterface(Node* tree);
 
 	private:
 		string toJavaTypeInformation(PureType<wake::QUALIFIED> type, bool forceBoxedTypes = false);

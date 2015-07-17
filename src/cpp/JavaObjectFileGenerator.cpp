@@ -82,8 +82,18 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 			}
 			break;
 
-		case NT_VALUES:
 		case NT_CLASSSET:
+			{
+				table.pushScope();
+				int i;
+				for(i = 0; i < tree->subnodes; i++)
+					generateInterface(tree->node_data.nodes[i]);
+				table.popScope();
+
+			}
+			break;
+
+		case NT_VALUES:
 		case NT_EXPRESSIONS:
 		case NT_INHERITANCESET:
 		case NT_PROVISIONS:
@@ -110,11 +120,11 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 
 		case NT_CLASS:
 			{
-				file << "public class ";
+				file << "\tpublic static class Impl implements " << classname << " {";
 				classname = tree->node_data.nodes[0]->node_data.pure_type->typedata._class.classname;
-				file << classname;
+				//file << classname;
 
-				file << " {\n";
+				//file << " {\n";
 
 				vector<SpecializableVarDecl<QUALIFIED>*>* needs = classes->findByImportedName(classname)->getNeeds();
 				for(vector<SpecializableVarDecl<QUALIFIED>*>::iterator it = needs->begin(); it != needs->end(); ++it) {
@@ -122,8 +132,7 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 					file << "\tpublic " << toJavaTypeInformation((*it)->decl.typedata) +  " " << toJavaIdentifier(ref) << ";\n";
 				}
 
-				file << "\tpublic ";
-				file << classname << "(";
+				file << "\tpublic Impl(";
 				table.pushScope();
 
 				for(vector<SpecializableVarDecl<QUALIFIED>*>::iterator it = needs->begin(); it != needs->end(); ++it) {
@@ -397,10 +406,9 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 
 		case NT_LAMBDA_INVOCATION:
 			{
-				file << "(";
 				generate(tree->node_data.nodes[0]);
 
-				file << ")(";
+				file << "(";
 				if(tree->subnodes == 2)
 				for(int i = 0; i < tree->node_data.nodes[1]->subnodes; i++) {
 					if(i != 0) {
@@ -563,49 +571,48 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_ASSIGNMENT:
-			generate(tree->node_data.nodes[0]);
-			file << " = ";
-			generate(tree->node_data.nodes[1]);
+			if(tree->node_data.nodes[0]->node_type == NT_ARRAY_ACCESS_LVAL) {
+				generate(tree->node_data.nodes[0]->node_data.nodes[0]);
+				file << ".set(";
+				generate(tree->node_data.nodes[0]->node_data.nodes[1]);
+				file << ", ";
+				generate(tree->node_data.nodes[1]);
+				file << ")";
+			} else {
+				generate(tree->node_data.nodes[0]);
+				file << " = ";
+				generate(tree->node_data.nodes[1]);
+			}
 			break;
 
 		case NT_VALUED_ASSIGNMENT:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " = ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_ADD_ASSIGNMENT:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " += ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_SUB_ASSIGNMENT:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " -= ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_MULT_ASSIGNMENT:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " *= ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_DIV_ASSIGNMENT:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " /= ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_ARRAY_DECLARATION:
@@ -663,13 +670,12 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 		case NT_ARRAY_ACCESS_LVAL:
 		case NT_TYPESAFE_ARRAY_ACCESS:
 		case NT_ARRAY_ACCESS:
-			file << "(";
 			forceArrayIdentifier = true;
 			generate(tree->node_data.nodes[0]);
 			forceArrayIdentifier = false;
-			file << ")[";
+			file << ".get(";
 			generate(tree->node_data.nodes[1]);
-			file << "]";
+			file << ")";
 			break;
 
 		case NT_EXISTS:
@@ -791,13 +797,11 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 		case NT_THIS: file << "this"; break;
 
 		case NT_IF_THEN_ELSE:
-			file << "((";
 			generate(tree->node_data.nodes[1]);
-			file << ") ? (";
+			file << " ? ";
 			generate(tree->node_data.nodes[0]);
-			file << ") : (";
+			file << " : ";
 			generate(tree->node_data.nodes[2]);
-			file << "))";
 			break;
 
 		case NT_RETURN:
@@ -810,25 +814,20 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_INVERT:
-			file << "(!";
+			file << "!";
 			generate(tree->node_data.nodes[0]);
-			file << ")";
 			break;
 
 		case NT_MULTIPLY:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " * ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_DIVIDE:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " / ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_MOD:
@@ -841,137 +840,104 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 
 		case NT_MODNATIVE:
 		case NT_MODALT:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " % ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_ADD:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " + ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_SUBTRACT:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " - ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_BITSHIFTLEFT:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " << ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_BITSHIFTRIGHT:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " >> ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_LESSTHAN:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " < ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_GREATERTHAN:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " > ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_LESSTHANEQUAL:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " <= ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_GREATERTHANEQUAL:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " >= ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_EQUALITY:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " == ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_INEQUALITY:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " != ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_BITNOT:
-			file << "(~";
+			file << "~";
 			generate(tree->node_data.nodes[0]);
-			file << ")";
 			break;
 
 		case NT_BITAND:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " & ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_BITXOR:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " ^ ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_BITOR:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " | ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_AND:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " && ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_OR:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << " || ";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_INTEGERLIT:
@@ -1061,4 +1027,95 @@ string JavaObjectFileGenerator::toJavaIdentifier(const VarRef& ref) {
 	}
 
 	return ident;
+}
+
+void JavaObjectFileGenerator::generateInterface(Node* tree) {
+	switch(tree->node_type) {
+		case NT_CLASS:
+			{
+				file << "public interface ";
+				classname = tree->node_data.nodes[0]->node_data.pure_type->typedata._class.classname;
+				file << classname;
+
+				file << " {\n";
+				generate(tree);
+
+				vector<SpecializableVarDecl<QUALIFIED>*>* needs = classes->findByImportedName(classname)->getNeeds();
+				for(vector<SpecializableVarDecl<QUALIFIED>*>::iterator it = needs->begin(); it != needs->end(); ++it) {
+					VarRef ref = (*it)->decl.createVarRef();
+					file << "\tpublic abstract " << toJavaTypeInformation((*it)->decl.typedata) +  " " << toJavaIdentifier(ref) << ";\n";
+				}
+
+				generateInterface(tree->node_data.nodes[1]);
+				if(tree->subnodes > 2) generateInterface(tree->node_data.nodes[2]);
+
+				file << "};";
+			}
+			break;
+
+		case NT_CLASSBODY:
+			{
+				int i;
+				// Generate properties
+				for(i = 0; i < tree->subnodes; i++)
+				if(tree->node_data.nodes[i]->node_type == NT_PROPERTY)
+					generateInterface(tree->node_data.nodes[i]);
+
+				file << "\n";
+
+				// Generate methods & provisions
+				for(i = 0; i < tree->subnodes; i++)
+				if(tree->node_data.nodes[i]->node_type == NT_METHOD_DECLARATION || tree->node_data.nodes[i]->node_type == NT_ANNOTATED_METHOD || tree->node_data.nodes[i]->node_type == NT_PROVISIONS)
+					generateInterface(tree->node_data.nodes[i]);
+
+				// TODO generate ctor body
+			}
+			break;
+
+		case NT_METHOD_DECLARATION:
+			{
+				MethodSignatureParseTreeTraverser traverser(classes);
+				table.pushScope();
+				string name;
+				vector<VarDecl<QUALIFIED>*> arguments = traverser.getArgDecls(tree);
+				int i;
+
+				file << "\tpublic ";
+
+				PureType<wake::QUALIFIED>* ret = traverser.getReturn(tree);
+				if(ret == NULL) {
+					file << "void";
+				} else {
+					file << toJavaTypeInformation(*ret);
+				}
+
+				vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >* segments = traverser.getName(tree);
+				for(vector<pair<string, PureTypeArray<wake::QUALIFIED>*> >::iterator it = segments->begin(); it != segments->end(); ++it) {
+					name += it->first;
+					for(int i = 0; it != --segments->end() && i < it->second->typecount; ++i) {
+						name += "_";
+					}
+				}
+
+				file << " " << name << "(";
+
+				for(i = 0; i < arguments.size(); i++) {
+					if(i != 0) file << ",";
+					table.add(arguments[i]);
+					VarRef ref = arguments[i]->createVarRef();
+					file << toJavaTypeInformation(arguments[i]->typedata) << " " << table.getAddress(&ref);
+				}
+
+				file << ");\n\n";
+				table.popScope();
+			}
+
+			break;
+
+		case NT_PROPERTY:
+			{
+				file << "\tpublic abstract " << toJavaTypeInformation(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.var_decl->typedata) << " " << toJavaIdentifier(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.var_decl->createVarRef()) << ";\n";
+			}
+			break;
+	}
 }
