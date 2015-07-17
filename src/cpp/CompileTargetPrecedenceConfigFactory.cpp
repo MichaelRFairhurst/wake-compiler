@@ -70,6 +70,7 @@ CompileTargetPrecedenceConfig CompileTargetPrecedenceConfigFactory::java() {
 	config[NT_IF_THEN_ELSE] = 13;
 
 	config[NT_ASSIGNMENT] = 14;
+	config[NT_VALUED_ASSIGNMENT] = 14;
 	config[NT_ADD_ASSIGNMENT] = 14;
 	config[NT_DIV_ASSIGNMENT] = 14;
 	config[NT_MULT_ASSIGNMENT] = 14;

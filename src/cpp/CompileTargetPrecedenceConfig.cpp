@@ -17,7 +17,7 @@
 using namespace std;
 
 bool CompileTargetPrecedenceConfig::binAssoc(int type) {
-	return type != NT_DIVIDE && type != NT_MOD && type != NT_MODNATIVE && type != NT_MODALT && type != NT_BITSHIFTLEFT && type != NT_BITSHIFTRIGHT;
+	return type != NT_SUBTRACT && type != NT_DIVIDE && type != NT_MOD && type != NT_MODNATIVE && type != NT_MODALT && type != NT_BITSHIFTLEFT && type != NT_BITSHIFTRIGHT;
 }
 
 /**

@@ -23,7 +23,7 @@
 using namespace wake;
 
 void ObjectFileGenerator::generate(Node* tree) {
-	if(forceArrayIdentifier && tree->node_type != NT_VAR_REF) {
+	if(forceArrayIdentifier && tree->node_type != NT_VAR_REF && tree->node_type != NT_REQUIRED_PARENS) {
 		forceArrayIdentifier = false;
 	}
 
@@ -410,10 +410,9 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 		case NT_LAMBDA_INVOCATION:
 			{
-				file << "(";
 				generate(tree->node_data.nodes[0]);
 
-				file << ")(";
+				file << "(";
 				if(tree->subnodes == 2)
 				for(int i = 0; i < tree->node_data.nodes[1]->subnodes; i++) {
 					if(i != 0) {
@@ -465,7 +464,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 				table.add(safecheckedname.str(), safechecked.get());
 
 				file << "(function(" << table.getAddress(safecheckedname.str()) << "){";
-				file << "return " << table.getAddress(safecheckedname.str()) << "===null?null:(";
+				file << "return " << table.getAddress(safecheckedname.str()) << "===null?null:";
 				file << table.getAddress(safecheckedname.str());
 				file << ".";
 				header->addPropertyUsage(file.tellp(), name);
@@ -481,7 +480,7 @@ void ObjectFileGenerator::generate(Node* tree) {
 					}
 				}
 
-				file << "));})(";
+				file << ");})(";
 				generate(tree->node_data.nodes[0]);
 				file << ")";
 				table.popScope();
@@ -574,43 +573,33 @@ void ObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_VALUED_ASSIGNMENT:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << "=";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_ADD_ASSIGNMENT:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << "+=";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_SUB_ASSIGNMENT:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << "-=";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_MULT_ASSIGNMENT:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << "*=";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_DIV_ASSIGNMENT:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << "/=";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_ARRAY_DECLARATION:
@@ -667,11 +656,10 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 		case NT_ARRAY_ACCESS_LVAL:
 		case NT_TYPESAFE_ARRAY_ACCESS:
-			file << "(";
 			forceArrayIdentifier = true;
 			generate(tree->node_data.nodes[0]);
 			forceArrayIdentifier = false;
-			file << ")[";
+			file << "[";
 			generate(tree->node_data.nodes[1]);
 			file << "]";
 			break;
@@ -806,13 +794,11 @@ void ObjectFileGenerator::generate(Node* tree) {
 		case NT_THIS: file << "this"; break;
 
 		case NT_IF_THEN_ELSE:
-			file << "((";
 			generate(tree->node_data.nodes[1]);
-			file << ")?(";
+			file << "?";
 			generate(tree->node_data.nodes[0]);
-			file << "):(";
+			file << ":";
 			generate(tree->node_data.nodes[2]);
-			file << "))";
 			break;
 
 		case NT_RETURN:
@@ -822,25 +808,20 @@ void ObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_INVERT:
-			file << "(!";
+			file << "!";
 			generate(tree->node_data.nodes[0]);
-			file << ")";
 			break;
 
 		case NT_MULTIPLY:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << "*";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_DIVIDE:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << "/";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_MOD:
@@ -853,137 +834,104 @@ void ObjectFileGenerator::generate(Node* tree) {
 
 		case NT_MODNATIVE:
 		case NT_MODALT:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << "%";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_ADD:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << "+";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_SUBTRACT:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << "-";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_BITSHIFTLEFT:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << "<<";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_BITSHIFTRIGHT:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << ">>";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_LESSTHAN:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << "<";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_GREATERTHAN:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << ">";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_LESSTHANEQUAL:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << "<=";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_GREATERTHANEQUAL:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << ">=";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_EQUALITY:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << "==";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_INEQUALITY:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << "!=";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_BITNOT:
-			file << "(~";
+			file << "~";
 			generate(tree->node_data.nodes[0]);
-			file << ")";
 			break;
 
 		case NT_BITAND:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << "&";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_BITXOR:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << "^";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_BITOR:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << "|";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_AND:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << "&&";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_OR:
-			file << "(";
 			generate(tree->node_data.nodes[0]);
 			file << "||";
 			generate(tree->node_data.nodes[1]);
-			file << ")";
 			break;
 
 		case NT_REQUIRED_PARENS:

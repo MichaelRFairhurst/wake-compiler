@@ -31,8 +31,8 @@ void PrecedenceEnforcer::enforceExact(Node* tree, int index, int outer) {
 	}
 }
 
-void PrecedenceEnforcer::enforceNonAssociative(Node* tree, int outer) {
-	enforceAssociative(tree, outer - 1);
+void PrecedenceEnforcer::enforceNonAssociative(Node* tree, int index) {
+	enforceExact(tree, index, config.getPrec(tree->node_type) - 1);
 }
 
 void PrecedenceEnforcer::enforce(Node* tree) {
@@ -216,6 +216,15 @@ void PrecedenceEnforcer::enforce(Node* tree) {
 			}
 			break;
 
+		case NT_LAMBDA_INVOCATION:
+			enforceAssociative(tree, 0);
+			if(tree->subnodes == 2) {
+				for(int i = 0; i < tree->node_data.nodes[1]->subnodes; ++i) {
+					enforce(tree->node_data.nodes[1]->node_data.nodes[i]);
+				}
+			}
+			break;
+
 		case NT_IF_THEN_ELSE:
 			if(config.triAssocLeft(NT_IF_THEN_ELSE)) {
 				enforceAssociative(tree, 0);
@@ -275,13 +284,14 @@ void PrecedenceEnforcer::enforce(Node* tree) {
 		case NT_BITOR:
 		case NT_AND:
 		case NT_OR:
-		case NT_LAMBDA_INVOCATION:
+			enforceAssociative(tree, 0);
 			if(config.binAssoc(tree->node_type)) {
-				enforceNonAssociative(tree, 0);
+				//enforceAssociative(tree, 0);
+				enforceAssociative(tree, 1);
 			} else {
-				enforceAssociative(tree, 0);
+				//enforceNonAssociative(tree, 0);
+				enforceNonAssociative(tree, 1);
 			}
-			enforceAssociative(tree, 1);
 			break;
 	}
 }
