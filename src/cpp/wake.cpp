@@ -43,6 +43,8 @@ extern "C" {
 #include "SimpleAddressTable.h"
 #include "ImportParseTreeTraverser.h"
 #include "ErrorTracker.h"
+#include "CompileTargetPrecedenceConfigFactory.h"
+#include "PrecedenceEnforcer.h"
 #include <boost/filesystem.hpp>
 #include <boost/unordered_set.hpp>
 using namespace boost;
@@ -155,7 +157,12 @@ void compileFile(Options* options) {
 		return;
 	}
 
+	CompileTargetPrecedenceConfigFactory precedenceConfigFactory;
+	CompileTargetPrecedenceConfig javaPrecedence = precedenceConfigFactory.java();
+	PrecedenceEnforcer precedenceEnforcer(javaPrecedence);
+
 	for(int i = 0; i < options->inFilenames.size(); ++i) {
+		precedenceEnforcer.enforce(parsers[i].getParseTree());
 		basic_ostringstream<char> object;
 		ObjectFileHeaderData header;
 

@@ -59,6 +59,9 @@ CPPNAMES= \
 	TempPropertySymbolTable.cpp \
 	AnnotationTreeTraverser.cpp \
 	UnifyingType.cpp \
+	PrecedenceEnforcer.cpp \
+	CompileTargetPrecedenceConfigFactory.cpp \
+	CompileTargetPrecedenceConfig.cpp \
 	AstCreator.cpp \
 	ast/Catch.cpp \
 	ast/MethodSegment.cpp \

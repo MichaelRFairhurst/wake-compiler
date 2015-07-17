@@ -1009,6 +1009,12 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_NOTHING: file << "null"; break;
+
+		case NT_REQUIRED_PARENS:
+			file << "(";
+			generate(tree->node_data.nodes[0]);
+			file << ")";
+			break;
 	}
 }
 

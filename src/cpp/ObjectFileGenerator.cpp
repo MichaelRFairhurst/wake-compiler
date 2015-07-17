@@ -986,6 +986,12 @@ void ObjectFileGenerator::generate(Node* tree) {
 			file << ")";
 			break;
 
+		case NT_REQUIRED_PARENS:
+			file << "(";
+			generate(tree->node_data.nodes[0]);
+			file << ")";
+			break;
+
 		case NT_INTEGERLIT:
 			file << tree->node_data.integer;
 			break;
