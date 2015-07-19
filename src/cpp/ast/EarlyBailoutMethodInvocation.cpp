@@ -20,6 +20,7 @@ using namespace wake;
 
 PureType<QUALIFIED>* ast::EarlyBailoutMethodInvocation::typeCheck(bool forceArrayIdentifier) {
 	PureType<QUALIFIED> subject = *auto_ptr<PureType<QUALIFIED> >(subjectExpr->typeCheck(false));
+	addSubNode(node, makeNodeFromPureType((PureType<UNQUALIFIED>*) new PureType<QUALIFIED>(subject), node->loc));
 	if(subject.type == TYPE_MATCHALL) {
 		return new PureType<QUALIFIED>(subject);
 	} else if(subject.type != TYPE_OPTIONAL) {
