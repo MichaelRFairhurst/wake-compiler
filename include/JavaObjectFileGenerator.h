@@ -30,12 +30,14 @@ class JavaObjectFileGenerator {
 	public:
 		JavaObjectFileGenerator(ostream& file, ClassSpaceSymbolTable* classes) : file(file) {this->classes = classes; forceArrayIdentifier = false; }
 		void generate(Node* tree);
-		void generateInterface(Node* tree);
 
 	private:
+		void generateInterface(Node* tree);
+		void generateEarlyBailoutTemporaries(Node* tree);
 		string toJavaTypeInformation(PureType<wake::QUALIFIED> type, bool forceBoxedTypes = false);
 		string toJavaTypeInformation(PureType<wake::UNQUALIFIED> type);
 		string toJavaIdentifier(const VarRef& ref);
+		string toJavaProvisionSymbol(string wakesymbol);
 		bool forceArrayIdentifier;
 		TypeAnalyzer typeanalyzer;
 		ClassSpaceSymbolTable* classes;

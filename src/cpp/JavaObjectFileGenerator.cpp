@@ -65,6 +65,7 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 				int i;
 				for(i = 0; i < tree->subnodes; i++) {
 					file << "\t\t";
+					generateEarlyBailoutTemporaries(tree->node_data.nodes[i]);
 					generate(tree->node_data.nodes[i]);
 					file << ";\n\t\t";
 				}
@@ -120,7 +121,7 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 
 		case NT_CLASS:
 			{
-				file << "\tpublic static class Impl implements " << classname << " {";
+				file << "\tpublic static class Impl implements " << classname << " {\n";
 				classname = tree->node_data.nodes[0]->node_data.pure_type->typedata._class.classname;
 				//file << classname;
 
@@ -155,7 +156,7 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 				generate(tree->node_data.nodes[1]);
 				if(tree->subnodes > 2) generate(tree->node_data.nodes[2]);
 
-				file << "};";
+				file << "}\n";
 				table.popScope();
 			}
 			break;
@@ -193,14 +194,14 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 			break;
 
 		case NT_PROVISION:
-			file << "this.";
+			file << "\tpublic ";
 			//header->addPropertyUsage(file.tellp(), tree->node_data.nodes[tree->subnodes - 1]->node_data.string);
-			file << "=";
 			if(tree->subnodes == 2) { // one for pure_type, on for hint
 				string provisionname = tree->node_data.nodes[0]->node_data.pure_type->typedata._class.classname;
-				file << "function(){return new ";
+				file << toJavaTypeInformation(*tree->node_data.nodes[0]->node_data.pure_type);
+				file << " " << toJavaProvisionSymbol(tree->node_data.nodes[tree->subnodes - 1]->node_data.string) << "() {\n\t\t";
 				//header->addClassUsage(file.tellp(), classes->getFullyQualifiedClassname(provisionname));
-				file << "(";
+				file << "return new " << toJavaTypeInformation(*tree->node_data.nodes[0]->node_data.pure_type) << "(";
 				vector<SpecializableVarDecl<QUALIFIED>*>* needs = classes->findByImportedName(provisionname)->getNeeds();
 				for(vector<SpecializableVarDecl<QUALIFIED>*>::iterator it = needs->begin(); it != needs->end(); ++it) {
 					SpecializablePureType<QUALIFIED> spType;
@@ -208,19 +209,19 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 					spType.typedata = (*it)->decl.typedata;
 					vector<PureType<QUALIFIED>*> no_args;
 					if(it != needs->begin()) file << ",";
-					file << "this.";
-					//header->addPropertyUsage(file.tellp(), spType.toProvisionSymbol(no_args));
-					file << "()";
+					file << "this." << toJavaProvisionSymbol(spType.toProvisionSymbol(no_args)) << "()";
 				}
-				file << ");";
+				file << ");\n\t}\n";
 			} else {
+				file << toJavaTypeInformation(tree->node_data.nodes[0]->node_data.specializable_pure_type->typedata);
+				file << " " << toJavaProvisionSymbol(tree->node_data.nodes[tree->subnodes - 1]->node_data.string) << "(";
 				if(tree->node_data.nodes[1]->node_type == NT_SPECIALIZABLE_TYPEDATA) {
-					file << "function(){return this.";
+					file << ") {\n\t\t";
+					file << "return this.";
 					vector<PureType<QUALIFIED>*> no_args;
-					//header->addPropertyUsage(file.tellp(), tree->node_data.nodes[1]->node_data.specializable_pure_type->toProvisionSymbol(no_args));
-					file << "();";
+					file << toJavaProvisionSymbol(tree->node_data.nodes[1]->node_data.specializable_pure_type->toProvisionSymbol(no_args));
+					file << "();\n\t}\n";
 				} else if(tree->node_data.nodes[1]->node_type == NT_INJECTION) {
-					file << "function(";
 					vector<PureType<QUALIFIED>*> no_args;
 					Node* inj = tree->node_data.nodes[1]->node_data.nodes[1];
 					table.pushScope();
@@ -236,13 +237,12 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 							decl.alias = strdup(string('$', i).c_str()); // unique name for each
 							table.add(&decl);
 							VarRef ref = decl.createVarRef();
-							file << table.getAddress(&ref);
+							file << toJavaTypeInformation(decl.typedata) << " " << table.getAddress(&ref);
 						}
 					}
 
-					file << "){return new ";
-					string provisionname = tree->node_data.nodes[0]->node_data.pure_type->typedata._class.classname;
-					//header->addClassUsage(file.tellp(), classes->getFullyQualifiedClassname(provisionname));
+					file << "){\n\t\treturn new ";
+					file << toJavaTypeInformation(*tree->node_data.nodes[0]->node_data.pure_type);
 					file << "(";
 						for(int i = 0; i < inj->subnodes; i++) {
 							if(i != 0) {
@@ -254,11 +254,11 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 								file << table.getAddress(&ref);
 							} else {
 								file << "this.";
-								//header->addPropertyUsage(file.tellp(), inj->node_data.nodes[i]->node_data.specializable_pure_type->toProvisionSymbol(no_args));
+								file << toJavaProvisionSymbol(inj->node_data.nodes[i]->node_data.specializable_pure_type->toProvisionSymbol(no_args));
 								file << "()";
 							}
 						}
-					file << ");";
+					file << ");\n\t}\n";
 					table.popScope();
 				} else if(tree->node_data.nodes[1]->node_type == NT_STRINGLIT
 					|| tree->node_data.nodes[1]->node_type == NT_NUMBERLIT
@@ -266,27 +266,27 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 					|| tree->node_data.nodes[1]->node_type == NT_INTEGERLIT
 					|| tree->node_data.nodes[1]->node_type == NT_CHARLIT
 				) {
-					file << "function(){return ";
+					file << ") {\n\t\t return ";
 					generate(tree->node_data.nodes[1]);
+					file << "\n\t}\n";
 				} else if(tree->node_data.nodes[1]->node_type == NT_PROVISION_BEHAVIOR) {
-					file << "function(";
-
 					table.pushScope();
 
 					for(int i = 0; i < tree->node_data.nodes[1]->node_data.nodes[0]->subnodes; i++) {
 						if(i != 0) file << ",";
 						// its ok that we have to cast, its been qualified elsewhere
-						table.add((VarDecl<QUALIFIED>*) tree->node_data.nodes[1]->node_data.nodes[0]->node_data.nodes[i]->node_data.var_decl);
-						VarRef ref = tree->node_data.nodes[1]->node_data.nodes[0]->node_data.nodes[i]->node_data.var_decl->createVarRef();
-						file << table.getAddress(&ref);
+						VarDecl<QUALIFIED>* decl = (VarDecl<QUALIFIED>*) tree->node_data.nodes[1]->node_data.nodes[0]->node_data.nodes[i]->node_data.var_decl;
+						table.add(decl);
+						VarRef ref = decl->createVarRef();
+						file << toJavaTypeInformation(decl->typedata) << " " << table.getAddress(&ref);
 					}
 
-					file << "){";
+					file << ") {\n";
 					generate(tree->node_data.nodes[1]->node_data.nodes[1]);
 					table.popScope();
+					file << "\n\t}\n";
 				}
 			}
-			file << "};";
 			break;
 
 		case NT_SUBINJECTIONS:
@@ -456,24 +456,24 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 
 		case NT_EARLYBAILOUT_METHOD_INVOCATION:
 			{
-				string methodclass = tree->node_data.nodes[tree->subnodes - 2]->node_data.string;
-				string name = tree->node_data.nodes[tree->subnodes - 1]->node_data.string;
+				file << "tmp1=(";
+				generate(tree->node_data.nodes[0]);
+				file << ")==null?null:tmp1";
 
-				table.pushScope();
-				auto_ptr<PureType<QUALIFIED> > safechecked(new PureType<QUALIFIED>(TYPE_MATCHALL));
-				std::stringstream safecheckedname;
-				safecheckedname << safechecked.get();
-				table.add(safecheckedname.str(), safechecked.get());
+				string name;
 
-				file << "(function(" << table.getAddress(safecheckedname.str()) << "){";
-				file << "return " << table.getAddress(safecheckedname.str()) << "===null?null:(";
-				file << table.getAddress(safecheckedname.str());
-				file << ".";
-				//header->addPropertyUsage(file.tellp(), name);
-				file << "(";
+				int i;
+				for(i = 0; i < tree->node_data.nodes[1]->subnodes; ++i) {
+					name += tree->node_data.nodes[1]->node_data.nodes[i]->node_data.string;
+					i += 1;
+					for(int b = 0; i < tree->node_data.nodes[1]->subnodes - 1 && b < tree->node_data.nodes[1]->node_data.nodes[i]->subnodes; b++) {
+						name += "_";
+					}
+				}
+
+				file << "." << name << "(";
 
 				int argnum = 0;
-				int i;
 				for(i = 1; i < tree->node_data.nodes[1]->subnodes; i += 2) {
 					for(int b = 0; b < tree->node_data.nodes[1]->node_data.nodes[i]->subnodes; b++) {
 						if(argnum != 0) file << ",";
@@ -482,10 +482,7 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 					}
 				}
 
-				file << "));})(";
-				generate(tree->node_data.nodes[0]);
 				file << ")";
-				table.popScope();
 			}
 			break;
 
@@ -526,7 +523,7 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 				generate(tree->node_data.nodes[2]);
 				string provisionSymbol = tree->node_data.nodes[tree->subnodes - 1]->node_data.string;
 
-				file << ".";
+				file << "." << toJavaProvisionSymbol(provisionSymbol);
 				//header->addPropertyUsage(file.tellp(), provisionSymbol);
 				file << "(";
 				for(int i = 0; i < tree->node_data.nodes[1]->subnodes; i++) {
@@ -1116,6 +1113,257 @@ void JavaObjectFileGenerator::generateInterface(Node* tree) {
 			{
 				file << "\tpublic abstract " << toJavaTypeInformation(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.var_decl->typedata) << " " << toJavaIdentifier(tree->node_data.nodes[0]->node_data.nodes[0]->node_data.var_decl->createVarRef()) << ";\n";
 			}
+			break;
+
+		case NT_PROVISION:
+			file << "\tpublic ";
+			if(tree->subnodes == 2) { // one for pure_type, on for hint
+				string provisionname = tree->node_data.nodes[0]->node_data.pure_type->typedata._class.classname;
+				file << toJavaTypeInformation(*tree->node_data.nodes[0]->node_data.pure_type);
+				file << " " << toJavaProvisionSymbol(tree->node_data.nodes[tree->subnodes - 1]->node_data.string) << "();\n";
+			} else {
+				file << toJavaTypeInformation(tree->node_data.nodes[0]->node_data.specializable_pure_type->typedata);
+				file << " " << toJavaProvisionSymbol(tree->node_data.nodes[tree->subnodes - 1]->node_data.string) << "(";
+				if(tree->node_data.nodes[1]->node_type == NT_SPECIALIZABLE_TYPEDATA) {
+					file << ");\n";
+				} else if(tree->node_data.nodes[1]->node_type == NT_INJECTION) {
+					vector<PureType<QUALIFIED>*> no_args;
+					Node* inj = tree->node_data.nodes[1]->node_data.nodes[1];
+					table.pushScope();
+
+					bool first = true;
+					for(int i = 0; i < inj->subnodes; i++) {
+						if(inj->node_data.nodes[i]->node_type == NT_INJECTION_ARG) {
+							if(first) first = false;
+							else file << ",";
+							VarDecl<QUALIFIED> decl;
+							// its ok that we have to cast, its been qualified elswhere
+							decl.typedata = *(PureType<QUALIFIED>*) inj->node_data.nodes[i]->node_data.nodes[0]->node_data.pure_type;
+							decl.alias = strdup(string('$', i).c_str()); // unique name for each
+							table.add(&decl);
+							VarRef ref = decl.createVarRef();
+							file << toJavaTypeInformation(decl.typedata) << " " << table.getAddress(&ref);
+						}
+					}
+
+					file << ");\n";
+					table.popScope();
+				} else if(tree->node_data.nodes[1]->node_type == NT_STRINGLIT
+					|| tree->node_data.nodes[1]->node_type == NT_NUMBERLIT
+					|| tree->node_data.nodes[1]->node_type == NT_BOOLLIT
+					|| tree->node_data.nodes[1]->node_type == NT_INTEGERLIT
+					|| tree->node_data.nodes[1]->node_type == NT_CHARLIT
+				) {
+					file << ");\n";
+				} else if(tree->node_data.nodes[1]->node_type == NT_PROVISION_BEHAVIOR) {
+					table.pushScope();
+
+					for(int i = 0; i < tree->node_data.nodes[1]->node_data.nodes[0]->subnodes; i++) {
+						if(i != 0) file << ",";
+						// its ok that we have to cast, its been qualified elsewhere
+						VarDecl<QUALIFIED>* decl = (VarDecl<QUALIFIED>*) tree->node_data.nodes[1]->node_data.nodes[0]->node_data.nodes[i]->node_data.var_decl;
+						table.add(decl);
+						VarRef ref = decl->createVarRef();
+						file << toJavaTypeInformation(decl->typedata) << " " << table.getAddress(&ref);
+					}
+
+					file << ");\n";
+					table.popScope();
+				}
+			}
+			break;
+	}
+}
+
+string JavaObjectFileGenerator::toJavaProvisionSymbol(string wakesymbol) {
+	string ret = "provide_";
+	bool ignore = false;
+	for(int i = 0; i < wakesymbol.size(); ++i)
+	switch(wakesymbol[i]) {
+		case '(':
+			ignore = true;
+			break;
+		case ')':
+			ignore = false;
+		case '<':
+			break;
+		case '-':
+			if(i != wakesymbol.size() - 1) {
+				ret += "_";
+			}
+			break;
+
+		default:
+			if(!ignore) {
+				ret += wakesymbol[i];
+			}
+	}
+
+	return ret;
+}
+
+void JavaObjectFileGenerator::generateEarlyBailoutTemporaries(Node* tree) {
+	switch(tree->node_type) {
+		case NT_LAMBDA_INVOCATION:
+			{
+				generateEarlyBailoutTemporaries(tree->node_data.nodes[0]);
+
+				if(tree->subnodes == 2)
+				for(int i = 0; i < tree->node_data.nodes[1]->subnodes; i++) {
+					generateEarlyBailoutTemporaries(tree->node_data.nodes[1]->node_data.nodes[i]);
+				}
+			}
+			break;
+
+		case NT_METHOD_INVOCATION:
+			{
+				generateEarlyBailoutTemporaries(tree->node_data.nodes[0]);
+				int i;
+				for(i = 1; i < tree->node_data.nodes[1]->subnodes; i += 2) {
+					for(int b = 0; b < tree->node_data.nodes[1]->node_data.nodes[i]->subnodes; b++) {
+						generateEarlyBailoutTemporaries(tree->node_data.nodes[1]->node_data.nodes[i]->node_data.nodes[b]);
+					}
+				}
+			}
+			break;
+
+		case NT_EARLYBAILOUT_METHOD_INVOCATION:
+			{
+				string methodclass = tree->node_data.nodes[tree->subnodes - 2]->node_data.string;
+				string name = tree->node_data.nodes[tree->subnodes - 1]->node_data.string;
+
+				// TODO generate the right type and a unique name...
+				file << "Object tmp1;\n\t\t";
+
+				int i;
+				for(i = 1; i < tree->node_data.nodes[1]->subnodes; i += 2) {
+					for(int b = 0; b < tree->node_data.nodes[1]->node_data.nodes[i]->subnodes; b++) {
+						generateEarlyBailoutTemporaries(tree->node_data.nodes[1]->node_data.nodes[i]->node_data.nodes[b]);
+					}
+				}
+				generateEarlyBailoutTemporaries(tree->node_data.nodes[0]);
+			}
+			break;
+
+		case NT_EARLYBAILOUT_MEMBER_ACCESS:
+		case NT_MEMBER_ACCESS:
+			// TODO generate the right type and a unique name...
+			file << "Object tmp1;\n\t\t";
+			generateEarlyBailoutTemporaries(tree->node_data.nodes[0]);
+			break;
+
+		case NT_RETRIEVAL:
+			{
+				generateEarlyBailoutTemporaries(tree->node_data.nodes[2]);
+				for(int i = 0; i < tree->node_data.nodes[1]->subnodes; i++) {
+					generateEarlyBailoutTemporaries(tree->node_data.nodes[1]->node_data.nodes[i]);
+				}
+			}
+			break;
+
+		case NT_PROPERTY:
+			{
+				// TODO put in a block {}
+				generateEarlyBailoutTemporaries(tree->node_data.nodes[0]->node_data.nodes[1]);
+			}
+			break;
+
+		case NT_TYPEINFER_DECLARATION:
+		case NT_DECLARATION:
+				generateEarlyBailoutTemporaries(tree->node_data.nodes[1]);
+			break;
+
+		case NT_ASSIGNMENT:
+		case NT_VALUED_ASSIGNMENT:
+		case NT_ADD_ASSIGNMENT:
+		case NT_SUB_ASSIGNMENT:
+		case NT_MULT_ASSIGNMENT:
+		case NT_DIV_ASSIGNMENT:
+		case NT_MULTIPLY:
+		case NT_DIVIDE:
+		case NT_MOD:
+		case NT_MODNATIVE:
+		case NT_MODALT:
+		case NT_ADD:
+		case NT_SUBTRACT:
+		case NT_BITSHIFTLEFT:
+		case NT_BITSHIFTRIGHT:
+		case NT_LESSTHAN:
+		case NT_GREATERTHAN:
+		case NT_LESSTHANEQUAL:
+		case NT_GREATERTHANEQUAL:
+		case NT_EQUALITY:
+		case NT_INEQUALITY:
+		case NT_BITAND:
+		case NT_BITXOR:
+		case NT_BITOR:
+		case NT_AND:
+		case NT_OR:
+		case NT_ARRAY_ACCESS_LVAL:
+		case NT_TYPESAFE_ARRAY_ACCESS:
+		case NT_ARRAY_ACCESS:
+			generateEarlyBailoutTemporaries(tree->node_data.nodes[0]);
+			generateEarlyBailoutTemporaries(tree->node_data.nodes[1]);
+			break;
+
+		case NT_ARRAY_DECLARATION:
+			if(tree->subnodes) {
+				int i;
+				for(i = 0; i < tree->subnodes; i++) {
+					generateEarlyBailoutTemporaries(tree->node_data.nodes[i]);
+				}
+
+			}
+			break;
+
+		case NT_EXISTS:
+		case NT_IF_ELSE:
+		case NT_WHILE:
+			// the condition may require temporaries, the rest dont
+			generateEarlyBailoutTemporaries(tree->node_data.nodes[0]);
+			break;
+
+		case NT_FOR:
+			// everything but the body may require temporaries, the rest dont
+			generateEarlyBailoutTemporaries(tree->node_data.nodes[0]);
+			generateEarlyBailoutTemporaries(tree->node_data.nodes[1]);
+			generateEarlyBailoutTemporaries(tree->node_data.nodes[2]);
+			break;
+
+		case NT_FOREACH:
+		case NT_FOREACHIN:
+		case NT_FOREACHAT:
+		case NT_FOREACHINAT:
+			{
+				Node* iterationValue;
+				if(tree->node_type == NT_FOREACHIN || tree->node_type == NT_FOREACHINAT) {
+					iterationValue = tree->node_data.nodes[1];
+				} else {
+					iterationValue = tree->node_data.nodes[0];
+				}
+				bool iterating_expression = iterationValue->node_type != NT_ALIAS && iterationValue->node_type != NT_VAR_REF;
+				if(iterating_expression) {
+					generateEarlyBailoutTemporaries(iterationValue);
+				}
+			}
+			break;
+
+		case NT_IF_THEN_ELSE:
+			generateEarlyBailoutTemporaries(tree->node_data.nodes[1]);
+			generateEarlyBailoutTemporaries(tree->node_data.nodes[0]);
+			generateEarlyBailoutTemporaries(tree->node_data.nodes[2]);
+			break;
+
+		case NT_RETURN:
+			if(tree->subnodes) {
+				generateEarlyBailoutTemporaries(tree->node_data.nodes[0]);
+			}
+			break;
+
+		case NT_BITNOT:
+		case NT_INVERT:
+		case NT_REQUIRED_PARENS:
+			generateEarlyBailoutTemporaries(tree->node_data.nodes[0]);
 			break;
 	}
 }
