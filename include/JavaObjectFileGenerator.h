@@ -28,7 +28,7 @@ using namespace std;
 class JavaObjectFileGenerator {
 
 	public:
-		JavaObjectFileGenerator(ostream& file, ClassSpaceSymbolTable* classes) : file(file) {this->classes = classes; forceArrayIdentifier = false; }
+		JavaObjectFileGenerator(ostream& file, ClassSpaceSymbolTable* classes) : file(file), classes(classes) ,forceArrayIdentifier(false), isNonStatementExpression(false) {};
 		void generate(Node* tree);
 
 	private:
@@ -44,6 +44,8 @@ class JavaObjectFileGenerator {
 		ScopeSymbolTable table;
 		ostream& file;
 		string classname;
+
+		bool isNonStatementExpression;
 
 };
 

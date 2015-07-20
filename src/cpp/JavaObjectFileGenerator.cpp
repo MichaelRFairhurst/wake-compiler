@@ -65,6 +65,26 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 				int i;
 				for(i = 0; i < tree->subnodes; i++) {
 					file << "\t\t";
+					if(tree->node_data.nodes[i]->node_type == NT_EARLYBAILOUT_METHOD_INVOCATION) {
+						// java can't do "(tmp1=blah)==null?null:tmp1.blah()", must do "tmp1=blah; if(tmp1!=null) blah.blah()"
+						// otherwise java says "not a statement" >_<
+						VarDecl<QUALIFIED> decl;
+						decl.typedata = *(PureType<QUALIFIED>*) tree->node_data.nodes[i]->node_data.nodes[tree->node_data.nodes[i]->subnodes - 3]->node_data.pure_type;
+						decl.alias = strdup("tmp");
+						table.add(&decl);
+						file << toJavaTypeInformation(decl.typedata) << " ";
+						VarRef ref = decl.createVarRef();
+						file << table.getAddress(&ref);
+						file << " = ";
+						generate(tree->node_data.nodes[i]->node_data.nodes[0]);
+						file << ";\n\t\t";
+						freeNode(tree->node_data.nodes[i]->node_data.nodes[0]);
+						Node* varnode1 = makeNodeFromString(NT_ALIAS, strdup("tmp"), tree->loc);
+						Node* varnode2 = makeNodeFromString(NT_ALIAS, strdup("tmp"), tree->loc);
+						tree->node_data.nodes[i] = makeTwoBranchNode(NT_EXISTS, varnode1, tree->node_data.nodes[i], tree->loc);
+						tree->node_data.nodes[i]->node_data.nodes[1]->node_type = NT_METHOD_INVOCATION;
+						tree->node_data.nodes[i]->node_data.nodes[1]->node_data.nodes[0] = varnode2;
+					}
 					generateEarlyBailoutTemporaries(tree->node_data.nodes[i]);
 					generate(tree->node_data.nodes[i]);
 					file << ";\n\t\t";
@@ -456,7 +476,7 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 
 		case NT_EARLYBAILOUT_METHOD_INVOCATION:
 			{
-				file << "tmp1=(";
+				file << "(tmp1=";
 				generate(tree->node_data.nodes[0]);
 				file << ")==null?null:tmp1";
 
@@ -994,7 +1014,7 @@ string JavaObjectFileGenerator::toJavaTypeInformation(PureType<wake::QUALIFIED> 
 			if(typeanalyzer.isPrimitiveTypeBool(&type)) return forceBoxedTypes ? "Boolean" : "boolean";
 			if(typeanalyzer.isPrimitiveTypeText(&type)) return "String";
 			// List and Exception are both happy without fq
-			if(type.typedata._class.modulename == NULL || type.typedata._class.modulename == "lang") return type.typedata._class.classname;
+			if(type.typedata._class.modulename == NULL || type.typedata._class.modulename == "" || type.typedata._class.modulename == "lang") return type.typedata._class.classname;
 			return type.typedata._class.modulename + string(".") + type.typedata._class.classname;
 
 		case TYPE_OPTIONAL:
@@ -1233,7 +1253,7 @@ void JavaObjectFileGenerator::generateEarlyBailoutTemporaries(Node* tree) {
 				string name = tree->node_data.nodes[tree->subnodes - 1]->node_data.string;
 
 				// TODO generate the right type and a unique name...
-				file << "Object tmp1;\n\t\t";
+				file << toJavaTypeInformation(*tree->node_data.nodes[tree->subnodes - 3]->node_data.pure_type) << " tmp1;\n\t\t";
 
 				int i;
 				for(i = 1; i < tree->node_data.nodes[1]->subnodes; i += 2) {
