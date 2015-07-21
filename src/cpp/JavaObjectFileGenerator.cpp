@@ -72,6 +72,8 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 						decl.typedata = *(PureType<QUALIFIED>*) tree->node_data.nodes[i]->node_data.nodes[tree->node_data.nodes[i]->subnodes - 3]->node_data.pure_type;
 						decl.alias = strdup("tmp");
 						table.add(&decl);
+						// generate temporaries for our subject expression if required
+						generateEarlyBailoutTemporaries(tree->node_data.nodes[i]->node_data.nodes[0]);
 						file << toJavaTypeInformation(decl.typedata) << " ";
 						VarRef ref = decl.createVarRef();
 						file << table.getAddress(&ref);
@@ -476,9 +478,12 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 
 		case NT_EARLYBAILOUT_METHOD_INVOCATION:
 			{
-				file << "(tmp1=";
+				std::stringstream varname;
+				varname << tree;
+				VarRef ref(strdup(varname.str().c_str()));
+				file << "(" << table.getAddress(&ref) << "=";
 				generate(tree->node_data.nodes[0]);
-				file << ")==null?null:tmp1";
+				file << ")==null?null:" << table.getAddress(&ref);
 
 				string name;
 
@@ -701,10 +706,10 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 			file << " != null) {\n";
 			generate(tree->node_data.nodes[1]);
 			if(tree->subnodes > 2) {
-				file << "} else {\n";
+				file << ";} else {\n";
 				generate(tree->node_data.nodes[2]);
 			}
-			file << "}\n";
+			file << ";}\n";
 			break;
 
 
@@ -714,10 +719,10 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 			file << ") {\n";
 			generate(tree->node_data.nodes[1]);
 			if(tree->subnodes > 2) {
-				file << "} else {\n";
+				file << ";} else {\n";
 				generate(tree->node_data.nodes[2]);
 			}
-			file << "}\n";
+			file << ";}\n";
 			break;
 
 		case NT_WHILE:
@@ -725,7 +730,7 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 			generate(tree->node_data.nodes[0]);
 			file << ") {\n";
 			generate(tree->node_data.nodes[1]);
-			file << "}\n";
+			file << ";}\n";
 			break;
 
 		case NT_FOR:
@@ -739,7 +744,7 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 			file << ") {\n";
 			generate(tree->node_data.nodes[3]);
 			table.popScope();
-			file << "}\n";
+			file << ";}\n";
 			break;
 
 		case NT_FOREACH:
@@ -1014,7 +1019,7 @@ string JavaObjectFileGenerator::toJavaTypeInformation(PureType<wake::QUALIFIED> 
 			if(typeanalyzer.isPrimitiveTypeBool(&type)) return forceBoxedTypes ? "Boolean" : "boolean";
 			if(typeanalyzer.isPrimitiveTypeText(&type)) return "String";
 			// List and Exception are both happy without fq
-			if(type.typedata._class.modulename == NULL || type.typedata._class.modulename == "" || type.typedata._class.modulename == "lang") return type.typedata._class.classname;
+			if(type.typedata._class.modulename == NULL || type.typedata._class.modulename == string("") || type.typedata._class.modulename == string("lang")) return type.typedata._class.classname;
 			return type.typedata._class.modulename + string(".") + type.typedata._class.classname;
 
 		case TYPE_OPTIONAL:
@@ -1252,8 +1257,14 @@ void JavaObjectFileGenerator::generateEarlyBailoutTemporaries(Node* tree) {
 				string methodclass = tree->node_data.nodes[tree->subnodes - 2]->node_data.string;
 				string name = tree->node_data.nodes[tree->subnodes - 1]->node_data.string;
 
-				// TODO generate the right type and a unique name...
-				file << toJavaTypeInformation(*tree->node_data.nodes[tree->subnodes - 3]->node_data.pure_type) << " tmp1;\n\t\t";
+				VarDecl<QUALIFIED> decl;
+				decl.typedata = *(PureType<QUALIFIED>*) tree->node_data.nodes[tree->subnodes - 3]->node_data.pure_type;
+				std::stringstream varname;
+				varname << tree;
+				decl.alias = strdup(varname.str().c_str());
+				table.add(&decl);
+				VarRef ref = decl.createVarRef();
+				file << toJavaTypeInformation(*tree->node_data.nodes[tree->subnodes - 3]->node_data.pure_type) << " " << table.getAddress(&ref) << ";\n\t\t";
 
 				int i;
 				for(i = 1; i < tree->node_data.nodes[1]->subnodes; i += 2) {
