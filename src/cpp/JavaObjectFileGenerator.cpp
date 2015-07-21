@@ -70,7 +70,9 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 						// otherwise java says "not a statement" >_<
 						VarDecl<QUALIFIED> decl;
 						decl.typedata = *(PureType<QUALIFIED>*) tree->node_data.nodes[i]->node_data.nodes[tree->node_data.nodes[i]->subnodes - 3]->node_data.pure_type;
-						decl.alias = strdup("tmp");
+						stringstream varname;
+						varname << tree->node_data.nodes[i];
+						decl.alias = strdup(varname.str().c_str());
 						table.add(&decl);
 						// generate temporaries for our subject expression if required
 						generateEarlyBailoutTemporaries(tree->node_data.nodes[i]->node_data.nodes[0]);
@@ -81,8 +83,8 @@ void JavaObjectFileGenerator::generate(Node* tree) {
 						generate(tree->node_data.nodes[i]->node_data.nodes[0]);
 						file << ";\n\t\t";
 						freeNode(tree->node_data.nodes[i]->node_data.nodes[0]);
-						Node* varnode1 = makeNodeFromString(NT_ALIAS, strdup("tmp"), tree->loc);
-						Node* varnode2 = makeNodeFromString(NT_ALIAS, strdup("tmp"), tree->loc);
+						Node* varnode1 = makeNodeFromString(NT_ALIAS, strdup(varname.str().c_str()), tree->loc);
+						Node* varnode2 = makeNodeFromString(NT_ALIAS, strdup(varname.str().c_str()), tree->loc);
 						tree->node_data.nodes[i] = makeTwoBranchNode(NT_EXISTS, varnode1, tree->node_data.nodes[i], tree->loc);
 						tree->node_data.nodes[i]->node_data.nodes[1]->node_type = NT_METHOD_INVOCATION;
 						tree->node_data.nodes[i]->node_data.nodes[1]->node_data.nodes[0] = varnode2;
