@@ -77,9 +77,9 @@ PTT_TEST_CASE(
 			var Num[]? = MyClass.?Num[]; 						\n\
 			var Text[]? = MyClass.?Text[]; 						\n\
 			Num = $MyClass.?Num; 								\n\
-			Text = $MyClass.?Text; 							\n\
+			Text = $MyClass.?Text; 								\n\
 			Num[] = $MyClass.?Num[]; 							\n\
-			Text[] = $MyClass.?Text[]; 						\n\
+			Text[] = $MyClass.?Text[]; 							\n\
 		}",
 	PTT_VALID
 );
@@ -97,10 +97,20 @@ PTT_TEST_CASE(
 			var Num[]? = MyClass.?getNumList(); 				\n\
 			var Text[]? = MyClass.?getTextList(); 				\n\
 			Num = $MyClass.?getNum();							\n\
-			Text = $MyClass.?getText();						\n\
-			Num[] = $MyClass.?getNumList();					\n\
+			Text = $MyClass.?getText();							\n\
+			Num[] = $MyClass.?getNumList();						\n\
 			Text[] = $MyClass.?getTextList();					\n\
 		}",
 	PTT_VALID
 );
 
+PTT_TEST_CASE(
+	TestChainedErroneousEarlyBailoutAccessesDontSegfault,
+	"every MyClass is:											\n\
+		myMethod(MyClass?) {									\n\
+			MyClass.?blah().?blah(); 							\n\
+			MyClass.?MyClass.?MyClass; 							\n\
+		}",
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+	PTT_EXPECT(PROPERTY_OR_METHOD_NOT_FOUND)
+);

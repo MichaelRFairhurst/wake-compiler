@@ -565,6 +565,12 @@ PureType<QUALIFIED>* ast::OtherExpression::typeCheck(bool forceArrayIdentifier) 
 						nonoptional = nonoptional->typedata.optional.contained;
 					}
 
+					if(nonoptional->type == TYPE_MATCHALL) {
+						delete ret;
+						ret = new PureType<QUALIFIED>(subject);
+						break;
+					}
+
 					ret->typedata.optional.contained = typeCheckMemberAccess(node, *nonoptional, forceArrayIdentifier);
 				}
 

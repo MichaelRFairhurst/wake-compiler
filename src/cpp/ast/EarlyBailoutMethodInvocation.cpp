@@ -27,13 +27,17 @@ PureType<QUALIFIED>* ast::EarlyBailoutMethodInvocation::typeCheck(bool forceArra
 		errors->addError(new SemanticError(OPTIONAL_USE_OF_NONOPTIONAL_TYPE, "using .? on a nonoptional", node));
 		return new PureType<QUALIFIED>(TYPE_MATCHALL);
 	} else {
-		PureType<QUALIFIED>* ret = new PureType<QUALIFIED>(TYPE_OPTIONAL);
 		PureType<QUALIFIED>* nonoptional = subject.typedata.optional.contained;
 
 		while(nonoptional->type == TYPE_OPTIONAL) {
 			nonoptional = nonoptional->typedata.optional.contained;
 		}
 
+		if(nonoptional->type == TYPE_MATCHALL) {
+			return new PureType<QUALIFIED>(TYPE_MATCHALL);
+		}
+
+		PureType<QUALIFIED>* ret = new PureType<QUALIFIED>(TYPE_OPTIONAL);
 		ret->typedata.optional.contained = typeCheckMethodInvocation(*nonoptional);
 
 		return ret;
