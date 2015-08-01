@@ -253,10 +253,10 @@ void ClassParseTreeTraverser::checkCtorArgs(Node* tree) {
 						//classestable->getAnalyzer()->assertNeedIsNotCircular(classname, needtype); DISABLED because we can't tell without importing everything
 						propertysymtable->addNeed(new SpecializableVarDecl<QUALIFIED>(needDecl), needNode->node_data.nodes[1]->node_type == NT_PUBLIC ? PROPERTY_PUBLIC : 0, annotations);
 					} catch(SymbolNotFoundException* e) {
-						errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree));
+						errors->addError(new SemanticError(CLASSNAME_NOT_FOUND, e->errormsg, tree->node_data.nodes[i]));
 						delete e;
 					} catch(SemanticError* e) {
-						e->token = tree;
+						e->token = tree->node_data.nodes[i];
 						errors->addError(e);
 					}
 				}

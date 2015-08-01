@@ -271,7 +271,7 @@ ctor:
 	;
 
 ctorargs:
-	ctorargs ',' ctorarg															{ $$ = $1; addSubNode($$, $3); }
+	ctorargs ',' ctorarg															{ $$ = $1; addSubNode($$, $3); $$->loc = @$; }
 	| ctorarg																		{ $$ = makeOneBranchNode(NT_CTOR_ARGS, $1, @$); }
 	;
 
